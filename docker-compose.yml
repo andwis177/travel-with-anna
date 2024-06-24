@@ -15,7 +15,7 @@ services:
       - "5432:5432"
     networks:
       - twa-network
-#    restart: unless-stopped
+    restart: unless-stopped
 
   backend:
     container_name: travel-with-anna-backend
@@ -36,6 +36,21 @@ services:
       SERVICE_NAME: app
     depends_on:
       - postgres
+    networks:
+      - twa-network
+    restart: unless-stopped
+
+  frontend:
+    container_name: travel-with-anna-frontend
+    build:
+      context: ./frontend/travel-with-anna-ui
+      dockerfile: Dockerfile`
+    ports:
+      - "80:80"
+    expose:
+      - "80"
+    depends_on:
+      - backend
     networks:
       - twa-network
     restart: unless-stopped

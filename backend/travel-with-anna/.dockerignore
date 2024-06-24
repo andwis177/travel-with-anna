@@ -1,0 +1,28 @@
+# Ignore Maven artifacts
+target/
+mvnw
+mvnw.cmd
+.mvn/
+
+# Ignore IDE files
+.idea/
+*.iml
+
+# Ignore build and configuration files
+*.log
+logs/
+*.war
+*.jar
+
+# Ignore Docker-related files if not needed
+Dockerfile*
+docker-compose.yml
+.dockerignore
+
+# Ignore git files and folders
+.git
+.gitignore
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db

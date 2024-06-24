@@ -1,0 +1,27 @@
+# Node modules and npm artifacts
+node_modules
+npm-debug.log
+
+# Angular build artifacts
+/dist
+
+# IDE files
+.idea
+*.iml
+
+# Temporary build artifacts
+*.js.map
+*.js
+
+# Docker-related files if not needed
+Dockerfile*
+docker-compose.yml
+.dockerignore
+
+# Git files and folders
+.git
+.gitignore
+
+# OS-specific files
+.DS_Store
+Thumbs.db

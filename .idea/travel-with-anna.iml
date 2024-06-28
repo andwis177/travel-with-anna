@@ -7,4 +7,18 @@
       <sourceFolder url="file://$MODULE_DIR$/backend/travel-with-anna/src/test/java" isTestSource="true" />
     </content>
   </component>
+  <component name="FacetManager">
+    <facet type="jpa" name="JPA">
+      <configuration>
+        <setting name="validation-enabled" value="true" />
+        <setting name="provider-name" value="Hibernate" />
+        <datasource-mapping>
+          <factory-entry name="entityManagerFactory" value="7aa6e193-47ab-449f-bf16-1a3239872f2c" />
+        </datasource-mapping>
+        <naming-strategy-map>
+          <unit-entry name="entityManagerFactory" />
+        </naming-strategy-map>
+      </configuration>
+    </facet>
+  </component>
 </module>

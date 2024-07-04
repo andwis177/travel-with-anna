@@ -1,7 +1,8 @@
 package com.andwis.travel_with_anna.auth;
 
 import com.andwis.travel_with_anna.email.EmailService;
-import com.andwis.travel_with_anna.email.EmailTemplateName;
+import com.andwis.travel_with_anna.handler.exception.ExpiredTokenException;
+import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.Token;
@@ -53,14 +54,12 @@ public class AuthenticationService {
 
     private void sendValidationEmail(User user) throws MessagingException {
         var newToken = generateAndSaveActivationToken(user);
-
-        emailService.sendEmail(
+        emailService.sendValidationEmail(
                 user.getEmail(),
                 user.getUserName(),
-                EmailTemplateName.ACTIVATE_ACCOUNT,
                 activationUrl,
                 newToken,
-                "Account Activation"
+                "Account activation"
         );
     }
 
@@ -77,9 +76,10 @@ public class AuthenticationService {
     }
 
     private String generateActivationCode(int length) {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
+
         for(int i = 0; i < length; i++) {
             int randomIndex = secureRandom.nextInt(characters.length());
             codeBuilder.append(characters.charAt(randomIndex));
@@ -100,10 +100,10 @@ public class AuthenticationService {
 
     public void activateAccount(String token) throws MessagingException {
         var tokenEntity = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+                .orElseThrow(() -> new InvalidTokenException("Invalid token"));
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
             sendValidationEmail(tokenEntity.getUser());
-            throw new IllegalArgumentException("Token expired. New token sent to your email");
+            throw new ExpiredTokenException("Token expired. New token sent to your email");
         }
         var user = userRepository.findById(tokenEntity.getUser().getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

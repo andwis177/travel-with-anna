@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/travel_with_anna_test
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql
+
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: email@example.com
+    password: password
+    properties:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.mailtrap.io
+
+application:
+  security:
+    jwt:
+      expiration: 86400000 # a day
+  mailing:
+    frontend:
+      activation-url: http://example.com/activate-account
+
+server:
+  port: 8080
+
+

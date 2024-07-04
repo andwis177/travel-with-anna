@@ -25,21 +25,16 @@ public class EmailService {
     private final SpringTemplateEngine templateEngine;
 
     @Async
-    public void sendEmail(
+    public void sendValidationEmail(
             String to,
             String userName,
-            EmailTemplateName emailTemplateName,
             String confirmationUrl,
             String activationCode,
             String subject
     ) throws MessagingException {
-        String templateName;
-        if (emailTemplateName == null) {
-            templateName = "travel-with-anna-default-email";
-        } else {
-            templateName = emailTemplateName.getTemplateName();
-        }
         try {
+        String templateName =
+                EmailTemplateName.ACTIVATE_ACCOUNT.getTemplateName();
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(
                     mimeMessage,
@@ -58,13 +53,18 @@ public class EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
 
-            String template = templateEngine.process(templateName, context);
+            String template;
+            try {
+                template = templateEngine.process(templateName, context);
+            } catch (RuntimeException e) {
+                throw new MessagingException("Failed to process template", e);
+            }
 
             helper.setText(template, true);
-
             mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
-            throw new MessagingException("Failed to send email", e);
+
+        } catch (MessagingException exp) {
+            throw new MessagingException("Failed to send validation email", exp);
         }
     }
 }

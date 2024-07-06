@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.handler;
 
 import com.andwis.travel_with_anna.handler.exception.ExpiredTokenException;
 import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
+import com.andwis.travel_with_anna.handler.exception.UserExistsException;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +130,19 @@ public class GlobalExceptionHandler {
                         ExceptionResponse.builder()
                                 .errorCode(ROLE_NOT_FOUND.getCode())
                                 .businessErrorMsg(ROLE_NOT_FOUND.getMessage())
+                                .error(exp.getMessage())
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(UserExistsException.class)
+    public ResponseEntity<ExceptionResponse> handleException(UserExistsException exp) {
+        return ResponseEntity
+                .status(CONFLICT)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(USER_EXISTS.getCode())
+                                .businessErrorMsg(USER_EXISTS.getMessage())
                                 .error(exp.getMessage())
                                 .build()
                 );

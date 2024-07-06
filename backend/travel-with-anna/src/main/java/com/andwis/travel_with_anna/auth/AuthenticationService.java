@@ -3,6 +3,7 @@ package com.andwis.travel_with_anna.auth;
 import com.andwis.travel_with_anna.email.EmailService;
 import com.andwis.travel_with_anna.handler.exception.ExpiredTokenException;
 import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
+import com.andwis.travel_with_anna.handler.exception.UserExistsException;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.Token;
@@ -48,6 +49,9 @@ public class AuthenticationService {
                 .enabled(false)
                 .roles(List.of(userRole))
                 .build();
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserExistsException("User with this email already exists");
+        }
         userRepository.save(user);
         sendValidationEmail(user);
     }

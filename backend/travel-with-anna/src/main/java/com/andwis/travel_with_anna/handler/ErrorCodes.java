@@ -18,7 +18,9 @@ public enum ErrorCodes {
 
     ROLE_NOT_FOUND(1400, "Role not found", NOT_FOUND),
 
-    MESSAGING_EXCEPTION(1500, "Email was NOT send", INTERNAL_SERVER_ERROR);
+    MESSAGING_EXCEPTION(1500, "Email was NOT send", INTERNAL_SERVER_ERROR),
+
+    USER_EXISTS(1600, "User with this email already exists", CONFLICT);
 
     private final int code;
     private final String message;

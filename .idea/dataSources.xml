@@ -13,11 +13,11 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="travel_with_anna@localhost" uuid="7aa6e193-47ab-449f-bf16-1a3239872f2c">
+    <data-source source="LOCAL" name="travel_with_anna_test@localhost" uuid="74748f70-5a9f-446c-9531-e193da98fcb8">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/travel_with_anna</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/travel_with_anna_test</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
@@ -26,11 +26,11 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="travel_with_anna_test@localhost" uuid="74748f70-5a9f-446c-9531-e193da98fcb8">
+    <data-source source="LOCAL" name="travel_with_anna@localhost" uuid="0812e60d-3b75-401c-b972-4e30e4bf51bb">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/travel_with_anna_test</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/travel_with_anna</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

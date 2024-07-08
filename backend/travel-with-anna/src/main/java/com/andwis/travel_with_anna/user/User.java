@@ -25,7 +25,7 @@ import java.util.List;
 public class User implements Principal {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
     @Column(unique = true)
     private String userName;

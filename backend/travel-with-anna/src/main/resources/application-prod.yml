@@ -35,6 +35,10 @@ spring:
       ssl:
         trust: ${SSL_TRUST}
 
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
+
 application:
   security:
     jwt:

@@ -24,19 +24,21 @@ import java.util.List;
 public class Role {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer roleId;
     @Column(unique = true)
     private String roleName;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<User> users;
-
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
-
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastModifiedDate;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "roles_users",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonIgnore
+    private List<User> users;
 }

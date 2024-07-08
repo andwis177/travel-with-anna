@@ -13,7 +13,7 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
         <datasource-mapping>
-          <factory-entry name="entityManagerFactory" value="7aa6e193-47ab-449f-bf16-1a3239872f2c" />
+          <factory-entry name="entityManagerFactory" value="0812e60d-3b75-401c-b972-4e30e4bf51bb" />
         </datasource-mapping>
         <naming-strategy-map>
           <unit-entry name="entityManagerFactory" />

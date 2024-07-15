@@ -1,10 +1,3 @@
-CREATE TABLE roles (
-                       role_id SERIAL PRIMARY KEY,
-                       role_name VARCHAR(255) UNIQUE NOT NULL,
-                       created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                       last_modified_date TIMESTAMP
-);
-
 CREATE TABLE users (
                        user_id BIGSERIAL PRIMARY KEY,
                        user_name VARCHAR(255) UNIQUE NOT NULL,
@@ -16,9 +9,17 @@ CREATE TABLE users (
                        last_modified_date TIMESTAMP
 );
 
-CREATE TABLE roles_users (
-                            user_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
+CREATE TABLE roles (
+                       role_id SERIAL PRIMARY KEY,
+                       role_name VARCHAR(255) UNIQUE NOT NULL,
+                       created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       last_modified_date TIMESTAMP
+);
+
+
+CREATE TABLE users_roles (
                             role_id INT REFERENCES roles(role_id) ON DELETE CASCADE,
+                            user_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
                             PRIMARY KEY (user_id, role_id)
 );
 

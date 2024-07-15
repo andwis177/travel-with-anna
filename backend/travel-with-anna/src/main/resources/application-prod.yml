@@ -43,6 +43,7 @@ application:
   security:
     jwt:
       expiration: ${TOKEN_EXPIRATION}
+    cors: ${CORS_ORIGIN_URL}
   mailing:
     frontend:
       activation-url: ${ACTIVATION_URL}}

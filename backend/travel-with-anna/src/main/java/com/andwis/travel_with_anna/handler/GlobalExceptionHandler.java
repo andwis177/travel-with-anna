@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.andwis.travel_with_anna.handler.ErrorCodes.*;
@@ -33,8 +34,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(BAD_CREDENTIALS.getCode())
-                                .businessErrorMsg(BAD_CREDENTIALS.getMessage())
-                                .error("Login and / or Password is incorrect")
+                                .errors(List.of(BAD_CREDENTIALS.getMessage()))
                                 .build()
                 );
     }
@@ -46,8 +46,8 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(ACCOUNT_DISABLED.getCode())
-                                .businessErrorMsg(ACCOUNT_DISABLED.getMessage())
-                                .error(exp.getMessage())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(ACCOUNT_DISABLED.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -59,8 +59,8 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(EXPIRED_TOKEN.getCode())
-                                .businessErrorMsg(EXPIRED_TOKEN.getMessage())
-                                .error(exp.getMessage())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(EXPIRED_TOKEN.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -72,8 +72,8 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(INVALID_TOKEN.getCode())
-                                .businessErrorMsg(INVALID_TOKEN.getMessage())
-                                .error(exp.getMessage())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(INVALID_TOKEN.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -85,8 +85,8 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(ACCOUNT_LOCKED.getCode())
-                                .businessErrorMsg(ACCOUNT_LOCKED.getMessage())
-                                .error(exp.getMessage())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(ACCOUNT_LOCKED.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -98,8 +98,8 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(MESSAGING_EXCEPTION.getCode())
-                                .businessErrorMsg(MESSAGING_EXCEPTION.getMessage())
-                                .error(exp.getMessage())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(MESSAGING_EXCEPTION.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -112,12 +112,13 @@ public class GlobalExceptionHandler {
                     var errorMessage = error.getDefaultMessage();
                     errors.add(errorMessage);
                 });
+        List<String> errorsSorted = errors.stream().sorted().toList();
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(
                         ExceptionResponse.builder()
-                                .validationErrors(errors)
-                                .error(exp.getMessage())
+                                .errorCode(VALIDATION_ERROR.getCode())
+                                .errors(errorsSorted)
                                 .build()
                 );
     }
@@ -129,8 +130,8 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(ROLE_NOT_FOUND.getCode())
-                                .businessErrorMsg(ROLE_NOT_FOUND.getMessage())
-                                .error(exp.getMessage())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(ROLE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -142,8 +143,8 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(USER_EXISTS.getCode())
-                                .businessErrorMsg(USER_EXISTS.getMessage())
-                                .error(exp.getMessage())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(USER_EXISTS.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -155,8 +156,7 @@ public class GlobalExceptionHandler {
                 .status(INTERNAL_SERVER_ERROR)
                 .body(
                         ExceptionResponse.builder()
-                                .businessErrorMsg("Internal error, please contact the admin")
-                                .error("An unexpected error occurred. --> " + exp.getMessage())
+                                .errors(List.of("An unexpected error occurred. --> " + exp.getMessage()))
                                 .build()
                 );
     }

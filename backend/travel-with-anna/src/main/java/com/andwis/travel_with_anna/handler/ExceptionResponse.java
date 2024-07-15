@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,7 +15,5 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ExceptionResponse {
     private Integer errorCode;
-    private String businessErrorMsg;
-    private String error;
-    private Set<String> validationErrors;
+    private List<String> errors;
 }

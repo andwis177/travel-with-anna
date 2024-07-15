@@ -1,8 +1,116 @@
 /* You can add global styles to this file, and also import other style files */
 @import "@fortawesome/fontawesome-free/css/all.min.css";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Montserrat, "Montserrat", sans-serif; }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Montserrat, "Montserrat", sans-serif; }
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+p, a, span {
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+.header,
+.subheader,
+.text-primary,
+.text-secondary,
+.text-accent,
+.mat-card-title,
+.mat-card-header,
+.mat-card,
+.mat-card-content,
+.mdc-form-field,
+.mdc-text-field--outlined,
+.mdc-notched-outline--upgraded,
+.mdc-floating-label--float-above {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2E3944;
+  height: 100%;
+}
+
+.second-container {
+  align-items: center;
+  border-radius: 15px;
+  max-width: 400px;
+  background-color: #EDEAE5 !important;
+  color: #2E3944 !important;
+
+  .mdc-text-field--outlined {
+    background-color: whitesmoke !important;
+  }
+
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__notch,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: #2E3944 !important;
+  }
+
+  .mdc-form-field,
+  .mdc-text-field--outlined,
+  .mdc-notched-outline--upgraded,
+  .mdc-floating-label--float-above {
+    color: #2E3944 !important;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.content{
+  text-align: center;
+}
+
+.custom-button{
+  background-color: #2E3944 !important;
+  color: whitesmoke !important;
+  border-radius: 10px !important;
+  padding: 25px 40px !important;
+  margin:18px !important;
+  font-size: 18px !important;
+}
+
+.custom-button:hover {
+  background-color: #A1C3D1 !important;
+  color: #2E3944 !important;
+}
+
+.custom-button-second {
+  background-color: #7B9D9C !important;
+  color: whitesmoke !important;
+  font-size: 14px !important;
+  border-radius: 8px !important;
+  padding: 8px 15px !important;
+}
+
+.custom-button-second:hover {
+  background-color: #A1C3D1 !important;
+  color: #2E3944 !important;
+}
+
+.error-msg {
+  color: darkred;
+}
+
+.header-shadow {
+  text-shadow: gray 2px 2px 2px;
+}

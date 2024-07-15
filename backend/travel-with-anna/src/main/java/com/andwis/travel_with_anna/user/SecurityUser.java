@@ -29,7 +29,7 @@ public class SecurityUser implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return user.getRoles()
                 .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toList());
     }
 
@@ -52,4 +52,4 @@ public class SecurityUser implements UserDetails {
     public boolean isEnabled() {
         return user.isEnabled();
     }
-}
+    }

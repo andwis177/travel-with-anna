@@ -15,6 +15,8 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.EAGER;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,7 +42,10 @@ public class User implements Principal {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastModifiedDate;
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(fetch = EAGER)
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
     @Override

@@ -1,0 +1,66 @@
+<div class="container">
+  <mat-card class="second-container">
+    <mat-card-header class="header-shadow">
+        <h3>Create Account</h3>
+    </mat-card-header>
+
+    <mat-card-content class="content">
+      <form>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input type="text" matInput [(ngModel)]="registerRequest.userName"
+                 [ngModelOptions]="{standalone: true}" placeholder="Your name" autocomplete="name">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input type="email" matInput [(ngModel)]="registerRequest.email"
+                 [ngModelOptions]="{standalone: true}" placeholder="Ex. pat@example.com" autocomplete="email">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input type="password" matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="registerRequest.password"
+                 [ngModelOptions]="{standalone: true}" placeholder="Password" autocomplete="new-password">
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Repeat password</mat-label>
+          <input type="password" matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="repeatPassword"
+                 [ngModelOptions]="{standalone: true}" placeholder="Password" autocomplete="new-password">
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <div>
+          <button (click)="register()" mat-raised-button class="custom-button" type="submit">Sign Up</button>
+          <div class="error-msg" *ngIf="errorMsg.length > 0">
+            <hr>
+            <p *ngFor="let msg of errorMsg">{{msg}}</p>
+            <hr style="margin-bottom: 20px">
+          </div>
+          <div >
+            <button mat-button class="custom-button-second" (click)="login()">Login</button>
+          </div>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

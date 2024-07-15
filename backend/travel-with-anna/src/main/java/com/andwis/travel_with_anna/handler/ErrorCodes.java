@@ -20,7 +20,9 @@ public enum ErrorCodes {
 
     MESSAGING_EXCEPTION(1500, "Email was NOT send", INTERNAL_SERVER_ERROR),
 
-    USER_EXISTS(1600, "User with this email already exists", CONFLICT);
+    USER_EXISTS(1600, "User with this name or email already exists", CONFLICT),
+
+    VALIDATION_ERROR(1700, "Validation error", BAD_REQUEST);
 
     private final int code;
     private final String message;

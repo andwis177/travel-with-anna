@@ -37,9 +37,11 @@ application:
   security:
     jwt:
       expiration: 86400000 # a day
+    cors: ${CORS_ORIGIN_URL}
   mailing:
     frontend:
       activation-url: http://localhost:80/activate-account
+
 
 server:
   port: 8080

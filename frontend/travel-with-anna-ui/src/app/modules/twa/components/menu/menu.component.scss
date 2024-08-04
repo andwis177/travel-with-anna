@@ -1,0 +1,92 @@
+.toolbar {
+  justify-content: center;
+  height: 150px;
+}
+
+.toolbar-row {
+  justify-content: space-between;
+}
+
+.toolbar-row-end {
+  width: auto;
+  height: auto;
+  display: flex;
+  align-items: center;
+}
+
+.account-container {
+  margin-right: 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.app-button {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.profile-button{
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.app-image,
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-image {
+  background-color: #D1D7DC;
+  border-radius: 50%;
+}
+
+.app-button:hover .app-image,
+.profile-button:hover .profile-image {
+  opacity: 0.5;
+}
+
+.profile-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 16px;
+  margin-top: 10px;
+  font-family: 'Montserrat', sans-serif;
+  color: #D1D7DC !important;
+}
+
+.custom-button-3 {
+  color: #86B3D1 !important;
+}
+
+.custom-button-3:hover {
+  .fa-sign-out-alt {
+    opacity: 0.5;
+  }
+}
+
+.app-image,
+.toolbar {
+  background-color: #2E3944;
+}
+
+

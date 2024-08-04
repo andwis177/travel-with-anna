@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 import {AuthenticationService} from "../../services/services/authentication.service";
 import {Router} from "@angular/router";
 import {CodeInputModule} from "angular-code-input";
@@ -7,6 +7,7 @@ import {MatButton} from "@angular/material/button";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
 import {animate, state, style, transition, trigger} from "@angular/animations";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-activate-account',
@@ -19,7 +20,8 @@ import {animate, state, style, transition, trigger} from "@angular/animations";
     MatCardHeader,
     MatIcon,
     NgForOf,
-    MatCardContent
+    MatCardContent,
+    MatDivider
   ],
   templateUrl: './activate-account.component.html',
   styleUrl: './activate-account.component.scss',
@@ -48,6 +50,26 @@ export class ActivateAccountComponent {
   )
   {}
 
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKeydownHandler(event: KeyboardEvent): void {
+    if (this.submitted && this.isOkay) {
+      this.redirectToLogin();
+    }
+    if (!this.isOkay && this.submitted) {
+      this.submitted = false;
+    }
+  }
+
+  @HostListener('document:keydown.enter', ['$event'])
+  onEnterKeydownHandler(event: KeyboardEvent): void {
+    if (!this.isOkay && this.submitted) {
+      this.submitted = false;
+    }
+    if (this.submitted && this.isOkay) {
+      this.redirectToLogin();
+    }
+  }
+
   onCodeCompleted(token: string) {
     this.confirmAccount(token);
   }
@@ -71,7 +93,7 @@ export class ActivateAccountComponent {
           if (this.jsonObject.errors ) {
             this.errorMsg = this.jsonObject.errors;
           } else {
-             this.errorMsg.push('Unexpected error occurred');
+            this.errorMsg.push('Unexpected error occurred');
           }
           this.submitted = true;
           this.isOkay = false;

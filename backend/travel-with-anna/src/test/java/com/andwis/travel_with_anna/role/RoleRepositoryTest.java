@@ -16,16 +16,19 @@ class RoleRepositoryTest {
 
     @Test
     void testFindByRoleName() {
-        //Given
+        // Given
         Role role = Role.builder()
                 .roleName("TEST_ROLE")
                 .build();
+        if (roleRepository.findByRoleName("TEST_ROLE").isPresent()) {
+            roleRepository.delete(roleRepository.findByRoleName("TEST_ROLE").get());
+        }
         Integer roleId = roleRepository.save(role).getRoleId();
 
-        //When
+        // When
         Role retrivedRole = roleRepository.findByRoleName("TEST_ROLE").orElse(null);
 
-        //Then
+        // Then
         assertNotNull(retrivedRole);
         assertEquals(roleId, retrivedRole.getRoleId());
         assertEquals("TEST_ROLE", role.getRoleName());
@@ -33,11 +36,11 @@ class RoleRepositoryTest {
 
     @Test
     void testFindByRoleName_Failure() {
-        //Given
-        //When
+        // Given
+        // When
         Role retrivedRole = roleRepository.findByRoleName("ROLE_NON_EXISTING").orElse(null);
 
-        //Then
+        // Then
         assertNull(retrivedRole);
     }
 }

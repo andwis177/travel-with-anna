@@ -1,19 +1,20 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/travel_with_anna_test
-    username: user
-    password: password
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
-        format_sql: false
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    database: postgresql
-
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    cleanDisabled: false
+    locations: classpath:db/migration
   mail:
     host: sandbox.smtp.mailtrap.io
     port: 2525
@@ -33,9 +34,9 @@ application:
       expiration: 86400000 # a day
   mailing:
     frontend:
-      activation-url: http://example.com/activate-account
+      activation-url: http://localhost:4200/activate-account
+      login-url: http://localhost:4200/login
 
 server:
   port: 8080
-
 

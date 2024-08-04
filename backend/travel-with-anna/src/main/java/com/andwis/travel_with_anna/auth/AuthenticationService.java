@@ -1,9 +1,7 @@
 package com.andwis.travel_with_anna.auth;
 
 import com.andwis.travel_with_anna.email.EmailService;
-import com.andwis.travel_with_anna.handler.exception.ExpiredTokenException;
-import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
-import com.andwis.travel_with_anna.handler.exception.UserExistsException;
+import com.andwis.travel_with_anna.handler.exception.*;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.Token;
@@ -15,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +36,8 @@ public class AuthenticationService {
     private final JwtService jwtService;
     @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
+    @Value("${application.mailing.frontend.login-url}")
+    private String loginUrl;
 
     public void register(RegistrationRequest request) throws RoleNotFoundException, MessagingException {
         var userRole = roleRepository.findByRoleName("USER")
@@ -55,8 +56,12 @@ public class AuthenticationService {
         if (userRepository.existsByUserName(user.getUserName())) {
             throw new UserExistsException("User with this name already exists");
         }
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new WrongPasswordException("Passwords do not match");
+        }
+
         userRepository.save(user);
-      //  sendValidationEmail(user);
+//        sendValidationEmail(user);
         System.out.println(generateAndSaveActivationToken(user));
     }
 
@@ -72,7 +77,7 @@ public class AuthenticationService {
     }
 
     private String generateAndSaveActivationToken(User user) {
-        String generatedToken = generateActivationCode(6);
+        String generatedToken = generateCode(6);
         var token = Token.builder()
                 .token(generatedToken)
                 .createdAt(LocalDateTime.now())
@@ -83,7 +88,7 @@ public class AuthenticationService {
         return generatedToken;
     }
 
-    private String generateActivationCode(int length) {
+    private String generateCode(int length) {
         final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
@@ -95,29 +100,59 @@ public class AuthenticationService {
         return codeBuilder.toString();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        var auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(), request.getPassword())
-        );
-        var jwtToken = jwtService.generateJwtToken(auth);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws WrongPasswordException {
+        try {
+            var auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(), request.getPassword())
+            );
+            var jwtToken = jwtService.generateJwtToken(auth);
+            return AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .build();
+        } catch (AuthenticationException exp) {
+            throw new WrongPasswordException("Authentication failed: Invalid email or password");
+        }
     }
 
     public void activateAccount(String token) throws MessagingException {
         var tokenEntity = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
-          //  sendValidationEmail(tokenEntity.getUser());
+
+//            sendValidationEmail(tokenEntity.getUser());
             throw new ExpiredTokenException("Token expired. New token was sent to your email");
         }
         var user = userRepository.findById(tokenEntity.getUser().getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setEnabled(true);
         userRepository.save(user);
-        tokenEntity.setValidatedAt(LocalDateTime.now());
-        tokenRepository.save(tokenEntity);
+        tokenRepository.delete(tokenEntity);
+    }
+
+    private String generateAndSaveNewPassword(User user) {
+        String generatedPassword = generateCode(20);
+        user.setPassword(passwordEncoder.encode(generatedPassword));
+        userRepository.save(user);
+        return generatedPassword;
+    }
+
+    protected void resetPassword(ResetPasswordRequest request) throws MessagingException {
+        User user;
+        if (request.getCredential().contains("@")) {
+            user = userRepository.findByEmail(request.getCredential())
+                    .orElseThrow(() -> new EmailNotFoundException("User with this email not found"));
+        } else {
+            user = userRepository.findByUserName(request.getCredential())
+                    .orElseThrow(() -> new UsernameNotFoundException("User with this user name not found"));
+        }
+        String newPassword = generateAndSaveNewPassword(user);
+        emailService.sendResetPassword(
+                user.getEmail(),
+                user.getUserName(),
+                loginUrl,
+                newPassword,
+                "Password reset"
+        );
     }
 }

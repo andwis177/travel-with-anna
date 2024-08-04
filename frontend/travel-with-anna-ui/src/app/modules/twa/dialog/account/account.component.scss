@@ -1,0 +1,51 @@
+.main-form{
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.dialog-header {
+  justify-content: flex-end;
+  height: 45px;
+  background-color: #BFBDB8;
+}
+
+.toolbar-row {
+  padding: 50px;
+  justify-content: center;
+}
+
+.delete-button-area {
+  text-align: center;
+}
+
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+
+.label-text {
+  font-size: 14px;
+  color: #2E3944;
+  margin-bottom: 1px;
+}
+
+.custom-header {
+  font-size: 24px;
+  color: #0677A1 !important;
+}
+
+.information-area {
+  border: 2px solid #BFBDB8;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+
+.padding {
+  padding: 10px;
+}
+
+.label-text,
+.custom-header {
+  margin-left: 10px !important;
+}
+

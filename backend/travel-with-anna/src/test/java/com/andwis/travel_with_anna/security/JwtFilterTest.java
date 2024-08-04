@@ -5,11 +5,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@SpringBootTest
 @DisplayName("JWT Filter tests")
 class JwtFilterTest {
 
@@ -47,6 +47,13 @@ class JwtFilterTest {
 
     private final UserDetails userDetails = mock(UserDetails.class);
 
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        SecurityContextHolder.clearContext();
+    }
+
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
@@ -54,48 +61,57 @@ class JwtFilterTest {
 
     @Test
     void testDoFilterInternal_WithAuthPath_ShouldProceedFilterChain() throws ServletException, IOException, IOException {
+        // Given
         when(request.getServletPath()).thenReturn("/twa/v1/auth");
 
+        // When
         jwtFilter.doFilterInternal(request, response, filterChain);
 
+        // Then
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
     @Test
     void testDoFilterInternal_WithNoAuthHeader_ShouldProceedFilterChain() throws ServletException, IOException {
+        // Given
         when(request.getServletPath()).thenReturn("/some/other/path");
         when(request.getHeader(AUTHORIZATION)).thenReturn(null);
 
+        // When
         jwtFilter.doFilterInternal(request, response, filterChain);
 
+        // Then
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
     @Test
     void testDoFilterInternal_WithInvalidAuthHeader_ShouldProceedFilterChain() throws ServletException, IOException {
+        // Given
         when(request.getServletPath()).thenReturn("/some/other/path");
         when(request.getHeader(AUTHORIZATION)).thenReturn("InvalidHeader");
 
+        // When
         jwtFilter.doFilterInternal(request, response, filterChain);
 
+        // Then
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
     @Test
     void testDoFilterInternal_WithValidAuthHeader_AndValidToken_ShouldSetAuthentication() throws ServletException, IOException {
-        System.out.println("1: " + SecurityContextHolder.getContext().getAuthentication());
-
+        // Given
         when(request.getServletPath()).thenReturn("/some/other/path");
         when(request.getHeader(AUTHORIZATION)).thenReturn("Bearer valid.jwt.token");
         when(jwtService.extractUsername("valid.jwt.token")).thenReturn("user@example.com");
 
-
-        when(userDetailsService.loadUserByUsername("user@example.com")).thenReturn(userDetails);
+        //When
+        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
         when(jwtService.isTokenValid("valid.jwt.token", userDetails)).thenReturn(true);
         when(userDetails.getAuthorities()).thenReturn(List.of());
 
         jwtFilter.doFilterInternal(request, response, filterChain);
 
+        // Then
         verify(filterChain, times(1)).doFilter(request, response);
         verify(userDetailsService, times(1)).loadUserByUsername("user@example.com");
 
@@ -107,24 +123,20 @@ class JwtFilterTest {
 
     @Test
     void testDoFilterInternal_WithValidAuthHeader_AndInvalidToken_ShouldNotSetAuthentication() throws ServletException, IOException {
-        System.out.println("3: " + SecurityContextHolder.getContext().getAuthentication());
-
+        // Given
         when(request.getServletPath()).thenReturn("/some/other/path");
         when(request.getHeader(AUTHORIZATION)).thenReturn("Bearer invalid.jwt.token");
         when(jwtService.extractUsername("invalid.jwt.token")).thenReturn("user@example.com");
-
-        String extractedUsername = jwtService.extractUsername("invalid.jwt.token");
-        System.out.println("Extracted Username: " + extractedUsername);
-
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetailsService.loadUserByUsername("user@example.com")).thenReturn(userDetails);
         when(jwtService.isTokenValid("invalid.jwt.token", userDetails)).thenReturn(false);
 
+        // When
         jwtFilter.doFilterInternal(request, response, filterChain);
 
+        // Then
         verify(filterChain, times(1)).doFilter(request, response);
         verify(userDetailsService, times(1)).loadUserByUsername("user@example.com");
         assertNull(SecurityContextHolder.getContext().getAuthentication());
-        System.out.println("4: " + SecurityContextHolder.getContext().getAuthentication());
     }
 }

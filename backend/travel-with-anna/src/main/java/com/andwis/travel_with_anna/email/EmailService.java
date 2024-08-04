@@ -24,6 +24,39 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
 
+    private void mimeMessageCreator(
+            String to, String userName, String url, String code, String subject, String templateName)
+            throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(
+                mimeMessage,
+                MimeMessageHelper.MULTIPART_MODE_MIXED,
+                UTF_8.name()
+        );
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("userName", userName);
+        properties.put("url", url);
+        properties.put("code", code);
+
+        Context context = new Context();
+        context.setVariables(properties);
+
+        helper.setFrom(senderEmail);
+        helper.setTo(to);
+        helper.setSubject(subject);
+
+        String template;
+        try {
+            template = templateEngine.process(templateName, context);
+        } catch (RuntimeException e) {
+            throw new MessagingException("Failed to process template", e);
+        }
+
+        helper.setText(template, true);
+        mailSender.send(mimeMessage);
+    }
+
+
     @Async
     public void sendValidationEmail(
             String to,
@@ -35,36 +68,27 @@ public class EmailService {
         try {
         String templateName =
                 EmailTemplateName.ACTIVATE_ACCOUNT.getTemplateName();
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    mimeMessage,
-                    MimeMessageHelper.MULTIPART_MODE_MIXED,
-                    UTF_8.name()
-            );
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("userName", userName);
-            properties.put("confirmationUrl", confirmationUrl);
-            properties.put("activationCode", activationCode);
-
-            Context context = new Context();
-            context.setVariables(properties);
-
-            helper.setFrom(senderEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-
-            String template;
-            try {
-                template = templateEngine.process(templateName, context);
-            } catch (RuntimeException e) {
-                throw new MessagingException("Failed to process template", e);
-            }
-
-            helper.setText(template, true);
-            mailSender.send(mimeMessage);
+            mimeMessageCreator(to, userName, confirmationUrl, activationCode, subject, templateName);
 
         } catch (MessagingException exp) {
             throw new MessagingException("Failed to send validation email", exp);
+        }
+    }
+
+    @Async
+    public void sendResetPassword(
+            String to,
+            String userName,
+            String loginUrl,
+            String newPassword,
+            String subject
+    ) throws MessagingException {
+        try {
+            String templateName =
+                    EmailTemplateName.RESET_PASSWORD.getTemplateName();
+            mimeMessageCreator(to, userName, loginUrl, newPassword, subject, templateName);
+        } catch (MessagingException exp) {
+            throw new MessagingException("Failed to send email with new password", exp);
         }
     }
 }

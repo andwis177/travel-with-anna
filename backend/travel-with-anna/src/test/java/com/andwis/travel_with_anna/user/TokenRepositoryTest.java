@@ -28,8 +28,9 @@ class TokenRepositoryTest {
 
     @Test
     void testFindByToken() {
-        //Given
+        // Given
         User user = User.builder()
+                .userName("user")
                 .email("user@example.com")
                 .password("password")
                 .build();
@@ -39,16 +40,15 @@ class TokenRepositoryTest {
                 .token("token")
                 .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.now().plusMinutes(10))
-                .validatedAt(LocalDateTime.now().plusMinutes(1))
                 .build();
         token.setUser(user);
 
         Long tokenId = tokenRepository.save(token).getTokenId();
 
-        //When
+        // When
         Token retrivedToken = tokenRepository.findByToken(token.getToken()).orElse(null);
 
-        //Then
+        // Then
         assertNotNull(retrivedToken);
         assertEquals(tokenId, retrivedToken.getTokenId());
         assertEquals("token", token.getToken());
@@ -56,11 +56,11 @@ class TokenRepositoryTest {
 
     @Test
     void testFindByToken_Failure() {
-        //Given
-        //When
+        // Given
+        // When
         Token retrivedToken = tokenRepository.findByToken("token").orElse(null);
 
-        //Then
+        // Then
         assertNull(retrivedToken);
     }
 }

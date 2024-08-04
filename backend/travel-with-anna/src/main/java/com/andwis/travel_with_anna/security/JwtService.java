@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -18,9 +19,14 @@ import java.util.function.Function;
 public class JwtService {
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
+    private final SecretKey key;
+
+    public JwtService() {
+        this.key = Jwts.SIG.HS256.key().build();
+    }
 
     private SecretKey getSignInKey() {
-        return Jwts.SIG.HS256.key().build();
+        return this.key;
     }
 
     public String generateJwtToken(Authentication authentication) {
@@ -51,11 +57,17 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+
+            return Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (JwtException exp) {
+            System.out.println("JWT parsing failed: " + exp.getMessage());
+            throw exp;
+        }
     }
 
     public String extractUsername(String token) {

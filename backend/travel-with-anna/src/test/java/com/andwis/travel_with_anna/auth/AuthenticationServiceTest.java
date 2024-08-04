@@ -1,8 +1,7 @@
 package com.andwis.travel_with_anna.auth;
 
 import com.andwis.travel_with_anna.email.EmailService;
-import com.andwis.travel_with_anna.handler.exception.ExpiredTokenException;
-import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
+import com.andwis.travel_with_anna.handler.exception.*;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
@@ -12,18 +11,17 @@ import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,10 +34,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+
 @DisplayName("Authentication Service tests")
 class AuthenticationServiceTest {
-
     @Mock
     private RoleRepository roleRepository;
     @Mock
@@ -56,6 +53,7 @@ class AuthenticationServiceTest {
     private JwtService jwtService;
     @InjectMocks
     private AuthenticationService authenticationService;
+
     @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
     private static RegistrationRequest request;
@@ -68,9 +66,13 @@ class AuthenticationServiceTest {
     private static final LocalDateTime now = LocalDateTime.now();
     private final String invalidToken = "invalid token";
 
-    @BeforeAll
-    static void setUp() {
-        request = new RegistrationRequest("username", "email@example.com", "password");
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        SecurityContextHolder.clearContext();
+
+        request = new RegistrationRequest("username", "email@example.com", "password", "password");
         role = new Role();
         role.setRoleName("USER");
 
@@ -89,11 +91,14 @@ class AuthenticationServiceTest {
                 .expiresAt(now.plusMinutes(10))
                 .user(user)
                 .build();
+
+        userRepository.deleteAll();
+        tokenRepository.deleteAll();
     }
 
     @AfterEach
     void afterEach() {
-        SecurityContextHolder.clearContext(); // Reset SecurityContextHolder
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -126,23 +131,39 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testRegister_MessagingException() throws MessagingException {
+    void testRegister_UserExistsByEmail()  {
         //Given
         when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-
-        //When
-        doThrow(MessagingException.class).when(emailService).sendValidationEmail(
-                eq("email@example.com"),
-                eq("username"),
-                eq(activationUrl),
-                anyString(),
-                eq("Account activation")
-        );
+        when(userRepository.existsByEmail("email@example.com")).thenReturn(true);
 
         // Then
-        assertThrows(MessagingException.class, () -> authenticationService.register(request));
-        verify(userRepository, times(1)).save(any());
+        assertThrows(UserExistsException.class, () -> authenticationService.register(request));
+        verify(userRepository, times(0)).save(any());
+    }
+
+    @Test
+    void testRegister_UserExistsByUserName()  {
+        //Given
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        when(userRepository.existsByUserName("username")).thenReturn(true);
+
+        // Then
+        assertThrows(UserExistsException.class, () -> authenticationService.register(request));
+        verify(userRepository, times(0)).save(any());
+    }
+
+    @Test
+    void testRegister_PasswordDoNotMatch() {
+        //Given
+        request.setConfirmPassword("differentPassword");
+        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+
+        // When & Then
+        assertThrows(WrongPasswordException.class, () -> authenticationService.register(request));
+        verify(userRepository, times(0)).save(any());
     }
 
     @Test
@@ -179,14 +200,11 @@ class AuthenticationServiceTest {
                         .build();
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("Bad credentials"));
+                .thenThrow(new AuthenticationException("Authentication failed") {});
 
         //When & Then
-        BadCredentialsException exception = assertThrows(BadCredentialsException.class, () -> authenticationService.authenticate(request));
-        assertEquals("Bad credentials", exception.getMessage());
-
-        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtService, never()).generateJwtToken(any(Authentication.class));
+        assertThrows(WrongPasswordException.class, () -> authenticationService.authenticate(request));
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 
 
@@ -203,8 +221,7 @@ class AuthenticationServiceTest {
         //Then
         assertTrue(user.isEnabled());
         verify(userRepository, times(1)).save(user);
-        assertNotNull(token.getValidatedAt());
-        verify(tokenRepository, times(1)).save(token);
+        verify(tokenRepository, times(1)).delete(token);
     }
 
     @Test
@@ -214,8 +231,8 @@ class AuthenticationServiceTest {
 
         //When & Then
         InvalidTokenException exception = assertThrows(InvalidTokenException.class, () -> authenticationService.activateAccount(invalidToken));
-        assertEquals("Invalid token", exception.getMessage());
 
+        assertEquals("Invalid token", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
         verify(tokenRepository, never()).save(any(Token.class));
     }
@@ -223,17 +240,16 @@ class AuthenticationServiceTest {
     @Test
     void testActivateAccount_ExpiredToken() {
         //Given
-        token.setExpiresAt(now.minusMinutes(15));
+        token.setExpiresAt(now.minusMinutes(25));
 
         when(tokenRepository.findByToken(jwtToken)).thenReturn(Optional.of(token));
 
         //When & Then
         ExpiredTokenException exception = assertThrows(ExpiredTokenException.class, () -> authenticationService.activateAccount(jwtToken));
-        assertEquals("Token expired. New token sent to your email", exception.getMessage());
+        assertEquals("Token expired. New token was sent to your email", exception.getMessage());
 
         assertFalse(user.isEnabled());
         verify(userRepository, never()).save(user);
-        assertNull(token.getValidatedAt());
         verify(tokenRepository, never()).save(token);
     }
 
@@ -246,11 +262,78 @@ class AuthenticationServiceTest {
 
         //When & Then
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () -> authenticationService.activateAccount(jwtToken));
-        assertEquals("User not found", exception.getMessage());
 
+        assertEquals("User not found", exception.getMessage());
         assertFalse(user.isEnabled());
         verify(userRepository, never()).save(user);
-        assertNull(token.getValidatedAt());
         verify(tokenRepository, never()).save(token);
+    }
+
+    @Test
+    void testResetPasswordWithUserName_Success() throws MessagingException {
+        // Given
+        String username = "username";
+        String email = "email@example.com";
+        String encodedPassword = "encodedPassword";
+        User user = new User();
+        user.setEmail(email);
+        user.setUserName(username);
+
+        ResetPasswordRequest request = new ResetPasswordRequest(username);
+
+        when(userRepository.findByUserName(username)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
+        doNothing().when(emailService).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+
+        // When
+        authenticationService.resetPassword(request);
+
+        // Then
+        verify(userRepository, times(1)).save(user);
+        verify(emailService, times(1)).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+    }
+
+    @Test
+    void testResetPasswordWithEmail_Success() throws MessagingException {
+        // Given
+        String username = "username";
+        String email = "email@example.com";
+        String encodedPassword = "encodedPassword";
+        User user = new User();
+        user.setEmail(email);
+        user.setUserName(username);
+
+        ResetPasswordRequest request = new ResetPasswordRequest(email);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
+        doNothing().when(emailService).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+
+        // When
+        authenticationService.resetPassword(request);
+
+        // Then
+        verify(userRepository, times(1)).save(user);
+        verify(emailService, times(1)).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+    }
+
+    @Test
+    void testResetPasswordWithEmail_Failed() throws MessagingException {
+        // Given
+        ResetPasswordRequest request = new ResetPasswordRequest("email@example.com");
+
+        //When & Then
+        assertThrows(EmailNotFoundException.class, () -> authenticationService.resetPassword(request));
+        verify(emailService, times(0)).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+    }
+
+    @Test
+    void testResetPasswordWithUserName_Failed() throws MessagingException {
+        // Given
+        ResetPasswordRequest request = new ResetPasswordRequest("username");
+
+        //When & Then
+        assertThrows(UsernameNotFoundException.class, () -> authenticationService.resetPassword(request));
+        verify(emailService, times(0)).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
     }
 }

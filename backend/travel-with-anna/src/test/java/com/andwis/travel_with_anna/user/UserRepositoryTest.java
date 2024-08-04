@@ -22,17 +22,18 @@ class UserRepositoryTest {
 
     @Test
     void testFindByEmail() {
-        //Given
+        // Given
         User user = User.builder()
+                .userName("user")
                 .email("user@example.com")
                 .password("password")
                 .build();
         user = userRepository.save(user);
 
-        //When
+        // When
         User retrivedUser = userRepository.findByEmail("user@example.com").orElse(null);
 
-        //Then
+        // Then
         assertNotNull(retrivedUser);
         assertEquals(user.getUserId(), retrivedUser.getUserId());
         assertEquals("user@example.com", retrivedUser.getEmail());
@@ -41,11 +42,11 @@ class UserRepositoryTest {
 
     @Test
     void testFindByUserEmail_Failure() {
-        //Given
-        //When
+        // Given
+        // When
         User retrivedUser = userRepository.findByEmail("nonExistingUser@example.com").orElse(null);
 
-        //Then
+        // Then
         assertNull(retrivedUser);
     }
 }

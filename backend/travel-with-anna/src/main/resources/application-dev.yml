@@ -40,8 +40,8 @@ application:
     cors: ${CORS_ORIGIN_URL}
   mailing:
     frontend:
-      activation-url: http://localhost:80/activate-account
-
+      activation-url: http://localhost:4200/activate-account
+      login-url: http://localhost:4200/login
 
 server:
   port: 8080

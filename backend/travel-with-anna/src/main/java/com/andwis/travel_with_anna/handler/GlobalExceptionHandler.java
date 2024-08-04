@@ -1,8 +1,6 @@
 package com.andwis.travel_with_anna.handler;
 
-import com.andwis.travel_with_anna.handler.exception.ExpiredTokenException;
-import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
-import com.andwis.travel_with_anna.handler.exception.UserExistsException;
+import com.andwis.travel_with_anna.handler.exception.*;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -52,6 +51,19 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(EmailNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(USER_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(USER_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
     @ExceptionHandler(ExpiredTokenException.class)
     public ResponseEntity<ExceptionResponse> handleException(ExpiredTokenException exp) {
         return ResponseEntity
@@ -61,6 +73,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(EXPIRED_TOKEN.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(EXPIRED_TOKEN.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionResponse> handleException(IllegalArgumentException exp) {
+        return ResponseEntity
+                .status(NOT_ACCEPTABLE)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(WRONG_CREDENTIALS.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(WRONG_CREDENTIALS.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -145,6 +170,32 @@ public class GlobalExceptionHandler {
                                 .errorCode(USER_EXISTS.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(USER_EXISTS.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(UsernameNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(USER_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(USER_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(WrongPasswordException.class)
+    public ResponseEntity<ExceptionResponse> handleException(WrongPasswordException exp) {
+        return ResponseEntity
+                .status(NOT_ACCEPTABLE)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(PASSWORD_NOT_MATCH.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(PASSWORD_NOT_MATCH.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }

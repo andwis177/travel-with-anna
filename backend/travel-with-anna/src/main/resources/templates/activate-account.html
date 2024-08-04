@@ -56,16 +56,21 @@
             border-radius: 5px;
         }
 
+        .travel-with-anna {
+            font-weight: bold;
+            color: #2E3944;
+        }
+
     </style>
 </head>
 <body>
 <div class="container">
     <h1>Account Activation</h1>
     <p class="hello" th:text="'Hello ' + ${userName} + ','"></p>
-    <p class="text">Thank you for signing up! Please use the following activation code to activate your account:</p>
-    <div class="activation-code"><span th:text="${activationCode}"></span></div>
+    <p class="text">Thank you for signing up to <span class="travel-with-anna"> -TRAVEL WITH ANNA- </span>! Please use the following activation code to activate your account:</p>
+    <div class="activation-code"><span th:text="${code}"></span></div>
     <div class="activation-link">
-        <a th:href="${confirmationUrl}" target="_blank">ACTIVATE</a>
+        <a th:href="${url}" target="_blank">ACTIVATE</a>
     </div>
 </div>
 </body>

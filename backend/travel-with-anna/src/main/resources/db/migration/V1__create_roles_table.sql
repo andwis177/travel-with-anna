@@ -28,7 +28,6 @@ CREATE TABLE tokens (
                         token VARCHAR(255),
                         created_at TIMESTAMP,
                         expires_at TIMESTAMP,
-                        validated_at TIMESTAMP,
                         user_id BIGINT NOT NULL,
                         FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

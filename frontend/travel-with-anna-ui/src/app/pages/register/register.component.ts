@@ -1,4 +1,4 @@
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component, HostListener, ViewEncapsulation} from '@angular/core';
 import {RegistrationRequest} from "../../services/models/registration-request";
 import {FormsModule} from "@angular/forms";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -9,7 +9,7 @@ import {MatInput} from "@angular/material/input";
 import {NgForOf, NgIf} from "@angular/common";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../../services/services/authentication.service";
-import {HttpErrorResponse} from "@angular/common/http";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-register',
@@ -28,7 +28,8 @@ import {HttpErrorResponse} from "@angular/common/http";
     MatLabel,
     MatSuffix,
     NgForOf,
-    NgIf
+    NgIf,
+    MatDivider
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
@@ -36,8 +37,7 @@ import {HttpErrorResponse} from "@angular/common/http";
 })
 export class RegisterComponent {
 
-  registerRequest: RegistrationRequest = {userName: '', email: '', password: ''};
-  repeatPassword: string = '';
+  registerRequest: RegistrationRequest = {userName: '', email: '', password: '', confirmPassword: ''};
   errorMsg: Array<string> = [];
   hidePassword: boolean = true;
 
@@ -46,33 +46,39 @@ export class RegisterComponent {
     private authService: AuthenticationService,
   ) {}
 
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKeydownHandler(event: KeyboardEvent): void {
+   this.login();
+  }
+
+  @HostListener('document:keydown.enter', ['$event'])
+  onEnterKeydownHandler(event: KeyboardEvent): void {
+    this.register()
+  }
+
   togglePasswordVisibility() {
     this.hidePassword = !this.hidePassword;
   }
 
   register() {
     this.errorMsg = [];
-    if(this.registerRequest.password !== this.repeatPassword) {
-      this.errorMsg.push('Passwords do not match');
-      throw new HttpErrorResponse({status: 400, statusText: 'Bad Request', error: {errorMsg: 'Passwords do not match'}});
-    } else {
-      this.authService.register({
-        body: this.registerRequest
-      }).subscribe( {
-        next: () => {
-          this.router.navigate(['activate-account']);
-        },
-        error: (err) => {
-          console.log(err);
-          if (err.error.errors && err.error.errors.length > 0) {
-            this.errorMsg = err.error.errors;
-          } else {
-            this.errorMsg.push('Unexpected error occurred');
-          }
+    this.authService.register({
+      body: this.registerRequest
+    }).subscribe( {
+      next: () => {
+        this.router.navigate(['activate-account']);
+      },
+      error: (err) => {
+        console.log(err);
+        if (err.error.errors && err.error.errors.length > 0) {
+          this.errorMsg = err.error.errors;
+        } else {
+          this.errorMsg.push('Unexpected error occurred');
         }
-      })
-    }
+      }
+    })
   }
+
   login() {
     this.router.navigate(['login']);
   }

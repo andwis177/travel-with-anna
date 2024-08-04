@@ -16,11 +16,12 @@ public class RegistrationRequest {
     @NotBlank(message = "User name is required")
     private String userName;
     @Email(message = "Email is not well formatted")
-    @NotEmpty(message = "Email is not well formatted")
-    @NotBlank(message = "Email is not well formatted")
+    @NotEmpty(message = "Email is required")
+    @NotBlank(message = "Email is required")
     private String email;
     @Size(min = 8, message = "Password should be 8 characters long minimum")
     @NotEmpty(message = "Password should be 8 characters long minimum")
     @NotBlank(message = "Password should be 8 characters long minimum")
     private String password;
+    private String confirmPassword;
 }

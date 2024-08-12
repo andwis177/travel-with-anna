@@ -1,4 +1,4 @@
-package com.andwis.travel_with_anna.user;
+package com.andwis.travel_with_anna.user.token;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

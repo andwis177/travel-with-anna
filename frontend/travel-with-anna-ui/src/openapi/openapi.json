@@ -17,6 +17,44 @@
     }
   ],
   "paths": {
+    "/avatar/upload-avatar": {
+      "post": {
+        "tags": [
+          "Avatar"
+        ],
+        "operationId": "uploadAvatar",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "tags": [
@@ -172,7 +210,7 @@
         "tags": [
           "User"
         ],
-        "operationId": "getProfile",
+        "operationId": "getCredentials",
         "responses": {
           "200": {
             "description": "OK",
@@ -180,6 +218,31 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserCredentials"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/avatar/avatar": {
+      "get": {
+        "tags": [
+          "Avatar"
+        ],
+        "operationId": "getCurrentUserAvatar",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "binaryStream": {
+                      "type": "object"
+                    }
+                  }
                 }
               }
             }
@@ -282,6 +345,12 @@
         "type": "object",
         "properties": {
           "token": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "email": {
             "type": "string"
           }
         }

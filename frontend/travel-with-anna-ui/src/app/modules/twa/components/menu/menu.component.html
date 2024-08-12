@@ -11,12 +11,13 @@
         <div class="button-container">
           <button mat-icon-button class="profile-button" matTooltip="Account settings"
                   (click)="openAccountDetails()" type="submit">
-            <img ngSrc="../../../../../assets/images/user.png" class="profile-image" alt="/" fill priority>
+            <img *ngIf="avatarImg" [src]="avatarImg" class="profile-image" alt="User Avatar" fill priority>
+            <img *ngIf="!avatarImg" src="../../../../../assets/images/user.png" class="profile-image" alt="Default Avatar" fill priority>
           </button>
         </div>
         <div>
           <mat-label class="profile-label">
-            {{this.label}}
+            {{this.userName}}
           </mat-label>
         </div>
       </div>

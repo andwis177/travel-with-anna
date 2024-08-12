@@ -7,14 +7,17 @@ import {MatInput} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {UserService} from "../../../../services/services/user.service";
 import {MatToolbarRow} from "@angular/material/toolbar";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import {PasswordComponent} from "../password/password.component";
 import {MatIcon} from "@angular/material/icon";
 import {MatDivider} from "@angular/material/divider";
 import {UserCredentials} from "../../../../services/models/user-credentials";
-import {TokenService} from "../../../../services/token/token.service";
 import {Router} from "@angular/router";
-import {SharedService} from "../../../../pages/shared/shared.service";
+import {SharedService} from "../../../../services/shared/shared.service";
+import {MatTooltip} from "@angular/material/tooltip";
+import {AuthService} from "../../../../services/auth/auth.service";
+import {ImageFileService} from "../../../../services/image-file-service/image-file-service";
+import {UserInformationService} from "../../../../services/user-information/user-information-service";
 
 @Component({
   selector: 'app-account',
@@ -37,16 +40,21 @@ import {SharedService} from "../../../../pages/shared/shared.service";
     MatIcon,
     MatDivider,
     NgForOf,
-    MatSuffix
+    MatSuffix,
+    MatTooltip,
+    NgOptimizedImage
   ],
   templateUrl: './account.component.html',
   styleUrl: './account.component.scss',
 
 })
 export class AccountComponent implements OnInit {
-  userCredentials: UserCredentials = { email: '', userName: '', password: ''};
+  @ViewChild('fileInput') fileInput!: ElementRef;
+  userCredentials: UserCredentials = {userName: '', email: '', password: ''};
   errorMsg: Array<string> = [];
   isEdit: boolean = false;
+  selectedFile: File | null = null;
+  avatarImg: string | null = null;
 
   constructor(
     public router: Router,
@@ -54,7 +62,9 @@ export class AccountComponent implements OnInit {
     public dialog: MatDialog,
     private sharedService: SharedService,
     private userService: UserService,
-    private tokenService: TokenService
+    private authService: AuthService,
+    private userInformationService: UserInformationService,
+    private imageFileService: ImageFileService
   ) {}
 
   hide = signal(true);
@@ -71,7 +81,7 @@ export class AccountComponent implements OnInit {
   @HostListener('document:keydown.enter', ['$event'])
   onEnterKeydownHandler(event: KeyboardEvent): void {
     if (this.isEdit) {
-      this.save();
+      this.saveUserCredentials();
     } else {
       this.edit();
     }
@@ -79,12 +89,51 @@ export class AccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.errorMsg = [];
-    this.userService.getProfile().subscribe({
-      next: (response) => {
-        this.userCredentials = response;
+    this.sharedService.getImage().subscribe((image) => {
+      this.avatarImg = image;
+    });
+    this.userCredentials.userName = this.userInformationService.getUserName();
+    this.userCredentials.email = this.userInformationService.getEmail();
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      if (file.type.startsWith('image/')) {
+        this.selectedFile = file;
+        this.saveUserAvatar(file);
+        this.sharedService.updateAvatarImg(URL.createObjectURL(file));
+      } else {
+        this.errorMsg.push('Invalid file type. Only images are allowed.');
+      }
+    } else {
+      this.errorMsg.push('No file selected');
+    }
+  }
+
+  triggerFileInput() {
+    if (this.fileInput && this.fileInput.nativeElement) {
+      this.fileInput.nativeElement.click();
+    } else {
+      console.error('File input element is not available.');
+    }
+  }
+
+  saveUserAvatar(file: File) {
+    this.errorMsg = [];
+    console.log("uploadParams", file)
+    this.imageFileService.uploadAvatar(file).subscribe({
+      next: () => {
+        this.sharedService.storeImage(file);
       },
       error: (err) => {
-        console.error('Error fetching user details:', err);
+        console.log(err.error.errors);
+        if (err.error.errors && err.error.errors.length > 0) {
+          this.errorMsg = err.error.errors;
+        } else {
+          this.errorMsg.push('Unexpected error occurred');
+        }
       }
     })
   }
@@ -98,13 +147,14 @@ export class AccountComponent implements OnInit {
     this.isEdit = true;
   }
 
-  save() {
+  saveUserCredentials() {
     this.errorMsg = [];
     this.userService.update({body: this.userCredentials})
       .subscribe({
         next: (response) => {
-          this.tokenService.token = response.token as string;
-          this.sharedService.updateLabel(<string> this.userCredentials.userName);
+          this.authService.setToken(response.token as string);
+          this.userInformationService.setUserCredentials(response.userName as string, response.email as string);
+          this.sharedService.updateUserName(this.userCredentials.userName as string);
           this.isEdit = false;
           this.userCredentials.password = '';
         },
@@ -127,4 +177,5 @@ export class AccountComponent implements OnInit {
   deleteAccount() {
     this.router.navigate(['delete-account']).then(r => this.dialogRef.close());
   }
+
 }

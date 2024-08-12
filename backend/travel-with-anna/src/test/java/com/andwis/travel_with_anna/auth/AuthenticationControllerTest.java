@@ -82,12 +82,12 @@ class AuthenticationControllerTest {
     }
 
     @Test
-    void authenticate_ShouldReturnOk() throws Exception {
+    void authenticationWithCredentials_ShouldReturnOk() throws Exception {
         // Given
         AuthenticationRequest request = new AuthenticationRequest("test@example.com", "password123");
         String jsonContent = objectMapper.writeValueAsString(request);
-        AuthenticationResponse response = new AuthenticationResponse("token value");
-        when(service.authenticate(request)).thenReturn(response);
+        AuthenticationResponse response = new AuthenticationResponse("token value","","");
+        when(service.authenticationWithCredentials(request)).thenReturn(response);
 
         // When
         ResultActions result =
@@ -107,7 +107,7 @@ class AuthenticationControllerTest {
     }
 
     @Test
-    void authenticate_ShouldReturnBadRequest() throws Exception {
+    void authenticationWithCredentials_ShouldReturnBadRequest() throws Exception {
         // Given
         AuthenticationRequest request = new AuthenticationRequest("test@example.com", "passwor");
         String jsonContent = objectMapper.writeValueAsString(request);
@@ -115,7 +115,7 @@ class AuthenticationControllerTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
-        when(service.authenticate(any(AuthenticationRequest.class)))
+        when(service.authenticationWithCredentials(any(AuthenticationRequest.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
         // When

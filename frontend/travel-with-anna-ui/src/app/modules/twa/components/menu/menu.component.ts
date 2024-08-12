@@ -3,16 +3,14 @@ import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
-import {NgOptimizedImage} from "@angular/common";
+import {NgIf, NgOptimizedImage} from "@angular/common";
 import {MatDialog} from "@angular/material/dialog";
 import {AccountComponent} from "../../dialog/account/account.component";
-import {UserService} from "../../../../services/services/user.service";
 import {MatLabel} from "@angular/material/form-field";
-import {UserCredentials} from "../../../../services/models/user-credentials";
 import {LogoutService} from "../../../../services/logout/logout.service";
 import {MatDivider} from "@angular/material/divider";
 import {MatTooltip} from "@angular/material/tooltip";
-import {SharedService} from "../../../../pages/shared/shared.service";
+import {SharedService} from "../../../../services/shared/shared.service";
 
 @Component({
   selector: 'app-menu',
@@ -29,45 +27,37 @@ import {SharedService} from "../../../../pages/shared/shared.service";
     MatButton,
     MatLabel,
     MatDivider,
-    MatTooltip
-
+    MatTooltip,
+    NgIf
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
-export class MenuComponent implements OnInit {
-  userCredentials: UserCredentials = { email: '', userName: '' };
+export class MenuComponent implements OnInit  {
   errorMsg: Array<string> = [];
-  label: string = <string> this.userCredentials.userName;
+  userName: string | null= '';
+  avatarImg: string | null = null;
 
   constructor(
     private logoutService: LogoutService,
     public dialog: MatDialog,
-    private userService: UserService,
-    private sharedService: SharedService
+    private sharedService: SharedService,
   ) {
+  }
+
+  ngOnInit(): void {
+    this.sharedService.getUserName().subscribe((name) => {
+      this.userName = name;
+    });
+    this.sharedService.getImage().subscribe((image) => {
+      this.avatarImg = image;
+    });
   }
 
   openAccountDetails() {
     const dialogRef = this.dialog.open(AccountComponent, {})
     dialogRef.afterClosed().subscribe(() => {
     });
-  }
-
-  ngOnInit(): void {
-    this.errorMsg = [];
-    this.sharedService.label$.subscribe((label) => {
-      this.label = label;
-    });
-    this.userService.getProfile().subscribe({
-      next: (response) => {
-        this.userCredentials = response;
-        this.sharedService.updateLabel(<string> this.userCredentials.userName);
-      },
-      error: (err) => {
-        console.error('Error fetching user details:', err);
-      }
-    })
   }
 
   logout() {

@@ -51,7 +51,6 @@ class JwtFilterTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        SecurityContextHolder.clearContext();
     }
 
     @AfterEach

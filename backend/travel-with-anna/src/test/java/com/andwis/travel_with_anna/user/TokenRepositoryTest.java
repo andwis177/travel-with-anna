@@ -1,5 +1,7 @@
 package com.andwis.travel_with_anna.user;
 
+import com.andwis.travel_with_anna.user.token.Token;
+import com.andwis.travel_with_anna.user.token.TokenRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,8 @@ class TokenRepositoryTest {
                 .email("user@example.com")
                 .password("password")
                 .build();
-        user = userRepository.save(user);
+
+        userRepository.save(user);
 
         Token token = Token.builder()
                 .token("token")

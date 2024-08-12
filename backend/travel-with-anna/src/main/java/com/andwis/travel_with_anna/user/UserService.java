@@ -1,7 +1,9 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
+import com.andwis.travel_with_anna.handler.exception.EmailNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.UserExistsException;
+import com.andwis.travel_with_anna.handler.exception.UserIdNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -24,44 +26,91 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
 
-    public UserCredentials getProfile(Authentication connectedUser) {
-        var user = getSecurityUser(connectedUser);
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean existsByUserName(String userName) {
+        return userRepository.existsByUserName(userName);
+    }
+
+    public User getConnectedUser(Authentication connectedUser) {
+        var securityUser = getSecurityUser(connectedUser);
+        return securityUser.getUser();
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() ->
+                new EmailNotFoundException("User not found"));
+    }
+
+    public User getUserByUserName(String userName) {
+        return userRepository.findByUserName(userName).orElseThrow(() ->
+                new UsernameNotFoundException("User not found"));
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() ->
+                new UserIdNotFoundException("User not found"));
+    }
+
+    public UserCredentials getCredentials(String email) {
+        User user = getUserByEmail(email);
         return UserCredentials.builder()
-                .email(user.getUser().getEmail())
-                .userName(user.getUser().getUserName())
+                .email(user.getEmail())
+                .userName(user.getUserName())
                 .build();
     }
 
-    private void updateUser(UserCredentials userCredentials, SecurityUser user) {
-        var currentUser = user.getUser();
+    public AuthenticationResponse updateUserExecution(UserCredentials userCredentials, Authentication connectedUser) {
+        var user = getSecurityUser(connectedUser).getUser();
+        verifyPassword(user, userCredentials.getPassword());
+        updateUser(userCredentials, user);
+        updateSecurityContext(userCredentials.getEmail());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String newJwtToken = jwtService.generateJwtToken(authentication);
+        return AuthenticationResponse.builder()
+                .token(newJwtToken)
+                .userName(userCredentials.getUserName())
+                .email(userCredentials.getEmail())
+                .build();
+    }
+
+
+    private void updateUser(UserCredentials userCredentials, User user) {
         boolean isChanged = false;
+        System.out.println(user.getRoles());
 
         String newUserName = userCredentials.getUserName();
         String newEmail = userCredentials.getEmail();
 
-        if (newUserName != null
-                && !newUserName.isBlank()
-                && !newUserName.equals(currentUser.getUserName())) {
-            if (userRepository.existsByUserName(newUserName)) {
-                throw new UserExistsException("User with this name already exists");
-            } else {
-                currentUser.setUserName(newUserName);
-                isChanged = true;
-            }
-        }
         if (newEmail != null
                 && !newEmail.isBlank()
-                && !newEmail.equals(currentUser.getEmail())) {
+                && !newEmail.equals(user.getEmail())) {
             if (userRepository.existsByEmail(newEmail)) {
                 throw new UserExistsException("Email already exists");
             } else {
-                currentUser.setEmail(newEmail);
+                user.setEmail(newEmail);
+                isChanged = true;
+            }
+        }
+        System.out.println(user.getRoles());
+        if (newUserName != null
+                && !newUserName.isBlank()
+                && !newUserName.equals(user.getUserName())) {
+            if (userRepository.existsByUserName(newUserName)) {
+                throw new UserExistsException("User with this name already exists");
+            } else {
+                user.setUserName(newUserName);
                 isChanged = true;
             }
         }
         if (isChanged) {
-            userRepository.save(currentUser);
+            userRepository.save(user);
         }
     }
 
@@ -75,17 +124,6 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    public AuthenticationResponse updateUserExecution(UserCredentials userCredentials, Authentication connectedUser) {
-        var user = getSecurityUser(connectedUser);
-        verifyPassword(user.getUser(), userCredentials.getPassword());
-        updateUser(userCredentials, user);
-        updateSecurityContext(userCredentials.getEmail());
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String newJwtToken = jwtService.generateJwtToken(authentication);
-        return AuthenticationResponse.builder()
-                .token(newJwtToken)
-                .build();
-    }
 
     public UserRespond changePassword(ChangePasswordRequest request, Authentication connectedUser) {
         var user = getSecurityUser(connectedUser);
@@ -102,11 +140,12 @@ public class UserService {
                 .build();
     }
 
-    public UserRespond deleteUser(PasswordRequest request, Authentication connectedUser) throws UsernameNotFoundException, WrongPasswordException {
+    public UserRespond deleteConnectedUser(PasswordRequest request, Authentication connectedUser) throws UsernameNotFoundException, WrongPasswordException {
         var securityUser = getSecurityUser(connectedUser);
         var currentUser = securityUser.getUser();
         String userName = currentUser.getUserName();
         verifyPassword(currentUser, request.password());
+        securityUser.getUser().getRoles().clear();
         userRepository.delete(securityUser.getUser());
         return UserRespond.builder()
                 .message("User " + userName + " has been deleted!")
@@ -129,4 +168,6 @@ public class UserService {
         }
         return securityUser ;
     }
+
+
 }

@@ -13,7 +13,8 @@
                  [(ngModel)]="registerRequest.userName"
                  [ngModelOptions]="{standalone: true}"
                  placeholder="Your name"
-                 autocomplete="name">
+                 autocomplete="name"
+                 (keydown.enter)="$event.preventDefault()">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
@@ -23,7 +24,8 @@
                  [(ngModel)]="registerRequest.email"
                  [ngModelOptions]="{standalone: true}"
                  placeholder="Ex. pat@example.com"
-                 autocomplete="email">
+                 autocomplete="email"
+                 (keydown.enter)="$event.preventDefault()">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">

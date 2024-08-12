@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.user;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,17 @@ class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
+                .userName("userName")
+                .email("user@example.com")
+                .password("password")
+                .build();
+       userRepository.save(user);
+    }
 
     @AfterEach
     void tearDown() {
@@ -23,30 +35,48 @@ class UserRepositoryTest {
     @Test
     void testFindByEmail() {
         // Given
-        User user = User.builder()
-                .userName("user")
-                .email("user@example.com")
-                .password("password")
-                .build();
-        user = userRepository.save(user);
-
         // When
         User retrivedUser = userRepository.findByEmail("user@example.com").orElse(null);
 
         // Then
         assertNotNull(retrivedUser);
         assertEquals(user.getUserId(), retrivedUser.getUserId());
+        assertEquals("userName", retrivedUser.getUserName());
         assertEquals("user@example.com", retrivedUser.getEmail());
         assertEquals("password", retrivedUser.getPassword());
     }
 
     @Test
-    void testFindByUserEmail_Failure() {
+    void testFindByUserName() {
         // Given
         // When
-        User retrivedUser = userRepository.findByEmail("nonExistingUser@example.com").orElse(null);
+        User retrivedUser = userRepository.findByUserName("userName").orElse(null);
 
         // Then
-        assertNull(retrivedUser);
+        assertNotNull(retrivedUser);
+        assertEquals(user.getUserId(), retrivedUser.getUserId());
+        assertEquals("userName", retrivedUser.getUserName());
+        assertEquals("user@example.com", retrivedUser.getEmail());
+        assertEquals("password", retrivedUser.getPassword());
+    }
+
+    @Test
+    void testExistsByEmail() {
+        // Given
+        // When
+        boolean userExists = userRepository.existsByEmail("user@example.com");
+
+        // Then
+        assertTrue(userExists);
+    }
+
+    @Test
+    void testExistsByUserName() {
+        // Given
+        // When
+        boolean userExists = userRepository.existsByUserName("userName");
+
+        // Then
+        assertTrue(userExists);
     }
 }

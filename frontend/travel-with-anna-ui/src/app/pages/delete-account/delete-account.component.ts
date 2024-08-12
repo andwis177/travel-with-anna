@@ -15,7 +15,6 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {Router} from "@angular/router";
 import {UserRespond} from "../../services/models/user-respond";
 
-
 @Component({
   selector: 'app-delete-account',
   standalone: true,
@@ -40,7 +39,6 @@ import {UserRespond} from "../../services/models/user-respond";
   encapsulation: ViewEncapsulation.None
 })
 export class DeleteAccountComponent {
-
   errorMsg: Array<string> = [];
   passwordRequest: PasswordRequest = {password: '' };
   userRespond: UserRespond = {message: ''};
@@ -92,6 +90,6 @@ export class DeleteAccountComponent {
   }
 
   cancel() {
-    this.router.navigate(['twa'])
+    this.router.navigate(['twa']).then(r => this._snackBar.open('Account deletion canceled', 'Close'));
   }
 }

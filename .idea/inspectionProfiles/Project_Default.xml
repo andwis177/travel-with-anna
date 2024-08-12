@@ -22,11 +22,13 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="4">
+          <list size="6">
             <item index="0" class="java.lang.String" itemvalue="ng-reflect-type" />
             <item index="1" class="java.lang.String" itemvalue="ng-reflect-placeholder" />
             <item index="2" class="java.lang.String" itemvalue="ng-reflect-model" />
             <item index="3" class="java.lang.String" itemvalue="ng-reflect-options" />
+            <item index="4" class="java.lang.String" itemvalue="fill" />
+            <item index="5" class="java.lang.String" itemvalue="priority" />
           </list>
         </value>
       </option>

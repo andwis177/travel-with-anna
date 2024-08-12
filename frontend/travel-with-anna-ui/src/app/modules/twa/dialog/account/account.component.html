@@ -12,6 +12,15 @@
       <h3>Account</h3>
     </mat-card-header>
 
+    <div class="button-container">
+      <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" />
+      <button mat-icon-button class="profile-button" matTooltip="Account settings"
+              (click)="triggerFileInput()" type="submit">
+        <img *ngIf="avatarImg" [src]="avatarImg" class="profile-image" alt="User Avatar" fill priority>
+        <img *ngIf="!avatarImg" src="../../../../../assets/images/user.png" class="profile-image" alt="Default Avatar" fill priority>
+      </button>
+    </div>
+
     <form class="main-form">
       <div *ngIf="!isEdit else edit_template_input">
         <div class="information-area">
@@ -48,48 +57,52 @@
 </div>
 
 <ng-template #edit_template_button>
-  <button class="custom-button-0 full-width" (click)="save()" type="submit">Save</button>
+  <button class="custom-button-0 full-width" (click)="saveUserCredentials()" type="submit">Save</button>
   <button class="custom-button-1 full-width" (click)="managePassword()" type="submit">Password</button>
 </ng-template>
 
 <ng-template #edit_template_input>
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Name: </mat-label>
-    <input  type="text"
-            matInput
-            [(ngModel)]=userCredentials.userName
-            [ngModelOptions]="{standalone: true}"
-            placeholder="Your name"
-            autocomplete="name" [disabled]="!isEdit">
-  </mat-form-field>
+  <div class = "full-width delete-button-area" >
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name: </mat-label>
+      <input  type="text"
+              matInput
+              [(ngModel)]=userCredentials.userName
+              [ngModelOptions]="{standalone: true}"
+              placeholder="Your name"
+              autocomplete="name" [disabled]="!isEdit"
+              (keydown.enter)="$event.preventDefault()">
+    </mat-form-field>
 
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Email: </mat-label>
-    <input type="email"
-           matInput
-           [(ngModel)]=userCredentials.email
-           [ngModelOptions]="{standalone: true}"
-           placeholder="Placeholder"
-           autocomplete="email" [disabled]="!isEdit">
-  </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email: </mat-label>
+      <input type="email"
+             matInput
+             [(ngModel)]=userCredentials.email
+             [ngModelOptions]="{standalone: true}"
+             placeholder="Placeholder"
+             autocomplete="email" [disabled]="!isEdit"
+             (keydown.enter)="$event.preventDefault()">
+    </mat-form-field>
 
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Password:</mat-label>
-    <input type="password"
-           matInput [type]="hide() ? 'password' : 'text'"
-           [(ngModel)]="userCredentials.password"
-           [ngModelOptions]="{standalone: true}"
-           placeholder="Password"
-           autocomplete="password"
-           (keydown.enter)="$event.preventDefault()">
-    <button
-      mat-icon-button
-      matSuffix
-      (click)="clickEvent($event)"
-      (keydown.enter)="$event.preventDefault()"
-      [attr.aria-label]="'Hide password'"
-      [attr.aria-pressed]="hide()">
-      <mat-icon>{{ hide() ? 'visibility_off' : 'visibility' }}</mat-icon>
-    </button>
-  </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Password:</mat-label>
+      <input type="password"
+             matInput [type]="hide() ? 'password' : 'text'"
+             [(ngModel)]="userCredentials.password"
+             [ngModelOptions]="{standalone: true}"
+             placeholder="Password"
+             autocomplete="password"
+             (keydown.enter)="$event.preventDefault()">
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="clickEvent($event)"
+        (keydown.enter)="$event.preventDefault()"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hide()">
+        <mat-icon>{{ hide() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
 </ng-template>

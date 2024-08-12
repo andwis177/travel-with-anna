@@ -9,9 +9,12 @@ import {MatAnchor, MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../../services/services/authentication.service";
-import {TokenService} from "../../services/token/token.service";
 import {MatDivider} from "@angular/material/divider";
-
+import {AuthService} from "../../services/auth/auth.service";
+import {SharedService} from "../../services/shared/shared.service";
+import {ImageFileService} from "../../services/image-file-service/image-file-service";
+import {UserInformationService} from "../../services/user-information/user-information-service";
+import {AuthenticationResponse} from "../../services/models/authentication-response";
 
 @Component({
   selector: 'app-login',
@@ -23,15 +26,18 @@ import {MatDivider} from "@angular/material/divider";
   styleUrl: './login.component.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class LoginComponent{
+export class LoginComponent {
   authRequest: AuthenticationRequest = {email: '', password: ''};
   errorMsg: Array<string> = [];
-
+  private avatarFile: File | null = null;
 
   constructor(
     private router: Router,
-    private authService: AuthenticationService,
-    private tokenService: TokenService,
+    private authenticationService: AuthenticationService,
+    private authService: AuthService,
+    private sharedService: SharedService,
+    private userInformationService: UserInformationService,
+    private imageFileService: ImageFileService,
   ) {
   }
 
@@ -47,21 +53,21 @@ export class LoginComponent{
   }
 
   register() {
-    this.router.navigate(['register']);
+    this.router.navigate(['register']).then(r => console.log('Register'));
   }
 
   resetPassword() {
-    this.router.navigate(['reset-password']);
+    this.router.navigate(['reset-password']).then(r => console.log('Reset password'));
+
   }
 
   signIn() {
     this.errorMsg = [];
-    this.authService.authenticate({
+    this.authenticationService.authenticate({
       body: this.authRequest}).
     subscribe({
       next: (response) => {
-        this.tokenService.token = response.token as string;
-        this.router.navigate(['twa']);
+        this.singInSuccess(response).then(r => console.log('Success'));
       },
       error: (err) => {
         console.log(err.error.errors);
@@ -72,5 +78,21 @@ export class LoginComponent{
         }
       }
     })
+  }
+
+  async singInSuccess(response: AuthenticationResponse) {
+    this.authService.setToken( response.token as string);
+    this.userInformationService.setUserCredentials(response.userName as string, response.email as string);
+    this.loadAvatar(response.userName as string);
+    setTimeout(() => {
+      this.router.navigate(['twa']).then(r => this.sharedService.updateUserName(<string>response.userName));
+    } , 1000);
+  }
+
+  loadAvatar(userName : string): void {
+    this.imageFileService.getAvatar().subscribe(blob => {
+      this.avatarFile = new File([blob], userName + '.jpg', { type: blob.type });
+      this.sharedService.storeImage(this.avatarFile);
+    });
   }
 }

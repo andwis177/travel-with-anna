@@ -12,7 +12,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -35,7 +37,7 @@ public class Role {
     @Column(insertable = false)
     private LocalDateTime lastModifiedDate;
 
-    @ManyToMany(mappedBy = "roles")
-    @JsonIgnore
-    private List<User> users;
+//    @ManyToMany(mappedBy = "roles")
+//    @JsonIgnore
+//    private Set<User> users = new HashSet<>();
 }

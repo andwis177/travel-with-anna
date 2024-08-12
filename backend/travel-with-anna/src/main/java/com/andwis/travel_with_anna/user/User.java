@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.user.avatar.Avatar;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.security.auth.Subject;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 import static jakarta.persistence.FetchType.EAGER;
 
@@ -46,7 +47,10 @@ public class User implements Principal {
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> roles;
+    private Set<Role> roles;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "avatar_id", referencedColumnName = "avatar_id")
+    private Avatar avatar;
 
     @Override
     public String getName() {

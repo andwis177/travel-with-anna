@@ -1,14 +1,14 @@
 import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
-import {TokenService} from "../token/token.service";
+import {LocalStorageService} from "../local-storage/local-storage.service";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private tokenService: TokenService) {
+  constructor(private localStorageService: LocalStorageService) {
   }
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const authToken = this.tokenService.token;
+    const authToken = this.localStorageService.getItem('token');
     const excludedEndpoints = ['register', 'authenticate', 'activate-account', 'reset-password', 'delete-account'];
 
     const isExcluded = excludedEndpoints.some(endpoint => {

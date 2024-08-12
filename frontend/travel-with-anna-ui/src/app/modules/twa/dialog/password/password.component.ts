@@ -61,7 +61,7 @@ export class PasswordComponent {
 
   @HostListener('document:keydown.enter', ['$event'])
   onEnterKeydownHandler(event: KeyboardEvent): void {
-      this.changePassword();
+    this.changePassword();
   }
 
   onClose() {

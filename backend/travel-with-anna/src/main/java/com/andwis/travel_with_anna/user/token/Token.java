@@ -1,5 +1,6 @@
-package com.andwis.travel_with_anna.user;
+package com.andwis.travel_with_anna.user.token;
 
+import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,355 +1,331 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
+import com.andwis.travel_with_anna.handler.exception.EmailNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.UserExistsException;
+import com.andwis.travel_with_anna.handler.exception.UserIdNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
-import com.andwis.travel_with_anna.security.JwtService;
+import com.andwis.travel_with_anna.role.RoleRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import javax.management.relation.RoleNotFoundException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@Transactional
 @DisplayName("User Service tests")
 class UserServiceTest {
 
-    @Mock
-    private UsernamePasswordAuthenticationToken principal;
-
-    @Mock
-    private SecurityContext securityContext;
-
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private JwtService jwtService;
-
-    @Mock
-    private UserDetailsService userDetailsService;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private AuthenticationManager authenticationManager;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @InjectMocks
+    @Autowired
     private UserService userService;
-
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
     private User user;
-    private SecurityUser securityUser;
-
+    private Role retrivedRole;
+    private Long userId;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        SecurityContextHolder.clearContext();
-
-        List<Role> roles = new ArrayList<>();
-        roles.add(Role.builder().roleName("USER").build());
+        Role role = new Role();
+        role.setRoleName("USER");
+        Optional<Role> existingRole = roleRepository.findByRoleName("USER");
+        retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
         user = User.builder()
-                .userName("testUsername")
+                .userName("userName")
                 .email("email@example.com")
-                .roles(roles)
+                .password(passwordEncoder.encode("password"))
+                .roles(new HashSet<>(List.of(retrivedRole)))
                 .build();
-        SecurityUser securityUserMocked = mock(SecurityUser.class);
-        securityUser = new SecurityUser(user);
+        user.setEnabled(true);
+        userId = userRepository.save(user).getUserId();
 
-        when(securityUserMocked.getUsername()).thenReturn("email@example.com");
-        when(securityUserMocked.getUser()).thenReturn(user);
-        when(principal.getPrincipal()).thenReturn(securityUserMocked);
-
-        SecurityContextHolder.setContext(securityContext);
+        User secondaryUser = User.builder()
+                .userName("userName2")
+                .email("email2@example.com")
+                .password(passwordEncoder.encode("password"))
+                .roles(new HashSet<>(List.of(retrivedRole)))
+                .build();
+        user.setEnabled(true);
+        userRepository.save(secondaryUser);
     }
 
-    @AfterEach
-    void afterEach() {
-        SecurityContextHolder.clearContext();
+    @AfterEach()
+    void cleanUp() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
     }
 
     @Test
-    void testGetProfile_Success() {
-        // Given
+    void testSaveUser() {
+        //Given
+        User user = User.builder()
+                .userName("testUser")
+                .email("test@example.com")
+                .password(passwordEncoder.encode("password"))
+                .roles(new HashSet<>(List.of(retrivedRole)))
+                .build();
+        user.setEnabled(true);
 
         // When
-        UserCredentials result = userService.getProfile(principal);
+        User savedUser = userService.saveUser(user);
+
+        //Then
+        assertNotNull(savedUser.getUserId());
+        assertEquals("testUser", savedUser.getUserName());
+        assertEquals("test@example.com", savedUser.getEmail());
+    }
+
+    @Test
+    void testExistsByEmail() {
+        // Given
+        // When
+        boolean exists = userService.existsByEmail("email@example.com");
 
         // Then
-        assertEquals("email@example.com", result.getEmail());
-        assertEquals("testUsername", result.getUserName());
+        assertTrue(exists);
     }
 
     @Test
-    void testGetProfile_UserNotFound() {
+    void testExistsByUserName() {
         // Given
-        when((principal).getPrincipal())
-                .thenReturn(null);
+        // When
+        boolean exists = userService.existsByUserName(user.getUserName());
+
+        // Then
+        assertTrue(exists);
+    }
+
+    @Test
+    void testGetConnectedUser() {
+        // Given
+        // When
+        User connectedUser = userService.getConnectedUser(createAuthentication(user));
+
+        // Then
+        assertNotNull(connectedUser);
+        assertEquals(user, connectedUser);
+    }
+
+    @Test
+    void testGetUserByEmail_UserExists() {
+        // Given
+        // When
+        User foundUser = userService.getUserByEmail("email@example.com");
+
+        // Then
+        assertNotNull(foundUser);
+        assertEquals("email@example.com", foundUser.getEmail());
+    }
+
+    @Test
+    void testGetUserByEmail_UserNotFound() {
+        // Given
+        String email = "nonexistent@example.com";
+
         // When & Then
-        assertThrows(UsernameNotFoundException.class, () -> {
-            userService.getProfile(principal);
-        });
+        assertThrows(EmailNotFoundException.class, () -> userService.getUserByEmail(email));
     }
 
     @Test
-    public void testUpdateUserExecution() {
+    void testGetUserByUserName_UserExists() {
         // Given
-        UserCredentials userCredentials = UserCredentials
-                .builder()
-                .email("newemail@example.com")
-                .userName("newUsername")
+        // When
+        User foundUser = userService.getUserByUserName("userName");
+
+        // Then
+        assertNotNull(foundUser);
+        assertEquals("userName", foundUser.getUserName());
+    }
+
+    @Test
+    void testGetUserByUserName_UserNotFound() {
+        // Given
+        String userName = "nonexistentUser";
+
+        // When & Then
+        assertThrows(UsernameNotFoundException.class, () -> userService.getUserByUserName(userName));
+    }
+
+    @Test
+    void testGetUserById_UserExists() {
+        // Given
+        // When
+        User foundUser = userService.getUserById(userId);
+
+        // Then
+        assertNotNull(foundUser);
+        assertEquals("userName", foundUser.getUserName());
+    }
+
+    @Test
+    void testGetUserById_UserNotFound() {
+        // Given & When & Then
+        assertThrows(UserIdNotFoundException.class, () -> userService.getUserById(2L));
+    }
+
+    @Test
+    void testGetCredentials() {
+        // Given
+        // When
+        UserCredentials credentials = userService.getCredentials(user.getEmail());
+
+        // Then
+        assertNotNull(credentials);
+        assertEquals(user.getEmail(), credentials.getEmail());
+        assertEquals(user.getUserName(), credentials.getUserName());
+    }
+
+    @Test
+    void testUpdateUserExecution_Success() {
+        // Given
+        UserCredentials userCredentials = UserCredentials.builder()
+                .email("newEmail@example.com")
+                .userName("newUserName")
+                .password("password")
                 .build();
 
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(userRepository.existsByUserName("newUsername")).thenReturn(false);
-        when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(jwtService.generateJwtToken(any(Authentication.class))).thenReturn("newJwtToken");
-        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(securityUser);
-
         // When
-        AuthenticationResponse response = userService.updateUserExecution(userCredentials, authentication);
+        AuthenticationResponse response = userService.updateUserExecution(userCredentials, createAuthentication(user));
+        User retrivedUser = userService.getUserById(userId);
 
         // Then
         assertNotNull(response);
-        assertEquals("newJwtToken", response.getToken());
-        verify(userRepository, times(1)).save(user);
-        verify(jwtService, times(1)).generateJwtToken(any(Authentication.class));
+        assertNotNull(response.getToken());
+        assertEquals(response.getEmail(), userCredentials.getEmail());
+        assertEquals(response.getUserName(), userCredentials.getUserName());
+        assertEquals("newEmail@example.com", retrivedUser.getEmail());
+        assertEquals("newUserName", retrivedUser.getUserName());
     }
 
     @Test
-    public void testUpdateUserExecution_UserNotFound() {
+    void testUpdateUserExecution_UserExistsByEmail() {
         // Given
-        when(authentication.getPrincipal()).thenReturn(null);
-
-        UserCredentials userCredentials = UserCredentials.builder().build();
-
-        // When & Then
-        assertThrows(UsernameNotFoundException.class, () -> {
-            userService.updateUserExecution(userCredentials, authentication);
-        });
-    }
-
-
-    @Test
-    public void testUpdateUserExecution_UsernameAlreadyExists() {
-        // Given
-        UserCredentials userCredentials = UserCredentials
-                .builder()
-                .userName("existingUsername")
-                .email("newemail@example.com")
+        UserCredentials userCredentials = UserCredentials.builder()
+                .email("email2@example.com")
+                .userName("newUserName")
+                .password("password")
                 .build();
 
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(userRepository.existsByUserName("existingUsername")).thenReturn(true);
-
-        // When
-        assertThrows(UserExistsException.class, () -> {
-            userService.updateUserExecution(userCredentials, authentication);
-        });
-    }
-
-    @Test
-    public void testUpdateUserExecution_EmailAlreadyExists() {
-        // Given
-        UserCredentials userCredentials = UserCredentials
-                .builder()
-                .userName("newUsername")
-                .email("existingEmail@example.com")
-                .build();
-
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(userRepository.existsByEmail("existingEmail@example.com")).thenReturn(true);
-
         // When & Then
-        assertThrows(UserExistsException.class, () -> {
-            userService.updateUserExecution(userCredentials, authentication);
-        });
+        assertThrows(UserExistsException.class, () ->
+                userService.updateUserExecution(userCredentials, createAuthentication(user)));
     }
 
     @Test
-    public void testUpdateUserExecution_NoChangesToUser() {
+    void testUpdateUserExecution_UserExistsByUsername() {
         // Given
-        UserCredentials userCredentials = UserCredentials
-                .builder()
-                .userName("testUsername")
+        UserCredentials userCredentials = UserCredentials.builder()
                 .email("email@example.com")
+                .userName("userName2")
+                .password("password")
                 .build();
-
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(jwtService.generateJwtToken(any(Authentication.class))).thenReturn("newJwtToken");
-        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(securityUser);
-
-        // When
-        AuthenticationResponse response = userService.updateUserExecution(userCredentials, authentication);
-
-        // Then
-        assertNotNull(response);
-        assertEquals("newJwtToken", response.getToken());
-        verify(userRepository, never()).save(any(User.class));
-        verify(jwtService, times(1)).generateJwtToken(any(Authentication.class));
-    }
-
-    @Test
-    public void testUpdateUserExecution_NullUserCredentials() {
-        // Given
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(jwtService.generateJwtToken(any(Authentication.class))).thenReturn("newJwtToken");
-        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(securityUser);
 
         // When & Then
-        assertThrows(NullPointerException.class, () -> {
-            userService.updateUserExecution(null, authentication);
-        });
+        assertThrows(UserExistsException.class, () ->
+                userService.updateUserExecution(userCredentials, createAuthentication(user)));
     }
 
     @Test
-    public void testUpdateUserExecution_InvalidEmailAndUsername() {
+    void testUpdateUserExecution_PasswordMismatch() {
         // Given
-        UserCredentials userCredentials = UserCredentials
-                .builder()
-                .userName("")
-                .email("")
+        UserCredentials userCredentials = UserCredentials.builder()
+                .email("newEmail@example.com")
+                .userName("newUserName")
+                .password("wrongPassword")
                 .build();
-
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(jwtService.generateJwtToken(any(Authentication.class))).thenReturn("newJwtToken");
-        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(securityUser);
-
-        // When
-        AuthenticationResponse response = userService.updateUserExecution(userCredentials, authentication);
-
-        // Then
-        assertNotNull(response);
-        assertEquals("newJwtToken", response.getToken());
-        verify(userRepository, never()).save(any(User.class));
-        verify(jwtService, times(1)).generateJwtToken(any(Authentication.class));
-    }
-
-    @Test
-    public void testUpdateUserExecution_UpdateSecurityContext_UserLoggedOut() {
-        // Given
-        UserCredentials userCredentials = UserCredentials
-                .builder()
-                .email("newemail@example.com")
-                .userName("newUsername")
-                .build();
-
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(userRepository.existsByUserName("newUsername")).thenReturn(false);
-        when(userRepository.existsByEmail("newemail@example.com")).thenReturn(false);
-        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(null);
 
         // When & Then
-        assertThrows(UsernameNotFoundException.class, () -> {
-            userService.updateUserExecution(userCredentials, authentication);
-        });
+        assertThrows(BadCredentialsException.class, () ->
+                userService.updateUserExecution(userCredentials, createAuthentication(user)));
     }
 
     @Test
-    public void testChangePassword() {
+    void testUpdateUserExecution_NotExistingUser() {
         // Given
-        ChangePasswordRequest request = ChangePasswordRequest.builder()
-                .currentPassword("oldPassword")
-                .newPassword("newPassword")
-                .confirmPassword("newPassword")
+        User testUser = User.builder()
+                .userName("testUser")
+                .email("test@example.com")
+                .password(passwordEncoder.encode("password"))
+                .roles(new HashSet<>(List.of(retrivedRole)))
+                .build();
+        testUser.setEnabled(true);
+
+        UserCredentials userCredentials = UserCredentials.builder()
+                .email("newEmail@example.com")
+                .userName("newUserName")
+                .password("wrongPassword")
                 .build();
 
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        // When & Then
+        assertThrows(BadCredentialsException.class, () ->
+                userService.updateUserExecution(userCredentials, createAuthentication(testUser)));
+    }
+
+
+
+    @Test
+    void testChangePassword_Success () throws RoleNotFoundException {
+        // Given
+        ChangePasswordRequest request = new ChangePasswordRequest("password", "newPassword", "newPassword");
 
         // When
-        UserRespond response = userService.changePassword(request, authentication);
+        UserRespond response = userService.changePassword(request, createAuthentication(user));
 
         // Then
         assertNotNull(response);
         assertEquals("Password has been changed", response.getMessage());
-        verify(userRepository, times(1)).save(any(User.class));
+        assertTrue(passwordEncoder.matches("newPassword", user.getPassword()));
     }
 
     @Test
-    public void testChangePassword_UserNotFound() {
+    void testChangePassword_WrongPasswordException () {
         // Given
-        ChangePasswordRequest request = ChangePasswordRequest.builder()
-                .currentPassword("oldPassword")
-                .newPassword("newPassword")
-                .confirmPassword("newPassword")
-                .build();
+        ChangePasswordRequest request = new ChangePasswordRequest("password", "newPassword", "differentPassword");
 
-        when(authentication.getPrincipal()).thenReturn(null);
         // When & Then
-        assertThrows(UsernameNotFoundException.class, () -> {
-            userService.changePassword(request, authentication);
-        });
+        assertThrows(WrongPasswordException.class, () -> userService.changePassword(request, createAuthentication(user)));
     }
 
     @Test
-    public void testChangePassword_NewPasswordAndConfirmPasswordDoNotMatch() {
+    void testDeleteConnectedUser_Success () {
         // Given
-        ChangePasswordRequest request = ChangePasswordRequest.builder()
-                .currentPassword("oldPassword")
-                .newPassword("newPassword")
-                .confirmPassword("wrongPassword")
-                .build();
+        long usersQty = userRepository.count();
+        PasswordRequest request = new PasswordRequest("password");
 
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        // When
+        UserRespond response = userService.deleteConnectedUser(request, createAuthentication(user));
+        long userQtyAfterDelete = userRepository.count();
 
-        // When & Then
-        assertThrows(WrongPasswordException.class, () -> {
-            userService.changePassword(request, authentication);
-            verify(userRepository, never()).save(any(User.class));
-        });
+        // Then
+        assertNotNull(response);
+        assertEquals("User userName has been deleted!", response.getMessage());
+        assertFalse(userService.existsByEmail("email@example.com"));
+        assertEquals(usersQty - 1, userQtyAfterDelete);
     }
 
-    @Test
-    public void testChangePassword_PasswordIncorrect() {
-        // Given
-        ChangePasswordRequest request = ChangePasswordRequest.builder()
-                .currentPassword("oldPassword")
-                .newPassword("newPassword")
-                .confirmPassword("wrongPassword")
-                .build();
-
-        when(authentication.getPrincipal()).thenReturn(securityUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
-
-        // When & Then
-        assertThrows(WrongPasswordException.class, () -> {
-            userService.changePassword(request, authentication);
-            verify(userRepository, never()).save(any(User.class));
-        });
+    private Authentication createAuthentication(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }
 }

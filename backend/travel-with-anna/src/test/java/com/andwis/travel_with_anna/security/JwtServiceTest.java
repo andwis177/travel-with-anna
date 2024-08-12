@@ -1,94 +1,144 @@
 package com.andwis.travel_with_anna.security;
 
+import com.andwis.travel_with_anna.handler.exception.JwtParsingException;
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.user.SecurityUser;
+import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.UserRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.function.Function;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DisplayName("JWT Service tests")
 class JwtServiceTest {
-    @Mock
-    private Authentication authentication;
-    @Mock
-    private UserDetails userDetails;
-    @Mock
-    private Claims claims;
-    @InjectMocks
+    @Autowired
     private JwtService jwtService;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
+    private User user;
 
 
-    @Test
-    public void testGenerateJwtToken() {
-        //Given
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(userDetails.getUsername()).thenReturn("email@example.com");
+    @BeforeEach
+    void setUp() {
+        Role role = new Role();
+        role.setRoleName("USER");
+        Optional<Role> existingRole = roleRepository.findByRoleName("USER");
+        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
-        when(claims.getSubject()).thenReturn("email@example.com");
-        when(claims.getExpiration()).thenReturn(new Date(System.currentTimeMillis() + jwtExpiration));
+        user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("password"))
+                .roles(new HashSet<>(List.of(retrivedRole)))
+                .build();
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
 
-        //When
-        String token = jwtService.generateJwtToken(authentication);
-
-        //Then
-        assertNotNull(token);
-        assertFalse(token.isEmpty());
-        verify(authentication, times(1)).getPrincipal();
-        verify(userDetails, times(1)).getUsername();
+    @AfterEach
+    void tearDown() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
     }
 
     @Test
-    public void testExtractClaim() {
+    void testGenerateJwtToken() {
+        String jwtToken =  jwtService.generateJwtToken(createAuthentication(user));
+
+        assertNotNull(jwtToken);
+        assertFalse(jwtToken.isEmpty());
+    }
+
+    @Test
+    void testExtractClaim_Success() {
         // Given
-        JwtService jwtServiceMock = mock(JwtService.class);
-        SecretKey secretKey = Jwts.SIG.HS256.key().build();
-        Date now = new Date(System.currentTimeMillis());
-        Date expiration = new Date(System.currentTimeMillis() - jwtExpiration);
+        String jwtToken =  jwtService.generateJwtToken(createAuthentication(user));
+        Date before = new Date(System.currentTimeMillis() - 1000);
+        Date shouldExpireBefore = new Date(System.currentTimeMillis() + jwtExpiration - 1000);
 
-        claims = Jwts.claims()
-                .subject("email@example.com")
-                .issuedAt(now)
-                .expiration(expiration)
-                .build();
+        // When
+        String claimResolver = jwtService.extractClaim(jwtToken, Claims::getSubject);
+        Date issuedAt = jwtService.extractClaim(jwtToken, Claims::getIssuedAt);
+        Date expiration = jwtService.extractClaim(jwtToken, Claims::getExpiration);
 
-        String token = Jwts.builder()
-                .claims(claims)
-                .signWith(secretKey)
-                .compact();
+        Date after = new Date(System.currentTimeMillis());
+        Date shouldExpireAfter = new Date(System.currentTimeMillis() + jwtExpiration);
 
-        //When
-        Claims claimsMock = mock(Claims.class);
-        when(claimsMock.getSubject()).thenReturn("email@example.com");
-        when(claimsMock.getIssuedAt()).thenReturn(now);
-        when(claimsMock.getExpiration()).thenReturn(expiration);
-
-        when(jwtServiceMock.extractClaim(eq(token), any(Function.class)))
-                .thenAnswer(invocation -> {
-                    Function<Claims, ?> resolver = invocation.getArgument(1);
-                    return resolver.apply(claimsMock);
-                });
-        String claimResolver = jwtServiceMock.extractClaim(token, Claims::getSubject);
-
-        //Then
+        // Then
         assertNotNull(claimResolver);
         assertFalse(claimResolver.isEmpty());
+        assertEquals("email@example.com", claimResolver);
+        assertTrue(issuedAt.before(after));
+        assertTrue(issuedAt.after(before));
+        assertTrue(expiration.before(shouldExpireAfter));
+        assertTrue(expiration.after(shouldExpireBefore));
+    }
 
-        verify(jwtServiceMock, times(1)).extractClaim(eq(token), any(Function.class));
+    @Test
+    void testExtractClaim_Failed() {
+        // Given
+        String jwtToken =  "Invalid token";
+
+        // When & Then
+        assertThrows(JwtParsingException.class,
+                () -> jwtService.extractClaim(jwtToken, Claims::getSubject));
+    }
+
+    @Test
+    void testExtractUserName() {
+        // Given
+        String jwtToken =  jwtService.generateJwtToken(createAuthentication(user));
+
+        // When
+        String claimResolver = jwtService.extractUsername(jwtToken);
+
+        // Then
+        assertNotNull(claimResolver);
+        assertFalse(claimResolver.isEmpty());
+        assertEquals("email@example.com", claimResolver);
+
+    }
+
+    @Test
+    void testIsTokenValid() {
+        // Given
+        String jwtToken =  jwtService.generateJwtToken(createAuthentication(user));
+        UserDetails userDetails1 = (UserDetails) createAuthentication(user).getPrincipal();
+        // When
+
+        boolean isTokenValid = jwtService.isTokenValid(jwtToken, userDetails1);
+
+        // Then
+        assertTrue(isTokenValid);
+    }
+
+    private Authentication createAuthentication(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }
 }

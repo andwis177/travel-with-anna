@@ -13,7 +13,8 @@
                  [(ngModel)]="authRequest.email"
                  [ngModelOptions]="{standalone: true}"
                  placeholder="Ex. pat@example.com"
-                 autocomplete="email">
+                 autocomplete="email"
+                 (keydown.enter)="$event.preventDefault()">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width" >
@@ -43,11 +44,8 @@
             <p *ngFor="let msg of errorMsg">{{msg}}</p>
             <mat-divider class="padding-bottom"></mat-divider>
           </div>
-          <div style="padding-top: 5px">
-            You don't have an account?
-            <div>
-              <button class="custom-button-1" style="margin-top: 5px" (click)="register()">Register</button>
-            </div>
+          <div>
+            <button class="custom-button-1" style="margin-top: 5px" (click)="register()">Register</button>
           </div>
         </div>
         <div style="padding-top: 20px">

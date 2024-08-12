@@ -77,6 +77,7 @@ public class GlobalExceptionHandler {
                 );
     }
 
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionResponse> handleException(IllegalArgumentException exp) {
         return ResponseEntity
@@ -90,6 +91,7 @@ public class GlobalExceptionHandler {
                 );
     }
 
+
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ExceptionResponse> handleException(InvalidTokenException exp) {
         return ResponseEntity
@@ -99,6 +101,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(INVALID_TOKEN.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(INVALID_TOKEN.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(JwtParsingException.class)
+    public ResponseEntity<ExceptionResponse> handleException(JwtParsingException exp) {
+        return ResponseEntity
+                .status(UNAUTHORIZED)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(JWT_PARSING_ERROR.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(JWT_PARSING_ERROR.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -148,6 +163,7 @@ public class GlobalExceptionHandler {
                 );
     }
 
+
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(RoleNotFoundException exp) {
         return ResponseEntity
@@ -157,6 +173,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(ROLE_NOT_FOUND.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(ROLE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(SaveAvatarException.class)
+    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(SaveAvatarException exp) {
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(AVATAR_NOT_SAVED.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(AVATAR_NOT_SAVED.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -176,6 +205,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(UsernameNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(USER_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(USER_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(UserIdNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(UserIdNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(

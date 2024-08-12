@@ -14,8 +14,8 @@ import { changePassword } from '../fn/user/change-password';
 import { ChangePassword$Params } from '../fn/user/change-password';
 import { delete$ } from '../fn/user/delete';
 import { Delete$Params } from '../fn/user/delete';
-import { getProfile } from '../fn/user/get-profile';
-import { GetProfile$Params } from '../fn/user/get-profile';
+import { getCredentials } from '../fn/user/get-credentials';
+import { GetCredentials$Params } from '../fn/user/get-credentials';
 import { update } from '../fn/user/update';
 import { Update$Params } from '../fn/user/update';
 import { UserCredentials } from '../models/user-credentials';
@@ -77,27 +77,27 @@ export class UserService extends BaseService {
     );
   }
 
-  /** Path part for operation `getProfile()` */
-  static readonly GetProfilePath = '/user/profile';
+  /** Path part for operation `getCredentials()` */
+  static readonly GetCredentialsPath = '/user/profile';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getProfile()` instead.
+   * To access only the response body, use `getCredentials()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getProfile$Response(params?: GetProfile$Params, context?: HttpContext): Observable<StrictHttpResponse<UserCredentials>> {
-    return getProfile(this.http, this.rootUrl, params, context);
+  getCredentials$Response(params?: GetCredentials$Params, context?: HttpContext): Observable<StrictHttpResponse<UserCredentials>> {
+    return getCredentials(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getProfile$Response()` instead.
+   * To access the full response (for headers, for example), `getCredentials$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getProfile(params?: GetProfile$Params, context?: HttpContext): Observable<UserCredentials> {
-    return this.getProfile$Response(params, context).pipe(
+  getCredentials(params?: GetCredentials$Params, context?: HttpContext): Observable<UserCredentials> {
+    return this.getCredentials$Response(params, context).pipe(
       map((r: StrictHttpResponse<UserCredentials>): UserCredentials => r.body)
     );
   }

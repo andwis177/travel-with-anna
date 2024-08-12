@@ -45,7 +45,6 @@ public class EmailServiceTest {
     @BeforeEach
     void setUp() throws IllegalAccessException, NoSuchFieldException {
         MockitoAnnotations.openMocks(this);
-        SecurityContextHolder.clearContext();
 
         Field senderEmailField = EmailService.class.getDeclaredField("senderEmail");
         senderEmailField.setAccessible(true);

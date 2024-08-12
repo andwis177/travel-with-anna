@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {BaseService} from "../base-service";
 import {ApiConfiguration} from "../api-configuration";
+import {SharedService} from "../shared/shared.service";
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class LogoutService extends BaseService {
 
   constructor(config: ApiConfiguration,
               http: HttpClient,
+              private sharedService: SharedService,
               private router: Router){
     super(config, http);
   }
@@ -21,8 +23,8 @@ export class LogoutService extends BaseService {
     this.http.post<void>(`${this.rootUrl}/execute_logout`, {},
       {responseType:'json'}).subscribe({
       next: () => {
-        localStorage.removeItem('token');
-        this.router.navigate(['/login']);
+        this.sharedService.clean();
+        this.router.navigate(['/login']).then(r => console.log('Navigated to login page.'));
       },
       error: (err) => {
         console.error('Error logging out:', err);

@@ -1,26 +1,33 @@
 package com.andwis.travel_with_anna.auth;
 
 import com.andwis.travel_with_anna.email.EmailService;
-import com.andwis.travel_with_anna.handler.exception.*;
+import com.andwis.travel_with_anna.handler.exception.ExpiredTokenException;
+import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
+import com.andwis.travel_with_anna.handler.exception.UserExistsException;
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
-import com.andwis.travel_with_anna.user.Token;
-import com.andwis.travel_with_anna.user.TokenRepository;
 import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserRepository;
+import com.andwis.travel_with_anna.user.UserCredentials;
+import com.andwis.travel_with_anna.user.UserService;
+import com.andwis.travel_with_anna.user.avatar.Avatar;
+import com.andwis.travel_with_anna.user.avatar.AvatarService;
+import com.andwis.travel_with_anna.user.token.Token;
+import com.andwis.travel_with_anna.user.token.TokenRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -29,7 +36,8 @@ public class AuthenticationService {
 
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final AvatarService avatarService;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
@@ -39,6 +47,7 @@ public class AuthenticationService {
     @Value("${application.mailing.frontend.login-url}")
     private String loginUrl;
 
+    @Transactional
     public void register(RegistrationRequest request) throws RoleNotFoundException, MessagingException {
         var userRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new RoleNotFoundException("Role 'USER' not found"));
@@ -48,21 +57,30 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .accountLocked(false)
                 .enabled(false)
-                .roles(List.of(userRole))
+                .roles(new HashSet<>(List.of(userRole)))
                 .build();
-        if (userRepository.existsByEmail(user.getEmail())) {
+        // user.addRole(userRole);
+        if (userService.existsByEmail(user.getEmail())) {
             throw new UserExistsException("User with this email already exists");
         }
-        if (userRepository.existsByUserName(user.getUserName())) {
+        if (userService.existsByUserName(user.getUserName())) {
             throw new UserExistsException("User with this name already exists");
         }
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new WrongPasswordException("Passwords do not match");
         }
 
-        userRepository.save(user);
-//        sendValidationEmail(user);
-        System.out.println(generateAndSaveActivationToken(user));
+        saveUserWithAvatar(user);
+
+        sendValidationEmail(user);
+        //     System.out.println(generateAndSaveActivationToken(user));
+    }
+
+
+    private void saveUserWithAvatar(User user) {
+        Avatar avatar = avatarService.createAvatar(user);
+        user.setAvatar(avatar);
+        userService.saveUser(user);
     }
 
     private void sendValidationEmail(User user) throws MessagingException {
@@ -100,7 +118,7 @@ public class AuthenticationService {
         return codeBuilder.toString();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) throws WrongPasswordException {
+    private AuthenticationResponse authenticate(AuthenticationRequest request) throws WrongPasswordException {
         try {
             var auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -115,36 +133,41 @@ public class AuthenticationService {
         }
     }
 
+    public AuthenticationResponse authenticationWithCredentials(AuthenticationRequest request) throws WrongPasswordException {
+        AuthenticationResponse response = authenticate(request);
+        UserCredentials userCredentials = userService.getCredentials(request.getEmail());
+        response.setUserName(userCredentials.getUserName());
+        response.setEmail(userCredentials.getEmail());
+        return response;
+    }
+
     public void activateAccount(String token) throws MessagingException {
         var tokenEntity = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
-
-//            sendValidationEmail(tokenEntity.getUser());
+//
+            sendValidationEmail(tokenEntity.getUser());
             throw new ExpiredTokenException("Token expired. New token was sent to your email");
         }
-        var user = userRepository.findById(tokenEntity.getUser().getUserId())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        var user = userService.getUserById(tokenEntity.getUser().getUserId());
         user.setEnabled(true);
-        userRepository.save(user);
+        userService.saveUser(user);
         tokenRepository.delete(tokenEntity);
     }
 
     private String generateAndSaveNewPassword(User user) {
         String generatedPassword = generateCode(20);
         user.setPassword(passwordEncoder.encode(generatedPassword));
-        userRepository.save(user);
+        userService.saveUser(user);
         return generatedPassword;
     }
 
     protected void resetPassword(ResetPasswordRequest request) throws MessagingException {
         User user;
         if (request.getCredential().contains("@")) {
-            user = userRepository.findByEmail(request.getCredential())
-                    .orElseThrow(() -> new EmailNotFoundException("User with this email not found"));
+            user = userService.getUserByEmail(request.getCredential());
         } else {
-            user = userRepository.findByUserName(request.getCredential())
-                    .orElseThrow(() -> new UsernameNotFoundException("User with this user name not found"));
+            user = userService.getUserByUserName(request.getCredential());
         }
         String newPassword = generateAndSaveNewPassword(user);
         emailService.sendResetPassword(

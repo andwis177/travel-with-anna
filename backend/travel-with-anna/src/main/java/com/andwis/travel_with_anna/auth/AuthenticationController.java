@@ -30,7 +30,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody @Valid AuthenticationRequest request
     )  {
-        AuthenticationResponse response = service.authenticate(request);
+        AuthenticationResponse response = service.authenticationWithCredentials(request);
         return ResponseEntity.ok(response);
     }
 

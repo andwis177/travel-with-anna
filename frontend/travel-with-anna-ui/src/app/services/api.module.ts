@@ -4,6 +4,7 @@ import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core
 import { HttpClient } from '@angular/common/http';
 import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 
+import { AvatarService } from './services/avatar.service';
 import { AuthenticationService } from './services/authentication.service';
 import { UserService } from './services/user.service';
 
@@ -15,6 +16,7 @@ import { UserService } from './services/user.service';
   exports: [],
   declarations: [],
   providers: [
+    AvatarService,
     AuthenticationService,
     UserService,
     ApiConfiguration

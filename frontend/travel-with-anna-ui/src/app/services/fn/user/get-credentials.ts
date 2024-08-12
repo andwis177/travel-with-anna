@@ -8,11 +8,11 @@ import { RequestBuilder } from '../../request-builder';
 
 import { UserCredentials } from '../../models/user-credentials';
 
-export interface GetProfile$Params {
+export interface GetCredentials$Params {
 }
 
-export function getProfile(http: HttpClient, rootUrl: string, params?: GetProfile$Params, context?: HttpContext): Observable<StrictHttpResponse<UserCredentials>> {
-  const rb = new RequestBuilder(rootUrl, getProfile.PATH, 'get');
+export function getCredentials(http: HttpClient, rootUrl: string, params?: GetCredentials$Params, context?: HttpContext): Observable<StrictHttpResponse<UserCredentials>> {
+  const rb = new RequestBuilder(rootUrl, getCredentials.PATH, 'get');
   if (params) {
   }
 
@@ -26,4 +26,4 @@ export function getProfile(http: HttpClient, rootUrl: string, params?: GetProfil
   );
 }
 
-getProfile.PATH = '/user/profile';
+getCredentials.PATH = '/user/profile';

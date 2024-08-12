@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.security;
 
+import com.andwis.travel_with_anna.handler.exception.JwtParsingException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -25,9 +26,9 @@ public class JwtService {
         this.key = Jwts.SIG.HS256.key().build();
     }
 
-    private SecretKey getSignInKey() {
-        return this.key;
-    }
+//    private SecretKey getSignInKey() {
+//        return this.key;
+//    }
 
     public String generateJwtToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -38,7 +39,7 @@ public class JwtService {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .claims(claims)
-                .signWith(getSignInKey())
+                .signWith(this.key)
                 .compact();
     }
 
@@ -58,15 +59,14 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         try {
-
             return Jwts.parser()
-                    .verifyWith(getSignInKey())
+                    .verifyWith(this.key)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException exp) {
             System.out.println("JWT parsing failed: " + exp.getMessage());
-            throw exp;
+            throw new JwtParsingException("JWT parsing failed");
         }
     }
 

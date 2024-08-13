@@ -1,3 +1,9 @@
+CREATE TABLE roles (
+                       role_id SERIAL PRIMARY KEY,
+                       role_name VARCHAR(255) UNIQUE NOT NULL,
+                       authority VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE users (
                        user_id BIGSERIAL PRIMARY KEY,
                        user_name VARCHAR(255) UNIQUE NOT NULL,
@@ -6,22 +12,11 @@ CREATE TABLE users (
                        account_locked BOOLEAN DEFAULT FALSE,
                        enabled BOOLEAN DEFAULT TRUE,
                        created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                       last_modified_date TIMESTAMP
+                       last_modified_date TIMESTAMP,
+                       role_id INT NOT NULL,
+                       CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 
-CREATE TABLE roles (
-                       role_id SERIAL PRIMARY KEY,
-                       role_name VARCHAR(255) UNIQUE NOT NULL,
-                       created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                       last_modified_date TIMESTAMP
-);
-
-
-CREATE TABLE users_roles (
-                            role_id INT REFERENCES roles(role_id) ON DELETE CASCADE,
-                            user_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
-                            PRIMARY KEY (user_id, role_id)
-);
 
 CREATE TABLE tokens (
                         token_id BIGSERIAL PRIMARY KEY,

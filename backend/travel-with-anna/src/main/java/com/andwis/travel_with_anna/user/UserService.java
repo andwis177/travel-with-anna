@@ -83,8 +83,6 @@ public class UserService {
 
     private void updateUser(UserCredentials userCredentials, User user) {
         boolean isChanged = false;
-        System.out.println(user.getRoles());
-
         String newUserName = userCredentials.getUserName();
         String newEmail = userCredentials.getEmail();
 
@@ -98,7 +96,6 @@ public class UserService {
                 isChanged = true;
             }
         }
-        System.out.println(user.getRoles());
         if (newUserName != null
                 && !newUserName.isBlank()
                 && !newUserName.equals(user.getUserName())) {
@@ -145,7 +142,6 @@ public class UserService {
         var currentUser = securityUser.getUser();
         String userName = currentUser.getUserName();
         verifyPassword(currentUser, request.password());
-        securityUser.getUser().getRoles().clear();
         userRepository.delete(securityUser.getUser());
         return UserRespond.builder()
                 .message("User " + userName + " has been deleted!")

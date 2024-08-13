@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -19,7 +18,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
-public class SecurityConfig {
+public class SecurityConfig  {
 
     private final JwtFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -44,6 +43,10 @@ public class SecurityConfig {
                                         "/webjars/**",
                                         "/swagger-ui.html"
                                 ).permitAll()
+                                .requestMatchers(
+                                        "/user/**",
+                                        "/avatar/**"
+                                ).hasAuthority("User")
                                 .anyRequest()
                                 .authenticated()
                 )

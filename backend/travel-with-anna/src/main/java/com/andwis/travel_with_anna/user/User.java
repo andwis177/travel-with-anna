@@ -14,7 +14,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.security.auth.Subject;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 import static jakarta.persistence.FetchType.EAGER;
 
@@ -30,24 +29,31 @@ public class User implements Principal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
     @Column(unique = true)
     private String userName;
+
     @Column(unique = true)
     private String email;
+
     private String password;
+
     private boolean accountLocked;
+
     private boolean enabled;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
+
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastModifiedDate;
-    @ManyToMany(fetch = EAGER)
-    @JoinTable(name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+
+    @ManyToOne(fetch = EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "avatar_id", referencedColumnName = "avatar_id")
     private Avatar avatar;

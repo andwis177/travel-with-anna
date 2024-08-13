@@ -73,4 +73,14 @@ public class BeansConfig {
     public CustomLogoutSuccessHandler customLogoutSuccessHandler() {
         return new CustomLogoutSuccessHandler();
     }
+//
+//    @Bean
+//    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+//        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+//        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+//        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+//        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+//        jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+//        return jwtConverter;
+//    }
 }

@@ -27,8 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.management.relation.RoleNotFoundException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +55,7 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .accountLocked(false)
                 .enabled(false)
-                .roles(new HashSet<>(List.of(userRole)))
+                .role(userRole)
                 .build();
         // user.addRole(userRole);
         if (userService.existsByEmail(user.getEmail())) {
@@ -72,8 +70,8 @@ public class AuthenticationService {
 
         saveUserWithAvatar(user);
 
-        sendValidationEmail(user);
-        //     System.out.println(generateAndSaveActivationToken(user));
+//        sendValidationEmail(user);
+        System.out.println(generateAndSaveActivationToken(user));
     }
 
 
@@ -145,8 +143,8 @@ public class AuthenticationService {
         var tokenEntity = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
-//
-            sendValidationEmail(tokenEntity.getUser());
+
+//            sendValidationEmail(tokenEntity.getUser());
             throw new ExpiredTokenException("Token expired. New token was sent to your email");
         }
         var user = userService.getUserById(tokenEntity.getUser().getUserId());

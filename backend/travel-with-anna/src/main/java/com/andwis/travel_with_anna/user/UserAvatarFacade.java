@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static com.andwis.travel_with_anna.user.avatar.AvatarService.bytesToHex;
@@ -59,7 +58,6 @@ public class UserAvatarFacade {
                     return hexToBytes(AvatarImg.DEFAULT.getImg());
                 }
             } else {
-                System.out.println(Arrays.toString(hexToBytes(AvatarImg.DEFAULT.getImg())));
                 return hexToBytes(AvatarImg.DEFAULT.getImg());
             }
         } else{

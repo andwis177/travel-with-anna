@@ -38,6 +38,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -78,7 +80,8 @@ class AuthenticationServiceTest {
     void setUp() {
         request = new RegistrationRequest("username", "email@example.com", "password", "password");
         role = new Role();
-        role.setRoleName("USER");
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
 
         avatar = Avatar.builder()
                 .avatarId(1L)
@@ -91,7 +94,7 @@ class AuthenticationServiceTest {
                 .password("password")
                 .accountLocked(false)
                 .enabled(false)
-                .roles(new HashSet<>(List.of(role)))
+                .role(role)
                 .build();
 
         user.setUserId(1L);
@@ -112,7 +115,7 @@ class AuthenticationServiceTest {
     @Test
     void testRegister_Success() throws MessagingException, RoleNotFoundException {
         //Given
-        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.of(role));
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
         when(userService.existsByEmail("email@example.com")).thenReturn(false);
         when(userService.existsByUserName("username")).thenReturn(false);
@@ -142,7 +145,7 @@ class AuthenticationServiceTest {
     @Test
     void testRegister_RoleNotFound() {
         // Given
-        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.empty());
+        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.empty());
 
         //When & Then
         assertThrows(RoleNotFoundException.class, () -> authenticationService.register(request));
@@ -151,7 +154,7 @@ class AuthenticationServiceTest {
     @Test
     void testRegister_UserExistsByEmail()  {
         //Given
-        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.of(role));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userService.existsByEmail("email@example.com")).thenReturn(true);
 
@@ -163,7 +166,7 @@ class AuthenticationServiceTest {
     @Test
     void testRegister_UserExistsByUserName()  {
         //Given
-        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.of(role));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userService.existsByUserName("username")).thenReturn(true);
 
@@ -176,7 +179,7 @@ class AuthenticationServiceTest {
     void testRegister_PasswordDoNotMatch() {
         //Given
         request.setConfirmPassword("differentPassword");
-        when(roleRepository.findByRoleName("USER")).thenReturn(Optional.of(role));
+        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.of(role));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
 
         // When & Then

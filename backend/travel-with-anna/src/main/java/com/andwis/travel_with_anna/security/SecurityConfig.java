@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.andwis.travel_with_anna.role.Role.getAdminAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -46,7 +48,7 @@ public class SecurityConfig  {
                                 .requestMatchers(
                                         "/user/**",
                                         "/avatar/**"
-                                ).hasAuthority("User")
+                                ).hasAnyAuthority(getUserAuthority(), getAdminAuthority())
                                 .anyRequest()
                                 .authenticated()
                 )

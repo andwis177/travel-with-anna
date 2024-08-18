@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -18,20 +20,22 @@ class RoleRepositoryTest {
     void testFindByRoleName() {
         // Given
         Role role = Role.builder()
-                .roleName("TEST_ROLE")
+                .roleName(getUserRole())
+                .authority(getUserAuthority())
                 .build();
-        if (roleRepository.findByRoleName("TEST_ROLE").isPresent()) {
-            roleRepository.delete(roleRepository.findByRoleName("TEST_ROLE").get());
+        if (roleRepository.findByRoleName(getUserRole()).isPresent()) {
+            roleRepository.delete(roleRepository.findByRoleName(getUserRole()).get());
         }
         Integer roleId = roleRepository.save(role).getRoleId();
 
         // When
-        Role retrivedRole = roleRepository.findByRoleName("TEST_ROLE").orElse(null);
+        Role retrivedRole = roleRepository.findByRoleName(getUserRole()).orElse(null);
 
         // Then
         assertNotNull(retrivedRole);
         assertEquals(roleId, retrivedRole.getRoleId());
-        assertEquals("TEST_ROLE", role.getRoleName());
+        assertEquals(getUserRole(), role.getRoleName());
+        assertEquals(getUserAuthority(), role.getAuthority());
     }
 
     @Test

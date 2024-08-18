@@ -1,5 +1,7 @@
 package com.andwis.travel_with_anna.user;
 
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.token.Token;
 import com.andwis.travel_with_anna.user.token.TokenRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -10,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -21,6 +25,8 @@ class TokenRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @AfterEach
     void tearDown() {
@@ -31,10 +37,18 @@ class TokenRepositoryTest {
     @Test
     void testFindByToken() {
         // Given
+        Role role = Role.builder()
+                .roleName(getUserRole())
+                .authority(getUserAuthority())
+                .build();
+
+        roleRepository.save(role);
+
         User user = User.builder()
                 .userName("user")
                 .email("user@example.com")
                 .password("password")
+                .role(role)
                 .avatarId(1L)
                 .build();
 

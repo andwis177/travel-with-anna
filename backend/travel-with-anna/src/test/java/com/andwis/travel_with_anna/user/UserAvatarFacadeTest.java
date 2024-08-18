@@ -1,12 +1,9 @@
-package com.andwis.travel_with_anna.user.avatar;
+package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.handler.exception.SaveAvatarException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
-import com.andwis.travel_with_anna.user.SecurityUser;
-import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserAvatarFacade;
-import com.andwis.travel_with_anna.user.UserRepository;
+import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,10 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,15 +45,16 @@ class UserAvatarFacadeTest {
     @BeforeEach
     void setUp() {
         Role role = new Role();
-        role.setRoleName("USER");
-        Optional<Role> existingRole = roleRepository.findByRoleName("USER");
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .roles(new HashSet<>(List.of(retrivedRole)))
+                .role(retrivedRole)
                 .avatarId(1L)
                 .build();
         user.setEnabled(true);

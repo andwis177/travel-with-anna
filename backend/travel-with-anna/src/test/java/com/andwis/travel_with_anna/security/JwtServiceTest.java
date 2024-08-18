@@ -20,10 +20,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -46,15 +46,16 @@ class JwtServiceTest {
     @BeforeEach
     void setUp() {
         Role role = new Role();
-        role.setRoleName("USER");
-        Optional<Role> existingRole = roleRepository.findByRoleName("USER");
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .roles(new HashSet<>(List.of(retrivedRole)))
+                .role(retrivedRole)
                 .avatarId(1L)
                 .build();
         user.setEnabled(true);

@@ -22,6 +22,7 @@ public class AvatarService {
         return avatarRepository.findById(id)
                 .orElseThrow(() -> new AvatarNotFoundException("Avatar not found"));
     }
+
     public static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {

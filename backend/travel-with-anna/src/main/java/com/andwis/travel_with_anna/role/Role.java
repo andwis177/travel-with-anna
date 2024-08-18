@@ -17,6 +17,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Role {
 
+    private final static String USER_ROLE = "USER";
+    private final static String ADMIN_ROLE = "ADMIN";
+    private final static String ADMIN_AUTHORITY = "ROLE_ADMIN";
+    private final static String USER_AUTHORITY = "ROLE_USER";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer roleId;
@@ -28,4 +33,20 @@ public class Role {
     @NotNull
     @Column()
     private String authority;
+
+    public static String getUserRole() {
+        return USER_ROLE;
+    }
+
+    public static String getAdminRole() {
+        return ADMIN_ROLE;
+    }
+
+    public static String getAdminAuthority() {
+        return ADMIN_AUTHORITY;
+    }
+
+    public static String getUserAuthority() {
+        return USER_AUTHORITY;
+    }
 }

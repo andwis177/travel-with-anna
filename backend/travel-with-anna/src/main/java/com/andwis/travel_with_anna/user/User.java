@@ -50,8 +50,9 @@ public class User implements Principal {
     @Column(insertable = false)
     private LocalDateTime lastModifiedDate;
 
+    @NotNull
     @ManyToOne(fetch = EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @NotNull

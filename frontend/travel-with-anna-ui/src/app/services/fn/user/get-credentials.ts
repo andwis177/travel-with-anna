@@ -26,4 +26,4 @@ export function getCredentials(http: HttpClient, rootUrl: string, params?: GetCr
   );
 }
 
-getCredentials.PATH = '/user/profile';
+getCredentials.PATH = '/user/credentials';

@@ -56,6 +56,7 @@ class UserServiceTest {
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
                 .roles(new HashSet<>(List.of(retrivedRole)))
+                .avatarId(1L)
                 .build();
         user.setEnabled(true);
         userId = userRepository.save(user).getUserId();
@@ -65,6 +66,7 @@ class UserServiceTest {
                 .email("email2@example.com")
                 .password(passwordEncoder.encode("password"))
                 .roles(new HashSet<>(List.of(retrivedRole)))
+                .avatarId(2L)
                 .build();
         user.setEnabled(true);
         userRepository.save(secondaryUser);
@@ -84,6 +86,7 @@ class UserServiceTest {
                 .email("test@example.com")
                 .password(passwordEncoder.encode("password"))
                 .roles(new HashSet<>(List.of(retrivedRole)))
+                .avatarId(1L)
                 .build();
         user.setEnabled(true);
 
@@ -281,8 +284,6 @@ class UserServiceTest {
         assertThrows(BadCredentialsException.class, () ->
                 userService.updateUserExecution(userCredentials, createAuthentication(testUser)));
     }
-
-
 
     @Test
     void testChangePassword_Success () throws RoleNotFoundException {

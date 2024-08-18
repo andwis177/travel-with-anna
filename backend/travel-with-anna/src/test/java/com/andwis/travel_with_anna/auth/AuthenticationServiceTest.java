@@ -83,7 +83,6 @@ class AuthenticationServiceTest {
         avatar = Avatar.builder()
                 .avatarId(1L)
                 .avatar("avatar")
-                .user(null)
                 .build();
 
         user = User.builder()
@@ -134,13 +133,10 @@ class AuthenticationServiceTest {
         );
         User savedUser = userCaptor.getValue();
 
-        assertNotNull(savedUser.getAvatar());
+        assertNotNull(savedUser.getAvatarId());
         assertEquals(request.getEmail(), savedUser.getEmail());
         assertEquals(request.getUserName(), savedUser.getUserName());
         assertEquals("encodedPassword", savedUser.getPassword());
-        assertEquals(avatar, savedUser.getAvatar());
-
-
     }
 
     @Test
@@ -364,4 +360,7 @@ class AuthenticationServiceTest {
         assertThrows(UsernameNotFoundException.class, () -> authenticationService.resetPassword(request));
         verify(emailService, never()).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
     }
+
+
+
 }

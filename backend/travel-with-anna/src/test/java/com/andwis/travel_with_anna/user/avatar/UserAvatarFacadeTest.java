@@ -5,6 +5,7 @@ import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.UserAvatarFacade;
 import com.andwis.travel_with_anna.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,24 +20,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DisplayName("Avatar Service tests")
-class AvatarServiceTest {
-
-    @Autowired
-    private AvatarService avatarService;
+class UserAvatarFacadeTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserAvatarFacade userAvatarFacade;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -45,7 +44,6 @@ class AvatarServiceTest {
     private PasswordEncoder passwordEncoder;
 
     private User user;
-    private Path path;
 
     @BeforeEach
     void setUp() {
@@ -59,13 +57,10 @@ class AvatarServiceTest {
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
                 .roles(new HashSet<>(List.of(retrivedRole)))
-                .avatar(new Avatar())
+                .avatarId(1L)
                 .build();
         user.setEnabled(true);
         userRepository.save(user);
-
-        path = Paths.get("src/test/resources/images/user.jpg");
-
     }
 
     @AfterEach()
@@ -85,13 +80,13 @@ class AvatarServiceTest {
         );
 
         // When
-        avatarService.setAvatar(file, createAuthentication(user));
+        userAvatarFacade.setAvatar(file, createAuthentication(user));
 
         // Then
         Optional<User> retrievedUser = userRepository.findById(user.getUserId());
         assertTrue(retrievedUser.isPresent());
-        assertNotNull(retrievedUser.get().getAvatar());
-        assertFalse(retrievedUser.get().getAvatar().getAvatar().isEmpty());
+        assertNotNull(retrievedUser.get().getAvatarId());
+        assertNotEquals(0, retrievedUser.get().getAvatarId());
     }
 
     @Test
@@ -106,7 +101,7 @@ class AvatarServiceTest {
 
         // When & Then
         SaveAvatarException exception = assertThrows(SaveAvatarException.class, () -> {
-            avatarService.setAvatar(file, createAuthentication(user));
+            userAvatarFacade.setAvatar(file, createAuthentication(user));
         });
 
         assertEquals("File is not a jpeg image", exception.getMessage());
@@ -125,7 +120,7 @@ class AvatarServiceTest {
 
         // When & Then
         SaveAvatarException exception = assertThrows(SaveAvatarException.class, () -> {
-            avatarService.setAvatar(file, createAuthentication(user));
+            userAvatarFacade.setAvatar(file, createAuthentication(user));
         });
 
         assertEquals("File is too big", exception.getMessage());
@@ -140,16 +135,16 @@ class AvatarServiceTest {
                 "some-image-content".getBytes()
         );
 
-        user.setAvatar(null);
+        user.setAvatarId(null);
 
         // When
-        avatarService.setAvatar(file, createAuthentication(user));
+        userAvatarFacade.setAvatar(file, createAuthentication(user));
 
         // Then
         Optional<User> retrievedUser = userRepository.findById(user.getUserId());
         assertTrue(retrievedUser.isPresent());
-        assertNotNull(retrievedUser.get().getAvatar());
-        assertFalse(retrievedUser.get().getAvatar().getAvatar().isEmpty());
+        assertNotNull(retrievedUser.get().getAvatarId());
+        assertNotEquals(0, retrievedUser.get().getAvatarId());
 
     }
 
@@ -162,10 +157,10 @@ class AvatarServiceTest {
                 "image/jpeg",
                 "some-image-content".getBytes()
         );
-        avatarService.setAvatar(file, createAuthentication(user));
+        userAvatarFacade.setAvatar(file, createAuthentication(user));
 
         // When
-        byte[] avatarBytes = avatarService.getAvatar(createAuthentication(user), path);
+        byte[] avatarBytes = userAvatarFacade.getAvatar(createAuthentication(user));
 
         // Then
         assertNotNull(avatarBytes);
@@ -173,25 +168,27 @@ class AvatarServiceTest {
     }
 
     @Test
-    void testGetAvatar_DefaultAvatar() throws IOException {
+    void testGetAvatar_DefaultAvatar(){
         // Given
-        byte[] avatarBytes = avatarService.getAvatar(createAuthentication(user), path);
-
-        // When & Then
-        assertNotNull(avatarBytes);
-        byte[] expectedBytes = Files.readAllBytes(path);
-        assertArrayEquals(expectedBytes, avatarBytes);
+        byte[] defaultImg = hexToBytes(AvatarImg.DEFAULT.getImg());
+        // When
+        byte[] avatar = userAvatarFacade.getAvatar(createAuthentication(user));
+        // Then
+        assertArrayEquals(defaultImg, avatar);
+        assertNotNull(user.getAvatarId());
     }
 
+
     @Test
-    void testGetAvatar_FileNotExists() throws IOException {
+    void testGetAvatar_FileNotExists() {
         // Given
-        path = Path.of("non-existing-path");
+        byte[] defaultImg = hexToBytes(AvatarImg.DEFAULT.getImg());
+        user.setAvatarId(null);
         // When
-        String errorMessage = assertThrows(SaveAvatarException.class, () -> avatarService.getAvatar(createAuthentication(user), path)).getMessage();
+        byte[] avatar = userAvatarFacade.getAvatar(createAuthentication(user));
         // Then
-        assertEquals("Error reading default avatar", errorMessage);
-        assertNull(user.getAvatar().getAvatar());
+        assertArrayEquals(defaultImg, avatar);
+        assertNotNull(user.getAvatarId());
     }
 
     private Authentication createAuthentication(User user) {

@@ -67,17 +67,17 @@ public class AuthenticationService {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new WrongPasswordException("Passwords do not match");
         }
-
         saveUserWithAvatar(user);
 
 //        sendValidationEmail(user);
+
+
         System.out.println(generateAndSaveActivationToken(user));
     }
 
-
     private void saveUserWithAvatar(User user) {
         Avatar avatar = avatarService.createAvatar(user);
-        user.setAvatar(avatar);
+        user.setAvatarId(avatar.getAvatarId());
         userService.saveUser(user);
     }
 
@@ -144,7 +144,9 @@ public class AuthenticationService {
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
 
+
 //            sendValidationEmail(tokenEntity.getUser());
+
             throw new ExpiredTokenException("Token expired. New token was sent to your email");
         }
         var user = userService.getUserById(tokenEntity.getUser().getUserId());

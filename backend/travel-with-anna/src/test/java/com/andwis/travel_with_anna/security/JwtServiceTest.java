@@ -55,6 +55,7 @@ class JwtServiceTest {
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
                 .roles(new HashSet<>(List.of(retrivedRole)))
+                .avatarId(1L)
                 .build();
         user.setEnabled(true);
         userRepository.save(user);

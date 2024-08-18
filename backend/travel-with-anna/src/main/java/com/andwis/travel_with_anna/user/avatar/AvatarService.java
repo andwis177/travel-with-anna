@@ -1,71 +1,28 @@
 package com.andwis.travel_with_anna.user.avatar;
 
-import com.andwis.travel_with_anna.handler.exception.SaveAvatarException;
+import com.andwis.travel_with_anna.handler.exception.AvatarNotFoundException;
 import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
     private final AvatarRepository avatarRepository;
-    private final UserService userService;
 
-    public void setAvatar(MultipartFile file, Authentication connectedUser)
-            throws IOException {
-
-        if (!Objects.equals(file.getContentType(), "image/jpeg")) {
-            throw new SaveAvatarException("File is not a jpeg image");
-        }
-
-        byte[] fileBytes = file.getBytes();
-        User user = userService.getConnectedUser(connectedUser);
-
-        if (fileBytes.length > 1024 * 1024) {
-            throw new SaveAvatarException("File is too big");
-        }
-        String fileHex = bytesToHex(fileBytes);
-
-        if (user.getAvatar() == null) {
-            Avatar avatar = createAvatar(user);
-            user.setAvatar(avatar);
-        }
-
-        Avatar userAvatar = user.getAvatar();
-        userAvatar.setAvatar(fileHex);
-
-        avatarRepository.save(userAvatar);
-        userService.saveUser(user);
+    public Avatar save(Avatar avatar) {
+        return avatarRepository.save(avatar);
     }
 
-    public byte[] getAvatar(Authentication connectedUser, Path path) throws SaveAvatarException {
-        User user = userService.getConnectedUser(connectedUser);
-        if (user.getAvatar() != null) {
-            String avatar = user.getAvatar().getAvatar();
-            if (avatar != null && !avatar.isEmpty()) {
-                return hexToBytes(avatar);
-            }
-        }
-        return getDefaultAvatar(path);
+    public boolean existsById(Long id) {
+        return avatarRepository.existsById(id);
     }
 
-    private byte[] getDefaultAvatar(Path path) throws SaveAvatarException {
-        try {
-            return Files.readAllBytes(path);
-        } catch (Exception exp) {
-            throw new SaveAvatarException("Error reading default avatar", exp);
-        }
+    public Avatar findById(Long id) {
+        return avatarRepository.findById(id)
+                .orElseThrow(() -> new AvatarNotFoundException("Avatar not found"));
     }
-
-    private static String bytesToHex(byte[] bytes) {
+    public static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02x", b));
@@ -73,7 +30,7 @@ public class AvatarService {
         return sb.toString();
     }
 
-    private static byte[] hexToBytes(String hex) {
+    public static byte[] hexToBytes(String hex) {
         if (hex == null || hex.length() % 2 != 0) {
             throw new IllegalArgumentException("Invalid hex string");
         }
@@ -87,6 +44,17 @@ public class AvatarService {
     }
 
     public Avatar createAvatar(User user) {
-        return avatarRepository.save(Avatar.builder().user(user).avatar("").build());
+        Avatar avatar = avatarRepository.save(Avatar.builder()
+                .avatar(null)
+                .build());
+        user.setAvatarId(avatar.getAvatarId());
+        return avatar;
+    }
+
+    public void deleteAvatar(User user) {
+        if (user.getAvatarId() != null) {
+            avatarRepository.deleteById(user.getAvatarId());
+            user.setAvatarId(null);
+        }
     }
 }

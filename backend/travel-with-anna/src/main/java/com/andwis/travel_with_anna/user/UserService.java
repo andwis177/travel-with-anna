@@ -6,6 +6,7 @@ import com.andwis.travel_with_anna.handler.exception.UserExistsException;
 import com.andwis.travel_with_anna.handler.exception.UserIdNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.security.JwtService;
+import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final AvatarService avatarService;
 
     public User saveUser(User user) {
         return userRepository.save(user);
@@ -143,6 +145,7 @@ public class UserService {
         String userName = currentUser.getUserName();
         verifyPassword(currentUser, request.password());
         userRepository.delete(securityUser.getUser());
+        avatarService.deleteAvatar(currentUser);
         return UserRespond.builder()
                 .message("User " + userName + " has been deleted!")
                 .build();
@@ -164,6 +167,4 @@ public class UserService {
         }
         return securityUser ;
     }
-
-
 }

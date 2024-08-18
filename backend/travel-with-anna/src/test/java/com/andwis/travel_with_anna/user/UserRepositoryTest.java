@@ -23,6 +23,7 @@ class UserRepositoryTest {
                 .userName("userName")
                 .email("user@example.com")
                 .password("password")
+                .avatarId(1L)
                 .build();
        userRepository.save(user);
     }

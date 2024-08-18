@@ -78,7 +78,7 @@ export class UserService extends BaseService {
   }
 
   /** Path part for operation `getCredentials()` */
-  static readonly GetCredentialsPath = '/user/profile';
+  static readonly GetCredentialsPath = '/user/credentials';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.

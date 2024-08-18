@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.user.avatar;
 
+import com.andwis.travel_with_anna.user.UserAvatarFacade;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.nio.file.Path;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -29,9 +28,9 @@ class AvatarControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private AvatarService avatarService;
-    @MockBean
     private Authentication authentication;
+    @MockBean
+    private UserAvatarFacade userAvatarFacade;
 
     @Test
     @WithMockUser(username = "email@example.com", roles = "USER")
@@ -55,7 +54,7 @@ class AvatarControllerTest {
     void getAvatar_ShouldReturnOkWithImageHeaders() throws Exception {
         // Given
         byte[] imageBytes = "test image".getBytes();
-        when(avatarService.getAvatar(any(Authentication.class), any(Path.class))).thenReturn(imageBytes);
+        when(userAvatarFacade.getAvatar(any(Authentication.class))).thenReturn(imageBytes);
 
         // When & Then
         mockMvc.perform(get("/avatar/get-avatar"))

@@ -162,8 +162,8 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted",
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -205,7 +205,7 @@
         }
       }
     },
-    "/user/profile": {
+    "/user/credentials": {
       "get": {
         "tags": [
           "User"
@@ -225,7 +225,7 @@
         }
       }
     },
-    "/avatar/avatar": {
+    "/avatar/get-avatar": {
       "get": {
         "tags": [
           "Avatar"
@@ -237,12 +237,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "binaryStream": {
-                      "type": "object"
-                    }
-                  }
+                  "type": "string"
                 }
               }
             }
@@ -290,8 +285,8 @@
           "required": true
         },
         "responses": {
-          "204": {
-            "description": "No Content",
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {

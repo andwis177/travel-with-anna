@@ -10,10 +10,7 @@ import { RequestBuilder } from '../../request-builder';
 export interface GetCurrentUserAvatar$Params {
 }
 
-export function getCurrentUserAvatar(http: HttpClient, rootUrl: string, params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<{
-'binaryStream'?: {
-};
-}>> {
+export function getCurrentUserAvatar(http: HttpClient, rootUrl: string, params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
   const rb = new RequestBuilder(rootUrl, getCurrentUserAvatar.PATH, 'get');
   if (params) {
   }
@@ -23,12 +20,9 @@ export function getCurrentUserAvatar(http: HttpClient, rootUrl: string, params?:
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<{
-      'binaryStream'?: {
-      };
-      }>;
+      return r as StrictHttpResponse<string>;
     })
   );
 }
 
-getCurrentUserAvatar.PATH = '/avatar/avatar';
+getCurrentUserAvatar.PATH = '/avatar/get-avatar';

@@ -1,8 +1,8 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.role.Role;
-import com.andwis.travel_with_anna.user.avatar.Avatar;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,9 +54,9 @@ public class User implements Principal {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "avatar_id", referencedColumnName = "avatar_id")
-    private Avatar avatar;
+    @NotNull
+    @Column(name = "avatar_id")
+    private Long avatarId;
 
     @Override
     public String getName() {

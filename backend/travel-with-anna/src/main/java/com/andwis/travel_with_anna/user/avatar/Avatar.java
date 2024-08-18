@@ -1,6 +1,5 @@
 package com.andwis.travel_with_anna.user.avatar;
 
-import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +19,8 @@ public class Avatar {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "avatar_id")
     private Long avatarId;
-    @Column(name = "avatar")
+    @Lob
+    @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar;
-    @OneToOne(mappedBy = "avatar")
-    private User user;
+
 }

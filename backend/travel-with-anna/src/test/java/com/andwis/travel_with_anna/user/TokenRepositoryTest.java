@@ -35,6 +35,7 @@ class TokenRepositoryTest {
                 .userName("user")
                 .email("user@example.com")
                 .password("password")
+                .avatarId(1L)
                 .build();
 
         userRepository.save(user);

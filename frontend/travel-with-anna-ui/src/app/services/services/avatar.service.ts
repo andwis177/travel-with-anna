@@ -50,7 +50,7 @@ export class AvatarService extends BaseService {
   }
 
   /** Path part for operation `getCurrentUserAvatar()` */
-  static readonly GetCurrentUserAvatarPath = '/avatar/avatar';
+  static readonly GetCurrentUserAvatarPath = '/avatar/get-avatar';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -58,10 +58,7 @@ export class AvatarService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getCurrentUserAvatar$Response(params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<{
-'binaryStream'?: {
-};
-}>> {
+  getCurrentUserAvatar$Response(params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
     return getCurrentUserAvatar(this.http, this.rootUrl, params, context);
   }
 
@@ -71,18 +68,9 @@ export class AvatarService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getCurrentUserAvatar(params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<{
-'binaryStream'?: {
-};
-}> {
+  getCurrentUserAvatar(params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<string> {
     return this.getCurrentUserAvatar$Response(params, context).pipe(
-      map((r: StrictHttpResponse<{
-'binaryStream'?: {
-};
-}>): {
-'binaryStream'?: {
-};
-} => r.body)
+      map((r: StrictHttpResponse<string>): string => r.body)
     );
   }
 

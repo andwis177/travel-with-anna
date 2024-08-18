@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Objects;
 
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,7 +45,7 @@ class AuthenticationControllerTest {
     @Test
     void register_ShouldReturnAccepted() throws Exception {
         // Given
-        RegistrationRequest request = new RegistrationRequest("testuser", "test@example.com", "password123", "password123");
+        RegistrationRequest request = new RegistrationRequest("testuser", "test@example.com", "password123", "password123", getUserRole());
         String jsonContent = objectMapper.writeValueAsString(request);
 
         // When
@@ -64,7 +65,7 @@ class AuthenticationControllerTest {
     @Test
     void register_ShouldReturnBadRequest() throws Exception {
         // Given
-        RegistrationRequest request = new RegistrationRequest("test", "test.com", "password123", "password123");
+        RegistrationRequest request = new RegistrationRequest("test", "test.com", "password123", "password123", getUserRole());
         String jsonContent = objectMapper.writeValueAsString(request);
 
         // When

@@ -2,3 +2,17 @@
   max-width: 500px;
 }
 
+.admin{
+  color: darkred !important;
+}
+
+.default{
+  color: darkgreen !important;
+}
+
+.admin,
+.default{
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+

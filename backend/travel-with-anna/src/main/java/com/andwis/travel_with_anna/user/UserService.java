@@ -5,6 +5,8 @@ import com.andwis.travel_with_anna.handler.exception.EmailNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.UserExistsException;
 import com.andwis.travel_with_anna.handler.exception.UserIdNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -31,13 +34,21 @@ public class UserService {
     public User saveUser(User user) {
         return userRepository.save(user);
     }
-
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
     public boolean existsByUserName(String userName) {
         return userRepository.existsByUserName(userName);
+    }
+
+    public boolean existsByRoleName(String roleName) {
+        if (roleRepository.existsByRoleName(roleName)) {
+            Role role = roleRepository.findByRoleName(roleName).orElseThrow(() ->
+                    new UserIdNotFoundException("Role not found"));
+            return userRepository.existsByRole(role);
+        }
+        return false;
     }
 
     public User getConnectedUser(Authentication connectedUser) {
@@ -139,7 +150,8 @@ public class UserService {
                 .build();
     }
 
-    public UserRespond deleteConnectedUser(PasswordRequest request, Authentication connectedUser) throws UsernameNotFoundException, WrongPasswordException {
+    public UserRespond deleteConnectedUser(PasswordRequest request, Authentication connectedUser)
+            throws UsernameNotFoundException, WrongPasswordException {
         var securityUser = getSecurityUser(connectedUser);
         var currentUser = securityUser.getUser();
         String userName = currentUser.getUserName();

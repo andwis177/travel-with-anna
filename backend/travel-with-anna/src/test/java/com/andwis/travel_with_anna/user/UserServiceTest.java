@@ -21,8 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.getUserAuthority;

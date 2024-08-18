@@ -33,13 +33,14 @@ class UserControllerTest {
     private Authentication connectedUser;
 
     @Test
-    @WithMockUser(username = "email@example.com", roles = "USER")
+    @WithMockUser(username = "email@example.com", authorities = "User")
     void getCredentials_ShouldReturnOkWithCredentials() throws Exception {
         // Given
         UserCredentials userCredentials = UserCredentials.builder()
                 .email("email@example.com")
                 .userName("username")
-                .password("password").build();
+                .password("password")
+                .build();
 
         when(service.getCredentials("email@example.com")).thenReturn(userCredentials);
         when(connectedUser.getName()).thenReturn("email@example.com");
@@ -53,7 +54,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "email@example.com", roles = "USER")
+    @WithMockUser(username = "email@example.com", authorities = "User")
     void update_ShouldReturnOkWithUpdatedResponse() throws Exception {
         // Given
         UserCredentials userCredentials = UserCredentials.builder()
@@ -82,7 +83,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "email@example.com", roles = "USER")
+    @WithMockUser(username = "email@example.com", authorities = "User")
     void changePassword_ShouldReturnAcceptedWithResponse() throws Exception {
         // Given
         ChangePasswordRequest request = ChangePasswordRequest.builder()
@@ -107,7 +108,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "email@example.com", roles = "USER")
+    @WithMockUser(username = "email@example.com", authorities = "User")
     void delete_ShouldReturnNoContent() throws Exception {
         // Given
         PasswordRequest request = new PasswordRequest("password");

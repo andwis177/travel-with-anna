@@ -24,4 +24,7 @@ public class RegistrationRequest {
     @NotBlank(message = "Password should be 8 characters long minimum")
     private String password;
     private String confirmPassword;
+    @NotEmpty(message = "Role is required")
+    @NotBlank(message = "Role is required")
+    private String roleName;
 }

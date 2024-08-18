@@ -3,7 +3,7 @@ package com.andwis.travel_with_anna.auth;
 import com.andwis.travel_with_anna.email.EmailService;
 import com.andwis.travel_with_anna.handler.exception.*;
 import com.andwis.travel_with_anna.role.Role;
-import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.role.RoleService;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserCredentials;
@@ -34,8 +34,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.management.relation.RoleNotFoundException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
@@ -49,7 +47,7 @@ class AuthenticationServiceTest {
     @Captor
     private ArgumentCaptor<User> userCaptor;
     @Mock
-    private RoleRepository roleRepository;
+    private RoleService roleService;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -78,7 +76,7 @@ class AuthenticationServiceTest {
 
     @BeforeEach
     void setUp() {
-        request = new RegistrationRequest("username", "email@example.com", "password", "password");
+        request = new RegistrationRequest("username", "email@example.com", "password", "password" , getUserRole());
         role = new Role();
         role.setRoleName(getUserRole());
         role.setAuthority(getUserAuthority());
@@ -95,6 +93,7 @@ class AuthenticationServiceTest {
                 .accountLocked(false)
                 .enabled(false)
                 .role(role)
+                .avatarId(1L)
                 .build();
 
         user.setUserId(1L);
@@ -115,18 +114,17 @@ class AuthenticationServiceTest {
     @Test
     void testRegister_Success() throws MessagingException, RoleNotFoundException {
         //Given
-        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.of(role));
+        when(roleService.getRoleByName(getUserRole())).thenReturn(role);
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
         when(userService.existsByEmail("email@example.com")).thenReturn(false);
         when(userService.existsByUserName("username")).thenReturn(false);
-        when(avatarService.createAvatar(any())).thenReturn(avatar);
         doNothing().when(emailService).sendValidationEmail(any(), any(), any(), any(), any());
 
         //When
         authenticationService.register(request);
 
         //Then
-        verify(userService, times(1)).saveUser(userCaptor.capture());
+        verify(avatarService, times(1)).createAvatar(userCaptor.capture());
         verify(emailService, times(1)).sendValidationEmail(
                 eq("email@example.com"),
                 eq("username"),
@@ -136,25 +134,25 @@ class AuthenticationServiceTest {
         );
         User savedUser = userCaptor.getValue();
 
-        assertNotNull(savedUser.getAvatarId());
+        assertNotNull(savedUser);
         assertEquals(request.getEmail(), savedUser.getEmail());
         assertEquals(request.getUserName(), savedUser.getUserName());
         assertEquals("encodedPassword", savedUser.getPassword());
     }
 
     @Test
-    void testRegister_RoleNotFound() {
+    void testRegister_RoleNotFound() throws RoleNotFoundException {
         // Given
-        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.empty());
+        when(roleService.getRoleByName(getUserRole())).thenThrow(RoleNotFoundException.class);
 
         //When & Then
         assertThrows(RoleNotFoundException.class, () -> authenticationService.register(request));
     }
 
     @Test
-    void testRegister_UserExistsByEmail()  {
+    void testRegister_UserExistsByEmail() throws RoleNotFoundException {
         //Given
-        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.of(role));
+        when(roleService.getRoleByName(getUserRole())).thenReturn(role);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userService.existsByEmail("email@example.com")).thenReturn(true);
 
@@ -164,9 +162,9 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testRegister_UserExistsByUserName()  {
+    void testRegister_UserExistsByUserName() throws RoleNotFoundException {
         //Given
-        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.of(role));
+        when(roleService.getRoleByName(getUserRole())).thenReturn(role);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userService.existsByUserName("username")).thenReturn(true);
 
@@ -176,10 +174,10 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testRegister_PasswordDoNotMatch() {
+    void testRegister_PasswordDoNotMatch() throws RoleNotFoundException {
         //Given
         request.setConfirmPassword("differentPassword");
-        when(roleRepository.findByRoleName(getUserRole())).thenReturn(Optional.of(role));
+        when(roleService.getRoleByName(getUserRole())).thenReturn(role);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
 
         // When & Then

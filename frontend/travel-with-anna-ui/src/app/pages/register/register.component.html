@@ -71,6 +71,14 @@
           </button>
         </mat-form-field>
 
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select [(value)] = "registerRequest.roleName" [ngClass]="getRoleClass(registerRequest.roleName)">
+            <mat-option *ngFor="let role of roles" [value]="role">
+              {{ role }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
         <div>
           <button class="custom-button-0" (click)="register()" type="submit">Sign Up</button>
           <div class="error-msg" *ngIf="errorMsg.length > 0">

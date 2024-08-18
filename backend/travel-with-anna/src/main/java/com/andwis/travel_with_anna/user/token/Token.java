@@ -22,7 +22,7 @@ public class Token {
     private String token;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false)
     private User user;
 }

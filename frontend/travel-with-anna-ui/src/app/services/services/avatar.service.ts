@@ -58,7 +58,7 @@ export class AvatarService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getCurrentUserAvatar$Response(params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+  getCurrentUserAvatar$Response(params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<string>>> {
     return getCurrentUserAvatar(this.http, this.rootUrl, params, context);
   }
 
@@ -68,9 +68,9 @@ export class AvatarService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getCurrentUserAvatar(params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<string> {
+  getCurrentUserAvatar(params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<Array<string>> {
     return this.getCurrentUserAvatar$Response(params, context).pipe(
-      map((r: StrictHttpResponse<string>): string => r.body)
+      map((r: StrictHttpResponse<Array<string>>): Array<string> => r.body)
     );
   }
 

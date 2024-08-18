@@ -7,11 +7,11 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 
-export interface GetCurrentUserAvatar$Params {
+export interface GetAllRoles$Params {
 }
 
-export function getCurrentUserAvatar(http: HttpClient, rootUrl: string, params?: GetCurrentUserAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<string>>> {
-  const rb = new RequestBuilder(rootUrl, getCurrentUserAvatar.PATH, 'get');
+export function getAllRoles(http: HttpClient, rootUrl: string, params?: GetAllRoles$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<string>>> {
+  const rb = new RequestBuilder(rootUrl, getAllRoles.PATH, 'get');
   if (params) {
   }
 
@@ -25,4 +25,4 @@ export function getCurrentUserAvatar(http: HttpClient, rootUrl: string, params?:
   );
 }
 
-getCurrentUserAvatar.PATH = '/avatar/get-avatar';
+getAllRoles.PATH = '/role/all';

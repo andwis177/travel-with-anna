@@ -225,6 +225,29 @@
         }
       }
     },
+    "/role/all": {
+      "get": {
+        "tags": [
+          "Role"
+        ],
+        "operationId": "getAllRoles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/avatar/get-avatar": {
       "get": {
         "tags": [
@@ -237,7 +260,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "byte"
+                  }
                 }
               }
             }
@@ -305,6 +332,7 @@
         "required": [
           "email",
           "password",
+          "roleName",
           "userName"
         ],
         "type": "object",
@@ -321,6 +349,9 @@
             "type": "string"
           },
           "confirmPassword": {
+            "type": "string"
+          },
+          "roleName": {
             "type": "string"
           }
         }

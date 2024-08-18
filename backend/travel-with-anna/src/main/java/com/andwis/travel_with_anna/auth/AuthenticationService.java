@@ -5,12 +5,12 @@ import com.andwis.travel_with_anna.handler.exception.ExpiredTokenException;
 import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
 import com.andwis.travel_with_anna.handler.exception.UserExistsException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
-import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleService;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserCredentials;
 import com.andwis.travel_with_anna.user.UserService;
-import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.user.token.Token;
 import com.andwis.travel_with_anna.user.token.TokenRepository;
@@ -28,11 +28,13 @@ import javax.management.relation.RoleNotFoundException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
+import static com.andwis.travel_with_anna.role.Role.getAdminRole;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final AvatarService avatarService;
@@ -47,8 +49,14 @@ public class AuthenticationService {
 
     @Transactional
     public void register(RegistrationRequest request) throws RoleNotFoundException, MessagingException {
-        var userRole = roleRepository.findByRoleName("USER")
-                .orElseThrow(() -> new RoleNotFoundException("Role 'USER' not found"));
+        Role role = roleService.getRoleByName(request.getRoleName());
+
+        if (role.getRoleName().equals(getAdminRole())) {
+            if (userService.existsByRoleName(getAdminRole())) {
+                throw new UserExistsException("Admin already exists");
+            }
+        }
+        var userRole = roleService.getRoleByName(request.getRoleName());
         var user = User.builder()
                 .userName(request.getUserName())
                 .email(request.getEmail())
@@ -57,7 +65,7 @@ public class AuthenticationService {
                 .enabled(false)
                 .role(userRole)
                 .build();
-        // user.addRole(userRole);
+
         if (userService.existsByEmail(user.getEmail())) {
             throw new UserExistsException("User with this email already exists");
         }
@@ -67,19 +75,11 @@ public class AuthenticationService {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new WrongPasswordException("Passwords do not match");
         }
-        saveUserWithAvatar(user);
-
-//        sendValidationEmail(user);
-
-
+        avatarService.createAvatar(user);
+        sendValidationEmail(user);
         System.out.println(generateAndSaveActivationToken(user));
     }
 
-    private void saveUserWithAvatar(User user) {
-        Avatar avatar = avatarService.createAvatar(user);
-        user.setAvatarId(avatar.getAvatarId());
-        userService.saveUser(user);
-    }
 
     private void sendValidationEmail(User user) throws MessagingException {
         var newToken = generateAndSaveActivationToken(user);
@@ -145,7 +145,7 @@ public class AuthenticationService {
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
 
 
-//            sendValidationEmail(tokenEntity.getUser());
+            sendValidationEmail(tokenEntity.getUser());
 
             throw new ExpiredTokenException("Token expired. New token was sent to your email");
         }

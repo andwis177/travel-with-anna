@@ -33,7 +33,7 @@ class AvatarControllerTest {
     private UserAvatarFacade userAvatarFacade;
 
     @Test
-    @WithMockUser(username = "email@example.com", roles = "USER")
+    @WithMockUser(username = "email@example.com", authorities = "User")
     void uploadAvatar_ShouldReturnOk() throws Exception {
         // Given
         MockMultipartFile imageFile = new MockMultipartFile(
@@ -50,7 +50,7 @@ class AvatarControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "email@example.com", roles = "USER")
+    @WithMockUser(username = "email@example.com", authorities = "User")
     void getAvatar_ShouldReturnOkWithImageHeaders() throws Exception {
         // Given
         byte[] imageBytes = "test image".getBytes();

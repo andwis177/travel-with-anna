@@ -1,9 +1,8 @@
-<mat-toolbar class="toolbar">
-
+<mat-toolbar class="toolbar" [ngClass]="verifyRole()">
   <mat-toolbar-row class="toolbar-row">
     <div class="account-container">
       <button mat-icon-button class="app-button">
-        <img ngSrc="assets/images/twa.png" class="app-image" alt="/" height="200" width="200" priority>
+        <img ngSrc="assets/images/twa.png" class="app-image" [ngClass]="verifyRole()" alt="/" height="200" width="200" priority>
       </button>
     </div>
     <div class="toolbar-row-end">
@@ -12,7 +11,7 @@
           <button mat-icon-button class="profile-button" matTooltip="Account settings"
                   (click)="openAccountDetails()" type="submit">
             <img *ngIf="avatarImg" [src]="avatarImg" class="profile-image" alt="User Avatar" fill priority>
-            <img *ngIf="!avatarImg" src="../../../../../assets/images/user.png" class="profile-image" alt="Default Avatar" fill priority>
+<!--            <img *ngIf="!avatarImg" src="../../../../../assets/images/user.png" class="profile-image" alt="Default Avatar" fill priority>-->
           </button>
         </div>
         <div>

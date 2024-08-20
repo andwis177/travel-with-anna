@@ -15,6 +15,7 @@ import {SharedService} from "../../services/shared/shared.service";
 import {ImageFileService} from "../../services/image-file-service/image-file-service";
 import {UserInformationService} from "../../services/user-information/user-information-service";
 import {AuthenticationResponse} from "../../services/models/authentication-response";
+import {firstValueFrom} from "rxjs";
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,8 @@ import {AuthenticationResponse} from "../../services/models/authentication-respo
 export class LoginComponent {
   authRequest: AuthenticationRequest = {email: '', password: ''};
   errorMsg: Array<string> = [];
-  private avatarFile: File | null = null;
+  avatarFile: File | null = null;
+  stringImg: string | ArrayBuffer = '';
 
   constructor(
     private router: Router,
@@ -58,7 +60,6 @@ export class LoginComponent {
 
   resetPassword() {
     this.router.navigate(['reset-password']).then(r => console.log('Reset password'));
-
   }
 
   signIn() {
@@ -82,17 +83,24 @@ export class LoginComponent {
 
   async singInSuccess(response: AuthenticationResponse) {
     this.authService.setToken( response.token as string);
-    this.userInformationService.setUserCredentials(response.userName as string, response.email as string);
-    this.loadAvatar(response.userName as string);
-    setTimeout(() => {
+    this.userInformationService.setUserCredentials(
+      response.userName as string, response.email as string, response.role as string);
+    try {
+      await this.loadAvatar(response.userName as string);
       this.router.navigate(['twa']).then(r => this.sharedService.updateUserName(<string>response.userName));
-    } , 1000);
+    } catch (error) {
+      console.error('Failed to load avatar:', error);
+    }
   }
 
-  loadAvatar(userName : string): void {
-    this.imageFileService.getAvatar().subscribe(blob => {
-      this.avatarFile = new File([blob], userName + '.jpg', { type: blob.type });
-      this.sharedService.storeImage(this.avatarFile);
-    });
+  async loadAvatar(userName: string): Promise<void> {
+    try {
+      const blob: Blob = await firstValueFrom(this.imageFileService.getAvatar());
+      this.avatarFile = new File([blob], `${userName}.jpg`, { type: blob.type });
+      this.stringImg = await this.imageFileService.convertBase64ToString(this.avatarFile);
+      this.sharedService.storeImage(this.stringImg);
+    } catch (error) {
+      console.error('Error loading avatar:', error);
+    }
   }
 }

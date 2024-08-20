@@ -8,6 +8,7 @@ import { AvatarService } from './services/avatar.service';
 import { AuthenticationService } from './services/authentication.service';
 import { UserService } from './services/user.service';
 import { RoleService } from './services/role.service';
+import { AdminService } from './services/admin.service';
 
 /**
  * Module that provides all services and configuration.
@@ -21,6 +22,7 @@ import { RoleService } from './services/role.service';
     AuthenticationService,
     UserService,
     RoleService,
+    AdminService,
     ApiConfiguration
   ],
 })

@@ -55,6 +55,7 @@ export class AccountComponent implements OnInit {
   isEdit: boolean = false;
   selectedFile: File | null = null;
   avatarImg: string | null = null;
+  stringImg: string | ArrayBuffer = '';
 
   constructor(
     public router: Router,
@@ -94,15 +95,16 @@ export class AccountComponent implements OnInit {
     });
     this.userCredentials.userName = this.userInformationService.getUserName();
     this.userCredentials.email = this.userInformationService.getEmail();
+    this.userCredentials.role = this.userInformationService.getRole();
   }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      if (file.type.startsWith('image/')) {
+      if (file.type.startsWith('image/jpg') || file.type.startsWith('image/jpeg')) {
         this.selectedFile = file;
-        this.saveUserAvatar(file);
+        this.saveUserAvatar(file).then(r => console.log('Avatar saved'));
         this.sharedService.updateAvatarImg(URL.createObjectURL(file));
       } else {
         this.errorMsg.push('Invalid file type. Only images are allowed.');
@@ -120,22 +122,16 @@ export class AccountComponent implements OnInit {
     }
   }
 
-  saveUserAvatar(file: File) {
+  async saveUserAvatar(file: File) {
     this.errorMsg = [];
-    console.log("uploadParams", file)
-    this.imageFileService.uploadAvatar(file).subscribe({
-      next: () => {
-        this.sharedService.storeImage(file);
-      },
-      error: (err) => {
-        console.log(err.error.errors);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Unexpected error occurred');
-        }
-      }
-    })
+    try {
+      this.imageFileService.uploadAvatar(file).subscribe();
+      this.stringImg = await this.imageFileService.convertBase64ToString(file);
+      this.sharedService.storeImage(this.stringImg);
+    } catch (err) {
+      console.error('Error occurred:', err);
+      this.errorMsg.push('Failed to upload avatar or convert image.');
+    }
   }
 
   onClose(): void {
@@ -153,7 +149,8 @@ export class AccountComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.authService.setToken(response.token as string);
-          this.userInformationService.setUserCredentials(response.userName as string, response.email as string);
+          this.userInformationService.setUserCredentials(
+            response.userName as string, response.email as string, response.role as string);
           this.sharedService.updateUserName(this.userCredentials.userName as string);
           this.isEdit = false;
           this.userCredentials.password = '';

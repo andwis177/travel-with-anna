@@ -225,12 +225,12 @@
         }
       }
     },
-    "/role/all": {
+    "/role/all-names": {
       "get": {
         "tags": [
           "Role"
         ],
-        "operationId": "getAllRoles",
+        "operationId": "getAllRoleNames",
         "responses": {
           "200": {
             "description": "OK",
@@ -291,6 +291,48 @@
         "responses": {
           "204": {
             "description": "No Content"
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "getAllUsers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseUserAdminView"
+                }
+              }
+            }
           }
         }
       }
@@ -378,6 +420,9 @@
           },
           "email": {
             "type": "string"
+          },
+          "role": {
+            "type": "string"
           }
         }
       },
@@ -391,6 +436,9 @@
             "type": "string"
           },
           "password": {
+            "type": "string"
+          },
+          "role": {
             "type": "string"
           }
         }
@@ -433,6 +481,78 @@
         "properties": {
           "credential": {
             "type": "string"
+          }
+        }
+      },
+      "PageResponseUserAdminView": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserAdminView"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserAdminView": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "accountLocked": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "roleName": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "byte"
+            }
           }
         }
       },

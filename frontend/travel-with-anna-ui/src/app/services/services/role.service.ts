@@ -9,8 +9,8 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { getAllRoles } from '../fn/role/get-all-roles';
-import { GetAllRoles$Params } from '../fn/role/get-all-roles';
+import { getAllRoleNames } from '../fn/role/get-all-role-names';
+import { GetAllRoleNames$Params } from '../fn/role/get-all-role-names';
 
 @Injectable({ providedIn: 'root' })
 export class RoleService extends BaseService {
@@ -18,27 +18,27 @@ export class RoleService extends BaseService {
     super(config, http);
   }
 
-  /** Path part for operation `getAllRoles()` */
-  static readonly GetAllRolesPath = '/role/all';
+  /** Path part for operation `getAllRoleNames()` */
+  static readonly GetAllRoleNamesPath = '/role/all-names';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getAllRoles()` instead.
+   * To access only the response body, use `getAllRoleNames()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getAllRoles$Response(params?: GetAllRoles$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<string>>> {
-    return getAllRoles(this.http, this.rootUrl, params, context);
+  getAllRoleNames$Response(params?: GetAllRoleNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<string>>> {
+    return getAllRoleNames(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getAllRoles$Response()` instead.
+   * To access the full response (for headers, for example), `getAllRoleNames$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getAllRoles(params?: GetAllRoles$Params, context?: HttpContext): Observable<Array<string>> {
-    return this.getAllRoles$Response(params, context).pipe(
+  getAllRoleNames(params?: GetAllRoleNames$Params, context?: HttpContext): Observable<Array<string>> {
+    return this.getAllRoleNames$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<string>>): Array<string> => r.body)
     );
   }

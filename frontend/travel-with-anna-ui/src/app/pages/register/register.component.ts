@@ -54,7 +54,7 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.roleService.getAllRoles()
+    this.roleService.getAllRoleNames()
       .subscribe( {
       next: (role) => {
         this.roles = role;
@@ -106,16 +106,15 @@ export class RegisterComponent implements OnInit {
   }
 
   login() {
-    this.router.navigate(['login']);
+    this.router.navigate(['login']).then(r => console.log('Login'));
   }
 
   getRoleClass(role: string): string {
-    if (role === 'ADMIN') {
-      console.log('admin');
-      return 'admin';
-    } else {
-      console.log('default');
-      return 'default';
+    switch (role) {
+      case 'ADMIN':
+        return 'admin';
+      default:
+        return 'default';
     }
   }
 }

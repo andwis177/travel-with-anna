@@ -6,13 +6,18 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { PageResponseUserAdminView } from '../../models/page-response-user-admin-view';
 
-export interface GetAllRoles$Params {
+export interface GetAllUsers$Params {
+  page?: number;
+  size?: number;
 }
 
-export function getAllRoles(http: HttpClient, rootUrl: string, params?: GetAllRoles$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<string>>> {
-  const rb = new RequestBuilder(rootUrl, getAllRoles.PATH, 'get');
+export function getAllUsers(http: HttpClient, rootUrl: string, params?: GetAllUsers$Params, context?: HttpContext): Observable<StrictHttpResponse<PageResponseUserAdminView>> {
+  const rb = new RequestBuilder(rootUrl, getAllUsers.PATH, 'get');
   if (params) {
+    rb.query('page', params.page, {});
+    rb.query('size', params.size, {});
   }
 
   return http.request(
@@ -20,9 +25,9 @@ export function getAllRoles(http: HttpClient, rootUrl: string, params?: GetAllRo
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<string>>;
+      return r as StrictHttpResponse<PageResponseUserAdminView>;
     })
   );
 }
 
-getAllRoles.PATH = '/role/all';
+getAllUsers.PATH = '/admin/users';

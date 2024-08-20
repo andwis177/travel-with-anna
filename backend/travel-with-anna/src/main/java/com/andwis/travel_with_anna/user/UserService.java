@@ -76,6 +76,7 @@ public class UserService {
         return UserCredentials.builder()
                 .email(user.getEmail())
                 .userName(user.getUserName())
+                .role(user.getRole().getRoleName())
                 .build();
     }
 

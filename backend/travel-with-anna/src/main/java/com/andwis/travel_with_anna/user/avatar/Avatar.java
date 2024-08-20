@@ -23,4 +23,5 @@ public class Avatar {
     @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar;
 
+
 }

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserView {
+public class UserAdminView {
     private Long userId;
     private String userName;
     private String email;

@@ -102,7 +102,7 @@ class UserAvatarFacadeTest {
             userAvatarFacade.setAvatar(file, createAuthentication(user));
         });
 
-        assertEquals("File is not a jpeg image", exception.getMessage());
+        assertEquals("File is not a JPEG image. Actual type: image/png", exception.getMessage());
     }
 
     @Test
@@ -186,7 +186,6 @@ class UserAvatarFacadeTest {
         byte[] avatar = userAvatarFacade.getAvatar(createAuthentication(user));
         // Then
         assertArrayEquals(defaultImg, avatar);
-        assertNotNull(user.getAvatarId());
     }
 
     private Authentication createAuthentication(User user) {

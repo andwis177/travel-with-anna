@@ -44,12 +44,15 @@ public class SecurityConfig  {
                                         "/swagger-ui/**",
                                         "/webjars/**",
                                         "/swagger-ui.html",
-                                        "/role/all"
+                                        "/role/all-names"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/user/**",
                                         "/avatar/**"
                                 ).hasAnyAuthority(getUserAuthority(), getAdminAuthority())
+                                .requestMatchers(
+                                        "/admin/**"
+                                ).hasAuthority(getAdminAuthority())
                                 .anyRequest()
                                 .authenticated()
                 )

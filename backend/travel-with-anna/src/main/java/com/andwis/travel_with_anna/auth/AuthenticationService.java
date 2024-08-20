@@ -76,7 +76,8 @@ public class AuthenticationService {
             throw new WrongPasswordException("Passwords do not match");
         }
         avatarService.createAvatar(user);
-        sendValidationEmail(user);
+        userService.saveUser(user);
+        //    sendValidationEmail(user);
         System.out.println(generateAndSaveActivationToken(user));
     }
 
@@ -136,6 +137,7 @@ public class AuthenticationService {
         UserCredentials userCredentials = userService.getCredentials(request.getEmail());
         response.setUserName(userCredentials.getUserName());
         response.setEmail(userCredentials.getEmail());
+        response.setRole(userCredentials.getRole());
         return response;
     }
 
@@ -144,8 +146,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
 
-
-            sendValidationEmail(tokenEntity.getUser());
+            //          sendValidationEmail(tokenEntity.getUser());
 
             throw new ExpiredTokenException("Token expired. New token was sent to your email");
         }

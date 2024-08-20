@@ -1,7 +1,11 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.role.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -12,4 +16,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     boolean existsByUserName(String userName);
     boolean existsByRole(Role role);
+
+    @Query(value = """
+    SELECT u FROM User u
+    WHERE u.userId != :userId
+""")
+    Page<User> findAllExcept(Pageable pageable, @Param("userId") Long userId);
 }

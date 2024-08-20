@@ -87,7 +87,7 @@ class AuthenticationControllerTest {
         // Given
         AuthenticationRequest request = new AuthenticationRequest("test@example.com", "password123");
         String jsonContent = objectMapper.writeValueAsString(request);
-        AuthenticationResponse response = new AuthenticationResponse("token value","","");
+        AuthenticationResponse response = new AuthenticationResponse("token value","","","");
         when(service.authenticationWithCredentials(request)).thenReturn(response);
 
         // When

@@ -10,6 +10,10 @@ export class SharedService {
   public userName$: Observable<string |null> = this.userName.asObservable();
   private avatarImg = new BehaviorSubject<string | null>(null);
   public avatarImg$:Observable<string | null> = this.avatarImg.asObservable();
+  private userAdminEditId = new BehaviorSubject<number | null>(null);
+  public userAdminEditId$:Observable<number | null> = this.userAdminEditId.asObservable();
+  public userAdminViewIdentifier= new BehaviorSubject<string>('');
+  public userAdminViewIdentifier$:Observable<string> = this.userAdminViewIdentifier.asObservable();
   private userNameKey: string = 'userName';
   private imageKey: string = 'image';
 
@@ -31,6 +35,26 @@ export class SharedService {
   getUserName(): Observable<string | null> {
     this.userName.next(this.localStorageService.getItem(this.userNameKey));
     return this.userName$;
+  }
+
+  setUserAdminEditId(userAdminEditId: number | undefined): void {
+    if (userAdminEditId !== undefined) {
+      this.userAdminEditId.next(userAdminEditId);
+    } else {
+      this.userAdminEditId.next(null);
+    }
+  }
+
+  getUserAdminEditId(): Observable<number | null> {
+    return this.userAdminEditId$;
+  }
+
+  setUserAdminViewIdentifier(identifier: string): void {
+      this.userAdminViewIdentifier.next(identifier);
+  }
+
+  getUserAdminViewIdentifier(): Observable<string> {
+    return this.userAdminViewIdentifier$;
   }
 
   updateAvatarImg(newImg: string): void {

@@ -5,13 +5,34 @@
         <img ngSrc="assets/images/twa.png" class="app-image" [ngClass]="verifyRole()" alt="/" height="200" width="200" priority>
       </button>
     </div>
+
+    <div *ngIf="role === 'ADMIN' else doNothing">
+      <form>
+        <div class="search-form">
+          <input type="text"
+                 class="search-field"
+                 matInput
+                 [(ngModel)]="identifier"
+                 [ngModelOptions]="{standalone: true}"
+                 placeholder="Search by ID, Name or Email"
+                 autocomplete="Identifier"
+                 (keydown.enter)="$event.preventDefault()">
+          <button class="search-button margin" (click)="findUser()" type="submit" matTooltip="Find specific user">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="search-button" (click)="AllUsers()" type="submit" matTooltip="Get all users">
+            <i class="fas fa-users"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+
     <div class="toolbar-row-end">
       <div class="account-container">
         <div class="button-container">
           <button mat-icon-button class="profile-button" matTooltip="Account settings"
                   (click)="openAccountDetails()" type="submit">
             <img *ngIf="avatarImg" [src]="avatarImg" class="profile-image" alt="User Avatar" fill priority>
-<!--            <img *ngIf="!avatarImg" src="../../../../../assets/images/user.png" class="profile-image" alt="Default Avatar" fill priority>-->
           </button>
         </div>
         <div>
@@ -21,10 +42,13 @@
         </div>
       </div>
       <div>
-        <button class="custom-button-3 full-width-button" matTooltip="Logout"
+        <button class="custom-button-3" matTooltip="Logout"
                 (click)=logout()><i class="fas fa-sign-out-alt fa-3x"></i>
         </button>
       </div>
     </div>
   </mat-toolbar-row>
 </mat-toolbar>
+
+<ng-template #doNothing>
+</ng-template>

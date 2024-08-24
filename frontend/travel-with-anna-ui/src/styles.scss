@@ -2,6 +2,7 @@
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 @import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alumni+Sans+Collegiate+One:ital@0;1&family=Belanosima:wght@400;600;700&family=Chicle&family=Fjalla+One&family=Fruktur:ital@0;1&family=Nothing+You+Could+Do&family=Odor+Mean+Chey&family=Purple+Purse&family=Rubik+Doodle+Shadow&family=Sigmar&family=Sirin+Stencil&family=Tourney:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"');
 
 
 html, body { height: 100%; }
@@ -137,6 +138,17 @@ p, a, span {
   height: 50px;
 }
 
+.pagination-button {
+  background: transparent !important;
+  border: none;
+  color: #2E3944 !important;
+  font-size: 28px !important;
+  font-weight: bold;
+  width: 50px;
+  font-family: Purple Purse, sans-serif;
+
+}
+
 .custom-button-0,
 .custom-button-1,
 .custom-button-2,
@@ -165,18 +177,30 @@ p, a, span {
   color: #2E3944 !important;
 }
 
+.pagination-button:hover {
+  background-color: rgba(161, 195, 209, 0.3) !important;
+  border-radius: 10%;
+}
+
 .error-msg {
   color: darkred;
   text-align: center;
 }
 
 .header-shadow {
+  text-align: center;
   text-shadow: gray 2px 2px 2px;
   margin: 10px !important;
 }
 
 .custom-card {
   border-radius: 16px;
+}
+
+.dialog-header {
+  justify-content: flex-end;
+  height: 40px;
+  background-color: #BFBDB8;
 }
 
 .mat-icon {
@@ -204,6 +228,7 @@ p, a, span {
 .close-button:hover,
 .close-icon:hover {
   background-color: #A1C3D1;
+  opacity: 0.5;
 }
 
 .label-padding {

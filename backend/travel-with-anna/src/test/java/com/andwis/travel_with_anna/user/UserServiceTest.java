@@ -3,7 +3,7 @@ package com.andwis.travel_with_anna.user;
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
 import com.andwis.travel_with_anna.handler.exception.EmailNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.UserExistsException;
-import com.andwis.travel_with_anna.handler.exception.UserIdNotFoundException;
+import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
@@ -185,7 +185,7 @@ class UserServiceTest {
     @Test
     void testGetUserById_UserNotFound() {
         // Given & When & Then
-        assertThrows(UserIdNotFoundException.class, () -> userService.getUserById(2L));
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(2L));
     }
 
     @Test

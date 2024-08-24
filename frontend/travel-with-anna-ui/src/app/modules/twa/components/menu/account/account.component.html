@@ -17,7 +17,6 @@
       <button mat-icon-button class="profile-button" matTooltip="Account settings"
               (click)="triggerFileInput()" type="submit">
         <img *ngIf="avatarImg" [src]="avatarImg" class="profile-image" alt="User Avatar" fill priority>
-        <img *ngIf="!avatarImg" src="../../../../../assets/images/user.png" class="profile-image" alt="Default Avatar" fill priority>
       </button>
     </div>
 
@@ -25,12 +24,12 @@
       <div *ngIf="!isEdit else edit_template_input">
         <div class="information-area">
           <div class="padding">
-            <a class="label-text">Name: </a>
-            <a class="custom-header">{{userCredentials.userName}}</a>
+            <p class="label-text">Name: </p>
+            <p class="custom-header">{{userCredentials.userName}}</p>
           </div>
           <div class="padding">
-            <a class="label-text">Email: </a>
-            <a class="custom-header">{{userCredentials.email}}</a>
+            <p class="label-text">Email: </p>
+            <p class="custom-header">{{userCredentials.email}}</p>
           </div>
         </div>
       </div>
@@ -44,7 +43,7 @@
       </mat-card-actions>
 
       <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-        <mat-divider class="padding-bottom"></mat-divider>
+        <mat-divider></mat-divider>
         <p *ngFor="let msg of errorMsg">{{msg}}</p>
       </div>
 

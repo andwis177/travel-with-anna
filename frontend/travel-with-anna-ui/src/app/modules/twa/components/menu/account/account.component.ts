@@ -5,19 +5,19 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {UserService} from "../../../../services/services/user.service";
+import {UserService} from "../../../../../services/services/user.service";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import {PasswordComponent} from "../password/password.component";
 import {MatIcon} from "@angular/material/icon";
 import {MatDivider} from "@angular/material/divider";
-import {UserCredentials} from "../../../../services/models/user-credentials";
+import {UserCredentials} from "../../../../../services/models/user-credentials";
 import {Router} from "@angular/router";
-import {SharedService} from "../../../../services/shared/shared.service";
+import {SharedService} from "../../../../../services/shared/shared.service";
 import {MatTooltip} from "@angular/material/tooltip";
-import {AuthService} from "../../../../services/auth/auth.service";
-import {ImageFileService} from "../../../../services/image-file-service/image-file-service";
-import {UserInformationService} from "../../../../services/user-information/user-information-service";
+import {AuthService} from "../../../../../services/auth/auth.service";
+import {ImageFileService} from "../../../../../services/image-file-service/image-file-service";
+import {UserInformationService} from "../../../../../services/user-information/user-information-service";
 
 @Component({
   selector: 'app-account',
@@ -93,9 +93,9 @@ export class AccountComponent implements OnInit {
     this.sharedService.getImage().subscribe((image) => {
       this.avatarImg = image;
     });
-    this.userCredentials.userName = this.userInformationService.getUserName();
-    this.userCredentials.email = this.userInformationService.getEmail();
-    this.userCredentials.role = this.userInformationService.getRole();
+    this.userCredentials.userName = this.userInformationService.getUserName() as string;
+    this.userCredentials.email = this.userInformationService.getEmail() as string;
+    this.userCredentials.role = this.userInformationService.getRole() as string;
   }
 
   onFileSelected(event: Event) {
@@ -174,5 +174,4 @@ export class AccountComponent implements OnInit {
   deleteAccount() {
     this.router.navigate(['delete-account']).then(r => this.dialogRef.close());
   }
-
 }

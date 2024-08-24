@@ -229,8 +229,8 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(UserIdNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(UserIdNotFoundException exp) {
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(UserNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(

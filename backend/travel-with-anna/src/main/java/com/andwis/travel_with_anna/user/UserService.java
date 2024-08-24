@@ -3,13 +3,15 @@ package com.andwis.travel_with_anna.user;
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
 import com.andwis.travel_with_anna.handler.exception.EmailNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.UserExistsException;
-import com.andwis.travel_with_anna.handler.exception.UserIdNotFoundException;
+import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -45,10 +47,18 @@ public class UserService {
     public boolean existsByRoleName(String roleName) {
         if (roleRepository.existsByRoleName(roleName)) {
             Role role = roleRepository.findByRoleName(roleName).orElseThrow(() ->
-                    new UserIdNotFoundException("Role not found"));
+                    new UserNotFoundException("Role not found"));
             return userRepository.existsByRole(role);
         }
         return false;
+    }
+
+    public boolean existsByUserId(Long userId) {
+        return userRepository.existsById(userId);
+    }
+
+    public Page<User> getAllUsersExcept(Pageable pageable, Long userId) {
+        return userRepository.findAllExcept(pageable, userId);
     }
 
     public User getConnectedUser(Authentication connectedUser) {
@@ -68,7 +78,7 @@ public class UserService {
 
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
-                new UserIdNotFoundException("User not found"));
+                new UserNotFoundException("User not found"));
     }
 
     public UserCredentials getCredentials(String email) {
@@ -164,7 +174,14 @@ public class UserService {
                 .build();
     }
 
-    private void verifyPassword(User user, String password) throws WrongPasswordException {
+    public void deleteUserById(Long userId) {
+        userRepository.deleteById(userId);
+        UserRespond.builder()
+                .message("User has been deleted!")
+                .build();
+    }
+
+    public void verifyPassword(User user, String password) throws WrongPasswordException {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getEmail(), password));

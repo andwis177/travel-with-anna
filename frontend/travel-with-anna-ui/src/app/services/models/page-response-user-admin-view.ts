@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-import { UserAdminView } from './user-admin-view';
+import { UserAdminView } from '../models/user-admin-view';
 export interface PageResponseUserAdminView {
   content?: Array<UserAdminView>;
   first?: boolean;

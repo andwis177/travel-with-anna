@@ -9,17 +9,20 @@ import java.util.Map;
 public class UserMapper {
 
     public UserAdminView toUserForAdminView(User user, Map<Long, byte[]> avatarsWithUsersId) {
-
-        return UserAdminView.builder()
+        UserAdminView userAdminView = UserAdminView.builder()
                 .userId(user.getUserId())
                 .userName(user.getUserName())
                 .email(user.getEmail())
                 .accountLocked(user.isAccountLocked())
                 .enabled(user.isEnabled())
                 .createdDate(user.getCreatedDate().toLocalDate())
-                .lastModifiedDate(user.getLastModifiedDate().toLocalDate())
                 .roleName(user.getRole().getRoleName())
                 .cover(avatarsWithUsersId.get(user.getAvatarId()))
                 .build();
+        if (user.getLastModifiedDate() != null) {
+            userAdminView.setLastModifiedDate(user.getLastModifiedDate().toLocalDate());
+        }
+
+        return userAdminView;
     }
 }

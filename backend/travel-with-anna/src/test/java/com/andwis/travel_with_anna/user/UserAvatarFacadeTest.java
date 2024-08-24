@@ -3,7 +3,9 @@ package com.andwis.travel_with_anna.user;
 import com.andwis.travel_with_anna.handler.exception.SaveAvatarException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
+import com.andwis.travel_with_anna.user.avatar.AvatarRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +40,9 @@ class UserAvatarFacadeTest {
     private RoleRepository roleRepository;
 
     @Autowired
+    private AvatarRepository avatarRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private User user;
@@ -50,12 +55,17 @@ class UserAvatarFacadeTest {
         Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
+        Avatar avatar = Avatar.builder()
+                .avatar(AvatarImg.DEFAULT.getImg())
+                .build();
+        Long avatarId = avatarRepository.save(avatar).getAvatarId();
+
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
                 .role(retrivedRole)
-                .avatarId(1L)
+                .avatarId(avatarId)
                 .build();
         user.setEnabled(true);
         userRepository.save(user);
@@ -65,6 +75,7 @@ class UserAvatarFacadeTest {
     void cleanUp() {
         userRepository.deleteAll();
         roleRepository.deleteAll();
+        avatarRepository.deleteAll();
     }
 
     @Test

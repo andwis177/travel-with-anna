@@ -1,4 +1,4 @@
-import {Component, HostListener, signal, ViewEncapsulation} from '@angular/core';
+import {Component, HostListener, OnInit, signal, ViewEncapsulation} from '@angular/core';
 import {AuthenticationRequest} from "../../services/models/authentication-request";
 import {MatCardModule} from '@angular/material/card';
 import {FormsModule, ReactiveFormsModule,} from '@angular/forms';
@@ -16,6 +16,7 @@ import {ImageFileService} from "../../services/image-file-service/image-file-ser
 import {UserInformationService} from "../../services/user-information/user-information-service";
 import {AuthenticationResponse} from "../../services/models/authentication-response";
 import {firstValueFrom} from "rxjs";
+import {LocalStorageService} from "../../services/local-storage/local-storage.service";
 
 @Component({
   selector: 'app-login',
@@ -27,7 +28,7 @@ import {firstValueFrom} from "rxjs";
   styleUrl: './login.component.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   authRequest: AuthenticationRequest = {email: '', password: ''};
   errorMsg: Array<string> = [];
   avatarFile: File | null = null;
@@ -36,6 +37,7 @@ export class LoginComponent {
   constructor(
     private router: Router,
     private authenticationService: AuthenticationService,
+    private localStorage: LocalStorageService,
     private authService: AuthService,
     private sharedService: SharedService,
     private userInformationService: UserInformationService,
@@ -52,6 +54,10 @@ export class LoginComponent {
   @HostListener('document:keydown.enter', ['$event'])
   onEnterKeydownHandler(event: KeyboardEvent): void {
     this.signIn();
+  }
+
+  ngOnInit() {
+      this.localStorage.clear()
   }
 
   register() {

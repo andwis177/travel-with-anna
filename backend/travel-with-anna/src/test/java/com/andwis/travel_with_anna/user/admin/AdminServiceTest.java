@@ -1,10 +1,12 @@
 package com.andwis.travel_with_anna.user.admin;
 
+import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
+import com.andwis.travel_with_anna.user.UserService;
 import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarRepository;
@@ -22,13 +24,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -48,9 +51,16 @@ class AdminServiceTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private Avatar avatar;
+    private Avatar avatar2;
+    private Long avatarId;
     private Long avatar2Id;
     private User user;
     private Long userId;
+    private User secondaryUser;
+    private Long secondaryUserId;
+    @Autowired
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
@@ -66,12 +76,12 @@ class AdminServiceTest {
         Optional<Role> existingAdminRole = roleRepository.findByRoleName(getAdminRole());
         Role retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
 
-        Avatar avatar = Avatar.builder()
+        avatar = Avatar.builder()
                 .avatar(AvatarImg.DEFAULT.getImg())
                 .build();
-        Long avatarId = avatarService.save(avatar).getAvatarId();
+        avatarId = avatarService.save(avatar).getAvatarId();
 
-        Avatar avatar2 = Avatar.builder()
+        avatar2 = Avatar.builder()
                 .avatar(AvatarImg.DEFAULT.getImg())
                 .build();
         avatar2Id = avatarService.save(avatar2).getAvatarId();
@@ -83,18 +93,20 @@ class AdminServiceTest {
                 .role(retrivedAdminRole)
                 .avatarId(avatarId)
                 .build();
+        user.setAccountLocked(false);
         user.setEnabled(true);
-        userRepository.save(user);
+        userId = userRepository.save(user).getUserId();
 
-        User secondaryUser = User.builder()
+        secondaryUser = User.builder()
                 .userName("userName2")
                 .email("email2@example.com")
                 .password(passwordEncoder.encode("password"))
                 .role(retrivedUserRole)
                 .avatarId(avatar2Id)
                 .build();
-        user.setEnabled(true);
-        userId = userRepository.save(secondaryUser).getUserId();
+        secondaryUser.setAccountLocked(false);
+        secondaryUser.setEnabled(true);
+        secondaryUserId = userRepository.save(secondaryUser).getUserId();
     }
 
     @AfterEach
@@ -105,19 +117,123 @@ class AdminServiceTest {
     }
 
     @Test
-    void getAllUsers() {
+    void testGetAllUsers() {
         // Getter
         PageResponse<UserAdminView> result = adminService.getAllUsers(0, 10, createAuthentication(user));
 
-        // When
+        // When & Then
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals(userId, result.getContent().get(0).getUserId());
+        assertEquals(secondaryUserId, result.getContent().get(0).getUserId());
 
-        // Then
         Map<Long, byte[]> avatars = adminService.getAvatars(List.of(avatar2Id));
         assertNotNull(avatars.get(avatar2Id));
 
+    }
+
+    @Test
+    void testGetAvatars() {
+        // Getter
+        List<Long> avatarsId = List.of(avatarId, avatar2Id);
+        byte[] avatarBytes = hexToBytes(avatar.getAvatar());
+        byte[] avatar2Bytes = hexToBytes(avatar2.getAvatar());
+
+        // When
+        Map<Long, byte[]> avatars = adminService.getAvatars(avatarsId);
+
+        // Then
+        assertNotNull(avatars);
+        assertEquals(2, avatars.size());
+        assertArrayEquals(avatarBytes, avatars.get(avatarId));
+        assertArrayEquals(avatar2Bytes, avatars.get(avatar2Id));
+    }
+
+    @Test
+    void testGetUserAdminViewByIdentifier_UserId() {
+        // Getter
+
+        // When
+        UserAdminView userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUserId.toString(), createAuthentication(user));
+
+        // Then
+        assertNotNull(userAdminView);
+        assertEquals(secondaryUserId, userAdminView.getUserId());
+    }
+
+    @Test
+    void testGetUserAdminViewByIdentifier_UserName() {
+        // Getter
+
+        // When
+        UserAdminView userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUser.getUserName(), createAuthentication(user));
+
+        // Then
+        assertNotNull(userAdminView);
+        assertEquals(secondaryUserId, userAdminView.getUserId());
+        assertEquals(secondaryUser.getUserName(), userAdminView.getUserName());
+    }
+
+    @Test
+    void testUpdateUser() throws RoleNotFoundException {
+        // Getter
+        UserAdminEdit userAdminEdit = new UserAdminEdit(
+                secondaryUserId, true, false, getAdminRole());
+
+        UserAdminUpdateRequest request = UserAdminUpdateRequest.builder()
+                .userAdminEdit(userAdminEdit)
+                .password("password")
+                .build();
+
+        // When
+        adminService.updateUser(request, createAuthentication(user));
+
+        // Then
+        assertTrue(secondaryUser.isAccountLocked());
+        assertFalse(secondaryUser.isEnabled());
+        assertEquals(getAdminRole(), secondaryUser.getRole().getRoleName());
+    }
+
+    @Test
+    void getUserAdminViewByIdentifier_Email() {
+        // Getter
+
+        // When
+        UserAdminView userAdminView = adminService.getUserAdminViewByIdentifier(user.getEmail(), createAuthentication(secondaryUser));
+
+        // Then
+        assertNotNull(userAdminView);
+        assertEquals(userId, userAdminView.getUserId());
+        assertEquals(user.getEmail(), userAdminView.getEmail());
+    }
+
+    @Test
+    void getUserAdminViewByIdentifier_OwnIdentifier() {
+        // Getter
+        // When & Then
+        assertThrows(UserNotFoundException.class,
+                () -> adminService.getUserAdminViewByIdentifier(user.getEmail(), createAuthentication(user)));
+    }
+
+    @Test
+    void testDeleteUser() {
+        // Getter
+        UserAdminDeleteRequest request = new UserAdminDeleteRequest(secondaryUserId, "password");
+        // When
+        adminService.deleteUser(request, createAuthentication(user));
+
+        // Then
+        assertFalse(userService.existsByUserId(secondaryUserId));
+    }
+
+    @Test
+    void testGetAllRoleNamesWithAdmin() {
+        // Getter
+        List<String> roles = adminService.getAllRoleNamesWithAdmin();
+
+        // When & Then
+        assertNotNull(roles);
+        assertTrue(roles.contains(getUserRole()));
+        assertTrue(roles.contains(getAdminRole()));
     }
 
     private Authentication createAuthentication(User user) {

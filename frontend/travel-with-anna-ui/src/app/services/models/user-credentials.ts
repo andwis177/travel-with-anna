@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export interface UserCredentials {
-  email?: string | null;
-  password?: string | null;
-  role?: string | null;
-  userName?: string | null;
+  email?: string;
+  password?: string;
+  role?: string;
+  userName?: string;
 }

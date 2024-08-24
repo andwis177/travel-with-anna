@@ -9,11 +9,11 @@ import {NgForOf, NgIf} from "@angular/common";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
 import {MatDivider} from "@angular/material/divider";
-import {UserService} from "../../../../services/services/user.service";
-import {ChangePasswordRequest} from "../../../../services/models/change-password-request";
+import {UserService} from "../../../../../services/services/user.service";
+import {ChangePasswordRequest} from "../../../../../services/models/change-password-request";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {AccountComponent} from "../account/account.component";
-import {UserRespond} from "../../../../services/models/user-respond";
+import {UserRespond} from "../../../../../services/models/user-respond";
 
 @Component({
   selector: 'app-password',

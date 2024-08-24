@@ -1,17 +1,20 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {NgClass, NgIf, NgOptimizedImage} from "@angular/common";
 import {MatDialog} from "@angular/material/dialog";
-import {AccountComponent} from "../../dialog/account/account.component";
-import {MatLabel} from "@angular/material/form-field";
+import {AccountComponent} from "./account/account.component";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {LogoutService} from "../../../../services/logout/logout.service";
 import {MatDivider} from "@angular/material/divider";
 import {MatTooltip} from "@angular/material/tooltip";
 import {SharedService} from "../../../../services/shared/shared.service";
 import {UserInformationService} from "../../../../services/user-information/user-information-service";
+import {FormsModule} from "@angular/forms";
+import {MatCardContent} from "@angular/material/card";
+import {MatInput} from "@angular/material/input";
 
 @Component({
   selector: 'app-menu',
@@ -30,7 +33,11 @@ import {UserInformationService} from "../../../../services/user-information/user
     MatDivider,
     MatTooltip,
     NgIf,
-    NgClass
+    NgClass,
+    FormsModule,
+    MatCardContent,
+    MatFormField,
+    MatInput
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
@@ -40,13 +47,25 @@ export class MenuComponent implements OnInit  {
   userName: string | null= '';
   avatarImg: string | null = null;
   role: string | null= '';
+  identifier: string = '';
 
   constructor(
     private logoutService: LogoutService,
     public dialog: MatDialog,
     private sharedService: SharedService,
-    private userInformationService: UserInformationService
+    private userInformationService: UserInformationService,
   ) {
+  }
+
+  @HostListener('document:keydown.enter', ['$event'])
+  onEnterKeydownHandler(event: KeyboardEvent): void {
+    if (this.identifier.length > 0) {
+      this.findUser();
+    } else {
+      if (this.identifier.length === 0) {
+        this.AllUsers();
+      }
+    }
   }
 
   ngOnInit(): void {
@@ -77,5 +96,15 @@ export class MenuComponent implements OnInit  {
       default:
         return 'default-background';
     }
+  }
+
+  findUser() {
+    this.sharedService.setUserAdminViewIdentifier(this.identifier);
+    this.identifier = '';
+  }
+
+  AllUsers() {
+    this.identifier = '';
+    this.sharedService.setUserAdminViewIdentifier('');
   }
 }

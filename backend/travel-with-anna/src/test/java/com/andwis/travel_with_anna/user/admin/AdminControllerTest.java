@@ -5,7 +5,9 @@ import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
+import com.andwis.travel_with_anna.user.UserRespond;
 import com.andwis.travel_with_anna.utility.PageResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,12 +27,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static com.andwis.travel_with_anna.role.Role.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,11 +51,14 @@ class AdminControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockBean
     private AdminService adminService;
 
-
     private User user;
+    private Role retrivedAdminRole;
 
     @BeforeEach
     void setup() {
@@ -71,6 +75,24 @@ class AdminControllerTest {
                 .role(retrivedRole)
                 .avatarId(1L)
                 .build();
+        user.setAccountLocked(false);
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        Role adminRole = new Role();
+        adminRole.setRoleName(getAdminRole());
+        adminRole.setAuthority(getAdminAuthority());
+        Optional<Role> existingAdminRole = roleRepository.findByRoleName(getAdminRole());
+        retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
+
+        User adminUser = User.builder()
+                .userName("adminUserName")
+                .email("adminEmail@example.com")
+                .password(passwordEncoder.encode("adminPassword"))
+                .role(retrivedAdminRole)
+                .avatarId(2L)
+                .build();
+        user.setAccountLocked(false);
         user.setEnabled(true);
         userRepository.save(user);
     }
@@ -83,7 +105,7 @@ class AdminControllerTest {
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "Admin")
-    void testGetAllUsers() throws Exception {
+    void shouldGetAllUsers() throws Exception {
         // Getter
         UserAdminView userResponse = UserAdminView.builder()
                 .userId(1L)
@@ -102,6 +124,8 @@ class AdminControllerTest {
                 0, 10, 1, 1, true, true
         );
 
+        String jsonContent = objectMapper.writeValueAsString(response);
+
         when(adminService.getAllUsers(anyInt(), anyInt(), any(Authentication.class)))
                 .thenReturn(response);
 
@@ -111,34 +135,13 @@ class AdminControllerTest {
                         .param("size", "10")
                         .principal(createAuthentication(user))) // Simulate an authenticated user
                 .andExpect(status().isOk())
-                .andExpect(content().json("""
-                    {
-                        "content": [
-                            {
-                                "userId": 1,
-                                "userName": "TestUser",
-                                "email": "testuser@example.com",
-                                "accountLocked": false,
-                                "enabled": true,
-                                "createdDate": "2024-08-19",
-                                "lastModifiedDate": "2024-08-19",
-                                "roleName": "USER",
-                                "cover": null
-                            }
-                        ],
-                        "number": 0,
-                        "size": 10,
-                        "totalElements": 1,
-                        "totalPages": 1,
-                        "first": true,
-                        "last": true
-                    }
-                    """));
+                .andExpect(content().json(jsonContent));
+
     }
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "Admin")
-    void testGetAllUsersWithDefaultParams() throws Exception {
+    void shouldGetAllUsersWithDefaultParams() throws Exception {
         // Given
         when(adminService.getAllUsers(anyInt(), anyInt(), any(Authentication.class)))
                 .thenReturn(new PageResponse<>(List.of(), 0, 10, 0, 0, true, true));
@@ -159,6 +162,114 @@ class AdminControllerTest {
                     }
                     """));
     }
+
+    @Test
+    @WithMockUser(username = "email@example.com", authorities = "Admin")
+    void shouldGetUserAdminViewByIdentifier() throws Exception {
+        // Given
+        UserAdminView userResponse = UserAdminView.builder()
+                .userId(1L)
+                .userName("TestUser")
+                .email("email@example.com")
+                .accountLocked(false)
+                .enabled(true)
+                .createdDate(LocalDate.of(2024, 8, 19))
+                .lastModifiedDate(LocalDate.of(2024, 9, 19))
+                .roleName(getUserRole())
+                .cover(new byte[0])
+                .build();
+
+        String identifier = "TestUser";
+        String jsonContent = objectMapper.writeValueAsString(userResponse);
+
+        when(adminService.getUserAdminViewByIdentifier(eq(identifier), any(Authentication.class)))
+                .thenReturn(userResponse);
+
+        // When & Then
+        mockMvc.perform(get("/admin/user/{identifier}", identifier)
+                        .principal(createAuthentication(user)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonContent));
+    }
+
+    @Test
+    @WithMockUser(username = "adminEmail@example.com", authorities = "Admin")
+    void shouldUpdateUser() throws Exception {
+        // Given
+        UserAdminEdit userAdminEdit = new UserAdminEdit(
+                1L ,true, false, getUserRole());
+
+
+        UserAdminUpdateRequest request = UserAdminUpdateRequest.builder()
+                .password("adminPassword")
+                .userAdminEdit(userAdminEdit)
+                .build();
+
+        User updatedUser = User.builder()
+                .userId(user.getUserId())
+                .userName(user.getUserName())
+                .email(user.getEmail())
+                .password(passwordEncoder.encode("password"))
+                .accountLocked(true)
+                .enabled(false)
+                .role(retrivedAdminRole)
+                .avatarId(user.getAvatarId())
+                .build();
+
+        String jsonContent = objectMapper.writeValueAsString(request);
+        String updatedJsonContent = objectMapper.writeValueAsString(updatedUser);
+
+        when(adminService.updateUser(any(UserAdminUpdateRequest.class), any(Authentication.class)))
+                .thenReturn(updatedUser);
+
+        // When & Then
+        mockMvc.perform(patch("/admin/update")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent))
+                .andExpect(status().isOk())
+                .andExpect(content().json(updatedJsonContent));
+    }
+
+    @Test
+    @WithMockUser(username = "email@example.com", authorities = "Admin")
+    void shouldDeleteUser() throws Exception {
+        // Given
+        Long userId = 1L;
+        UserRespond userRespond = UserRespond.builder()
+                .message("User deleted successfully")
+                .build();
+        UserAdminDeleteRequest request = new UserAdminDeleteRequest(userId, "password");
+        String jsonContent = objectMapper.writeValueAsString(request);
+
+        when(adminService.deleteUser(eq(request), any())).thenReturn(userRespond);
+
+        // When & Then
+        mockMvc.perform(delete("/admin/delete/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent))
+                .andExpect(status().isNoContent())
+                .andExpect(content().json("""
+                    {
+                        "message": "User deleted successfully"
+                    }
+                    """));
+    }
+
+    @Test
+    @WithMockUser(username = "email@example.com", authorities = "Admin")
+    void shouldGetAllRoleNamesWithAdmin() throws Exception {
+        // Given
+        List<String> roleNames = List.of(getUserRole(), getAdminRole());
+        String jsonContent = objectMapper.writeValueAsString(roleNames);
+
+        when(adminService.getAllRoleNamesWithAdmin()).thenReturn(roleNames);
+
+        // When & Then
+        mockMvc.perform(get("/admin/roles"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonContent));
+    }
+
 
     private Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);

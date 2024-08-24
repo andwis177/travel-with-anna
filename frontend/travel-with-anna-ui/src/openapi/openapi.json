@@ -205,6 +205,36 @@
         }
       }
     },
+    "/admin/update": {
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "updateUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAdminUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/credentials": {
       "get": {
         "tags": [
@@ -337,6 +367,59 @@
         }
       }
     },
+    "/admin/user/{identifier}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "getUserAdminViewByIdentifier",
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdminView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/roles": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "getAllRoleNamesWithAdmin",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/delete": {
       "delete": {
         "tags": [
@@ -348,6 +431,36 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/PasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRespond"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/delete/{userId}": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "deleteUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAdminDeleteRequest"
               }
             }
           },
@@ -484,6 +597,100 @@
           }
         }
       },
+      "UserAdminEdit": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountLocked": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "roleName": {
+            "type": "string"
+          }
+        }
+      },
+      "UserAdminUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "userAdminEdit": {
+            "$ref": "#/components/schemas/UserAdminEdit"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "Role": {
+        "required": [
+          "authority",
+          "roleName"
+        ],
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roleName": {
+            "type": "string"
+          },
+          "authority": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "avatarId",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "accountLocked": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "avatarId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "PageResponseUserAdminView": {
         "type": "object",
         "properties": {
@@ -559,6 +766,18 @@
       "PasswordRequest": {
         "type": "object",
         "properties": {
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "UserAdminDeleteRequest": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
           "password": {
             "type": "string"
           }

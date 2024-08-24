@@ -7,8 +7,8 @@ import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 import { AvatarService } from './services/avatar.service';
 import { AuthenticationService } from './services/authentication.service';
 import { UserService } from './services/user.service';
-import { RoleService } from './services/role.service';
 import { AdminService } from './services/admin.service';
+import { RoleService } from './services/role.service';
 
 /**
  * Module that provides all services and configuration.
@@ -21,8 +21,8 @@ import { AdminService } from './services/admin.service';
     AvatarService,
     AuthenticationService,
     UserService,
-    RoleService,
     AdminService,
+    RoleService,
     ApiConfiguration
   ],
 })

@@ -17,7 +17,7 @@ public class UserMapper {
                 .enabled(user.isEnabled())
                 .createdDate(user.getCreatedDate().toLocalDate())
                 .roleName(user.getRole().getRoleName())
-                .cover(avatarsWithUsersId.get(user.getAvatarId()))
+                .avatar(avatarsWithUsersId.get(user.getAvatarId()))
                 .build();
         if (user.getLastModifiedDate() != null) {
             userAdminView.setLastModifiedDate(user.getLastModifiedDate().toLocalDate());

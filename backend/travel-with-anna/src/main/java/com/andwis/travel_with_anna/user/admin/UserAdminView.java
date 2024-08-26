@@ -20,5 +20,5 @@ public class UserAdminView {
     private LocalDate createdDate;
     private LocalDate lastModifiedDate;
     private String roleName;
-    private byte[] cover;
+    private byte[] avatar;
 }

@@ -420,6 +420,37 @@
         }
       }
     },
+    "/admin/avatar/{userId}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "getAvatar",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAvatar"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/delete": {
       "delete": {
         "tags": [
@@ -754,7 +785,19 @@
           "roleName": {
             "type": "string"
           },
-          "cover": {
+          "avatar": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "byte"
+            }
+          }
+        }
+      },
+      "UserAvatar": {
+        "type": "object",
+        "properties": {
+          "avatar": {
             "type": "array",
             "items": {
               "type": "string",

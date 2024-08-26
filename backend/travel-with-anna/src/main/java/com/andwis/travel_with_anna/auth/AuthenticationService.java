@@ -78,7 +78,7 @@ public class AuthenticationService {
         avatarService.createAvatar(user);
         userService.saveUser(user);
         //
-     //      sendValidationEmail(user);
+//           sendValidationEmail(user);
         System.out.println(generateAndSaveActivationToken(user));
     }
 
@@ -147,7 +147,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
 //
-    //                  sendValidationEmail(tokenEntity.getUser());
+//                      sendValidationEmail(tokenEntity.getUser());
 
             throw new ExpiredTokenException("Token expired. New token was sent to your email");
         }

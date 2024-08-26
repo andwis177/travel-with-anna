@@ -1,4 +1,4 @@
-import {Component, HostListener, signal} from '@angular/core';
+import {Component, HostListener, OnInit, signal} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {MatDivider} from "@angular/material/divider";
@@ -34,16 +34,33 @@ import {AdminService} from "../../../../../services/services/admin.service";
   templateUrl: './delete.component.html',
   styleUrl: './delete.component.scss'
 })
-export class DeleteComponent {
+export class DeleteComponent implements OnInit {
   errorMsg: Array<string> = [];
   passwordRequest: PasswordRequest = {password: ''};
-  userId: any;
+  userId: number | null = null;
 
   constructor(private adminService: AdminService,
               public dialogRef: MatDialogRef<DeleteComponent>,
               private shareService: SharedService) {
 
   }
+
+  ngOnInit(): void {
+    this.shareService.getUserAdminEditId().subscribe({
+      next: (id: number | null) => {
+        if (id !== null) {
+          this.userId = id;
+        } else {
+          console.error('User ID is null');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching User ID:', error);
+      }
+    });
+  }
+
+
 
   hide = signal(true);
   clickEvent(event: MouseEvent) {
@@ -62,7 +79,7 @@ export class DeleteComponent {
   }
 
   deleteAccount() {
-    this.userId = this.shareService.getUserAdminEditId();
+   // this.userId = this.shareService.getUserAdminEditId() as unknown as number;
     this.shareService.getUserAdminEditId().subscribe({
       next: (userId: number | null) => {
         if (userId !== null) {

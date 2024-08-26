@@ -9,17 +9,27 @@
     </mat-toolbar-row>
 
     <div class="header-shadow">
-      <h4>Account</h4>
-    </div>
-
-    <div class="image-container">
-      <img *ngIf="userAdminView.cover && userAdminView.cover.length > 0"
-           [src]="'data:image/jpeg;base64,' + userAdminView.cover"
-           alt="Cover Image"
-           class="profile-image" />
+      <h4>Edit User with ID: {{userAdminView.userId}}</h4>
     </div>
 
     <div class="main-container">
+
+      <div class = "info-area">
+        <div class="margin">
+          <p class="label-text">User ID: </p>
+          <p class="user-details">{{userAdminView.userId}}</p>
+        </div>
+
+        <div class="margin">
+          <p class="label-text">Name: </p>
+          <p class="user-details">{{userAdminView.userName}}</p>
+        </div>
+
+        <div class="margin">
+          <p class="label-text">Email: </p>
+          <p class="user-details">{{userAdminView.email}}</p>
+        </div>
+      </div>
 
       <div class="fields-container">
         <div class = "edit-area">
@@ -43,28 +53,11 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-
             </div>
           </div>
         </div>
       </div>
 
-      <div class = "info-area">
-        <div class="margin">
-          <p class="label-text">User ID: </p>
-          <p class="user-details">{{userAdminView.userId}}</p>
-        </div>
-
-        <div class="margin">
-          <p class="label-text">Name: </p>
-          <p class="user-details">{{userAdminView.userName}}</p>
-        </div>
-
-        <div class="margin">
-          <p class="label-text">Email: </p>
-          <p class="user-details">{{userAdminView.email}}</p>
-        </div>
-      </div>
     </div>
 
     <form class = "bottom-container full-width">

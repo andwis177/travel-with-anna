@@ -6,6 +6,9 @@ import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import com.andwis.travel_with_anna.user.UserRespond;
+import com.andwis.travel_with_anna.user.avatar.Avatar;
+import com.andwis.travel_with_anna.user.avatar.AvatarImg;
+import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -28,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.*;
+import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
+import static org.apache.commons.lang3.Conversion.hexToByte;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -59,6 +64,7 @@ class AdminControllerTest {
 
     private User user;
     private Role retrivedAdminRole;
+    private User adminUser;
 
     @BeforeEach
     void setup() {
@@ -85,7 +91,7 @@ class AdminControllerTest {
         Optional<Role> existingAdminRole = roleRepository.findByRoleName(getAdminRole());
         retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
 
-        User adminUser = User.builder()
+        adminUser = User.builder()
                 .userName("adminUserName")
                 .email("adminEmail@example.com")
                 .password(passwordEncoder.encode("adminPassword"))
@@ -116,7 +122,7 @@ class AdminControllerTest {
                 .createdDate(LocalDate.of(2024, 8, 19))
                 .lastModifiedDate(LocalDate.of(2024, 8, 19))
                 .roleName("USER")
-                .cover(null)
+                .avatar(null)
                 .build();
 
         PageResponse<UserAdminView> response = new PageResponse<>(
@@ -176,7 +182,7 @@ class AdminControllerTest {
                 .createdDate(LocalDate.of(2024, 8, 19))
                 .lastModifiedDate(LocalDate.of(2024, 9, 19))
                 .roleName(getUserRole())
-                .cover(new byte[0])
+                .avatar(new byte[0])
                 .build();
 
         String identifier = "TestUser";
@@ -188,6 +194,26 @@ class AdminControllerTest {
         // When & Then
         mockMvc.perform(get("/admin/user/{identifier}", identifier)
                         .principal(createAuthentication(user)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonContent));
+    }
+
+    @Test
+    @WithMockUser(username = "email@example.com", authorities = "Admin")
+    void shouldGetAvatar() throws Exception {
+        // Given
+
+        byte[] avatarBytes = hexToBytes(AvatarImg.DEFAULT.getImg());
+        UserAvatar userAvatar = UserAvatar.builder()
+                .avatar(avatarBytes)
+                .build();
+        String jsonContent = objectMapper.writeValueAsString(userAvatar);
+        when(adminService.getAvatar(any(Long.class))).thenReturn(userAvatar);
+
+
+        // When & Then
+        mockMvc.perform(get("/admin/avatar/{userId}", 1L)
+                        .principal(createAuthentication(adminUser)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));
     }

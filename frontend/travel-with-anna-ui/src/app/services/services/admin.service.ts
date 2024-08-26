@@ -15,6 +15,8 @@ import { getAllRoleNamesWithAdmin } from '../fn/admin/get-all-role-names-with-ad
 import { GetAllRoleNamesWithAdmin$Params } from '../fn/admin/get-all-role-names-with-admin';
 import { getAllUsers } from '../fn/admin/get-all-users';
 import { GetAllUsers$Params } from '../fn/admin/get-all-users';
+import { getAvatar } from '../fn/admin/get-avatar';
+import { GetAvatar$Params } from '../fn/admin/get-avatar';
 import { getUserAdminViewByIdentifier } from '../fn/admin/get-user-admin-view-by-identifier';
 import { GetUserAdminViewByIdentifier$Params } from '../fn/admin/get-user-admin-view-by-identifier';
 import { PageResponseUserAdminView } from '../models/page-response-user-admin-view';
@@ -22,6 +24,7 @@ import { updateUser } from '../fn/admin/update-user';
 import { UpdateUser$Params } from '../fn/admin/update-user';
 import { User } from '../models/user';
 import { UserAdminView } from '../models/user-admin-view';
+import { UserAvatar } from '../models/user-avatar';
 import { UserRespond } from '../models/user-respond';
 
 @Injectable({ providedIn: 'root' })
@@ -127,6 +130,31 @@ export class AdminService extends BaseService {
   getAllRoleNamesWithAdmin(params?: GetAllRoleNamesWithAdmin$Params, context?: HttpContext): Observable<Array<string>> {
     return this.getAllRoleNamesWithAdmin$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<string>>): Array<string> => r.body)
+    );
+  }
+
+  /** Path part for operation `getAvatar()` */
+  static readonly GetAvatarPath = '/admin/avatar/{userId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getAvatar()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getAvatar$Response(params: GetAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAvatar>> {
+    return getAvatar(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getAvatar$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getAvatar(params: GetAvatar$Params, context?: HttpContext): Observable<UserAvatar> {
+    return this.getAvatar$Response(params, context).pipe(
+      map((r: StrictHttpResponse<UserAvatar>): UserAvatar => r.body)
     );
   }
 

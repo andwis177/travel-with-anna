@@ -54,6 +54,21 @@ public class AdminService {
         );
     }
 
+    public UserAvatar getAvatar(Long userId) {
+        User user = userService.getUserById(userId);
+        Avatar avatar = avatarService.findById(user.getAvatarId());
+        String avatarHex = (
+                avatar != null &&
+                        avatar.getAvatar() != null &&
+                        !avatar.getAvatar().isEmpty()
+        )
+                ? avatar.getAvatar()
+                : AvatarImg.DEFAULT.getImg();
+        return UserAvatar.builder()
+                .avatar(hexToBytes(avatarHex))
+                .build();
+    }
+
     public Map<Long, byte[]> getAvatars(List<Long> avatarsId) {
         return avatarsId.stream()
                 .filter(avatarService::existsById)
@@ -62,7 +77,7 @@ public class AdminService {
                         avatarId -> {
                             Avatar avatar = avatarService.findById(avatarId);
                             String avatarHex = (
-                                            avatar != null &&
+                                    avatar != null &&
                                             avatar.getAvatar() != null &&
                                             !avatar.getAvatar().isEmpty()
                             )
@@ -73,8 +88,10 @@ public class AdminService {
                 ));
     }
 
+
+
     public UserAdminView getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
-        User user = returnUserBasedOnIdentifier(identifier);
+        User user = getUserBasedOnIdentifier(identifier);
         if (user.getUserId().equals(userService.getConnectedUser(connectedUser).getUserId())) {
             throw new UserNotFoundException("You can't view your own profile");
         }
@@ -83,7 +100,7 @@ public class AdminService {
         return userMapper.toUserForAdminView(user, avatarsWithUsersId);
     }
 
-    private User returnUserBasedOnIdentifier(String identifier){
+    private User getUserBasedOnIdentifier(String identifier){
         if (NumberUtils.isLong(identifier)) {
             if (userService.existsByUserId(Long.parseLong(identifier))) {
                 return userService.getUserById(Long.parseLong(identifier));

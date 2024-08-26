@@ -56,7 +56,7 @@ class UserMapperTest {
         assertEquals("2023-01-01", response.getCreatedDate().toString());
         assertEquals("2023-01-02", response.getLastModifiedDate().toString());
         assertEquals(getAdminRole(), response.getRoleName());
-        assertArrayEquals("avatarImage".getBytes(), response.getCover());
+        assertArrayEquals("avatarImage".getBytes(), response.getAvatar());
     }
 
     @Test
@@ -92,6 +92,6 @@ class UserMapperTest {
         assertEquals("2023-01-05", response.getCreatedDate().toString());
         assertEquals("2023-01-06", response.getLastModifiedDate().toString());
         assertEquals(getUserRole(), response.getRoleName());
-        assertNull(response.getCover());
+        assertNull(response.getAvatar());
     }
 }

@@ -18,11 +18,28 @@
   margin-bottom: 10px;
 }
 
-.main-container {
-  justify-content: space-evenly;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
+.info-area {
+  background-color: #D6E6E9;
+  border: 2px solid #2E3944;
+  border-radius: 10px;
+  padding-top:5px ;
+  padding-bottom: 5px;
+}
+
+.margin {
+  margin: 10px 20px;
+}
+
+.label-text {
+  font-size: 16px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.user-details {
+  font-weight: bold;
+  color: #2E3944 !important;
+  font-size: 16px;
 }
 
 .fields-container {
@@ -33,15 +50,11 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .edit-area {
   width: 500px !important;
-}
-
-.margin {
-  margin: 10px 20px;
 }
 
 .top-container {
@@ -52,12 +65,6 @@
 .label-container {
   display: flex;
   align-items: center;
-}
-
-.label-text {
-  font-size: 16px;
-  margin: 0px;
-  padding: 0px;
 }
 
 .font-bold {
@@ -81,20 +88,7 @@
   flex-shrink: 0;
   width: 190px !important;
   min-width: 190px !important;
-}
-
-.info-area {
-  background-color: #D6E6E9;
-  border: 2px solid #2E3944;
-  border-radius: 10px;
-  padding-top:5px ;
-  padding-bottom: 5px;
-}
-
-.user-details {
-  font-weight: bold;
-  color: #2E3944 !important;
-  font-size: 16px;
+  margin-left: 10px;
 }
 
 .bottom-container{

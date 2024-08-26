@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.user.admin;
 
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRespond;
+import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,12 @@ public class AdminController {
     public ResponseEntity<UserAdminView> getUserAdminViewByIdentifier(@PathVariable String identifier, Authentication connectedUser) {
         UserAdminView user = adminService.getUserAdminViewByIdentifier(identifier, connectedUser);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/avatar/{userId}")
+    public ResponseEntity<UserAvatar> getAvatar(@PathVariable Long userId) {
+        UserAvatar userAvatar = adminService.getAvatar(userId);
+        return ResponseEntity.ok(userAvatar);
     }
 
     @PatchMapping("/update")

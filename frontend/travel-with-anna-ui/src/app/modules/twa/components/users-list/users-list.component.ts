@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, inject, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, HostListener, inject, OnInit, ViewChild} from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -33,6 +33,7 @@ import {MatInput} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
 import {MatCardContent} from "@angular/material/card";
 import {GetUserAdminViewByIdentifier$Params} from "../../../../services/fn/admin/get-user-admin-view-by-identifier";
+import {ImageComponent} from "./image/image.component";
 
 
 @Component({
@@ -79,7 +80,7 @@ export class UsersListComponent implements OnInit, AfterViewInit {
     totalPages: 0
   };
   page = 0;
-  size = 2;
+  size = 1;
   pages: any = [];
   message = '';
   level: 'success' | 'error' = 'success';
@@ -100,6 +101,8 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
   selection = new SelectionModel<UserAdminView>(false, []);
   identifier: string = '';
+  currentRowIndex = -1;
+
 
   constructor(public dialog: MatDialog,
               private adminService: AdminService,
@@ -107,16 +110,69 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   ) {
   }
 
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKeydownHandler(event: KeyboardEvent): void {
+    this.selection.clear();
+  }
+
+  @HostListener('document:keydown.ArrowDown', ['$event'])
+  onArrowDownKeydownHandler(event: KeyboardEvent): void {
+    if (this.currentRowIndex < this.dataSource.data.length - 1) {
+      this.currentRowIndex++;
+      this.selectRowByIndex(this.currentRowIndex);
+    }
+  }
+
+  @HostListener('document:keydown.ArrowUp', ['$event'])
+  onArrowUpKeydownHandler(event: KeyboardEvent): void {
+    if (this.currentRowIndex > 0) {
+      this.currentRowIndex--;
+      this.selectRowByIndex(this.currentRowIndex);
+    }
+  }
+
+  @HostListener('document:keydown.ArrowRight', ['$event'])
+  onArrowRightKeydownHandler(event: KeyboardEvent): void {
+    if (this.isLastPage){
+      this.goToFirstPage();
+    } else {
+      this.goToNextPage();
+    }
+  }
+
+  @HostListener('document:keydown.ArrowLeft', ['$event'])
+  onArrowLeftKeydownHandler(event: KeyboardEvent): void {
+    if (this.page === 0){
+      this.goToLastPage();
+    } else {
+      this.goToPreviousPage();
+    }
+  }
+
+  selectRowByIndex(index: number): void {
+    const row = this.dataSource.data[index];
+    if (row) {
+      this.selection.clear(); // Clear previous selection
+      this.selection.select(row); // Select the new row
+      this.shareService.setUserAdminEditId(row.userId as number); // Set the selected user's ID
+    }
+  }
+
   ngOnInit(): void {
+    this.selection.clear()
     this.loadUsers()
     this.findUserData();
+
+    if (this.dataSource.data.length > 0) {
+      this.currentRowIndex = 0; // Select the first row initially if needed
+      this.selectRowByIndex(this.currentRowIndex);
+    }
   }
 
   findUserData() {
     this.shareService.userAdminViewIdentifier$.subscribe((identifier: string) => {
       if (identifier !== '') {
         this.getUserAdminView(identifier);
-        // Perform any additional actions, like refreshing the view
       } else {
         this.loadUsers()
       }
@@ -181,19 +237,25 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   }
 
   toggleRow(row: UserAdminView) {
+    this.currentRowIndex = this.dataSource.data.indexOf(row);
     this.selection.clear();
     this.selection.select(row);
+    this.shareService.setUserAdminEditId(row.userId as number);
   }
 
-  onEdit(element: UserAdminView) {
-    this.shareService.setUserAdminEditId(element.userId as number);
+  onEdit() {
     const dialogRef = this.dialog.open(EditComponent, {})
     dialogRef.afterClosed().subscribe(() => {
     });
   }
 
-  onDelete(element: UserAdminView) {
-    this.shareService.setUserAdminEditId(element.userId as number);
+  onAvatar() {
+    const dialogRef = this.dialog.open(ImageComponent, {})
+    dialogRef.afterClosed().subscribe(() => {
+    });
+  }
+
+  onDelete() {
     const dialogRef = this.dialog.open(DeleteComponent, {})
     dialogRef.afterClosed().subscribe(() => {
     });

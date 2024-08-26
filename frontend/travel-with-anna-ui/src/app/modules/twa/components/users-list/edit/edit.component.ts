@@ -51,7 +51,7 @@ import {UpdateUser$Params} from "../../../../../services/fn/admin/update-user";
 })
 export class EditComponent implements OnInit {
   errorMsg: Array<string> = [];
-  userId: any;
+  userId: number = 0;
   roles: Array<string> = [];
   userAdminView: UserAdminView = {};
   userAdminEdit: UserAdminEdit = {userId: 0, accountLocked: false, enabled: true, roleName: ''};

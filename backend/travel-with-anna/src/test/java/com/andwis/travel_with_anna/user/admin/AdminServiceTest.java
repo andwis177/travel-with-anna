@@ -130,6 +130,19 @@ class AdminServiceTest {
         assertNotNull(avatars.get(avatar2Id));
 
     }
+    @Test
+    void testGetAvatar() {
+        // Getter
+        byte[] avatarBytes = hexToBytes(avatar.getAvatar());
+
+        // When
+        UserAvatar userAvatar = adminService.getAvatar(userId);
+
+        // Then
+        assertNotNull(userAvatar);
+        assertArrayEquals(avatarBytes, userAvatar.getAvatar());
+    }
+
 
     @Test
     void testGetAvatars() {

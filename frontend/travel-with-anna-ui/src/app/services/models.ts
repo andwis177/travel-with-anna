@@ -13,5 +13,6 @@ export { UserAdminDeleteRequest } from './models/user-admin-delete-request';
 export { UserAdminEdit } from './models/user-admin-edit';
 export { UserAdminUpdateRequest } from './models/user-admin-update-request';
 export { UserAdminView } from './models/user-admin-view';
+export { UserAvatar } from './models/user-avatar';
 export { UserCredentials } from './models/user-credentials';
 export { UserRespond } from './models/user-respond';

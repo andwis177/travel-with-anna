@@ -2,13 +2,9 @@ package com.andwis.travel_with_anna.user.admin;
 
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
-import com.andwis.travel_with_anna.user.SecurityUser;
-import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserRepository;
-import com.andwis.travel_with_anna.user.UserRespond;
-import com.andwis.travel_with_anna.user.avatar.Avatar;
+import com.andwis.travel_with_anna.trip.trip.TripRepository;
+import com.andwis.travel_with_anna.user.*;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
-import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -31,8 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.*;
-import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
-import static org.apache.commons.lang3.Conversion.hexToByte;
+import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -41,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("AdminController tests")
+@DisplayName("Admin Controller tests")
 class AdminControllerTest {
 
     @Autowired
@@ -57,7 +52,13 @@ class AdminControllerTest {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private TripRepository tripRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserService userService;
 
     @MockBean
     private AdminService adminService;
@@ -66,6 +67,7 @@ class AdminControllerTest {
     private Role retrivedAdminRole;
     private User adminUser;
 
+
     @BeforeEach
     void setup() {
         Role role = new Role();
@@ -73,6 +75,8 @@ class AdminControllerTest {
         role.setAuthority(getUserAuthority());
         Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+
+
 
         user = User.builder()
                 .userName("userName")
@@ -83,7 +87,6 @@ class AdminControllerTest {
                 .build();
         user.setAccountLocked(false);
         user.setEnabled(true);
-        userRepository.save(user);
 
         Role adminRole = new Role();
         adminRole.setRoleName(getAdminRole());
@@ -97,16 +100,17 @@ class AdminControllerTest {
                 .password(passwordEncoder.encode("adminPassword"))
                 .role(retrivedAdminRole)
                 .avatarId(2L)
+
                 .build();
-        user.setAccountLocked(false);
-        user.setEnabled(true);
-        userRepository.save(user);
+        adminUser.setAccountLocked(false);
+        adminUser.setEnabled(true);
     }
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
         roleRepository.deleteAll();
+        tripRepository.deleteAll();
     }
 
     @Test
@@ -242,18 +246,18 @@ class AdminControllerTest {
                 .avatarId(user.getAvatarId())
                 .build();
 
+        userService.saveUser(updatedUser);
+
         String jsonContent = objectMapper.writeValueAsString(request);
-        String updatedJsonContent = objectMapper.writeValueAsString(updatedUser);
 
         when(adminService.updateUser(any(UserAdminUpdateRequest.class), any(Authentication.class)))
-                .thenReturn(updatedUser);
+                .thenReturn(updatedUser.getUserId());
 
         // When & Then
         mockMvc.perform(patch("/admin/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
-                .andExpect(status().isOk())
-                .andExpect(content().json(updatedJsonContent));
+                .andExpect(status().isOk());
     }
 
     @Test

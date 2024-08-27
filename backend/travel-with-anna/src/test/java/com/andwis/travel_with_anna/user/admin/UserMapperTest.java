@@ -3,6 +3,7 @@ package com.andwis.travel_with_anna.user.admin;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.user.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import static com.andwis.travel_with_anna.role.Role.getAdminRole;
 import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("User Mapper tests")
 class UserMapperTest {
 
     private UserMapper userMapper;

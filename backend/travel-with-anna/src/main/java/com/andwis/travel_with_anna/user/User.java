@@ -1,6 +1,8 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.role.Role;
+//import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.trip.trip.Trip;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.security.auth.Subject;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static jakarta.persistence.FetchType.EAGER;
 
@@ -59,6 +64,12 @@ public class User implements Principal {
     @Column(name = "avatar_id")
     private Long avatarId;
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Trip> ownedTrips;
+
+    @ManyToMany(mappedBy = "viewers")
+    private Set<Trip> tripsToView;
+
     @Override
     public String getName() {
         return this.getEmail();
@@ -67,5 +78,9 @@ public class User implements Principal {
     @Override
     public boolean implies(Subject subject) {
         return Principal.super.implies(subject);
+    }
+
+    public void addTrip(Trip trip) {
+        this.ownedTrips.add(trip);
     }
 }

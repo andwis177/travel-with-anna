@@ -152,9 +152,9 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   selectRowByIndex(index: number): void {
     const row = this.dataSource.data[index];
     if (row) {
-      this.selection.clear(); // Clear previous selection
-      this.selection.select(row); // Select the new row
-      this.shareService.setUserAdminEditId(row.userId as number); // Set the selected user's ID
+      this.selection.clear();
+      this.selection.select(row);
+      this.shareService.setUserAdminEditId(row.userId as number);
     }
   }
 
@@ -164,7 +164,7 @@ export class UsersListComponent implements OnInit, AfterViewInit {
     this.findUserData();
 
     if (this.dataSource.data.length > 0) {
-      this.currentRowIndex = 0; // Select the first row initially if needed
+      this.currentRowIndex = 0;
       this.selectRowByIndex(this.currentRowIndex);
     }
   }

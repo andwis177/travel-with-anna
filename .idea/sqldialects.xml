@@ -3,5 +3,6 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/main/resources/db/migration/V1__create_roles_table.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/main/resources/db/migration/V2__create_users_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/main/resources/db/migration/V4__created_trip_and_related_tables.sql" dialect="PostgreSQL" />
   </component>
 </project>

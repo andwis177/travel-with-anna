@@ -69,7 +69,7 @@ class UserServiceTest {
                 .role(retrivedRole)
                 .avatarId(2L)
                 .build();
-        user.setEnabled(true);
+        secondaryUser.setEnabled(true);
         userRepository.save(secondaryUser);
     }
 
@@ -92,10 +92,11 @@ class UserServiceTest {
         user.setEnabled(true);
 
         // When
-        User savedUser = userService.saveUser(user);
+        Long savedUserId = userService.saveUser(user);
+        User savedUser = userRepository.findById(savedUserId).orElseThrow();
 
         //Then
-        assertNotNull(savedUser.getUserId());
+        assertNotNull(savedUserId);
         assertEquals("testUser", savedUser.getUserName());
         assertEquals("test@example.com", savedUser.getEmail());
     }

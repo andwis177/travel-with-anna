@@ -33,7 +33,7 @@ class AvatarServiceTest {
         Avatar avatar = new Avatar();
 
         // When
-        Avatar savedAvatar = avatarService.save(avatar);
+        Avatar savedAvatar = avatarService.saveAvatar(avatar);
 
         // Then
         assertNotNull(savedAvatar);
@@ -44,7 +44,7 @@ class AvatarServiceTest {
     void existsById_ShouldReturnTrue_WhenAvatarExists() {
         // Given
         Avatar avatar = new Avatar();
-        Avatar savedAvatar = avatarService.save(avatar);
+        Avatar savedAvatar = avatarService.saveAvatar(avatar);
 
         // When
         boolean result = avatarService.existsById(savedAvatar.getAvatarId());
@@ -66,7 +66,7 @@ class AvatarServiceTest {
     void findById_ShouldReturnAvatar_WhenAvatarExists() {
         // Given
         Avatar avatar = new Avatar();
-        Avatar savedAvatar = avatarService.save(avatar);
+        Avatar savedAvatar = avatarService.saveAvatar(avatar);
 
         // When
         Avatar result = avatarService.findById(savedAvatar.getAvatarId());

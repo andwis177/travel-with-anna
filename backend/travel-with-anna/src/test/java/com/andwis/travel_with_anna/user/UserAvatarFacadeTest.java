@@ -19,15 +19,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
 import static com.andwis.travel_with_anna.role.Role.getUserRole;
-import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
+import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@DisplayName("Avatar Service tests")
+@DisplayName("User Avatar Facade tests")
 class UserAvatarFacadeTest {
 
     @Autowired
@@ -66,6 +67,7 @@ class UserAvatarFacadeTest {
                 .password(passwordEncoder.encode("password"))
                 .role(retrivedRole)
                 .avatarId(avatarId)
+                .ownedTrips(new HashSet<>())
                 .build();
         user.setEnabled(true);
         userRepository.save(user);

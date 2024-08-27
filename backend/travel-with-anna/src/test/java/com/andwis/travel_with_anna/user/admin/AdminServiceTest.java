@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.*;
-import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
+import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -79,12 +79,12 @@ class AdminServiceTest {
         avatar = Avatar.builder()
                 .avatar(AvatarImg.DEFAULT.getImg())
                 .build();
-        avatarId = avatarService.save(avatar).getAvatarId();
+        avatarId = avatarService.saveAvatar(avatar).getAvatarId();
 
         avatar2 = Avatar.builder()
                 .avatar(AvatarImg.DEFAULT.getImg())
                 .build();
-        avatar2Id = avatarService.save(avatar2).getAvatarId();
+        avatar2Id = avatarService.saveAvatar(avatar2).getAvatarId();
 
         user = User.builder()
                 .userName("userName")

@@ -42,9 +42,9 @@ public class AdminController {
     }
 
     @PatchMapping("/update")
-    public ResponseEntity<User> updateUser(@RequestBody UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
-        User user = adminService.updateUser(request, authentication);
-        return ResponseEntity.ok().body(user);
+    public ResponseEntity<Void> updateUser(@RequestBody UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
+        adminService.updateUser(request, authentication);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete/{userId}")

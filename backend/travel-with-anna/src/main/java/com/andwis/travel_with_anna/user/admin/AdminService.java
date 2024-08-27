@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.andwis.travel_with_anna.role.Role.getAdminRole;
-import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
+import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 
 @Service
 @RequiredArgsConstructor
@@ -117,7 +117,7 @@ public class AdminService {
         throw new UserNotFoundException("User not found");
     }
 
-    public User updateUser(UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
+    public Long updateUser(UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.getPassword());
         UserAdminEdit userAdminEdit = request.getUserAdminEdit();
@@ -126,7 +126,7 @@ public class AdminService {
         user.setEnabled(userAdminEdit.enabled());
         user.setRole(roleService.getRoleByName(userAdminEdit.roleName()));
         userService.saveUser(user);
-        return user;
+        return user.getUserId();
     }
 
     public UserRespond deleteUser(UserAdminDeleteRequest request, Authentication authentication) {

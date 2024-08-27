@@ -11,8 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.andwis.travel_with_anna.user.avatar.AvatarService.bytesToHex;
-import static com.andwis.travel_with_anna.user.avatar.AvatarService.hexToBytes;
+import static com.andwis.travel_with_anna.utility.ByteConverter.bytesToHex;
+import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 
 @Service
 @RequiredArgsConstructor
@@ -35,15 +35,16 @@ public class UserAvatarFacade {
         if (fileBytes.length > 1024 * 1024) {
             throw new SaveAvatarException("File is too big");
         }
-        String fileHex = bytesToHex(fileBytes);
+
         if (user.getAvatarId() == null) {
-            avatarService.createAvatar(user);
+          Avatar newAvatar = avatarService.createAvatar(user);
+          user.setAvatarId(newAvatar.getAvatarId());
             userService.saveUser(user);
         }
 
         Avatar userAvatar = avatarService.findById(user.getAvatarId());
-        userAvatar.setAvatar(fileHex);
-        avatarService.save(userAvatar);
+        userAvatar.setAvatar(bytesToHex(fileBytes));
+        avatarService.saveAvatar(userAvatar);
     }
 
     public byte[] getAvatar(Authentication connectedUser) {

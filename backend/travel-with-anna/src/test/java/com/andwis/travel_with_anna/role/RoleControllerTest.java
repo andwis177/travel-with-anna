@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("RoleController tests")
+@DisplayName("Role Controller tests")
 class RoleControllerTest {
 
     @Autowired

@@ -33,8 +33,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AvatarService avatarService;
 
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public Long saveUser(User user) {
+       return userRepository.save(user).getUserId();
     }
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);

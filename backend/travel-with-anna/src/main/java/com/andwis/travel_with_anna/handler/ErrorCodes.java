@@ -23,7 +23,9 @@ public enum ErrorCodes {
     JWT_PARSING_ERROR(1800, "JWT parsing error", UNAUTHORIZED),
 
     AVATAR_NOT_SAVED(2000, "Avatar was not saved", INTERNAL_SERVER_ERROR),
-    AVATAR_NOT_FOUND(2100, "Avatar not found", NOT_FOUND),;
+    AVATAR_NOT_FOUND(2100, "Avatar not found", NOT_FOUND),
+
+    TRIP_NOT_FOUND(3000, "Trip not found", NOT_FOUND);
 
     private final int code;
     private final String message;

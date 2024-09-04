@@ -1,0 +1,29 @@
+.toolbar {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  background: transparent !important;
+
+}
+.image-container {
+  padding: 0;
+  margin: 0;
+}
+
+.app-button {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.app-image,
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.role;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,12 +27,14 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer roleId;
 
+    @Size(max = 50)
     @NotNull
-    @Column(unique = true)
+    @Column(name = "role_name", unique = true, length = 50)
     private String roleName;
 
+    @Size(max = 50)
     @NotNull
-    @Column()
+    @Column(name = "authority", unique = true, length = 50)
     private String authority;
 
     public static String getUserRole() {

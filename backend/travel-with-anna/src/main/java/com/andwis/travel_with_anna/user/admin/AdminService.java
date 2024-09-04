@@ -3,10 +3,9 @@ package com.andwis.travel_with_anna.user.admin;
 import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.role.RoleService;
 import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.UserMapper;
 import com.andwis.travel_with_anna.user.UserRespond;
 import com.andwis.travel_with_anna.user.UserService;
-import com.andwis.travel_with_anna.user.avatar.Avatar;
-import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.utility.NumberUtils;
 import com.andwis.travel_with_anna.utility.PageResponse;
@@ -21,10 +20,8 @@ import org.springframework.stereotype.Service;
 import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.andwis.travel_with_anna.role.Role.getAdminRole;
-import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +37,7 @@ public class AdminService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("userId").ascending());
         Page<User> users = userService.getAllUsersExcept(pageable, user.getUserId());
         List<Long> avatarsId = users.map(User::getAvatarId).getContent();
-        Map<Long, byte[]> avatarsWithUsersId = getAvatars(avatarsId);
+        Map<Long, byte[]> avatarsWithUsersId = avatarService.getAvatars(avatarsId);
         List<UserAdminView> userAdminViewList = users.stream()
                 .map(theUser -> userMapper.toUserForAdminView(theUser, avatarsWithUsersId)).toList();
         return new PageResponse<>(
@@ -56,39 +53,9 @@ public class AdminService {
 
     public UserAvatar getAvatar(Long userId) {
         User user = userService.getUserById(userId);
-        Avatar avatar = avatarService.findById(user.getAvatarId());
-        String avatarHex = (
-                avatar != null &&
-                        avatar.getAvatar() != null &&
-                        !avatar.getAvatar().isEmpty()
-        )
-                ? avatar.getAvatar()
-                : AvatarImg.DEFAULT.getImg();
-        return UserAvatar.builder()
-                .avatar(hexToBytes(avatarHex))
-                .build();
+        return avatarService.getAvatar(user);
+
     }
-
-    public Map<Long, byte[]> getAvatars(List<Long> avatarsId) {
-        return avatarsId.stream()
-                .filter(avatarService::existsById)
-                .collect(Collectors.toMap(
-                        avatarId -> avatarId,
-                        avatarId -> {
-                            Avatar avatar = avatarService.findById(avatarId);
-                            String avatarHex = (
-                                    avatar != null &&
-                                            avatar.getAvatar() != null &&
-                                            !avatar.getAvatar().isEmpty()
-                            )
-                                    ? avatar.getAvatar()
-                                    : AvatarImg.DEFAULT.getImg();
-                            return hexToBytes(avatarHex);
-                        }
-                ));
-    }
-
-
 
     public UserAdminView getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
         User user = getUserBasedOnIdentifier(identifier);
@@ -96,7 +63,7 @@ public class AdminService {
             throw new UserNotFoundException("You can't view your own profile");
         }
         List<Long> avatarsId = List.of(user.getAvatarId());
-        Map<Long, byte[]> avatarsWithUsersId = getAvatars(avatarsId);
+        Map<Long, byte[]> avatarsWithUsersId = avatarService.getAvatars(avatarsId);
         return userMapper.toUserForAdminView(user, avatarsWithUsersId);
     }
 

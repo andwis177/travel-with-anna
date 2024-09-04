@@ -2,8 +2,15 @@ package com.andwis.travel_with_anna.user.avatar;
 
 import com.andwis.travel_with_anna.handler.exception.AvatarNotFoundException;
 import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.admin.UserAvatar;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 
 @Service
 @RequiredArgsConstructor
@@ -23,27 +30,6 @@ public class AvatarService {
                 .orElseThrow(() -> new AvatarNotFoundException("Avatar not found"));
     }
 
-//    public static String bytesToHex(byte[] bytes) {
-//        StringBuilder sb = new StringBuilder();
-//        for (byte b : bytes) {
-//            sb.append(String.format("%02x", b));
-//        }
-//        return sb.toString();
-//    }
-//
-//    public static byte[] hexToBytes(String hex) {
-//        if (hex == null || hex.length() % 2 != 0) {
-//            throw new IllegalArgumentException("Invalid hex string");
-//        }
-//
-//        byte[] bytes = new byte[hex.length() / 2];
-//        for (int i = 0; i < hex.length(); i += 2) {
-//            bytes[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-//                    + Character.digit(hex.charAt(i+1), 16));
-//        }
-//        return bytes;
-//    }
-
     public Avatar createAvatar(User user) {
         Avatar avatar = avatarRepository.save(Avatar.builder()
                 .avatar(null)
@@ -57,5 +43,38 @@ public class AvatarService {
             avatarRepository.deleteById(user.getAvatarId());
             user.setAvatarId(null);
         }
+    }
+
+    public UserAvatar getAvatar(User user) {
+        Avatar avatar = findById(user.getAvatarId());
+        String avatarHex = (
+                avatar != null &&
+                        avatar.getAvatar() != null &&
+                        !avatar.getAvatar().isEmpty()
+        )
+                ? avatar.getAvatar()
+                : AvatarImg.DEFAULT.getImg();
+        return UserAvatar.builder()
+                .avatar(hexToBytes(avatarHex))
+                .build();
+    }
+
+    public Map<Long, byte[]> getAvatars(List<Long> avatarsId) {
+        return avatarsId.stream()
+                .filter(this::existsById)
+                .collect(Collectors.toMap(
+                        avatarId -> avatarId,
+                        avatarId -> {
+                            Avatar avatar = findById(avatarId);
+                            String avatarHex = (
+                                    avatar != null &&
+                                            avatar.getAvatar() != null &&
+                                            !avatar.getAvatar().isEmpty()
+                            )
+                                    ? avatar.getAvatar()
+                                    : AvatarImg.DEFAULT.getImg();
+                            return hexToBytes(avatarHex);
+                        }
+                ));
     }
 }

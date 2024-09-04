@@ -1,13 +1,5 @@
 <div class="d-flex flex-column gap-1">
-  <app-menu></app-menu>
-
-  <div class="pe-2 ps-2" *ngIf="!isRoleAdmin else userList">
-   <app-trip-list></app-trip-list>
+  <div>
+    <router-outlet></router-outlet>
   </div>
 </div>
-
-<ng-template #userList>
-<div class="pe-2 ps-2">
-  <app-users-list> </app-users-list>
-</div>
-</ng-template>

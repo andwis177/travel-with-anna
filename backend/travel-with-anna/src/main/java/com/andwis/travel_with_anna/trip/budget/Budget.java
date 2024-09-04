@@ -1,8 +1,10 @@
 package com.andwis.travel_with_anna.trip.budget;
 
+import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.utility.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,7 +23,6 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "budget")
 public class Budget extends BaseEntity {
-
     @NotNull
     @Column(name = "currency", length = 10)
     private String currency;
@@ -30,4 +31,6 @@ public class Budget extends BaseEntity {
     @Column(name = "to_spend")
     private BigDecimal toSpend;
 
+    @OneToOne(mappedBy = "budget")
+    private Trip trip;
 }

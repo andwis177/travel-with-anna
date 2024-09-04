@@ -203,6 +203,19 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(TripNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(TripNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(TRIP_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(TRIP_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
     @ExceptionHandler(UserExistsException.class)
     public ResponseEntity<ExceptionResponse> handleException(UserExistsException exp) {
         return ResponseEntity

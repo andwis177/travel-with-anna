@@ -1,5 +1,13 @@
+export { TripService } from './services/trip.service';
+export { PdfDocService } from './services/pdf-doc.service';
+export { NoteService } from './services/note.service';
+export { ExpanseService } from './services/expanse.service';
+export { DayService } from './services/day.service';
+export { BudgetService } from './services/budget.service';
+export { BackpackService } from './services/backpack.service';
 export { AvatarService } from './services/avatar.service';
 export { AuthenticationService } from './services/authentication.service';
 export { UserService } from './services/user.service';
 export { AdminService } from './services/admin.service';
 export { RoleService } from './services/role.service';
+export { CountryApiControllerService } from './services/country-api-controller.service';

@@ -1,0 +1,35 @@
+.second-container {
+  display: flex;
+}
+
+.main-form{
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.delete-button-area {
+  text-align: center;
+}
+
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+
+mat-form-field {
+  width: 100%;
+  max-width: 500px;
+}
+
+.currency-container {
+  text-align: start
+}
+
+.insert-size {
+  width: 50%;
+  max-width: 150px;
+  margin-right: 20px;
+}
+
+
+
+

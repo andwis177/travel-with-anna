@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
+
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String userEmail);
     Optional<User> findByUserName(String userName);
@@ -17,9 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUserName(String userName);
     boolean existsByRole(Role role);
 
-    @Query(value = """
-    SELECT u FROM User u
-    WHERE u.userId != :userId
-""")
+    @Query("SELECT u FROM User u WHERE u.userId != :userId")
     Page<User> findAllExcept(Pageable pageable, @Param("userId") Long userId);
 }

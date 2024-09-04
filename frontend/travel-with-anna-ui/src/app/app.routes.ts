@@ -5,6 +5,7 @@ import {ActivateAccountComponent} from "./pages/activate-account/activate-accoun
 import {ResetPasswordComponent} from "./pages/reset-password/reset-password.component";
 import {AuthGuard} from "./services/auth/auth.guard";
 import {DeleteAccountComponent} from "./pages/delete-account/delete-account.component";
+import {TripDetailsComponent} from "./modules/twa/components/trip-list/trip-details/trip-details.component";
 
 
 

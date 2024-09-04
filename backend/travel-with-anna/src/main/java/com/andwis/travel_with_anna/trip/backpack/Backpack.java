@@ -1,17 +1,14 @@
 package com.andwis.travel_with_anna.trip.backpack;
 
-import com.andwis.travel_with_anna.trip.expanse.Expanse;
+import com.andwis.travel_with_anna.trip.backpack.item.Item;
 import com.andwis.travel_with_anna.trip.note.Note;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.utility.BaseEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -23,22 +20,19 @@ import java.util.Set;
 @Table(name = "backpack")
 public class Backpack extends BaseEntity {
 
-    @NotNull
-    @Column(name = "item", length = 100)
-    private String item;
-
-    @Column(name = "is_packed")
-    private boolean isPacked;
+    @OneToMany(mappedBy = "backpack", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<Item> items = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "note_id")
     private Note note;
 
-    @ManyToOne
-    @JoinColumn(name = "trip_id")
+    @OneToOne(mappedBy = "backpack")
     private Trip trip;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "expanse_id")
-    private Expanse expanse;
+    public void setNote(Note note) {
+        this.note = note;
+        note.setBackpack(this);
+    }
 }

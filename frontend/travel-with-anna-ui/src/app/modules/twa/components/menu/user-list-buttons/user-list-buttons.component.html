@@ -1,0 +1,19 @@
+<form>
+  <div class="buttons-container">
+    <input type="text"
+           class="search-field"
+           matInput
+           [(ngModel)]="identifier"
+           [ngModelOptions]="{standalone: true}"
+           placeholder="Search by ID, Name or Email"
+           autocomplete="Identifier"
+           (keydown.enter)="$event.preventDefault()">
+    <button class="admin-button margin" (click)="findUser()" type="submit" matTooltip="Find specific user">
+      <i class="fas fa-search"></i>
+    </button>
+    <button class="admin-button" (click)="AllUsers()" type="submit" matTooltip="Get all users">
+      <i class="fas fa-users"></i>
+    </button>
+  </div>
+</form>
+

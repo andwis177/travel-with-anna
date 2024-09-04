@@ -1,6 +1,6 @@
-package com.andwis.travel_with_anna.user.admin;
+package com.andwis.travel_with_anna.user;
 
-import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.admin.UserAdminView;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

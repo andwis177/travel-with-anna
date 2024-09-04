@@ -51,7 +51,8 @@ public class SecurityConfig  {
                                         "/avatar/**"
                                 ).hasAnyAuthority(getUserAuthority(), getAdminAuthority())
                                 .requestMatchers(
-                                        "/trip/**"
+                                        "/trip/**",
+                                        "/api/country/**"
                                 ).hasAuthority(getUserAuthority())
                                 .requestMatchers(
                                         "/admin/**"

@@ -34,6 +34,10 @@ import {FormsModule} from "@angular/forms";
 import {MatCardContent} from "@angular/material/card";
 import {GetUserAdminViewByIdentifier$Params} from "../../../../services/fn/admin/get-user-admin-view-by-identifier";
 import {ImageComponent} from "./image/image.component";
+import {LogoComponent} from "../menu/logo/logo.component";
+import {TripListButtons} from "../menu/trip-list-buttons/trip-list-buttons.component";
+import {UserComponent} from "../menu/user/user.component";
+import {UserListButtonsComponent} from "../menu/user-list-buttons/user-list-buttons.component";
 
 
 @Component({
@@ -63,7 +67,11 @@ import {ImageComponent} from "./image/image.component";
     MatInput,
     FormsModule,
     MatLabel,
-    MatCardContent
+    MatCardContent,
+    LogoComponent,
+    TripListButtons,
+    UserComponent,
+    UserListButtonsComponent
   ],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.scss'

@@ -34,7 +34,7 @@ public class UserService {
     private final AvatarService avatarService;
 
     public Long saveUser(User user) {
-       return userRepository.save(user).getUserId();
+        return userRepository.save(user).getUserId();
     }
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
@@ -197,4 +197,5 @@ public class UserService {
         }
         return securityUser ;
     }
+
 }

@@ -79,7 +79,6 @@ export class DeleteComponent implements OnInit {
   }
 
   deleteAccount() {
-   // this.userId = this.shareService.getUserAdminEditId() as unknown as number;
     this.shareService.getUserAdminEditId().subscribe({
       next: (userId: number | null) => {
         if (userId !== null) {

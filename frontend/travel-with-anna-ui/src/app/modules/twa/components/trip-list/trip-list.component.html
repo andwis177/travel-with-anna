@@ -1,2 +1,26 @@
-<div class="fullscreen">
+<div>
+  <div class="user-background toolbar-menu">
+    <div class="logo">
+      <app-logo></app-logo>
+    </div>
+    <div class="menu-buttons">
+      <app-trip-list-buttons></app-trip-list-buttons>
+    </div>
+    <div class="user">
+      <app-user></app-user>
+    </div>
+  </div>
+
+  <div class="main-form">
+    <div class="top-container">
+      <app-trip-card [trip]="trip" *ngFor="let trip of tripResponse.content">{{trip.tripName}} !!!! </app-trip-card>
+    </div>
+    <div class="pagination-container full-width">
+      <button class="pagination-button" (click)="goToFirstPage()" type="submit" [class.disabled]="page === 0"> << </button>
+      <button class="pagination-button" (click)="goToPreviousPage()" type="submit" [class.disabled]="page === 0"> < </button>
+      <p class="margin-top">{{page + 1}} of {{tripResponse.totalPages}}</p>
+      <button class="pagination-button" (click)="goToNextPage()" type="submit" [class.disabled]="isLastPage"> > </button>
+      <button class="pagination-button" (click)="goToLastPage()" type="submit" [class.disabled]="isLastPage"> >> </button>
+    </div>
+  </div>
 </div>

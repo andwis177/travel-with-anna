@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {LocalStorageService} from "../local-storage/local-storage.service";
 
 @Injectable({
@@ -7,19 +7,20 @@ import {LocalStorageService} from "../local-storage/local-storage.service";
 })
 export class SharedService {
   private userName = new BehaviorSubject<string |null>('');
-  public userName$: Observable<string |null> = this.userName.asObservable();
+  private userName$: Observable<string |null> = this.userName.asObservable();
   private avatarImg = new BehaviorSubject<string | null>(null);
-  public avatarImg$:Observable<string | null> = this.avatarImg.asObservable();
+  private avatarImg$:Observable<string | null> = this.avatarImg.asObservable();
   private userAdminEditId = new BehaviorSubject<number | null>(null);
-  public userAdminEditId$:Observable<number | null> = this.userAdminEditId.asObservable();
-  public userAdminViewIdentifier= new BehaviorSubject<string>('');
+  private userAdminEditId$:Observable<number | null> = this.userAdminEditId.asObservable();
+  private userAdminViewIdentifier= new BehaviorSubject<string>('');
   public userAdminViewIdentifier$:Observable<string> = this.userAdminViewIdentifier.asObservable();
+
   private userNameKey: string = 'userName';
   private imageKey: string = 'image';
 
-
-  constructor(private localStorageService: LocalStorageService) {
-  }
+  constructor(
+    private localStorageService: LocalStorageService)
+  {}
 
   clean(): void {
     this.localStorageService.clear();
@@ -51,10 +52,6 @@ export class SharedService {
 
   setUserAdminViewIdentifier(identifier: string): void {
       this.userAdminViewIdentifier.next(identifier);
-  }
-
-  getUserAdminViewIdentifier(): Observable<string> {
-    return this.userAdminViewIdentifier$;
   }
 
   updateAvatarImg(newImg: string): void {

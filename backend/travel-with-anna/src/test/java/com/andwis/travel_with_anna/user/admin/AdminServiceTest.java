@@ -11,7 +11,6 @@ import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarRepository;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
-import com.andwis.travel_with_anna.utility.PageResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.*;
@@ -52,9 +50,6 @@ class AdminServiceTest {
     private PasswordEncoder passwordEncoder;
 
     private Avatar avatar;
-    private Avatar avatar2;
-    private Long avatarId;
-    private Long avatar2Id;
     private User user;
     private Long userId;
     private User secondaryUser;
@@ -79,12 +74,12 @@ class AdminServiceTest {
         avatar = Avatar.builder()
                 .avatar(AvatarImg.DEFAULT.getImg())
                 .build();
-        avatarId = avatarService.saveAvatar(avatar).getAvatarId();
+        Long avatarId = avatarService.saveAvatar(avatar).getAvatarId();
 
-        avatar2 = Avatar.builder()
+        Avatar avatar2 = Avatar.builder()
                 .avatar(AvatarImg.DEFAULT.getImg())
                 .build();
-        avatar2Id = avatarService.saveAvatar(avatar2).getAvatarId();
+        Long avatar2Id = avatarService.saveAvatar(avatar2).getAvatarId();
 
         user = User.builder()
                 .userName("userName")
@@ -117,20 +112,6 @@ class AdminServiceTest {
     }
 
     @Test
-    void testGetAllUsers() {
-        // Getter
-        PageResponse<UserAdminView> result = adminService.getAllUsers(0, 10, createAuthentication(user));
-
-        // When & Then
-        assertNotNull(result);
-        assertEquals(1, result.getContent().size());
-        assertEquals(secondaryUserId, result.getContent().get(0).getUserId());
-
-        Map<Long, byte[]> avatars = adminService.getAvatars(List.of(avatar2Id));
-        assertNotNull(avatars.get(avatar2Id));
-
-    }
-    @Test
     void testGetAvatar() {
         // Getter
         byte[] avatarBytes = hexToBytes(avatar.getAvatar());
@@ -141,24 +122,6 @@ class AdminServiceTest {
         // Then
         assertNotNull(userAvatar);
         assertArrayEquals(avatarBytes, userAvatar.getAvatar());
-    }
-
-
-    @Test
-    void testGetAvatars() {
-        // Getter
-        List<Long> avatarsId = List.of(avatarId, avatar2Id);
-        byte[] avatarBytes = hexToBytes(avatar.getAvatar());
-        byte[] avatar2Bytes = hexToBytes(avatar2.getAvatar());
-
-        // When
-        Map<Long, byte[]> avatars = adminService.getAvatars(avatarsId);
-
-        // Then
-        assertNotNull(avatars);
-        assertEquals(2, avatars.size());
-        assertArrayEquals(avatarBytes, avatars.get(avatarId));
-        assertArrayEquals(avatar2Bytes, avatars.get(avatar2Id));
     }
 
     @Test

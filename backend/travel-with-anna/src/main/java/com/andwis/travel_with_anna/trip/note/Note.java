@@ -1,5 +1,8 @@
 package com.andwis.travel_with_anna.trip.note;
 
+import com.andwis.travel_with_anna.trip.backpack.Backpack;
+import com.andwis.travel_with_anna.trip.day.Day;
+import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.utility.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,4 +26,13 @@ public class Note extends BaseEntity {
     @Size(max = 500)
     @Column(length = 500)
     private String note;
+
+    @OneToOne(mappedBy = "note")
+    private Day day;
+
+    @OneToOne(mappedBy = "note")
+    private Backpack backpack;
+
+    @OneToOne(mappedBy = "note")
+    private Activity activity;
 }

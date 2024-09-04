@@ -22,7 +22,6 @@ import { GetUserAdminViewByIdentifier$Params } from '../fn/admin/get-user-admin-
 import { PageResponseUserAdminView } from '../models/page-response-user-admin-view';
 import { updateUser } from '../fn/admin/update-user';
 import { UpdateUser$Params } from '../fn/admin/update-user';
-import { User } from '../models/user';
 import { UserAdminView } from '../models/user-admin-view';
 import { UserAvatar } from '../models/user-avatar';
 import { UserRespond } from '../models/user-respond';
@@ -42,7 +41,7 @@ export class AdminService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  updateUser$Response(params: UpdateUser$Params, context?: HttpContext): Observable<StrictHttpResponse<User>> {
+  updateUser$Response(params: UpdateUser$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     return updateUser(this.http, this.rootUrl, params, context);
   }
 
@@ -52,9 +51,9 @@ export class AdminService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  updateUser(params: UpdateUser$Params, context?: HttpContext): Observable<User> {
+  updateUser(params: UpdateUser$Params, context?: HttpContext): Observable<void> {
     return this.updateUser$Response(params, context).pipe(
-      map((r: StrictHttpResponse<User>): User => r.body)
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 

@@ -1,7 +1,7 @@
 .button-container {
   display: flex;
   justify-content: center;
-  padding-bottom: 30px;
+  padding-bottom: 20px;
 }
 
 .profile-button{
@@ -21,6 +21,12 @@
   object-fit: cover;
   background-color: #D1D7DC;
   border-radius: 50%;
+  border: 3px solid #2E3944;
+}
+
+.profile-button:hover,
+.profile-image:hover {
+  opacity: 0.5;
 }
 
 .main-form{
@@ -29,14 +35,11 @@
 }
 
 .information-area {
-  border: 2px solid #BFBDB8;
+  border: 1px solid #2E3944;
   padding: 5px;
   border-radius: 10px;
   background-color: whitesmoke;
-}
-
-.padding {
-  padding: 10px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .label-text {
@@ -55,9 +58,10 @@
   margin-left: 10px !important;
 }
 
-.toolbar-row {
-  padding: 50px;
-  justify-content: center;
+.button-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .delete-button-area {

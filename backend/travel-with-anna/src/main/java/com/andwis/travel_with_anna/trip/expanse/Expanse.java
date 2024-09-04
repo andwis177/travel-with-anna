@@ -1,5 +1,7 @@
 package com.andwis.travel_with_anna.trip.expanse;
 
+import com.andwis.travel_with_anna.trip.backpack.item.Item;
+import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.pdf_doc.PdfDoc;
 import com.andwis.travel_with_anna.utility.BaseEntity;
 import jakarta.persistence.*;
@@ -39,7 +41,13 @@ public class Expanse extends BaseEntity {
     @Column(name = "exchange_rate")
     private BigDecimal exchangeRate;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "pdf_doc_id")
     private PdfDoc pdfDoc;
+
+    @OneToOne(mappedBy = "expanse")
+    private Item item;
+
+    @OneToOne(mappedBy = "expanse")
+    private Activity activity;
 }

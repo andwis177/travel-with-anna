@@ -1,13 +1,13 @@
 .second-container {
-  display: flex;
+  display: flex !important;
+  width: 100% !important;
 }
 
 .main-form{
-  padding-left: 25px;
-  padding-right: 25px;
+  padding: 5%;
 }
 
-.delete-button-area {
+.name-button-area {
   text-align: center;
 }
 
@@ -16,20 +16,16 @@
 }
 
 mat-form-field {
-  width: 100%;
-  max-width: 500px;
+  max-width: 100% !important;
 }
 
 .currency-container {
-  text-align: start
+  margin-top: 10px !important;
+  text-align: center !important;
 }
 
 .insert-size {
-  width: 50%;
-  max-width: 150px;
-  margin-right: 20px;
+  width: 40% !important;
+  margin-right: 10px;
 }
-
-
-
 

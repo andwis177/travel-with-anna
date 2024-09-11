@@ -14,9 +14,8 @@ import {Router} from "@angular/router";
 import {TripService} from "../../../../../services/services/trip.service";
 import {MatDialog} from "@angular/material/dialog";
 import {MatOption, MatSelect} from "@angular/material/select";
-import {firstValueFrom} from "rxjs";
-import {CountryApiControllerService} from "../../../../../services/services/country-api-controller.service";
 import {CountryCurrency} from "../../../../../services/models/country-currency";
+import {CountryControllerService} from "../../../../../services/services/country-controller.service";
 
 @Component({
   selector: 'app-trip-new',
@@ -51,8 +50,8 @@ export class TripNewComponent implements OnInit {
   amount: number = 0;
 
   constructor(private router: Router,
-          private tripService: TripService,
-              private countryApiService: CountryApiControllerService,
+              private tripService: TripService,
+              private countryControllerService: CountryControllerService,
               public dialog: MatDialog) {
 
   }
@@ -61,46 +60,43 @@ export class TripNewComponent implements OnInit {
     this.getCurrency()
   }
 
- async createNewTrip() {
+  createNewTrip() {
     this.errorMsg = [];
-    try {
-      const tripId = await firstValueFrom(this.tripService.createTrip({
-        body: this.tripCreatorRequest
-      }));
-
-      this.onClose();
-      this.router.navigate(['/twa/trip-details', tripId]).then();
-    } catch (err) {
-      if (err instanceof Error) {
-        this.errorMsg.push(err.message);
-      } else if (typeof err === 'object' && err !== null && 'error' in err) {
-        const serverError = err as { error: { errors: string[] } };
-        if (serverError.error.errors && serverError.error.errors.length > 0) {
-          this.errorMsg = serverError.error.errors;
+    console.log("tripCreatorRequest", this.tripCreatorRequest);
+    this.tripService.createTrip({
+      body: this.tripCreatorRequest
+    }).subscribe({
+      next: (tripId) => {
+        this.onClose();
+        this.router.navigate(['/twa/trip-details', tripId]).then();
+        console.log("response", tripId);
+      },
+      error: (err) => {
+        console.log("error message", err.error.errors || err.error.message);
+        if (err.error.errors && err.error.errors.length > 0) {
+          this.errorMsg = err.error.errors;
         } else {
           this.errorMsg.push('Unexpected error occurred');
         }
-      } else {
-        this.errorMsg.push('An unknown error occurred');
       }
-    }
- }
+    });
+  }
 
- getCurrency() {
-    this.countryApiService.findAllCountryCurrencies().subscribe( {
+  getCurrency() {
+    this.countryControllerService.findAllCountryCurrencies().subscribe( {
       next: (currency) => {
         this.currency = currency;
         if(this.currency.length > 0) {
-          this.tripCreatorRequest.currency = this.currency[110].currency || '';
+          this.tripCreatorRequest.currency = "PLN" || '';
         }
       },
       error: (error) => {
         this.errorMsg.push(error);
       }
- });
+    });
   }
 
   onClose() {
-  this.dialog.closeAll();
+    this.dialog.closeAll();
   }
 }

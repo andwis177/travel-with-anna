@@ -1,10 +1,10 @@
-<div>
-  <div class="user-background toolbar-menu">
+<div class="user-background">
+  <div class="menu-components-background toolbar-menu">
     <div class="logo">
       <app-logo></app-logo>
     </div>
     <div class="menu-buttons">
-
+      <app-trip-details-buttons *ngIf="trip.budgetId" [_trip]="trip"></app-trip-details-buttons>
     </div>
     <div class="user">
       <app-user></app-user>
@@ -12,6 +12,6 @@
   </div>
 </div>
 
-<div>
-  <h3 class="header-shadow trip-name trip-font">{{trip.tripName}}</h3>
+<div *ngIf="trip.tripName">
+  <h3 class="trip-name trip-font mat-elevation-z8">{{ trip.tripName }}</h3>
 </div>

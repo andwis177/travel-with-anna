@@ -18,7 +18,6 @@ public class AuthenticationController {
     private final AuthenticationService service;
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> register(
             @RequestBody @Valid RegistrationRequest request
     ) throws RoleNotFoundException, MessagingException {
@@ -28,18 +27,18 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody @Valid AuthenticationRequest request
+            @RequestBody AuthenticationRequest request
     )  {
         AuthenticationResponse response = service.authenticationWithCredentials(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/activate-account")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void confirm(
+    public ResponseEntity<Void> confirm(
             @RequestParam String token
     ) throws MessagingException {
         service.activateAccount(token);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PatchMapping("/reset-password")

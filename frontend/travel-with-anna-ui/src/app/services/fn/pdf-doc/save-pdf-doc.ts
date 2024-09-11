@@ -6,10 +6,10 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { PdfDoc } from '../../models/pdf-doc';
+import { Pdf } from '../../models/pdf';
 
 export interface SavePdfDoc$Params {
-  pdfDoc: PdfDoc;
+  pdfDoc: Pdf;
 }
 
 export function savePdfDoc(http: HttpClient, rootUrl: string, params: SavePdfDoc$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {

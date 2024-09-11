@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: whitesmoke;
+        }
+        .container {
+            max-width: 600px;
+            margin: 10px auto;
+            padding: 20px;
+            background-color: #EDEAE5;
+            color: #2E3944;
+            font-family: "Verdana", sans-serif;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .hello {
+            text-align: left;
+            font-size: 14px;
+            color: #2E3944;
+        }
+        .text {
+            font-size: 18px;
+            text-align: left;
+            margin-bottom: 20px;
+            color: #2E3944;
+        }
+
+        .activation-code {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #90AEAD;
+            font-weight: bold;
+
+        }
+        .activation-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .activation-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2E3944;
+            color: whitesmoke;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .travel-with-anna {
+            font-weight: bold;
+            color: #2E3944;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Account Activation</h1>
+    <p class="hello" th:text="'Hello ' + ${userName} + ','"></p>
+    <p class="text">Thank you for signing up to <span class="travel-with-anna"> -TRAVEL WITH ANNA- </span>! Please use the following activation code to activate your account:</p>
+    <div class="activation-code"><span th:text="${code}"></span></div>
+    <div class="activation-link">
+        <a th:href="${url}" target="_blank">ACTIVATE</a>
+    </div>
+</div>
+</body>
+</html>

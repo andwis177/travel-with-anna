@@ -3,6 +3,6 @@
 import { Activity } from '../models/activity';
 export interface Badge {
   activity?: Array<Activity>;
-  id?: number;
+  badgeId?: number;
   name: string;
 }

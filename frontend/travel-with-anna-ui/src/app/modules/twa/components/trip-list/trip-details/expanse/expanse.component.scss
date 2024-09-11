@@ -1,0 +1,128 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.second-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box;
+  padding: 20px;
+  background-color: #EDEAE5;
+  color: #2E3944;
+
+  border: none !important;
+}
+
+.main-form{
+  padding: 5%;
+}
+
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+
+mat-form-field {
+  max-width: 100% !important;
+}
+
+.insert-size {
+  width: 40% !important;
+  margin-right: 10px;
+}
+
+.insert-description-size {
+  width: 95% !important;
+  margin-right: 10px;
+}
+
+.insert-currency-size {
+  width: 40% !important;
+  margin-right: 10px;
+}
+
+.insert-size {
+  width: 50% !important;
+  margin-right: 10px;
+}
+
+.input-with-currency {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.currency {
+  font-size: 0.8em;
+  font-weight: 400;
+  color: #2E3944;
+  margin-left: 10px;
+}
+
+.main-expanse-container{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: start;
+  padding: 10px;
+}
+
+.expanse-container {
+  width: 28% !important;
+  height: 35vh !important;
+  border-radius: 5% !important;
+  border: 2px solid #2E3944 !important;
+  margin-top: 1% !important;
+  margin-bottom: 2% !important;
+  padding: 4% 2% 2% 2% !important;
+  background-color: #D1E0E2 !important;
+}
+
+.center-align {
+  text-align: center !important;
+}
+
+.padding-label{
+  padding: 2% !important;
+  font-size: 22px !important;
+  font-weight: 550 !important;
+  color: whitesmoke !important;
+  background-color: #2E3944;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.value-container {
+  display: flex !important;
+  justify-content: start !important;
+  align-items: baseline !important;
+  margin-left: 25% !important;
+  margin-top: 5% !important;
+  padding: 2% !important;
+}
+
+.title-label{
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  color: #7B9D9C !important;
+  margin-right: 4% !important;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.value-label{
+  font-size: 18px !important;
+  font-weight: 650 !important;
+  color:  #5A6D6E !important;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.currency-label {
+  font-size: 10px !important;
+  font-weight: 450 !important;
+  color:  #5A6D6E !important;
+  margin-left: 2% !important;
+  font-family: 'Montserrat', sans-serif;
+}
+
+

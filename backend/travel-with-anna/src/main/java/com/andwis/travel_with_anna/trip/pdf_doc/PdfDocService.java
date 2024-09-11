@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class PdfDocService {
     private final PdfDocRepository pdfDocRepository;
 
-    public void savePdfDoc(PdfDoc pdfDoc) {
+    public void savePdfDoc(Pdf pdfDoc) {
         pdfDocRepository.save(pdfDoc);
     }
 }

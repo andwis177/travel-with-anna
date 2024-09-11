@@ -69,9 +69,9 @@ public class AdminService {
 
     private User getUserBasedOnIdentifier(String identifier){
         if (NumberUtils.isLong(identifier)) {
-            if (userService.existsByUserId(Long.parseLong(identifier))) {
-                return userService.getUserById(Long.parseLong(identifier));
-            }
+//            if (userService.existsByUserId(Long.parseLong(identifier))) {
+//                return userService.getUserById(Long.parseLong(identifier));
+//            }
             return userService.getUserById(Long.parseLong(identifier));
         } else {
             if (userService.existsByEmail(identifier)) {

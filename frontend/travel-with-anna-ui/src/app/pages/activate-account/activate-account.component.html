@@ -1,4 +1,3 @@
-
 <div class="container" *ngIf="submitted else codeForm">
   <mat-card class="second-container">
     <div *ngIf="isOkay else activationError">
@@ -19,21 +18,17 @@
 
     <ng-template #activationError>
       <div>
-        <mat-card class="second-container">
-          <mat-card-content class="content padding">
-            <mat-card-header class="header-shadow">
-              <h3 class="failure">ACTIVATION FAILED</h3>
-            </mat-card-header>
-            <div class="error-msg" *ngIf="errorMsg.length > 0">
-              <mat-divider class="padding-bottom"></mat-divider>
-              <p *ngFor="let msg of errorMsg">{{ msg }}</p>
-              <mat-divider class="padding-bottom"></mat-divider>
-            </div>
-            <div>
-              <button class="custom-button-0 failure-button" (click)="submitted=false" type="submit">Try Again</button>
-            </div>
-          </mat-card-content>
-        </mat-card>
+        <mat-card-content class="content padding">
+          <mat-card-header class="header-shadow">
+            <h3 class="failure">ACTIVATION FAILED</h3>
+          </mat-card-header>
+          <div class="error-msg fa-beat" *ngIf="errorMsg.length > 0">
+            <p *ngFor="let msg of errorMsg">{{ msg }}</p>
+          </div>
+          <div>
+            <button class="custom-button-0 failure-button" (click)="submitted=false" type="submit">Try Again</button>
+          </div>
+        </mat-card-content>
       </div>
     </ng-template>
   </mat-card>

@@ -2,16 +2,20 @@ package com.andwis.travel_with_anna.handler;
 
 import com.andwis.travel_with_anna.handler.exception.*;
 import jakarta.mail.MessagingException;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.HashSet;
@@ -39,6 +43,20 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(BackpackNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(BackpackNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(BACKPACK_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(BACKPACK_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ExceptionResponse> handleException() {
         return ResponseEntity
@@ -47,6 +65,47 @@ public class GlobalExceptionHandler {
                         ExceptionResponse.builder()
                                 .errorCode(BAD_CREDENTIALS.getCode())
                                 .errors(List.of(BAD_CREDENTIALS.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(BudgetNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(BudgetNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(BUDGET_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(BUDGET_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ExceptionResponse> handleException(ConstraintViolationException exp) {
+        Set<String> errors = new HashSet<>();
+        exp.getConstraintViolations().forEach(violation -> errors.add(violation.getMessage()));
+        List<String> errorsSorted = errors.stream().sorted().toList();
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(VALIDATION_ERROR.getCode())
+                                .errors(errorsSorted)
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(CurrencyNotProvidedException.class)
+    public ResponseEntity<ExceptionResponse> handleException(CurrencyNotProvidedException exp) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(CURRENCY_NOT_PROVIDED.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(CURRENCY_NOT_PROVIDED.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -90,6 +149,20 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ExceptionResponse> handleException(HandlerMethodValidationException exp) {
+        Set<String> errors = new HashSet<>();
+        exp.getAllValidationResults().forEach(violation -> errors.add(violation.toString()));
+        List<String> errorsSorted = errors.stream().sorted().toList();
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(VALIDATION_ERROR.getCode())
+                                .errors(errorsSorted)
+                                .build()
+                );
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionResponse> handleException(IllegalArgumentException exp) {
@@ -117,6 +190,20 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(ItemNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(ITEM_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(ITEM_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
 
     @ExceptionHandler(JwtParsingException.class)
     public ResponseEntity<ExceptionResponse> handleException(JwtParsingException exp) {
@@ -160,14 +247,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exp) {
         Set<String> errors = new HashSet<>();
-        exp.getBindingResult().getAllErrors()
-                .forEach(error -> {
-                    var errorMessage = error.getDefaultMessage();
-                    errors.add(errorMessage);
-                });
+        exp.getBindingResult().getAllErrors().forEach(error -> {
+            var errorMessage = error.getDefaultMessage();
+            errors.add(errorMessage);
+        });
+
         List<String> errorsSorted = errors.stream().sorted().toList();
         return ResponseEntity
-                .status(BAD_REQUEST)
+                .status(HttpStatus.BAD_REQUEST)
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(VALIDATION_ERROR.getCode())
@@ -176,6 +263,18 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(NoteNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(NoteNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(NOTE_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(NOTE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
 
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(RoleNotFoundException exp) {
@@ -199,6 +298,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(AVATAR_NOT_SAVED.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(AVATAR_NOT_SAVED.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(TransactionSystemException.class)
+    public ResponseEntity<ExceptionResponse> handleException(TransactionSystemException exp) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(VALIDATION_ERROR.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(VALIDATION_ERROR.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }

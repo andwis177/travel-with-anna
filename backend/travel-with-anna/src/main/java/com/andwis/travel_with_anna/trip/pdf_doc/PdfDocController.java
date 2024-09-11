@@ -15,7 +15,7 @@ public class PdfDocController {
     private final PdfDocService service;
 
     @PostMapping("/create")
-    public ResponseEntity<Void> savePdfDoc(PdfDoc pdfDoc) {
+    public ResponseEntity<Void> savePdfDoc(Pdf pdfDoc) {
         service.savePdfDoc(pdfDoc);
         return ResponseEntity.accepted().build();
     }

@@ -12,6 +12,7 @@ import {ResetPasswordRequest} from "../../services/models/reset-password-request
 import {AuthenticationService} from "../../services/services/authentication.service";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {ErrorService} from "../../services/error/error.service";
 
 @Component({
   selector: 'app-reset-password',
@@ -43,6 +44,7 @@ export class ResetPasswordComponent {
   constructor(
     private router: Router,
     private authService: AuthenticationService,
+    private errorService: ErrorService,
     private _snackBar: MatSnackBar
   ) {
   }
@@ -67,17 +69,12 @@ export class ResetPasswordComponent {
         this.router.navigate(['login']).then(r => this._snackBar.open('Your password has been successfully reset and sent to your email.', 'Close'));
       },
       error: (err) => {
-        console.log(err);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Unexpected error occurred');
-        }
+        this.errorMsg = this.errorService.errorHandler(err);
       }
     })
   }
 
   onClose() {
-    this.router.navigate(['login']);
+    this.router.navigate(['login']).then();
   }
 }

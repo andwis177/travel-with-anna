@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "Day")
 public class DayController {
-    private final DayService service;
+    private final DayFacade facade;
 
     @PostMapping("/create")
     public ResponseEntity<Void> saveDay(Day day) {
-        service.saveDay(day);
+        facade.saveDay(day);
         return ResponseEntity.accepted().build();
     }
 }

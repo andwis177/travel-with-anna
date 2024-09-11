@@ -79,6 +79,7 @@ export class ActivateAccountComponent {
   }
 
   private confirmAccount(token: string) {
+    this.errorMsg = [];
     this.authService.confirm({token})
       .subscribe( {
         next: () => {
@@ -87,7 +88,6 @@ export class ActivateAccountComponent {
           this.isOkay = true;
         },
         error: (err) => {
-          this.errorMsg = [];
           console.log(err);
           this.jsonObject = JSON.parse(err.error)
           if (this.jsonObject.errors ) {

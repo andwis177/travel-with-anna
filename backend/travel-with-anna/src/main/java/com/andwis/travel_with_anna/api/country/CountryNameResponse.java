@@ -1,15 +1,11 @@
 package com.andwis.travel_with_anna.api.country;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Builder
 public class CountryNameResponse {
     private List<CountryName> data;

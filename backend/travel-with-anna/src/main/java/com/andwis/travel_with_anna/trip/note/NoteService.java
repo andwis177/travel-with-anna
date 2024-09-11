@@ -11,4 +11,8 @@ public class NoteService {
     public void saveNote(Note note) {
         noteRepository.save(note);
     }
+
+    public boolean isNoteExists(Long noteId) {
+        return noteRepository.existsById(noteId);
+    }
 }

@@ -3,26 +3,28 @@ package com.andwis.travel_with_anna.trip.day;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.note.Note;
 import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.andwis.travel_with_anna.utility.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@Builder
 @Entity
 @Table(name = "days")
-public class Day extends BaseEntity {
+public class Day {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "day_id")
+    private Long dayId;
+
     @NotNull
     @Column(name = "date")
     private LocalDate date;
@@ -33,8 +35,22 @@ public class Day extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "trip_id")
+    @JsonIgnore
     private Trip trip;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Activity> activity;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Day day = (Day) o;
+        return Objects.equals(dayId, day.dayId) && Objects.equals(date, day.date) && Objects.equals(note, day.note) && Objects.equals(trip, day.trip) && Objects.equals(activity, day.activity);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dayId, date);
+    }
 }

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="travel-with-anna-0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/backend/travel-with-anna/target/travel-with-anna-0.0.1-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

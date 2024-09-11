@@ -16,7 +16,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.security.auth.Subject;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 import static jakarta.persistence.FetchType.EAGER;
@@ -34,8 +33,8 @@ public class User implements Principal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Size(max = 15)
-    @Column(unique = true, length = 15)
+    @Size(max = 30)
+    @Column(unique = true, length = 30)
     private String userName;
 
     @Column(unique = true)
@@ -65,12 +64,7 @@ public class User implements Principal {
     private Long avatarId;
 
     @OneToMany(fetch = EAGER, mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private Set<Trip> ownedTrips = new HashSet<>();
-
-    @ManyToMany(mappedBy = "viewers")
-    @Builder.Default
-    private Set<Trip> tripsToView = new HashSet<>();
+    private Set<Trip> ownedTrips;
 
     @Override
     public String getName() {
@@ -90,13 +84,5 @@ public class User implements Principal {
     public void removeTrip(Trip trip) {
         this.ownedTrips.remove(trip);
         trip.setOwner(null);
-    }
-
-    public void addTripToView(Trip trip) {
-        this.tripsToView.add(trip);
-    }
-
-    public void removeTripToView(Trip trip) {
-        this.tripsToView.remove(trip);
     }
 }

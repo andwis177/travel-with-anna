@@ -5,9 +5,6 @@ import {ActivateAccountComponent} from "./pages/activate-account/activate-accoun
 import {ResetPasswordComponent} from "./pages/reset-password/reset-password.component";
 import {AuthGuard} from "./services/auth/auth.guard";
 import {DeleteAccountComponent} from "./pages/delete-account/delete-account.component";
-import {TripDetailsComponent} from "./modules/twa/components/trip-list/trip-details/trip-details.component";
-
-
 
 export const routes: Routes = [
   {
@@ -33,6 +30,11 @@ export const routes: Routes = [
   {
     path: 'twa',
     loadChildren: () => import('./modules/twa/twa.module').then(m => m.TwaModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule),
     canActivate: [AuthGuard]
   },
   {

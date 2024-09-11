@@ -51,6 +51,12 @@ public class SecurityConfig  {
                                         "/avatar/**"
                                 ).hasAnyAuthority(getUserAuthority(), getAdminAuthority())
                                 .requestMatchers(
+                                        "/expanse/**",
+                                        "/pdf_doc/**",
+                                        "/note/**",
+                                        "/day/**",
+                                        "/budget/**",
+                                        "/backpack/**",
                                         "/trip/**",
                                         "/api/country/**"
                                 ).hasAuthority(getUserAuthority())

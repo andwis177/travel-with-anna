@@ -25,7 +25,13 @@ public enum ErrorCodes {
     AVATAR_NOT_SAVED(2000, "Avatar was not saved", INTERNAL_SERVER_ERROR),
     AVATAR_NOT_FOUND(2100, "Avatar not found", NOT_FOUND),
 
-    TRIP_NOT_FOUND(3000, "Trip not found", NOT_FOUND);
+    TRIP_NOT_FOUND(3000, "Trip not found", NOT_FOUND),
+    BACKPACK_NOT_FOUND(3100, "Backpack not found", NOT_FOUND),
+    ITEM_NOT_FOUND(3200, "Item not found", NOT_FOUND),
+    BUDGET_NOT_FOUND(3300, "Budget not found", NOT_FOUND),
+    NOTE_NOT_FOUND(3400, "Note not found", NOT_FOUND),
+    CURRENCY_NOT_PROVIDED(3500, "Currency is required", BAD_REQUEST);
+
 
     private final int code;
     private final String message;

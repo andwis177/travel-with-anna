@@ -1,7 +1,9 @@
 package com.andwis.travel_with_anna.config;
 
 import com.andwis.travel_with_anna.security.CustomLogoutSuccessHandler;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -22,9 +24,15 @@ import java.util.Collections;
 @Configuration
 @RequiredArgsConstructor
 public class BeansConfig {
-
-    private static final String corsOrigin = "http://localhost:4200";
+    @Value("${application.security.cors}")
+    private String corsValue;
+    private static String corsOrigin;
     private final UserDetailsService userDetailsService;
+
+    @PostConstruct
+    private void init() {
+        corsOrigin = corsValue;
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

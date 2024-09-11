@@ -1,0 +1,192 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.second-container {
+  display: flex;
+  flex-direction: column;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box;
+  padding: 20px;
+  background-color: #EDEAE5;
+  color: #2E3944;
+
+  border: none !important;
+}
+
+.table-container {
+  width: 100%;
+  height: 350px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+table {
+  width: 100%;
+  height: 100%;
+  table-layout: fixed;
+}
+
+th, td {
+  white-space: nowrap;
+  text-overflow: unset;
+  overflow: visible;
+  word-wrap: break-word;
+}
+
+.table-container {
+  width: 100%;
+}
+
+mat-card-actions {
+  margin-top: auto;
+  padding: 20px 0;
+}
+
+mat-form-field.insert-size {
+  width: 80px;
+}
+
+
+.backpack-button-area {
+  display: flex !important;
+  justify-content: start !important;
+  width: 100% !important;
+  text-align: center !important;
+  align-items: center !important;
+  margin-top: 20px;
+
+}
+
+.user-button-area {
+  display: flex;
+  width: 100% !important;
+  justify-content: end;
+  margin-right: 5%;
+}
+
+.user-button{
+  width: 50px;
+  height: 50px;
+}
+
+.user-button-image {
+  background-color: whitesmoke;
+  border: 2px solid green;
+  border-radius: 50% !important;
+}
+
+.user-button-image:hover {
+  opacity: 0.5;
+}
+
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+
+mat-form-field {
+  width: 100%;
+  max-width: 500px;
+}
+
+.selected {
+  background-color: #D6E6E9 !important;
+}
+
+
+th.mat-sort-header-sorted {
+  color: black;
+}
+
+.insert-size {
+  height: 20px !important;
+  font-size: 12px;
+}
+
+.insert-size input {
+  height: 20px !important;
+  font-size: 12px;
+}
+
+mat-form-field.insert-size {
+  width: 90px;
+}
+
+
+.insert-size .mat-form-field-wrapper {
+  padding-bottom: 0 !important;
+}
+
+.insert-size input {
+  max-height: 10px !important;
+  font-size: 18px !important;
+  padding: 0 4px !important;
+  box-sizing: border-box !important;
+}
+
+.input-field {
+  border: none !important;
+  background-color: transparent !important;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.input-field:focus {
+  outline: none !important;
+}
+
+.packed-column {
+  width: 8% !important;
+}
+
+.item-column {
+  width: 45% !important;
+}
+
+.qty-column {
+  width: 20% !important;
+}
+
+.action-column {
+  width: 15% !important;
+
+}
+
+.delete-button {
+  background-color: #EDEAE5;
+  border: 1px solid #A23232;
+  border-radius: 15%;
+  color: #D46A6A;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.expanse-button {
+  background-color: #EDEAE5;
+  border: 2px solid green;
+  border-radius: 15%;
+  color: green;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.margin {
+  margin: 15px !important;
+}
+
+.action-container {
+  display: flex;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+::ng-deep .mdc-checkbox__background {
+  background-color: #D6E6E9 !important;
+  border: 2px solid #2E3944 !important;
+}
+
+::ng-deep .mdc-checkbox__checkmark {
+  background-color: #2E3944 !important;
+}

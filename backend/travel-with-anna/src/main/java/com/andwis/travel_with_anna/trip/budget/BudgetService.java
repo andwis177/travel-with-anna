@@ -11,4 +11,9 @@ public class BudgetService {
     public void saveBudget(Budget budget) {
         budgetRepository.save(budget);
     }
+
+    public BudgetRequest getBudgetById(Long budgetId) {
+        Budget budget = budgetRepository.findById(budgetId).orElseThrow();
+        return BudgetMapper.toBudgetRequest(budget);
+    }
 }

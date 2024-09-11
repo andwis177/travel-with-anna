@@ -9,8 +9,6 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { addViewer } from '../fn/trip/add-viewer';
-import { AddViewer$Params } from '../fn/trip/add-viewer';
 import { changeTripName } from '../fn/trip/change-trip-name';
 import { ChangeTripName$Params } from '../fn/trip/change-trip-name';
 import { createTrip } from '../fn/trip/create-trip';
@@ -21,13 +19,8 @@ import { getAllOwnersTrips } from '../fn/trip/get-all-owners-trips';
 import { GetAllOwnersTrips$Params } from '../fn/trip/get-all-owners-trips';
 import { getTripById } from '../fn/trip/get-trip-by-id';
 import { GetTripById$Params } from '../fn/trip/get-trip-by-id';
-import { getTripViewers } from '../fn/trip/get-trip-viewers';
-import { GetTripViewers$Params } from '../fn/trip/get-trip-viewers';
-import { PageResponseTripDto } from '../models/page-response-trip-dto';
-import { removeViewer } from '../fn/trip/remove-viewer';
-import { RemoveViewer$Params } from '../fn/trip/remove-viewer';
-import { TripDto } from '../models/trip-dto';
-import { ViewerDto } from '../models/viewer-dto';
+import { PageResponseTripRequest } from '../models/page-response-trip-request';
+import { TripRequest } from '../models/trip-request';
 
 @Injectable({ providedIn: 'root' })
 export class TripService extends BaseService {
@@ -57,56 +50,6 @@ export class TripService extends BaseService {
   createTrip(params: CreateTrip$Params, context?: HttpContext): Observable<number> {
     return this.createTrip$Response(params, context).pipe(
       map((r: StrictHttpResponse<number>): number => r.body)
-    );
-  }
-
-  /** Path part for operation `removeViewer()` */
-  static readonly RemoveViewerPath = '/trip/{tripId}/viewer/{viewerId}/remove';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `removeViewer()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  removeViewer$Response(params: RemoveViewer$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return removeViewer(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `removeViewer$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  removeViewer(params: RemoveViewer$Params, context?: HttpContext): Observable<void> {
-    return this.removeViewer$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
-  }
-
-  /** Path part for operation `addViewer()` */
-  static readonly AddViewerPath = '/trip/{tripId}/viewer/{viewerId}/add';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `addViewer()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  addViewer$Response(params: AddViewer$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return addViewer(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `addViewer$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  addViewer(params: AddViewer$Params, context?: HttpContext): Observable<void> {
-    return this.addViewer$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 
@@ -144,7 +87,7 @@ export class TripService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllOwnersTrips$Response(params?: GetAllOwnersTrips$Params, context?: HttpContext): Observable<StrictHttpResponse<PageResponseTripDto>> {
+  getAllOwnersTrips$Response(params?: GetAllOwnersTrips$Params, context?: HttpContext): Observable<StrictHttpResponse<PageResponseTripRequest>> {
     return getAllOwnersTrips(this.http, this.rootUrl, params, context);
   }
 
@@ -154,9 +97,9 @@ export class TripService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllOwnersTrips(params?: GetAllOwnersTrips$Params, context?: HttpContext): Observable<PageResponseTripDto> {
+  getAllOwnersTrips(params?: GetAllOwnersTrips$Params, context?: HttpContext): Observable<PageResponseTripRequest> {
     return this.getAllOwnersTrips$Response(params, context).pipe(
-      map((r: StrictHttpResponse<PageResponseTripDto>): PageResponseTripDto => r.body)
+      map((r: StrictHttpResponse<PageResponseTripRequest>): PageResponseTripRequest => r.body)
     );
   }
 
@@ -169,7 +112,7 @@ export class TripService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getTripById$Response(params: GetTripById$Params, context?: HttpContext): Observable<StrictHttpResponse<TripDto>> {
+  getTripById$Response(params: GetTripById$Params, context?: HttpContext): Observable<StrictHttpResponse<TripRequest>> {
     return getTripById(this.http, this.rootUrl, params, context);
   }
 
@@ -179,34 +122,9 @@ export class TripService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getTripById(params: GetTripById$Params, context?: HttpContext): Observable<TripDto> {
+  getTripById(params: GetTripById$Params, context?: HttpContext): Observable<TripRequest> {
     return this.getTripById$Response(params, context).pipe(
-      map((r: StrictHttpResponse<TripDto>): TripDto => r.body)
-    );
-  }
-
-  /** Path part for operation `getTripViewers()` */
-  static readonly GetTripViewersPath = '/trip/{tripId}/viewers';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getTripViewers()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getTripViewers$Response(params: GetTripViewers$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ViewerDto>>> {
-    return getTripViewers(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getTripViewers$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getTripViewers(params: GetTripViewers$Params, context?: HttpContext): Observable<Array<ViewerDto>> {
-    return this.getTripViewers$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<ViewerDto>>): Array<ViewerDto> => r.body)
+      map((r: StrictHttpResponse<TripRequest>): TripRequest => r.body)
     );
   }
 

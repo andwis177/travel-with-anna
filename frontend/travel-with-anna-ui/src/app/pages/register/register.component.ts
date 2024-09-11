@@ -12,6 +12,7 @@ import {AuthenticationService} from "../../services/services/authentication.serv
 import {MatDivider} from "@angular/material/divider";
 import {RoleService} from "../../services/services/role.service";
 import {MatOption, MatSelect} from "@angular/material/select";
+import {ErrorService} from "../../services/error/error.service";
 
 @Component({
   selector: 'app-register',
@@ -51,30 +52,26 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private authService: AuthenticationService,
     private roleService: RoleService,
+    private errorService: ErrorService
   ) {}
 
   ngOnInit(): void {
     this.roleService.getAllRoleNames()
       .subscribe( {
-      next: (role) => {
-        this.roles = role;
-        this.registerRequest.roleName = this.roles[0];
-        console.log(role);
-      },
-      error: (err) => {
-        console.log(err);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Unexpected error occurred');
+        next: (role) => {
+          this.roles = role;
+          this.registerRequest.roleName = this.roles[0];
+          console.log(role);
+        },
+        error: (err) => {
+          this.errorMsg = this.errorService.errorHandler(err);
         }
-      }
-    })
+      })
   }
 
   @HostListener('document:keydown.escape', ['$event'])
   onEscapeKeydownHandler(event: KeyboardEvent): void {
-   this.login();
+    this.login();
   }
 
   @HostListener('document:keydown.enter', ['$event'])
@@ -92,15 +89,10 @@ export class RegisterComponent implements OnInit {
       body: this.registerRequest
     }).subscribe( {
       next: () => {
-        this.router.navigate(['activate-account']);
+        this.router.navigate(['activate-account']).then();
       },
       error: (err) => {
-        console.log(err);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Unexpected error occurred');
-        }
+        this.errorMsg = this.errorService.errorHandler(err);
       }
     })
   }

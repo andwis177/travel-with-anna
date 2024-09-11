@@ -2,40 +2,56 @@ package com.andwis.travel_with_anna.trip.backpack.item;
 
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
-import com.andwis.travel_with_anna.utility.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
+
+import java.util.Objects;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@Builder
 @Entity
 @Table(name = "items")
-public class Item extends BaseEntity {
-    @NotNull
+public class Item{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "item_id")
+    private Long itemId;
+
     @Size(max = 60)
     @Column(name = "item", length = 60)
     private String item;
 
-    @Column(name = "quantity")
-    private Integer quantity;
+    @Size(max = 40)
+    @Column(name = "quantity", length = 40)
+    private String quantity;
 
     @Column(name = "is_packed")
-    private boolean isPacked = false;
+    private boolean isPacked;
+
+    @ManyToOne
+    @JoinColumn(name = "backpack_id")
+    @JsonIgnore
+    private Backpack backpack;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "expanse_id")
     private Expanse expanse;
 
-    @ManyToOne
-    @JoinColumn(name = "backpack_id")
-    private Backpack backpack;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item1 = (Item) o;
+        return isPacked == item1.isPacked && Objects.equals(itemId, item1.itemId) && Objects.equals(item, item1.item) && Objects.equals(quantity, item1.quantity) && Objects.equals(backpack, item1.backpack);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(itemId, item, quantity, isPacked);
+    }
 }

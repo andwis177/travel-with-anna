@@ -9,12 +9,13 @@
       <option name="myIgnoreVendorSpecificProperties" value="false" />
       <option name="myCustomPropertiesList">
         <value>
-          <list size="5">
+          <list size="6">
             <item index="0" class="java.lang.String" itemvalue="align-text" />
             <item index="1" class="java.lang.String" itemvalue="transparency" />
             <item index="2" class="java.lang.String" itemvalue="fxlaout" />
             <item index="3" class="java.lang.String" itemvalue="fxlayoutalign" />
             <item index="4" class="java.lang.String" itemvalue="dislpay" />
+            <item index="5" class="java.lang.String" itemvalue="flex-display" />
           </list>
         </value>
       </option>
@@ -38,7 +39,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="7">
+          <list size="8">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -46,6 +47,7 @@
             <item index="4" class="java.lang.String" itemvalue="embed" />
             <item index="5" class="java.lang.String" itemvalue="script" />
             <item index="6" class="java.lang.String" itemvalue="app-trip-list-buttons" />
+            <item index="7" class="java.lang.String" itemvalue="app-user-list-buttons" />
           </list>
         </value>
       </option>

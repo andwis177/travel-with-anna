@@ -9,8 +9,16 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { saveExpanse } from '../fn/expanse/save-expanse';
-import { SaveExpanse$Params } from '../fn/expanse/save-expanse';
+import { createOrUpdateExpanse } from '../fn/expanse/create-or-update-expanse';
+import { CreateOrUpdateExpanse$Params } from '../fn/expanse/create-or-update-expanse';
+import { ExpanseItem } from '../models/expanse-item';
+import { getExchangeRate } from '../fn/expanse/get-exchange-rate';
+import { GetExchangeRate$Params } from '../fn/expanse/get-exchange-rate';
+import { getExpanseForItem } from '../fn/expanse/get-expanse-for-item';
+import { GetExpanseForItem$Params } from '../fn/expanse/get-expanse-for-item';
+import { getTripCurrencyValues } from '../fn/expanse/get-trip-currency-values';
+import { GetTripCurrencyValues$Params } from '../fn/expanse/get-trip-currency-values';
+import { TripCurrencyValue } from '../models/trip-currency-value';
 
 @Injectable({ providedIn: 'root' })
 export class ExpanseService extends BaseService {
@@ -18,28 +26,103 @@ export class ExpanseService extends BaseService {
     super(config, http);
   }
 
-  /** Path part for operation `saveExpanse()` */
-  static readonly SaveExpansePath = '/expanse/create';
+  /** Path part for operation `createOrUpdateExpanse()` */
+  static readonly CreateOrUpdateExpansePath = '/expanse/save';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `saveExpanse()` instead.
+   * To access only the response body, use `createOrUpdateExpanse()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
-  saveExpanse$Response(params: SaveExpanse$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return saveExpanse(this.http, this.rootUrl, params, context);
+  createOrUpdateExpanse$Response(params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseItem>> {
+    return createOrUpdateExpanse(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `saveExpanse$Response()` instead.
+   * To access the full response (for headers, for example), `createOrUpdateExpanse$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  createOrUpdateExpanse(params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<ExpanseItem> {
+    return this.createOrUpdateExpanse$Response(params, context).pipe(
+      map((r: StrictHttpResponse<ExpanseItem>): ExpanseItem => r.body)
+    );
+  }
+
+  /** Path part for operation `getExpanseForItem()` */
+  static readonly GetExpanseForItemPath = '/expanse/{itemId}/expanse';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getExpanseForItem()` instead.
    *
    * This method doesn't expect any request body.
    */
-  saveExpanse(params: SaveExpanse$Params, context?: HttpContext): Observable<void> {
-    return this.saveExpanse$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
+  getExpanseForItem$Response(params: GetExpanseForItem$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseItem>> {
+    return getExpanseForItem(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getExpanseForItem$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExpanseForItem(params: GetExpanseForItem$Params, context?: HttpContext): Observable<ExpanseItem> {
+    return this.getExpanseForItem$Response(params, context).pipe(
+      map((r: StrictHttpResponse<ExpanseItem>): ExpanseItem => r.body)
+    );
+  }
+
+  /** Path part for operation `getTripCurrencyValues()` */
+  static readonly GetTripCurrencyValuesPath = '/expanse/trip-currency-values';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getTripCurrencyValues()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getTripCurrencyValues$Response(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<StrictHttpResponse<TripCurrencyValue>> {
+    return getTripCurrencyValues(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getTripCurrencyValues$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getTripCurrencyValues(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<TripCurrencyValue> {
+    return this.getTripCurrencyValues$Response(params, context).pipe(
+      map((r: StrictHttpResponse<TripCurrencyValue>): TripCurrencyValue => r.body)
+    );
+  }
+
+  /** Path part for operation `getExchangeRate()` */
+  static readonly GetExchangeRatePath = '/expanse/exchange';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getExchangeRate()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExchangeRate$Response(params: GetExchangeRate$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
+    return getExchangeRate(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getExchangeRate$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExchangeRate(params: GetExchangeRate$Params, context?: HttpContext): Observable<number> {
+    return this.getExchangeRate$Response(params, context).pipe(
+      map((r: StrictHttpResponse<number>): number => r.body)
     );
   }
 

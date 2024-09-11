@@ -1,0 +1,20 @@
+<mat-toolbar-row class="dialog-header">
+  <div class="dialog-title">Avatar</div>
+  <button mat-icon-button class="close-button"
+          (click)="onClose()"
+          (keydown.enter)="$event.preventDefault()">
+    <mat-icon class="close-icon">close</mat-icon>
+  </button>
+</mat-toolbar-row>
+
+<mat-card class="second-container" style="padding: 5%;" appearance="outlined">
+  <div class="image-container">
+    <img [src]="'data:image/jpeg;base64,' + userAvatar?.avatar"
+         alt="/"
+         class="profile-image mat-elevation-z8" />
+  </div>
+
+  <div>
+    <button class="custom-button-0" (click)="onClose()" type="submit">Close</button>
+  </div>
+</mat-card>

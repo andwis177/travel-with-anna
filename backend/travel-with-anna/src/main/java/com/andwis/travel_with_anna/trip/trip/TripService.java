@@ -12,7 +12,7 @@ public class TripService {
     private final TripRepository tripRepository;
 
     public Long saveTrip(Trip trip) {
-        return tripRepository.save(trip).getId();
+        return tripRepository.save(trip).getTripId();
     }
 
     public Page<Trip> getTripsByOwnerId(Long userId, Pageable pageable) {

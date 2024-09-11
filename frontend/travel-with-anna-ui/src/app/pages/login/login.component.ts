@@ -17,6 +17,7 @@ import {UserInformationService} from "../../services/user-information/user-infor
 import {AuthenticationResponse} from "../../services/models/authentication-response";
 import {firstValueFrom} from "rxjs";
 import {LocalStorageService} from "../../services/local-storage/local-storage.service";
+import {ErrorService} from "../../services/error/error.service";
 
 @Component({
   selector: 'app-login',
@@ -42,6 +43,7 @@ export class LoginComponent implements OnInit {
     private sharedService: SharedService,
     private userInformationService: UserInformationService,
     private imageFileService: ImageFileService,
+    private errorService: ErrorService
   ) {
   }
 
@@ -57,7 +59,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-      this.localStorage.clear()
+    this.localStorage.clear()
   }
 
   register() {
@@ -68,21 +70,20 @@ export class LoginComponent implements OnInit {
     this.router.navigate(['reset-password']).then(r => console.log('Reset password'));
   }
 
+  activateAccount() {
+    this.router.navigate(['activate-account']).then();
+  }
+
   signIn() {
     this.errorMsg = [];
     this.authenticationService.authenticate({
       body: this.authRequest}).
     subscribe({
       next: (response) => {
-        this.singInSuccess(response).then(r => console.log('Success'));
+        this.singInSuccess(response).then();
       },
       error: (err) => {
-        console.log(err.error.errors);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Unexpected error occurred');
-        }
+        this.errorMsg = this.errorService.errorHandler(err);
       }
     })
   }
@@ -90,10 +91,15 @@ export class LoginComponent implements OnInit {
   async singInSuccess(response: AuthenticationResponse) {
     this.authService.setToken( response.token as string);
     this.userInformationService.setUserCredentials(
-      response.userName as string, response.email as string, response.role as string);
+      response.userName as string, response.email as string);
     try {
       await this.loadAvatar(response.userName as string);
-      this.router.navigate(['twa']).then(r => this.sharedService.updateUserName(<string>response.userName));
+      if (response.role === 'ADMIN') {
+        this.router.navigate(['admin']).then(r => this.sharedService.updateUserName(<string>response.userName));
+      }
+      if (response.role === 'USER') {
+        this.router.navigate(['twa']).then(r => this.sharedService.updateUserName(<string>response.userName));
+      }
     } catch (error) {
       console.error('Failed to load avatar:', error);
     }

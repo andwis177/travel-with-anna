@@ -9,8 +9,13 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { saveBackpack } from '../fn/backpack/save-backpack';
-import { SaveBackpack$Params } from '../fn/backpack/save-backpack';
+import { addItemToBackpack } from '../fn/backpack/add-item-to-backpack';
+import { AddItemToBackpack$Params } from '../fn/backpack/add-item-to-backpack';
+import { BackpackRequest } from '../models/backpack-request';
+import { deleteItem } from '../fn/backpack/delete-item';
+import { DeleteItem$Params } from '../fn/backpack/delete-item';
+import { getBackpackById } from '../fn/backpack/get-backpack-by-id';
+import { GetBackpackById$Params } from '../fn/backpack/get-backpack-by-id';
 
 @Injectable({ providedIn: 'root' })
 export class BackpackService extends BaseService {
@@ -18,27 +23,77 @@ export class BackpackService extends BaseService {
     super(config, http);
   }
 
-  /** Path part for operation `saveBackpack()` */
-  static readonly SaveBackpackPath = '/backpack/create';
+  /** Path part for operation `addItemToBackpack()` */
+  static readonly AddItemToBackpackPath = '/backpack/{backpackId}/item-add';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `saveBackpack()` instead.
+   * To access only the response body, use `addItemToBackpack()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
-  saveBackpack$Response(params: SaveBackpack$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return saveBackpack(this.http, this.rootUrl, params, context);
+  addItemToBackpack$Response(params: AddItemToBackpack$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return addItemToBackpack(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `saveBackpack$Response()` instead.
+   * To access the full response (for headers, for example), `addItemToBackpack$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  addItemToBackpack(params: AddItemToBackpack$Params, context?: HttpContext): Observable<void> {
+    return this.addItemToBackpack$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `getBackpackById()` */
+  static readonly GetBackpackByIdPath = '/backpack/{backpackId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getBackpackById()` instead.
    *
    * This method doesn't expect any request body.
    */
-  saveBackpack(params: SaveBackpack$Params, context?: HttpContext): Observable<void> {
-    return this.saveBackpack$Response(params, context).pipe(
+  getBackpackById$Response(params: GetBackpackById$Params, context?: HttpContext): Observable<StrictHttpResponse<BackpackRequest>> {
+    return getBackpackById(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getBackpackById$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getBackpackById(params: GetBackpackById$Params, context?: HttpContext): Observable<BackpackRequest> {
+    return this.getBackpackById$Response(params, context).pipe(
+      map((r: StrictHttpResponse<BackpackRequest>): BackpackRequest => r.body)
+    );
+  }
+
+  /** Path part for operation `deleteItem()` */
+  static readonly DeleteItemPath = '/backpack/delete/{itemId}/item';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `deleteItem()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  deleteItem$Response(params: DeleteItem$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return deleteItem(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `deleteItem$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  deleteItem(params: DeleteItem$Params, context?: HttpContext): Observable<void> {
+    return this.deleteItem$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }

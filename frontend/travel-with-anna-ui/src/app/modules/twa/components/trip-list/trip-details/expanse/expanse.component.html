@@ -1,0 +1,126 @@
+<mat-toolbar-row class="dialog-header">
+  <div class="dialog-title">Expanse</div>
+  <button mat-icon-button class="close-button"
+          (click)="onClose()"
+          (keydown.enter)="$event.preventDefault()">
+    <mat-icon class="close-icon">close</mat-icon>
+  </button>
+</mat-toolbar-row>
+
+<div class="second-container">
+  <div class="full-width main-form" style="padding:10px">
+    <div class="main-expanse-container " >
+      <div class="expanse-container mat-elevation-z8">
+        <mat-form-field appearance="outline" class="insert-description-size">
+          <mat-label>Description </mat-label>
+          <input  type="text"
+                  matInput
+                  [(ngModel)]=expanse.expanseName
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Description"
+                  autocomplete="name"
+                  (keydown.enter)="$event.preventDefault()">
+
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="insert-currency-size">
+          <mat-label>Currency</mat-label>
+          <mat-select [(value)] = "expanse.currency" >
+            <mat-option *ngFor="let currency of currencyList" [value]="currency.currency">
+              {{ currency.currency?.toString()}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+      <div class="expanse-container center-align mat-elevation-z8">
+        <form class="full-width">
+          <mat-form-field appearance="outline" class="insert-size">
+            <mat-label>Price</mat-label>
+            <div class="input-with-currency">
+              <input
+                matInput placeholder="0.00"
+                [(ngModel)]="expanse.price"
+                type="number"
+                name="price"
+                min="0"
+                step="0.01">
+              <label class="currency">{{expanse.currency}}</label>
+            </div>
+            <span matPrefix>$ </span>
+          </mat-form-field>
+        </form>
+
+        <form class="full-width">
+          <mat-form-field appearance="outline" class="insert-size">
+            <mat-label>Paid</mat-label>
+            <div class="input-with-currency">
+              <input
+                matInput placeholder="0.00"
+                [(ngModel)]="expanse.paid"
+                type="number" name="paid"
+                min="0"
+                step="0.01">
+              <label class="currency">{{expanse.currency}}</label>
+            </div>
+            <span matPrefix>$ </span>
+          </mat-form-field>
+        </form>
+
+
+        <form class="full-width">
+          <mat-form-field appearance="outline" class="insert-size">
+            <mat-label>Exchange Rate</mat-label>
+            <input
+              matInput placeholder="0.00"
+              [(ngModel)]="expanse.exchangeRate"
+              type="number"
+              name="exchangeRate"
+              min="0"
+              step="0.01">
+            <button
+              mat-icon-button
+              matSuffix
+              (click)="getExchangeRate($event)"
+              (keydown.enter)="$event.preventDefault()"
+              matTooltip="Get exchnage">
+              <mat-icon>attach_money</mat-icon>
+            </button>
+            <span matPrefix></span>
+          </mat-form-field>
+        </form>
+      </div>
+
+      <div class="expanse-container center-align mat-elevation-z8">
+        <div class="padding-label mat-elevation-z8">{{ currency }}</div>
+        <div class="value-container">
+          <label class="title-label">PRICE: </label>
+          <label class="value-label">{{expanse.priceInTripCurrency}}</label>
+          <label class="currency-label">{{ currency}}</label>
+        </div>
+
+        <div class="value-container">
+          <label class="title-label">PAID: </label>
+          <label class="value-label" style="margin-left: 3%">{{expanse.paidInTripCurrency}}</label>
+          <label class="currency-label">{{ currency}}</label>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="full-width center-align">
+      <button
+        class="custom-button-0 full-width" (click)="saveExpanses()" type="submit">Save</button>
+      <button class="custom-button-1 full-width" (click)="onClose()" type="submit">Close</button>
+    </div>
+
+    <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+      <mat-divider></mat-divider>
+      <p *ngFor="let msg of errorMsg">{{msg}}</p>
+    </div>
+  </div>
+</div>
+
+
+
+

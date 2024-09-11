@@ -176,9 +176,6 @@ public class UserService {
 
     public void deleteUserById(Long userId) {
         userRepository.deleteById(userId);
-        UserRespond.builder()
-                .message("User has been deleted!")
-                .build();
     }
 
     public void verifyPassword(User user, String password) throws WrongPasswordException {

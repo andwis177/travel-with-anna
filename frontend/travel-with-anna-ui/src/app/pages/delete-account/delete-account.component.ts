@@ -14,6 +14,7 @@ import {LogoutService} from "../../services/logout/logout.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {Router} from "@angular/router";
 import {UserRespond} from "../../services/models/user-respond";
+import {ErrorService} from "../../services/error/error.service";
 
 @Component({
   selector: 'app-delete-account',
@@ -46,7 +47,8 @@ export class DeleteAccountComponent {
   constructor(private userService: UserService,
               private logoutService: LogoutService,
               private _snackBar: MatSnackBar,
-              private router: Router)
+              private router: Router,
+              private errorService: ErrorService)
   {
   }
 
@@ -79,12 +81,7 @@ export class DeleteAccountComponent {
         }
       },
       error: (err) => {
-        console.log(err.error.errors);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Unexpected error occurred');
-        }
+        this.errorMsg = this.errorService.errorHandler(err);
       }
     })
   }

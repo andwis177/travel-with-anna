@@ -1,21 +1,19 @@
 package com.andwis.travel_with_anna.api.country;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CountryService {
     private final RestClient restClient;
 
-    public CountryService() {
-        restClient = RestClient.builder()
-                .baseUrl("https://countriesnow.space")
+    public CountryService(@Value("${my_apis.country.country_url}") String baseUrl) {
+        this.restClient = RestClient.builder()
+                .baseUrl(baseUrl)
                 .build();
     }
 
@@ -31,8 +29,8 @@ public class CountryService {
                 .uri("/api/v0.1/countries/currency")
                 .retrieve()
                 .body(CountryCurrencyResponse.class);
-        if (response == null) {
-            return null;
+        if (response == null || response.getData() == null) {
+            return Collections.emptyList();
         }
         HashSet<CountryCurrency> countryCurrencies = new HashSet<>(response.getData());
         List<CountryCurrency> countryCurrenciesList = new ArrayList<>(countryCurrencies);

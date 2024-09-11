@@ -15,29 +15,29 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User")
 public class UserController {
 
-    private final UserService service;
+    private final UserFacade facade;
 
     @GetMapping("/credentials")
     public ResponseEntity<UserCredentials> getCredentials(Authentication connectedUser) {
-        UserCredentials userCredentials = service.getCredentials(connectedUser.getName());
+        UserCredentials userCredentials = facade.getCredentials(connectedUser.getName());
         return ResponseEntity.ok(userCredentials);
     }
 
     @PatchMapping("/update")
-    public ResponseEntity<AuthenticationResponse> update(@Valid @RequestBody UserCredentials userCredentials, Authentication connectedUser) {
-        AuthenticationResponse response = service.updateUserExecution(userCredentials, connectedUser);
+    public ResponseEntity<AuthenticationResponse> update(@RequestBody @Valid UserCredentials userCredentials, Authentication connectedUser) {
+        AuthenticationResponse response = facade.updateUserExecution(userCredentials, connectedUser);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/change-password")
-    public ResponseEntity<UserRespond> changePassword(@Valid @RequestBody ChangePasswordRequest request, Authentication connectedUser) {
-        UserRespond respond = service.changePassword(request, connectedUser);
+    public ResponseEntity<UserRespond> changePassword(@RequestBody @Valid ChangePasswordRequest request, Authentication connectedUser) {
+        UserRespond respond = facade.changePassword(request, connectedUser);
         return ResponseEntity.accepted().body(respond);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<UserRespond> delete(@Valid @RequestBody PasswordRequest request, Authentication connectedUser) {
-        UserRespond respond =service.deleteConnectedUser(request, connectedUser);
+    public ResponseEntity<UserRespond> delete(@RequestBody @Valid PasswordRequest request, Authentication connectedUser) {
+        UserRespond respond = facade.deleteConnectedUser(request, connectedUser);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respond);
     }
 }

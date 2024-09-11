@@ -1,16 +1,14 @@
 /* tslint:disable */
 /* eslint-disable */
-import { Activity } from '../models/activity';
-import { Item } from '../models/item';
-import { PdfDoc } from '../models/pdf-doc';
+import { Pdf } from '../models/pdf';
 export interface Expanse {
-  activity?: Activity;
   currency: string;
   exchangeRate: number;
+  expanseId?: number;
   expanseName?: string;
-  id?: number;
-  item?: Item;
   paid: number;
-  pdfDoc?: PdfDoc;
+  paidInTripCurrency?: number;
+  pdf?: Pdf;
   price: number;
+  priceInTripCurrency?: number;
 }

@@ -10,13 +10,15 @@ import { NoteService } from './services/note.service';
 import { ExpanseService } from './services/expanse.service';
 import { DayService } from './services/day.service';
 import { BudgetService } from './services/budget.service';
-import { BackpackService } from './services/backpack.service';
 import { AvatarService } from './services/avatar.service';
 import { AuthenticationService } from './services/authentication.service';
 import { UserService } from './services/user.service';
+import { ItemService } from './services/item.service';
+import { BackpackService } from './services/backpack.service';
 import { AdminService } from './services/admin.service';
 import { RoleService } from './services/role.service';
-import { CountryApiControllerService } from './services/country-api-controller.service';
+import { CurrencyExchangeControllerService } from './services/currency-exchange-controller.service';
+import { CountryControllerService } from './services/country-controller.service';
 
 /**
  * Module that provides all services and configuration.
@@ -32,13 +34,15 @@ import { CountryApiControllerService } from './services/country-api-controller.s
     ExpanseService,
     DayService,
     BudgetService,
-    BackpackService,
     AvatarService,
     AuthenticationService,
     UserService,
+    ItemService,
+    BackpackService,
     AdminService,
     RoleService,
-    CountryApiControllerService,
+    CurrencyExchangeControllerService,
+    CountryControllerService,
     ApiConfiguration
   ],
 })

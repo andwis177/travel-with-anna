@@ -14,12 +14,14 @@ public class CurrencyExchangeService {
     private String apiKey;
     private final RestClient restClient;
 
-    public CurrencyExchangeService(@Value("${my_apis.currency.currency_url}") String baseUrl,
-                                   @Value("${my_apis.currency.header.apikey}") String apiKey) {
-        this.restClient = RestClient.builder()
-                .baseUrl(baseUrl)
-                .build();
-        this.apiKey = apiKey;
+    public CurrencyExchangeService(RestClient restClient) {
+        this.restClient = restClient;
+//        this.restClient = RestClient.builder()
+//                .baseUrl(baseUrl)
+//                .build();
+        this.restClient.head().header("apikey", apiKey).retrieve();
+
+//        this.apiKey = apiKey;
     }
 
     public List<CurrencyExchangeDto> getAllExchangeRates() {

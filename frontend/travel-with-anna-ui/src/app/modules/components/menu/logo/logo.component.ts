@@ -24,12 +24,13 @@ export class LogoComponent {
 
 
   constructor(
-    private route: Router,
+    private router: Router,
   ) {
   }
 
-  goToHomePage() {
-    this.route.navigate(['']).then();
+  goToHomePage(event: Event) {
+    event.preventDefault();
+    this.router.navigate(['twa/']).then();
   }
 
 }

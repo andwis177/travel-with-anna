@@ -10,8 +10,10 @@ import java.util.*;
 @Service
 public class CountryService {
     private final RestClient restClient;
+    @Value("${my_apis.country.country_url}")
+    private String baseUrl;
 
-    public CountryService(@Value("${my_apis.country.country_url}") String baseUrl) {
+    public CountryService() {
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();

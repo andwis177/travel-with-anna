@@ -14,7 +14,7 @@ public class ItemFacade {
         itemService.saveAllItems(items);
     }
 
-    public List<ItemRequest> getAllItemsByBackpackId(Long backpackId) {
+    public List<ItemResponse> getAllItemsByBackpackId(Long backpackId) {
         return itemService.getAllItemsByBackpackId(backpackId);
     }
 }

@@ -9,6 +9,7 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
+import { AvatarImg } from '../models/avatar-img';
 import { deleteUser } from '../fn/admin/delete-user';
 import { DeleteUser$Params } from '../fn/admin/delete-user';
 import { getAllRoleNamesWithAdmin } from '../fn/admin/get-all-role-names-with-admin';
@@ -19,12 +20,11 @@ import { getAvatar } from '../fn/admin/get-avatar';
 import { GetAvatar$Params } from '../fn/admin/get-avatar';
 import { getUserAdminViewByIdentifier } from '../fn/admin/get-user-admin-view-by-identifier';
 import { GetUserAdminViewByIdentifier$Params } from '../fn/admin/get-user-admin-view-by-identifier';
-import { PageResponseUserAdminView } from '../models/page-response-user-admin-view';
+import { PageResponseUserAdminResponse } from '../models/page-response-user-admin-response';
 import { updateUser } from '../fn/admin/update-user';
 import { UpdateUser$Params } from '../fn/admin/update-user';
-import { UserAdminView } from '../models/user-admin-view';
-import { UserAvatar } from '../models/user-avatar';
-import { UserRespond } from '../models/user-respond';
+import { UserAdminResponse } from '../models/user-admin-response';
+import { UserResponse } from '../models/user-response';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService extends BaseService {
@@ -66,7 +66,7 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllUsers$Response(params?: GetAllUsers$Params, context?: HttpContext): Observable<StrictHttpResponse<PageResponseUserAdminView>> {
+  getAllUsers$Response(params?: GetAllUsers$Params, context?: HttpContext): Observable<StrictHttpResponse<PageResponseUserAdminResponse>> {
     return getAllUsers(this.http, this.rootUrl, params, context);
   }
 
@@ -76,9 +76,9 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllUsers(params?: GetAllUsers$Params, context?: HttpContext): Observable<PageResponseUserAdminView> {
+  getAllUsers(params?: GetAllUsers$Params, context?: HttpContext): Observable<PageResponseUserAdminResponse> {
     return this.getAllUsers$Response(params, context).pipe(
-      map((r: StrictHttpResponse<PageResponseUserAdminView>): PageResponseUserAdminView => r.body)
+      map((r: StrictHttpResponse<PageResponseUserAdminResponse>): PageResponseUserAdminResponse => r.body)
     );
   }
 
@@ -91,7 +91,7 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getUserAdminViewByIdentifier$Response(params: GetUserAdminViewByIdentifier$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAdminView>> {
+  getUserAdminViewByIdentifier$Response(params: GetUserAdminViewByIdentifier$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAdminResponse>> {
     return getUserAdminViewByIdentifier(this.http, this.rootUrl, params, context);
   }
 
@@ -101,9 +101,9 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getUserAdminViewByIdentifier(params: GetUserAdminViewByIdentifier$Params, context?: HttpContext): Observable<UserAdminView> {
+  getUserAdminViewByIdentifier(params: GetUserAdminViewByIdentifier$Params, context?: HttpContext): Observable<UserAdminResponse> {
     return this.getUserAdminViewByIdentifier$Response(params, context).pipe(
-      map((r: StrictHttpResponse<UserAdminView>): UserAdminView => r.body)
+      map((r: StrictHttpResponse<UserAdminResponse>): UserAdminResponse => r.body)
     );
   }
 
@@ -141,7 +141,7 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAvatar$Response(params: GetAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAvatar>> {
+  getAvatar$Response(params: GetAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<AvatarImg>> {
     return getAvatar(this.http, this.rootUrl, params, context);
   }
 
@@ -151,9 +151,9 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAvatar(params: GetAvatar$Params, context?: HttpContext): Observable<UserAvatar> {
+  getAvatar(params: GetAvatar$Params, context?: HttpContext): Observable<AvatarImg> {
     return this.getAvatar$Response(params, context).pipe(
-      map((r: StrictHttpResponse<UserAvatar>): UserAvatar => r.body)
+      map((r: StrictHttpResponse<AvatarImg>): AvatarImg => r.body)
     );
   }
 
@@ -166,7 +166,7 @@ export class AdminService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  deleteUser$Response(params: DeleteUser$Params, context?: HttpContext): Observable<StrictHttpResponse<UserRespond>> {
+  deleteUser$Response(params: DeleteUser$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
     return deleteUser(this.http, this.rootUrl, params, context);
   }
 
@@ -176,9 +176,9 @@ export class AdminService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  deleteUser(params: DeleteUser$Params, context?: HttpContext): Observable<UserRespond> {
+  deleteUser(params: DeleteUser$Params, context?: HttpContext): Observable<UserResponse> {
     return this.deleteUser$Response(params, context).pipe(
-      map((r: StrictHttpResponse<UserRespond>): UserRespond => r.body)
+      map((r: StrictHttpResponse<UserResponse>): UserResponse => r.body)
     );
   }
 

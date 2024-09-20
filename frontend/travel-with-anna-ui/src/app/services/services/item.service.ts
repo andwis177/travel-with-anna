@@ -11,7 +11,7 @@ import { StrictHttpResponse } from '../strict-http-response';
 
 import { getAllItemsByBackpackId } from '../fn/item/get-all-items-by-backpack-id';
 import { GetAllItemsByBackpackId$Params } from '../fn/item/get-all-items-by-backpack-id';
-import { ItemRequest } from '../models/item-request';
+import { ItemResponse } from '../models/item-response';
 import { saveAllItemsFromTheList } from '../fn/item/save-all-items-from-the-list';
 import { SaveAllItemsFromTheList$Params } from '../fn/item/save-all-items-from-the-list';
 
@@ -55,7 +55,7 @@ export class ItemService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllItemsByBackpackId$Response(params: GetAllItemsByBackpackId$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ItemRequest>>> {
+  getAllItemsByBackpackId$Response(params: GetAllItemsByBackpackId$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ItemResponse>>> {
     return getAllItemsByBackpackId(this.http, this.rootUrl, params, context);
   }
 
@@ -65,9 +65,9 @@ export class ItemService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllItemsByBackpackId(params: GetAllItemsByBackpackId$Params, context?: HttpContext): Observable<Array<ItemRequest>> {
+  getAllItemsByBackpackId(params: GetAllItemsByBackpackId$Params, context?: HttpContext): Observable<Array<ItemResponse>> {
     return this.getAllItemsByBackpackId$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<ItemRequest>>): Array<ItemRequest> => r.body)
+      map((r: StrictHttpResponse<Array<ItemResponse>>): Array<ItemResponse> => r.body)
     );
   }
 

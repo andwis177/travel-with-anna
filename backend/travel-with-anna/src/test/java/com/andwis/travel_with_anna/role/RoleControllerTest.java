@@ -1,8 +1,5 @@
 package com.andwis.travel_with_anna.role;
 
-import com.andwis.travel_with_anna.user.UserCredentials;
-import com.andwis.travel_with_anna.user.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static com.andwis.travel_with_anna.role.Role.*;
-import static com.andwis.travel_with_anna.role.Role.getAdminAuthority;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -48,5 +43,4 @@ class RoleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json("['USER', 'ADMIN']"));
     }
-
 }

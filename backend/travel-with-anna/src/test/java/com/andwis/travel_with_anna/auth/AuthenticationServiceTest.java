@@ -6,7 +6,8 @@ import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleService;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserCredentials;
+import com.andwis.travel_with_anna.user.UserCredentialsRequest;
+import com.andwis.travel_with_anna.user.UserCredentialsResponse;
 import com.andwis.travel_with_anna.user.UserService;
 import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
@@ -71,20 +72,20 @@ class AuthenticationServiceTest {
     private static User user;
     private static Role role;
     private static Token token;
-    private static Avatar avatar;
     private static final LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void setUp() {
-        request = new RegistrationRequest("username", "email@example.com", "password", "password" , getUserRole());
+        request = new RegistrationRequest(
+                "username",
+                "email@example.com",
+                "password",
+                "password",
+                getUserRole()
+        );
         role = new Role();
         role.setRoleName(getUserRole());
         role.setAuthority(getUserAuthority());
-
-        avatar = Avatar.builder()
-                .avatarId(1L)
-                .avatar("avatar")
-                .build();
 
         user = User.builder()
                 .userName("username")
@@ -196,9 +197,15 @@ class AuthenticationServiceTest {
 
         Authentication authentication = mock(Authentication.class);
 
+        UserCredentialsResponse userCredentials = new UserCredentialsResponse(
+                "email@example.com",
+                "username",
+                "ROLE_USER"
+        );
+
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(jwtService.generateJwtToken(authentication)).thenReturn("jwtToken");
-        when(userService.getCredentials("email@example.com")).thenReturn(UserCredentials.builder().email("email@example.com").userName("username").build());
+        when(userService.getCredentials("email@example.com")).thenReturn(userCredentials);
 
         //When
         AuthenticationResponse response = authenticationService.authenticationWithCredentials(request);
@@ -254,7 +261,8 @@ class AuthenticationServiceTest {
         when(tokenRepository.findByToken("invalid token")).thenReturn(Optional.empty());
 
         //When & Then
-        InvalidTokenException exception = assertThrows(InvalidTokenException.class, () -> authenticationService.activateAccount("invalid token"));
+        InvalidTokenException exception = assertThrows(InvalidTokenException.class,
+                () -> authenticationService.activateAccount("invalid token"));
 
         assertEquals("Invalid token", exception.getMessage());
         verify(userService, never()).saveUser(any(User.class));
@@ -268,7 +276,8 @@ class AuthenticationServiceTest {
         when(tokenRepository.findByToken("jwtToken")).thenReturn(Optional.of(token));
 
         //When & Then
-        ExpiredTokenException exception = assertThrows(ExpiredTokenException.class, () -> authenticationService.activateAccount("jwtToken"));
+        ExpiredTokenException exception = assertThrows(ExpiredTokenException.class,
+                () -> authenticationService.activateAccount("jwtToken"));
         assertEquals("Token expired. New token was sent to your email", exception.getMessage());
 
         assertFalse(user.isEnabled());
@@ -285,7 +294,8 @@ class AuthenticationServiceTest {
         when(userService.getUserById(user.getUserId())).thenThrow(new UsernameNotFoundException("User not found"));
 
         //When & Then
-        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () -> authenticationService.activateAccount("jwtToken"));
+        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
+                () -> authenticationService.activateAccount("jwtToken"));
         assertEquals("User not found", exception.getMessage());
         assertFalse(user.isEnabled());
         verify(userService, never()).saveUser(user);
@@ -361,7 +371,4 @@ class AuthenticationServiceTest {
         assertThrows(UsernameNotFoundException.class, () -> authenticationService.resetPassword(request));
         verify(emailService, never()).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
     }
-
-
-
 }

@@ -1,5 +1,4 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {UserAvatar} from "../../../../../services/models/user-avatar";
 import {AdminService} from "../../../../../services/services/admin.service";
 import {MatDialogRef} from "@angular/material/dialog";
 import {SharedService} from "../../../../../services/shared/shared.service";
@@ -9,6 +8,7 @@ import {MatToolbarRow} from "@angular/material/toolbar";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {EditComponent} from "../edit/edit.component";
+import {AvatarImg} from "../../../../../services/models/avatar-img";
 
 @Component({
   selector: 'app-image',
@@ -24,7 +24,7 @@ import {EditComponent} from "../edit/edit.component";
 })
 export class ImageComponent implements OnInit{
 
-  userAvatar: UserAvatar | null = null;
+  userAvatar: AvatarImg | null = null;
 
   constructor(private adminService: AdminService,
               public dialogRef: MatDialogRef<EditComponent>,

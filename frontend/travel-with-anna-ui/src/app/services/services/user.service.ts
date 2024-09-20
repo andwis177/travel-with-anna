@@ -18,8 +18,8 @@ import { getCredentials } from '../fn/user/get-credentials';
 import { GetCredentials$Params } from '../fn/user/get-credentials';
 import { update } from '../fn/user/update';
 import { Update$Params } from '../fn/user/update';
-import { UserCredentials } from '../models/user-credentials';
-import { UserRespond } from '../models/user-respond';
+import { UserCredentialsResponse } from '../models/user-credentials-response';
+import { UserResponse } from '../models/user-response';
 
 @Injectable({ providedIn: 'root' })
 export class UserService extends BaseService {
@@ -61,7 +61,7 @@ export class UserService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  changePassword$Response(params: ChangePassword$Params, context?: HttpContext): Observable<StrictHttpResponse<UserRespond>> {
+  changePassword$Response(params: ChangePassword$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
     return changePassword(this.http, this.rootUrl, params, context);
   }
 
@@ -71,9 +71,9 @@ export class UserService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  changePassword(params: ChangePassword$Params, context?: HttpContext): Observable<UserRespond> {
+  changePassword(params: ChangePassword$Params, context?: HttpContext): Observable<UserResponse> {
     return this.changePassword$Response(params, context).pipe(
-      map((r: StrictHttpResponse<UserRespond>): UserRespond => r.body)
+      map((r: StrictHttpResponse<UserResponse>): UserResponse => r.body)
     );
   }
 
@@ -86,7 +86,7 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getCredentials$Response(params?: GetCredentials$Params, context?: HttpContext): Observable<StrictHttpResponse<UserCredentials>> {
+  getCredentials$Response(params?: GetCredentials$Params, context?: HttpContext): Observable<StrictHttpResponse<UserCredentialsResponse>> {
     return getCredentials(this.http, this.rootUrl, params, context);
   }
 
@@ -96,9 +96,9 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getCredentials(params?: GetCredentials$Params, context?: HttpContext): Observable<UserCredentials> {
+  getCredentials(params?: GetCredentials$Params, context?: HttpContext): Observable<UserCredentialsResponse> {
     return this.getCredentials$Response(params, context).pipe(
-      map((r: StrictHttpResponse<UserCredentials>): UserCredentials => r.body)
+      map((r: StrictHttpResponse<UserCredentialsResponse>): UserCredentialsResponse => r.body)
     );
   }
 
@@ -111,7 +111,7 @@ export class UserService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  delete$Response(params: Delete$Params, context?: HttpContext): Observable<StrictHttpResponse<UserRespond>> {
+  delete$Response(params: Delete$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
     return delete$(this.http, this.rootUrl, params, context);
   }
 
@@ -121,9 +121,9 @@ export class UserService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  delete(params: Delete$Params, context?: HttpContext): Observable<UserRespond> {
+  delete(params: Delete$Params, context?: HttpContext): Observable<UserResponse> {
     return this.delete$Response(params, context).pipe(
-      map((r: StrictHttpResponse<UserRespond>): UserRespond => r.body)
+      map((r: StrictHttpResponse<UserResponse>): UserResponse => r.body)
     );
   }
 

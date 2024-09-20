@@ -11,7 +11,7 @@ import { StrictHttpResponse } from '../strict-http-response';
 
 import { addItemToBackpack } from '../fn/backpack/add-item-to-backpack';
 import { AddItemToBackpack$Params } from '../fn/backpack/add-item-to-backpack';
-import { BackpackRequest } from '../models/backpack-request';
+import { BackpackResponse } from '../models/backpack-response';
 import { deleteItem } from '../fn/backpack/delete-item';
 import { DeleteItem$Params } from '../fn/backpack/delete-item';
 import { getBackpackById } from '../fn/backpack/get-backpack-by-id';
@@ -57,7 +57,7 @@ export class BackpackService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getBackpackById$Response(params: GetBackpackById$Params, context?: HttpContext): Observable<StrictHttpResponse<BackpackRequest>> {
+  getBackpackById$Response(params: GetBackpackById$Params, context?: HttpContext): Observable<StrictHttpResponse<BackpackResponse>> {
     return getBackpackById(this.http, this.rootUrl, params, context);
   }
 
@@ -67,9 +67,9 @@ export class BackpackService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getBackpackById(params: GetBackpackById$Params, context?: HttpContext): Observable<BackpackRequest> {
+  getBackpackById(params: GetBackpackById$Params, context?: HttpContext): Observable<BackpackResponse> {
     return this.getBackpackById$Response(params, context).pipe(
-      map((r: StrictHttpResponse<BackpackRequest>): BackpackRequest => r.body)
+      map((r: StrictHttpResponse<BackpackResponse>): BackpackResponse => r.body)
     );
   }
 

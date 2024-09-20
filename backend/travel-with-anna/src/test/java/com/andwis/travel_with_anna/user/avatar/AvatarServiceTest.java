@@ -3,13 +3,11 @@ package com.andwis.travel_with_anna.user.avatar;
 import com.andwis.travel_with_anna.handler.exception.AvatarNotFoundException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
-import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.andwis.travel_with_anna.trip.trip.TripRepository;
 import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import com.andwis.travel_with_anna.user.admin.AdminService;
-import com.andwis.travel_with_anna.user.admin.UserAdminView;
+import com.andwis.travel_with_anna.user.admin.UserAdminResponse;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,12 +66,12 @@ class AvatarServiceTest {
         Role retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
 
         avatar = Avatar.builder()
-                .avatar(AvatarImg.DEFAULT.getImg())
+                .avatar(AvatarDefaultImg.DEFAULT.getImg())
                 .build();
         avatarId = avatarService.saveAvatar(avatar).getAvatarId();
 
         avatar2 = Avatar.builder()
-                .avatar(AvatarImg.DEFAULT.getImg())
+                .avatar(AvatarDefaultImg.DEFAULT.getImg())
                 .build();
         avatar2Id = avatarService.saveAvatar(avatar2).getAvatarId();
 
@@ -89,7 +87,6 @@ class AvatarServiceTest {
         user.setEnabled(true);
 
         userRepository.save(user);
-
 
         User secondaryUser = User.builder()
                 .userName("userName2")
@@ -212,12 +209,12 @@ class AvatarServiceTest {
     @Test
     void testGetAllUsers() {
         // Getter
-        PageResponse<UserAdminView> result = adminService.getAllUsers(0, 10, createAuthentication(user));
+        PageResponse<UserAdminResponse> result = adminService.getAllUsers(0, 10, createAuthentication(user));
 
         // When & Then
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals(secondaryUserId, result.getContent().get(0).getUserId());
+        assertEquals(secondaryUserId, result.getContent().getFirst().userId());
 
         Map<Long, byte[]> avatars = avatarService.getAvatars(List.of(avatar2Id));
         assertNotNull(avatars.get(avatar2Id));

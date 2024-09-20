@@ -4,8 +4,9 @@ import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.role.RoleService;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserMapper;
-import com.andwis.travel_with_anna.user.UserRespond;
+import com.andwis.travel_with_anna.user.UserResponse;
 import com.andwis.travel_with_anna.user.UserService;
+import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.utility.NumberUtils;
 import com.andwis.travel_with_anna.utility.PageResponse;
@@ -31,14 +32,14 @@ public class AdminService {
     private final UserService userService;
     private final RoleService roleService;
 
-    public PageResponse<UserAdminView> getAllUsers(int page, int size, Authentication connectedUser) {
+    public PageResponse<UserAdminResponse> getAllUsers(int page, int size, Authentication connectedUser) {
         var user  = userService.getConnectedUser(connectedUser);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("userId").ascending());
         Page<User> users = userService.getAllUsersExcept(pageable, user.getUserId());
         List<Long> avatarsId = users.map(User::getAvatarId).getContent();
         Map<Long, byte[]> avatarsWithUsersId = avatarService.getAvatars(avatarsId);
-        List<UserAdminView> userAdminViewList = users.stream()
+        List<UserAdminResponse> userAdminViewList = users.stream()
                 .map(theUser -> userMapper.toUserForAdminView(theUser, avatarsWithUsersId)).toList();
         return new PageResponse<>(
                 userAdminViewList,
@@ -51,13 +52,13 @@ public class AdminService {
         );
     }
 
-    public UserAvatar getAvatar(Long userId) {
+    public AvatarImg getAvatar(Long userId) {
         User user = userService.getUserById(userId);
         return avatarService.getAvatar(user);
 
     }
 
-    public UserAdminView getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
+    public UserAdminResponse getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
         User user = getUserBasedOnIdentifier(identifier);
         if (user.getUserId().equals(userService.getConnectedUser(connectedUser).getUserId())) {
             throw new UserNotFoundException("You can't view your own profile");
@@ -69,9 +70,6 @@ public class AdminService {
 
     private User getUserBasedOnIdentifier(String identifier){
         if (NumberUtils.isLong(identifier)) {
-//            if (userService.existsByUserId(Long.parseLong(identifier))) {
-//                return userService.getUserById(Long.parseLong(identifier));
-//            }
             return userService.getUserById(Long.parseLong(identifier));
         } else {
             if (userService.existsByEmail(identifier)) {
@@ -87,20 +85,20 @@ public class AdminService {
     public Long updateUser(UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.getPassword());
-        UserAdminEdit userAdminEdit = request.getUserAdminEdit();
-        User user = userService.getUserById(userAdminEdit.userId());
-        user.setAccountLocked(userAdminEdit.accountLocked());
-        user.setEnabled(userAdminEdit.enabled());
-        user.setRole(roleService.getRoleByName(userAdminEdit.roleName()));
+        UserAdminEditRequest userAdminEditRequest = request.getUserAdminEditRequest();
+        User user = userService.getUserById(userAdminEditRequest.userId());
+        user.setAccountLocked(userAdminEditRequest.accountLocked());
+        user.setEnabled(userAdminEditRequest.enabled());
+        user.setRole(roleService.getRoleByName(userAdminEditRequest.roleName()));
         userService.saveUser(user);
         return user.getUserId();
     }
 
-    public UserRespond deleteUser(UserAdminDeleteRequest request, Authentication authentication) {
+    public UserResponse deleteUser(UserAdminDeleteRequest request, Authentication authentication) {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.password());
         userService.deleteUserById(request.userId());
-        return UserRespond.builder().message("User has been deleted").build();
+        return UserResponse.builder().message("User has been deleted").build();
     }
 
     public List<String> getAllRoleNamesWithAdmin() {

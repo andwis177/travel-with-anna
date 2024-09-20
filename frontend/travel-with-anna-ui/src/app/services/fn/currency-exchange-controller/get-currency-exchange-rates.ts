@@ -6,12 +6,12 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CurrencyExchangeDto } from '../../models/currency-exchange-dto';
+import { CurrencyExchangeResponse } from '../../models/currency-exchange-response';
 
 export interface GetCurrencyExchangeRates$Params {
 }
 
-export function getCurrencyExchangeRates(http: HttpClient, rootUrl: string, params?: GetCurrencyExchangeRates$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CurrencyExchangeDto>>> {
+export function getCurrencyExchangeRates(http: HttpClient, rootUrl: string, params?: GetCurrencyExchangeRates$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CurrencyExchangeResponse>>> {
   const rb = new RequestBuilder(rootUrl, getCurrencyExchangeRates.PATH, 'get');
   if (params) {
   }
@@ -21,7 +21,7 @@ export function getCurrencyExchangeRates(http: HttpClient, rootUrl: string, para
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<CurrencyExchangeDto>>;
+      return r as StrictHttpResponse<Array<CurrencyExchangeResponse>>;
     })
   );
 }

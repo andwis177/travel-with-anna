@@ -44,6 +44,11 @@ public class Backpack {
         item.setBackpack(this);
     }
 
+    public void removeItem(Item item) {
+        items.remove(item);
+        item.setBackpack(null);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

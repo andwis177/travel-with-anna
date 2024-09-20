@@ -4,7 +4,7 @@ import com.andwis.travel_with_anna.handler.exception.SaveAvatarException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.avatar.Avatar;
-import com.andwis.travel_with_anna.user.avatar.AvatarImg;
+import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +57,7 @@ class UserAvatarFacadeTest {
         Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
         Avatar avatar = Avatar.builder()
-                .avatar(AvatarImg.DEFAULT.getImg())
+                .avatar(AvatarDefaultImg.DEFAULT.getImg())
                 .build();
         Long avatarId = avatarRepository.save(avatar).getAvatarId();
 
@@ -181,7 +181,7 @@ class UserAvatarFacadeTest {
     @Test
     void testGetAvatar_DefaultAvatar(){
         // Given
-        byte[] defaultImg = hexToBytes(AvatarImg.DEFAULT.getImg());
+        byte[] defaultImg = hexToBytes(AvatarDefaultImg.DEFAULT.getImg());
 
         // When
         byte[] avatar = userAvatarMgr.getAvatar(createAuthentication(user));
@@ -195,7 +195,7 @@ class UserAvatarFacadeTest {
     @Test
     void testGetAvatar_FileNotExists() {
         // Given
-        byte[] defaultImg = hexToBytes(AvatarImg.DEFAULT.getImg());
+        byte[] defaultImg = hexToBytes(AvatarDefaultImg.DEFAULT.getImg());
         user.setAvatarId(null);
 
         // When

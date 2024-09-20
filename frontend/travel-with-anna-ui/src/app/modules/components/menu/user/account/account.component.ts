@@ -12,13 +12,13 @@ import {MatDivider} from "@angular/material/divider";
 import {Router} from "@angular/router";
 import {MatTooltip} from "@angular/material/tooltip";
 import {PasswordComponent} from "../password/password.component";
-import {UserCredentials} from "../../../../../services/models/user-credentials";
 import {SharedService} from "../../../../../services/shared/shared.service";
 import {UserService} from "../../../../../services/services/user.service";
 import {AuthService} from "../../../../../services/auth/auth.service";
 import {UserInformationService} from "../../../../../services/user-information/user-information-service";
 import {ImageFileService} from "../../../../../services/image-file-service/image-file-service";
 import {ErrorService} from "../../../../../services/error/error.service";
+import {UserCredentialsRequest} from "../../../../../services/models/user-credentials-request";
 
 @Component({
   selector: 'app-account',
@@ -51,7 +51,7 @@ import {ErrorService} from "../../../../../services/error/error.service";
 })
 export class AccountComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
-  userCredentials: UserCredentials = {userName: '', email: '', password: ''};
+  userCredentials: UserCredentialsRequest = {userName: '', email: '', password: ''};
   errorMsg: Array<string> = [];
   isEdit: boolean = false;
   selectedFile: File | null = null;
@@ -103,7 +103,6 @@ export class AccountComponent implements OnInit {
       });
     this.userCredentials.userName = this.userInformationService.getUserName() as string;
     this.userCredentials.email = this.userInformationService.getEmail() as string;
-    // this.userCredentials.role = this.userInformationService.getRole() as string;
   }
 
   onFileSelected(event: Event) {
@@ -182,6 +181,7 @@ export class AccountComponent implements OnInit {
       maxHeight: '90vh',
       id: 'password-dialog',
     })
+    this.dialog.getDialogById("account-dialog")?.close();
     dialogRef.afterClosed().subscribe(() => {
     });
   }

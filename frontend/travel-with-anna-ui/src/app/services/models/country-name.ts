@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export interface CountryName {
-  Iso2?: string;
-  Iso3?: string;
+  iso2?: string;
+  iso3?: string;
   name?: string;
 }

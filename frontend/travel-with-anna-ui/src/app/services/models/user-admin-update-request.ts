@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
-import { UserAdminEdit } from '../models/user-admin-edit';
+import { UserAdminEditRequest } from '../models/user-admin-edit-request';
 export interface UserAdminUpdateRequest {
   password?: string;
-  userAdminEdit?: UserAdminEdit;
+  userAdminEditRequest?: UserAdminEditRequest;
 }

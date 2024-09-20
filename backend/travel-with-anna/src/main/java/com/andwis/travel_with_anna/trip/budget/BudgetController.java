@@ -23,4 +23,10 @@ public class BudgetController {
         BudgetRequest budgetDto = facade.getBudgetById(budgetId);
         return ResponseEntity.ok(budgetDto);
     }
+
+    @GetMapping("/{budgetId}/expanses/{tripId}")
+    public ResponseEntity<BudgetExpensesRespond> getBudgetExpanses(@PathVariable("tripId") Long tripId, @PathVariable("budgetId") Long budgetId) {
+        BudgetExpensesRespond budgetExpensesRespond = facade.getBudgetExpanses(tripId, budgetId);
+        return ResponseEntity.ok(budgetExpensesRespond);
+    }
 }

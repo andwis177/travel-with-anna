@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 @Getter
@@ -68,7 +69,10 @@ public class Expanse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Expanse expanse = (Expanse) o;
-        return Objects.equals(expanseId, expanse.expanseId) && Objects.equals(expanseName, expanse.expanseName) && Objects.equals(currency, expanse.currency) && Objects.equals(price, expanse.price) && Objects.equals(paid, expanse.paid) && Objects.equals(exchangeRate, expanse.exchangeRate) && Objects.equals(pdf, expanse.pdf) &&  Objects.equals(activity, expanse.activity);
+        return Objects.equals(expanseId, expanse.expanseId) && Objects.equals(expanseName, expanse.expanseName)
+                && Objects.equals(currency, expanse.currency) && Objects.equals(price, expanse.price)
+                && Objects.equals(paid, expanse.paid) && Objects.equals(exchangeRate, expanse.exchangeRate)
+                && Objects.equals(pdf, expanse.pdf) &&  Objects.equals(activity, expanse.activity);
     }
 
     @Override
@@ -81,13 +85,13 @@ public class Expanse {
         if(exchangeRate == null || price == null) {
             return BigDecimal.ZERO;
         }
-        return exchangeRate.multiply(price);
+        return exchangeRate.multiply(price).setScale(2, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getPaidInTripCurrency() {
         if(exchangeRate == null || paid == null) {
             return BigDecimal.ZERO;
         }
-        return exchangeRate.multiply(paid);
+        return exchangeRate.multiply(paid).setScale(2, RoundingMode.HALF_UP);
     }
 }

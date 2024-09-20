@@ -17,8 +17,8 @@ public class ItemController {
     private final ItemFacade itemFacade;
 
   @GetMapping("/{backpackId}")
-    public ResponseEntity<List<ItemRequest>> getAllItemsByBackpackId(@PathVariable("backpackId") Long backpackId) {
-      List<ItemRequest> items = itemFacade.getAllItemsByBackpackId(backpackId);
+    public ResponseEntity<List<ItemResponse>> getAllItemsByBackpackId(@PathVariable("backpackId") Long backpackId) {
+      List<ItemResponse> items = itemFacade.getAllItemsByBackpackId(backpackId);
       return ResponseEntity.status(HttpStatus.OK).body(items);
     }
 

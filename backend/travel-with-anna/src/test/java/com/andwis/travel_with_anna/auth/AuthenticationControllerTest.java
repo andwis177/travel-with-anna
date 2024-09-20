@@ -45,7 +45,14 @@ class AuthenticationControllerTest {
     @Test
     void register_ShouldReturnAccepted() throws Exception {
         // Given
-        RegistrationRequest request = new RegistrationRequest("testUser", "test@example.com", "password123", "password123", getUserRole());
+        RegistrationRequest request = new RegistrationRequest(
+                "testUser",
+                "test@example.com",
+                "password123",
+                "password123",
+                getUserRole()
+        );
+
         String jsonContent = objectMapper.writeValueAsString(request);
 
         // When
@@ -65,7 +72,12 @@ class AuthenticationControllerTest {
     @Test
     void register_ShouldReturnBadRequest() throws Exception {
         // Given
-        RegistrationRequest request = new RegistrationRequest("test", "test.com", "password123", "password123", getUserRole());
+        RegistrationRequest request = new RegistrationRequest("test",
+                "test.com",
+                "password123",
+                "password123",
+                getUserRole()
+        );
         String jsonContent = objectMapper.writeValueAsString(request);
 
         // When
@@ -85,9 +97,17 @@ class AuthenticationControllerTest {
     @Test
     void authenticationWithCredentials_ShouldReturnOk() throws Exception {
         // Given
-        AuthenticationRequest request = new AuthenticationRequest("test@example.com", "password123");
+        AuthenticationRequest request = new AuthenticationRequest(
+                "test@example.com",
+                "password123"
+        );
         String jsonContent = objectMapper.writeValueAsString(request);
-        AuthenticationResponse response = new AuthenticationResponse("token value","","","");
+        AuthenticationResponse response = new AuthenticationResponse(
+                "token value",
+                "",
+                "",
+                ""
+        );
         when(service.authenticationWithCredentials(request)).thenReturn(response);
 
         // When
@@ -145,10 +165,10 @@ class AuthenticationControllerTest {
                         .perform(MockMvcRequestBuilders
                                 .get("/auth/activate-account")
                                 .param("token", token))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isAccepted());
 
         // Then
-        assertEquals(204, result.andReturn().getResponse().getStatus());
+        assertEquals(202, result.andReturn().getResponse().getStatus());
     }
 
     @Test

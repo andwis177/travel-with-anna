@@ -19,8 +19,8 @@ import { getAllOwnersTrips } from '../fn/trip/get-all-owners-trips';
 import { GetAllOwnersTrips$Params } from '../fn/trip/get-all-owners-trips';
 import { getTripById } from '../fn/trip/get-trip-by-id';
 import { GetTripById$Params } from '../fn/trip/get-trip-by-id';
-import { PageResponseTripRequest } from '../models/page-response-trip-request';
-import { TripRequest } from '../models/trip-request';
+import { PageResponseTripResponse } from '../models/page-response-trip-response';
+import { TripResponse } from '../models/trip-response';
 
 @Injectable({ providedIn: 'root' })
 export class TripService extends BaseService {
@@ -87,7 +87,7 @@ export class TripService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllOwnersTrips$Response(params?: GetAllOwnersTrips$Params, context?: HttpContext): Observable<StrictHttpResponse<PageResponseTripRequest>> {
+  getAllOwnersTrips$Response(params?: GetAllOwnersTrips$Params, context?: HttpContext): Observable<StrictHttpResponse<PageResponseTripResponse>> {
     return getAllOwnersTrips(this.http, this.rootUrl, params, context);
   }
 
@@ -97,9 +97,9 @@ export class TripService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllOwnersTrips(params?: GetAllOwnersTrips$Params, context?: HttpContext): Observable<PageResponseTripRequest> {
+  getAllOwnersTrips(params?: GetAllOwnersTrips$Params, context?: HttpContext): Observable<PageResponseTripResponse> {
     return this.getAllOwnersTrips$Response(params, context).pipe(
-      map((r: StrictHttpResponse<PageResponseTripRequest>): PageResponseTripRequest => r.body)
+      map((r: StrictHttpResponse<PageResponseTripResponse>): PageResponseTripResponse => r.body)
     );
   }
 
@@ -112,7 +112,7 @@ export class TripService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getTripById$Response(params: GetTripById$Params, context?: HttpContext): Observable<StrictHttpResponse<TripRequest>> {
+  getTripById$Response(params: GetTripById$Params, context?: HttpContext): Observable<StrictHttpResponse<TripResponse>> {
     return getTripById(this.http, this.rootUrl, params, context);
   }
 
@@ -122,9 +122,9 @@ export class TripService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getTripById(params: GetTripById$Params, context?: HttpContext): Observable<TripRequest> {
+  getTripById(params: GetTripById$Params, context?: HttpContext): Observable<TripResponse> {
     return this.getTripById$Response(params, context).pipe(
-      map((r: StrictHttpResponse<TripRequest>): TripRequest => r.body)
+      map((r: StrictHttpResponse<TripResponse>): TripResponse => r.body)
     );
   }
 

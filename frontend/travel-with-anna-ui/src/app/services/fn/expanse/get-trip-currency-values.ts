@@ -6,7 +6,7 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { TripCurrencyValue } from '../../models/trip-currency-value';
+import { ExpanseInTripCurrency } from '../../models/expanse-in-trip-currency';
 
 export interface GetTripCurrencyValues$Params {
   price: number;
@@ -14,7 +14,7 @@ export interface GetTripCurrencyValues$Params {
   exchangeRate: number;
 }
 
-export function getTripCurrencyValues(http: HttpClient, rootUrl: string, params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<StrictHttpResponse<TripCurrencyValue>> {
+export function getTripCurrencyValues(http: HttpClient, rootUrl: string, params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseInTripCurrency>> {
   const rb = new RequestBuilder(rootUrl, getTripCurrencyValues.PATH, 'get');
   if (params) {
     rb.query('price', params.price, {});
@@ -27,7 +27,7 @@ export function getTripCurrencyValues(http: HttpClient, rootUrl: string, params:
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<TripCurrencyValue>;
+      return r as StrictHttpResponse<ExpanseInTripCurrency>;
     })
   );
 }

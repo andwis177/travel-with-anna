@@ -11,12 +11,12 @@
   <div class="table-container mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)">
 
-      <ng-container matColumnDef="packed">
+      <ng-container matColumnDef="isPacked">
         <th mat-header-cell *matHeaderCellDef  mat-sort-header class="packed-column" sortActionDescription="Sort by packed" >
           Packed
         </th>
         <td mat-cell *matCellDef="let element" class="packed-column">
-          <mat-checkbox class="" [(ngModel)]="element.packed"></mat-checkbox>
+          <mat-checkbox class="" [(ngModel)]="element.isPacked"></mat-checkbox>
         </td>
       </ng-container>
 

@@ -6,13 +6,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { BackpackRequest } from '../../models/backpack-request';
+import { BackpackResponse } from '../../models/backpack-response';
 
 export interface GetBackpackById$Params {
   backpackId: number;
 }
 
-export function getBackpackById(http: HttpClient, rootUrl: string, params: GetBackpackById$Params, context?: HttpContext): Observable<StrictHttpResponse<BackpackRequest>> {
+export function getBackpackById(http: HttpClient, rootUrl: string, params: GetBackpackById$Params, context?: HttpContext): Observable<StrictHttpResponse<BackpackResponse>> {
   const rb = new RequestBuilder(rootUrl, getBackpackById.PATH, 'get');
   if (params) {
     rb.path('backpackId', params.backpackId, {});
@@ -23,7 +23,7 @@ export function getBackpackById(http: HttpClient, rootUrl: string, params: GetBa
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<BackpackRequest>;
+      return r as StrictHttpResponse<BackpackResponse>;
     })
   );
 }

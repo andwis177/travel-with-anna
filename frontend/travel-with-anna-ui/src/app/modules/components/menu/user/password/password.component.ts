@@ -11,11 +11,11 @@ import {MatIcon} from "@angular/material/icon";
 import {MatDivider} from "@angular/material/divider";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ChangePasswordRequest} from "../../../../../services/models/change-password-request";
-import {UserRespond} from "../../../../../services/models/user-respond";
 import {UserService} from "../../../../../services/services/user.service";
 import {ErrorService} from "../../../../../services/error/error.service";
 import {ChangePassword$Params} from "../../../../../services/fn/user/change-password";
-
+import {UserResponse} from "../../../../../services/models/user-response";
+import {AccountComponent} from "../account/account.component";
 
 @Component({
   selector: 'app-password',
@@ -43,7 +43,7 @@ import {ChangePassword$Params} from "../../../../../services/fn/user/change-pass
 export class PasswordComponent {
   errorMsg: Array<string> = [];
   changePasswordRequest: ChangePasswordRequest = {currentPassword: '', newPassword: '', confirmPassword: ''};
-  userRespond: UserRespond = {message: ''};
+  userRespond: UserResponse = {message: ''};
 
   constructor(public dialogRef: MatDialogRef<PasswordComponent>,
               public dialog: MatDialog,
@@ -80,7 +80,8 @@ export class PasswordComponent {
       next: (respond) => {
         console.log("Respond:", respond);
         this.userRespond = respond;
-        this.dialogRef.close();
+        this.dialog.getDialogById('password-dialog')?.close();
+        this.openAccountDetails();
         this._snackBar.open(<string> this.userRespond.message, 'Close');
       },
       error: (err) => {
@@ -88,6 +89,17 @@ export class PasswordComponent {
         this.errorService.errorHandler(err);
         this.errorMsg = this.errorService.errorHandler(err);
       }
+    });
+  }
+  openAccountDetails() {
+    const dialogRef = this.dialog.open(AccountComponent, {
+      width: '50vw',
+      height: '90vh',
+      maxWidth: '50vw',
+      maxHeight: '90vh',
+      id: 'account-dialog',
+    })
+    dialogRef.afterClosed().subscribe(() => {
     });
   }
 }

@@ -12,6 +12,7 @@ import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@EnableJpaAuditing
 public class UserService {
 
     private final UserRepository userRepository;
@@ -81,16 +83,16 @@ public class UserService {
                 new UserNotFoundException("User not found"));
     }
 
-    public UserCredentials getCredentials(String email) {
+    public UserCredentialsResponse getCredentials(String email) {
         User user = getUserByEmail(email);
-        return UserCredentials.builder()
-                .email(user.getEmail())
-                .userName(user.getUserName())
-                .role(user.getRole().getRoleName())
-                .build();
+        return new UserCredentialsResponse(
+                user.getEmail(),
+                user.getUserName(),
+                user.getRole().getRoleName()
+        );
     }
 
-    public AuthenticationResponse updateUserExecution(UserCredentials userCredentials, Authentication connectedUser) {
+    public AuthenticationResponse updateUserExecution(UserCredentialsRequest userCredentials, Authentication connectedUser) {
         var user = getSecurityUser(connectedUser).getUser();
         verifyPassword(user, userCredentials.getPassword());
         updateUser(userCredentials, user);
@@ -105,7 +107,7 @@ public class UserService {
     }
 
 
-    private void updateUser(UserCredentials userCredentials, User user) {
+    private void updateUser(UserCredentialsRequest userCredentials, User user) {
         boolean isChanged = false;
         String newUserName = userCredentials.getUserName();
         String newEmail = userCredentials.getEmail();
@@ -146,7 +148,7 @@ public class UserService {
     }
 
 
-    public UserRespond changePassword(ChangePasswordRequest request, Authentication connectedUser) {
+    public UserResponse changePassword(ChangePasswordRequest request, Authentication connectedUser) {
         var user = getSecurityUser(connectedUser);
         var currentUser = user.getUser();
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
@@ -156,12 +158,12 @@ public class UserService {
         verifyPassword(currentUser, request.getCurrentPassword());
         currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(currentUser);
-        return UserRespond.builder()
+        return UserResponse.builder()
                 .message("Password has been changed")
                 .build();
     }
 
-    public UserRespond deleteConnectedUser(PasswordRequest request, Authentication connectedUser)
+    public UserResponse deleteConnectedUser(PasswordRequest request, Authentication connectedUser)
             throws UsernameNotFoundException, WrongPasswordException {
         var securityUser = getSecurityUser(connectedUser);
         var currentUser = securityUser.getUser();
@@ -169,7 +171,7 @@ public class UserService {
         verifyPassword(currentUser, request.password());
         userRepository.delete(securityUser.getUser());
         avatarService.deleteAvatar(currentUser);
-        return UserRespond.builder()
+        return UserResponse.builder()
                 .message("User " + userName + " has been deleted!")
                 .build();
     }
@@ -194,5 +196,4 @@ public class UserService {
         }
         return securityUser ;
     }
-
 }

@@ -7,13 +7,13 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { UserAdminDeleteRequest } from '../../models/user-admin-delete-request';
-import { UserRespond } from '../../models/user-respond';
+import { UserResponse } from '../../models/user-response';
 
 export interface DeleteUser$Params {
       body: UserAdminDeleteRequest
 }
 
-export function deleteUser(http: HttpClient, rootUrl: string, params: DeleteUser$Params, context?: HttpContext): Observable<StrictHttpResponse<UserRespond>> {
+export function deleteUser(http: HttpClient, rootUrl: string, params: DeleteUser$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
   const rb = new RequestBuilder(rootUrl, deleteUser.PATH, 'delete');
   if (params) {
     rb.body(params.body, 'application/json');
@@ -24,7 +24,7 @@ export function deleteUser(http: HttpClient, rootUrl: string, params: DeleteUser
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<UserRespond>;
+      return r as StrictHttpResponse<UserResponse>;
     })
   );
 }

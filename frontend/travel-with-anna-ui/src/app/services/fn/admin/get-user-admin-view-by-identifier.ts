@@ -6,13 +6,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { UserAdminView } from '../../models/user-admin-view';
+import { UserAdminResponse } from '../../models/user-admin-response';
 
 export interface GetUserAdminViewByIdentifier$Params {
   identifier: string;
 }
 
-export function getUserAdminViewByIdentifier(http: HttpClient, rootUrl: string, params: GetUserAdminViewByIdentifier$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAdminView>> {
+export function getUserAdminViewByIdentifier(http: HttpClient, rootUrl: string, params: GetUserAdminViewByIdentifier$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAdminResponse>> {
   const rb = new RequestBuilder(rootUrl, getUserAdminViewByIdentifier.PATH, 'get');
   if (params) {
     rb.path('identifier', params.identifier, {});
@@ -23,7 +23,7 @@ export function getUserAdminViewByIdentifier(http: HttpClient, rootUrl: string, 
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<UserAdminView>;
+      return r as StrictHttpResponse<UserAdminResponse>;
     })
   );
 }

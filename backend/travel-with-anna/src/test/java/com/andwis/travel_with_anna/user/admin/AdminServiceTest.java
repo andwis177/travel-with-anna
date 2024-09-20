@@ -7,10 +7,7 @@ import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import com.andwis.travel_with_anna.user.UserService;
-import com.andwis.travel_with_anna.user.avatar.Avatar;
-import com.andwis.travel_with_anna.user.avatar.AvatarImg;
-import com.andwis.travel_with_anna.user.avatar.AvatarRepository;
-import com.andwis.travel_with_anna.user.avatar.AvatarService;
+import com.andwis.travel_with_anna.user.avatar.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -72,12 +69,12 @@ class AdminServiceTest {
         Role retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
 
         avatar = Avatar.builder()
-                .avatar(AvatarImg.DEFAULT.getImg())
+                .avatar(AvatarDefaultImg.DEFAULT.getImg())
                 .build();
         Long avatarId = avatarService.saveAvatar(avatar).getAvatarId();
 
         Avatar avatar2 = Avatar.builder()
-                .avatar(AvatarImg.DEFAULT.getImg())
+                .avatar(AvatarDefaultImg.DEFAULT.getImg())
                 .build();
         Long avatar2Id = avatarService.saveAvatar(avatar2).getAvatarId();
 
@@ -117,11 +114,11 @@ class AdminServiceTest {
         byte[] avatarBytes = hexToBytes(avatar.getAvatar());
 
         // When
-        UserAvatar userAvatar = adminService.getAvatar(userId);
+        AvatarImg userAvatar = adminService.getAvatar(userId);
 
         // Then
         assertNotNull(userAvatar);
-        assertArrayEquals(avatarBytes, userAvatar.getAvatar());
+        assertArrayEquals(avatarBytes, userAvatar.avatar());
     }
 
     @Test
@@ -129,11 +126,11 @@ class AdminServiceTest {
         // Getter
 
         // When
-        UserAdminView userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUserId.toString(), createAuthentication(user));
+        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUserId.toString(), createAuthentication(user));
 
         // Then
         assertNotNull(userAdminView);
-        assertEquals(secondaryUserId, userAdminView.getUserId());
+        assertEquals(secondaryUserId, userAdminView.userId());
     }
 
     @Test
@@ -141,22 +138,22 @@ class AdminServiceTest {
         // Getter
 
         // When
-        UserAdminView userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUser.getUserName(), createAuthentication(user));
+        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUser.getUserName(), createAuthentication(user));
 
         // Then
         assertNotNull(userAdminView);
-        assertEquals(secondaryUserId, userAdminView.getUserId());
-        assertEquals(secondaryUser.getUserName(), userAdminView.getUserName());
+        assertEquals(secondaryUserId, userAdminView.userId());
+        assertEquals(secondaryUser.getUserName(), userAdminView.userName());
     }
 
     @Test
     void testUpdateUser() throws RoleNotFoundException {
         // Getter
-        UserAdminEdit userAdminEdit = new UserAdminEdit(
+        UserAdminEditRequest userAdminEdit = new UserAdminEditRequest(
                 secondaryUserId, true, false, getAdminRole());
 
         UserAdminUpdateRequest request = UserAdminUpdateRequest.builder()
-                .userAdminEdit(userAdminEdit)
+                .userAdminEditRequest(userAdminEdit)
                 .password("password")
                 .build();
 
@@ -174,12 +171,12 @@ class AdminServiceTest {
         // Getter
 
         // When
-        UserAdminView userAdminView = adminService.getUserAdminViewByIdentifier(user.getEmail(), createAuthentication(secondaryUser));
+        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(user.getEmail(), createAuthentication(secondaryUser));
 
         // Then
         assertNotNull(userAdminView);
-        assertEquals(userId, userAdminView.getUserId());
-        assertEquals(user.getEmail(), userAdminView.getEmail());
+        assertEquals(userId, userAdminView.userId());
+        assertEquals(user.getEmail(), userAdminView.email());
     }
 
     @Test

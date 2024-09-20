@@ -13,17 +13,17 @@
     <div class = "info-area mat-elevation-z8">
       <div class="margin">
         <p class="label-text">User ID: </p>
-        <p class="user-details">{{userAdminView.userId}}</p>
+        <p class="user-details">{{userAdminResponse.userId}}</p>
       </div>
 
       <div class="margin">
         <p class="label-text">Name: </p>
-        <p class="user-details">{{userAdminView.userName}}</p>
+        <p class="user-details">{{userAdminResponse.userName}}</p>
       </div>
 
       <div class="margin">
         <p class="label-text">Email: </p>
-        <p class="user-details">{{userAdminView.email}}</p>
+        <p class="user-details">{{userAdminResponse.email}}</p>
       </div>
     </div>
 
@@ -35,18 +35,18 @@
             <div class="label-container">
               <div>
                 <a class="label-text font-bold">Locked:</a>
-                <mat-checkbox [(ngModel)]="userAdminView.accountLocked" name="locked"></mat-checkbox>
+                <mat-checkbox [(ngModel)]="userAdminResponse.accountLocked" name="locked"></mat-checkbox>
               </div>
               <div>
                 <a class="label-text font-bold">Enabled:</a>
-                <mat-checkbox [(ngModel)]="userAdminView.enabled" name="enabled"></mat-checkbox>
+                <mat-checkbox [(ngModel)]="userAdminResponse.enabled" name="enabled"></mat-checkbox>
               </div>
             </div>
 
             <div class="role-container">
               <p class="label-text font-bold">Role: </p>
               <mat-form-field appearance="outline" class="role-selector" style="margin-top: 14px">
-                <mat-select [(value)] = "userAdminView.roleName" [ngClass]="getRoleClass(userAdminView.roleName!)">
+                <mat-select [(value)] = "userAdminResponse.roleName" [ngClass]="getRoleClass(userAdminResponse.roleName!)">
                   <mat-option *ngFor="let role of roles" [value]="role" >
                     {{ role }}
                   </mat-option>

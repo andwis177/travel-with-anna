@@ -2,7 +2,7 @@ package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.handler.exception.SaveAvatarException;
 import com.andwis.travel_with_anna.user.avatar.Avatar;
-import com.andwis.travel_with_anna.user.avatar.AvatarImg;
+import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -60,6 +60,6 @@ public class UserAvatarMgr {
                 }
             }
         }
-        return hexToBytes(AvatarImg.DEFAULT.getImg());
+        return hexToBytes(AvatarDefaultImg.DEFAULT.getImg());
     }
 }

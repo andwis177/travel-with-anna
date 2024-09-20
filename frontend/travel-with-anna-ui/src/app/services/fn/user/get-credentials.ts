@@ -6,12 +6,12 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { UserCredentials } from '../../models/user-credentials';
+import { UserCredentialsResponse } from '../../models/user-credentials-response';
 
 export interface GetCredentials$Params {
 }
 
-export function getCredentials(http: HttpClient, rootUrl: string, params?: GetCredentials$Params, context?: HttpContext): Observable<StrictHttpResponse<UserCredentials>> {
+export function getCredentials(http: HttpClient, rootUrl: string, params?: GetCredentials$Params, context?: HttpContext): Observable<StrictHttpResponse<UserCredentialsResponse>> {
   const rb = new RequestBuilder(rootUrl, getCredentials.PATH, 'get');
   if (params) {
   }
@@ -21,7 +21,7 @@ export function getCredentials(http: HttpClient, rootUrl: string, params?: GetCr
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<UserCredentials>;
+      return r as StrictHttpResponse<UserCredentialsResponse>;
     })
   );
 }

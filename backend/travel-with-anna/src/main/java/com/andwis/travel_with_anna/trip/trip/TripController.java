@@ -24,7 +24,7 @@ public class TripController {
     }
 
     @GetMapping("")
-    public PageResponse<TripRequest> getAllOwnersTrips(
+    public PageResponse<TripResponse> getAllOwnersTrips(
         @RequestParam(name = "page", defaultValue = "0", required = false) int page,
         @RequestParam(name = "size", defaultValue = "10", required = false) int size,
         Authentication connectedUser) {
@@ -32,8 +32,8 @@ public class TripController {
     }
 
     @GetMapping("/{tripId}")
-    public ResponseEntity<TripRequest> getTripById(@PathVariable("tripId") Long tripId) {
-        TripRequest tripDto = facade.getTripById(tripId);
+    public ResponseEntity<TripResponse> getTripById(@PathVariable("tripId") Long tripId) {
+        TripResponse tripDto = facade.getTripById(tripId);
         return ResponseEntity.status(HttpStatus.OK).body(tripDto);
     }
 

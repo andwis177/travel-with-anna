@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.user.admin;
 
-import com.andwis.travel_with_anna.user.UserRespond;
+import com.andwis.travel_with_anna.user.UserResponse;
+import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -14,15 +15,15 @@ import java.util.List;
 public class AdminFacade {
     private final AdminService adminService;
 
-    public PageResponse<UserAdminView> getAllUsers(int page, int size, Authentication connectedUser) {
+    public PageResponse<UserAdminResponse> getAllUsers(int page, int size, Authentication connectedUser) {
         return adminService.getAllUsers(page, size, connectedUser);
     }
 
-    public UserAdminView getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
+    public UserAdminResponse getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
         return adminService.getUserAdminViewByIdentifier(identifier, connectedUser);
     }
 
-    public UserAvatar getAvatar(Long userId) {
+    public AvatarImg getAvatar(Long userId) {
         return adminService.getAvatar(userId);
     }
 
@@ -30,7 +31,7 @@ public class AdminFacade {
         adminService.updateUser(request, authentication);
     }
 
-    public UserRespond deleteUser(UserAdminDeleteRequest request, Authentication authentication) {
+    public UserResponse deleteUser(UserAdminDeleteRequest request, Authentication authentication) {
         return adminService.deleteUser(request, authentication);
     }
 

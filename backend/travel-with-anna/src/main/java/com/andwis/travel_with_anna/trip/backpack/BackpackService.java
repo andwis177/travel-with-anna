@@ -2,7 +2,7 @@ package com.andwis.travel_with_anna.trip.backpack;
 
 import com.andwis.travel_with_anna.handler.exception.BackpackNotFoundException;
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
-import com.andwis.travel_with_anna.trip.backpack.item.ItemCreator;
+import com.andwis.travel_with_anna.trip.backpack.item.ItemWithExpanseRequest;
 import com.andwis.travel_with_anna.trip.backpack.item.ItemService;
 import com.andwis.travel_with_anna.trip.note.NoteService;
 import lombok.RequiredArgsConstructor;
@@ -19,20 +19,26 @@ public class BackpackService {
         return backpackRepository.findById(backpackId).orElseThrow(BackpackNotFoundException::new);
     }
 
-    public void addItemToBackpack(Long backpackId, ItemCreator itemCreator) {
+    public void addItemToBackpack(Long backpackId, ItemWithExpanseRequest itemWithExpanseRequest) {
         Backpack backpack = findById(backpackId);
-        Item item = itemService.createItem(itemCreator);
+        Item item = itemService.createItem(itemWithExpanseRequest);
         backpack.addItem(item);
         itemService.saveItem(item);
     }
 
-    public BackpackRequest getBackpackById(Long backpackId) {
+    public BackpackResponse getBackpackById(Long backpackId) {
         Backpack backpack = findById(backpackId);
         boolean isNote = noteService.isNoteExists(backpackId);
-        return BackpackMapper.toBackpackRequest(backpack, isNote);
+        return BackpackMapper.toBackpackResponse(backpack, isNote);
     }
 
     public void deleteItem(Long itemId) {
+        Item item = itemService.findById(itemId);
+
+        Backpack backpack = item.getBackpack();
+        if (backpack != null) {
+            backpack.removeItem(item);
+        }
         itemService.deleteItem(itemId);
     }
 }

@@ -1,10 +1,12 @@
 package com.andwis.travel_with_anna.trip.expanse;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExpanseMapper {
 
-    public static Expanse mapToExpanse(ExpanseItem expanseRequest) {
+    public static Expanse mapToExpanse(ExpanseRequest expanseRequest) {
         return Expanse.builder()
                 .expanseName(expanseRequest.getExpanseName())
                 .currency(expanseRequest.getCurrency())
@@ -14,13 +16,23 @@ public class ExpanseMapper {
                 .build();
     }
 
-    public static ExpanseItem mapToExpanseItem(Expanse expanse) {
-        return ExpanseItem.builder()
-                .expanseName(expanse.getExpanseName())
-                .currency(expanse.getCurrency())
-                .price(expanse.getPrice())
-                .paid(expanse.getPaid())
-                .exchangeRate(expanse.getExchangeRate())
-                .build();
+    public static ExpanseResponse mapToExpanseItem(Expanse expanse) {
+        return new ExpanseResponse(
+                expanse.getExpanseId(),
+                expanse.getExpanseName(),
+                expanse.getCurrency(),
+                expanse.getPrice(),
+                expanse.getPaid(),
+                expanse.getExchangeRate(),
+                expanse.getPriceInTripCurrency(),
+                expanse.getPaidInTripCurrency()
+        );
+
+    }
+
+    public static List<ExpanseResponse> mapToExpanseItemList(List<Expanse> expanses) {
+        return expanses.stream()
+                .map(ExpanseMapper::mapToExpanseItem)
+                .collect(Collectors.toList());
     }
 }

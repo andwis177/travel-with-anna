@@ -6,13 +6,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { TripRequest } from '../../models/trip-request';
+import { TripResponse } from '../../models/trip-response';
 
 export interface GetTripById$Params {
   tripId: number;
 }
 
-export function getTripById(http: HttpClient, rootUrl: string, params: GetTripById$Params, context?: HttpContext): Observable<StrictHttpResponse<TripRequest>> {
+export function getTripById(http: HttpClient, rootUrl: string, params: GetTripById$Params, context?: HttpContext): Observable<StrictHttpResponse<TripResponse>> {
   const rb = new RequestBuilder(rootUrl, getTripById.PATH, 'get');
   if (params) {
     rb.path('tripId', params.tripId, {});
@@ -23,7 +23,7 @@ export function getTripById(http: HttpClient, rootUrl: string, params: GetTripBy
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<TripRequest>;
+      return r as StrictHttpResponse<TripResponse>;
     })
   );
 }

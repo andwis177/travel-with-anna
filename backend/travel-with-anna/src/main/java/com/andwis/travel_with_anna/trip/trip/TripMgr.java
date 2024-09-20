@@ -45,12 +45,12 @@ public class TripMgr {
         return tripService.saveTrip(trip);
     }
 
-    public PageResponse<TripRequest> getAllOwnersTrips(int page, int size, Authentication connectedUser) {
+    public PageResponse<TripResponse> getAllOwnersTrips(int page, int size, Authentication connectedUser) {
         User user = userService.getConnectedUser(connectedUser);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Trip> trips = tripService.getTripsByOwnerId(user.getUserId(), pageable);
-        List<TripRequest> tripsDto = trips.stream().map(TripMapper::toTripRequest).toList();
+        List<TripResponse> tripsDto = trips.stream().map(TripMapper::toTripResponse).toList();
         return new PageResponse<>(
                 tripsDto,
                 trips.getNumber(),
@@ -62,8 +62,8 @@ public class TripMgr {
         );
     }
 
-    public TripRequest getTripById(Long tripId) {
-        return TripMapper.toTripRequest(tripService.getTripById(tripId));
+    public TripResponse getTripById(Long tripId) {
+        return TripMapper.toTripResponse(tripService.getTripById(tripId));
     }
 
     public Long changeTripName(Long tripId, String tripName) {

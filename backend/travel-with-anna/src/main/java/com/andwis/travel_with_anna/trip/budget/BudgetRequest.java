@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Setter
 @Builder
 public class BudgetRequest {
+    private Long budgetId;
     @Size(max = 10, message = "Currency description should be 10 characters or less")
     private String currency;
     private BigDecimal toSpend;

@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.trip.backpack;
 
-import com.andwis.travel_with_anna.trip.backpack.item.ItemCreator;
+import com.andwis.travel_with_anna.trip.backpack.item.ItemWithExpanseRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,11 +10,11 @@ public class BackpackFacade {
     private final BackpackService backpackService;
 
 
-    public void addItemToBackpack(Long backpackId, ItemCreator itemCreator) {
-        backpackService.addItemToBackpack(backpackId, itemCreator);
+    public void addItemToBackpack(Long backpackId, ItemWithExpanseRequest itemWithExpanseRequest) {
+        backpackService.addItemToBackpack(backpackId, itemWithExpanseRequest);
     }
 
-    public BackpackRequest getBackpackById(Long backpackId) {
+    public BackpackResponse getBackpackById(Long backpackId) {
         return backpackService.getBackpackById(backpackId);
     }
 

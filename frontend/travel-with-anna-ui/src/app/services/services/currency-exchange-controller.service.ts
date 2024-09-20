@@ -9,7 +9,7 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { CurrencyExchangeDto } from '../models/currency-exchange-dto';
+import { CurrencyExchangeResponse } from '../models/currency-exchange-response';
 import { getCurrencyExchangeRates } from '../fn/currency-exchange-controller/get-currency-exchange-rates';
 import { GetCurrencyExchangeRates$Params } from '../fn/currency-exchange-controller/get-currency-exchange-rates';
 
@@ -28,7 +28,7 @@ export class CurrencyExchangeControllerService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getCurrencyExchangeRates$Response(params?: GetCurrencyExchangeRates$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CurrencyExchangeDto>>> {
+  getCurrencyExchangeRates$Response(params?: GetCurrencyExchangeRates$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CurrencyExchangeResponse>>> {
     return getCurrencyExchangeRates(this.http, this.rootUrl, params, context);
   }
 
@@ -38,9 +38,9 @@ export class CurrencyExchangeControllerService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getCurrencyExchangeRates(params?: GetCurrencyExchangeRates$Params, context?: HttpContext): Observable<Array<CurrencyExchangeDto>> {
+  getCurrencyExchangeRates(params?: GetCurrencyExchangeRates$Params, context?: HttpContext): Observable<Array<CurrencyExchangeResponse>> {
     return this.getCurrencyExchangeRates$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<CurrencyExchangeDto>>): Array<CurrencyExchangeDto> => r.body)
+      map((r: StrictHttpResponse<Array<CurrencyExchangeResponse>>): Array<CurrencyExchangeResponse> => r.body)
     );
   }
 

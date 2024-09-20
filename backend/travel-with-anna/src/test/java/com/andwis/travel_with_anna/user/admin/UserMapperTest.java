@@ -47,19 +47,19 @@ class UserMapperTest {
         avatarsWithUsersId.put(100L, "avatarImage".getBytes());
 
         // When
-        UserAdminView response = userMapper.toUserForAdminView(user, avatarsWithUsersId);
+        UserAdminResponse response = userMapper.toUserForAdminView(user, avatarsWithUsersId);
 
         // Then
         assertNotNull(response);
-        assertEquals(1L, response.getUserId());
-        assertEquals("TestUser", response.getUserName());
-        assertEquals("testuser@example.com", response.getEmail());
-        assertFalse(response.isAccountLocked());
-        assertTrue(response.isEnabled());
-        assertEquals("2023-01-01", response.getCreatedDate().toString());
-        assertEquals("2023-01-02", response.getLastModifiedDate().toString());
-        assertEquals(getAdminRole(), response.getRoleName());
-        assertArrayEquals("avatarImage".getBytes(), response.getAvatar());
+        assertEquals(1L, response.userId());
+        assertEquals("TestUser", response.userName());
+        assertEquals("testuser@example.com", response.email());
+        assertFalse(response.accountLocked());
+        assertTrue(response.enabled());
+        assertEquals("2023-01-01", response.createdDate().toString());
+        assertEquals("2023-01-02", response.lastModifiedDate().toString());
+        assertEquals(getAdminRole(), response.roleName());
+        assertArrayEquals("avatarImage".getBytes(), response.avatar());
     }
 
     @Test
@@ -83,18 +83,18 @@ class UserMapperTest {
         Map<Long, byte[]> avatarsWithUsersId = new HashMap<>();
 
         // When
-        UserAdminView response = userMapper.toUserForAdminView(user, avatarsWithUsersId);
+        UserAdminResponse response = userMapper.toUserForAdminView(user, avatarsWithUsersId);
 
         // Then
         assertNotNull(response);
-        assertEquals(2L, response.getUserId());
-        assertEquals("AnotherUser", response.getUserName());
-        assertEquals("anotheruser@example.com", response.getEmail());
-        assertTrue(response.isAccountLocked());
-        assertFalse(response.isEnabled());
-        assertEquals("2023-01-05", response.getCreatedDate().toString());
-        assertEquals("2023-01-06", response.getLastModifiedDate().toString());
-        assertEquals(getUserRole(), response.getRoleName());
-        assertNull(response.getAvatar());
+        assertEquals(2L, response.userId());
+        assertEquals("AnotherUser", response.userName());
+        assertEquals("anotheruser@example.com", response.email());
+        assertTrue(response.accountLocked());
+        assertFalse(response.enabled());
+        assertEquals("2023-01-05", response.createdDate().toString());
+        assertEquals("2023-01-06", response.lastModifiedDate().toString());
+        assertEquals(getUserRole(), response.roleName());
+        assertNull(response.avatar());
     }
 }

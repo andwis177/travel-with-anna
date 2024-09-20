@@ -2,7 +2,7 @@ import {Component, Input} from '@angular/core';
 import {MatDivider} from "@angular/material/divider";
 import {Router} from "@angular/router";
 import {NgIf} from "@angular/common";
-import {TripRequest} from "../../../../../services/models/trip-request";
+import {TripResponse} from "../../../../../services/models/trip-response";
 
 @Component({
   selector: 'app-trip-card',
@@ -16,18 +16,18 @@ import {TripRequest} from "../../../../../services/models/trip-request";
 })
 export class TripCardComponent {
 
-  private _trip: TripRequest = {};
+  private _trip: TripResponse = {};
 
   constructor(
     private router: Router,) {
   }
 
-  get trip(): TripRequest {
+  get trip(): TripResponse {
     return this._trip;
   }
 
   @Input()
-  set trip(value: TripRequest) {
+  set trip(value: TripResponse) {
     this._trip = value;
   }
 

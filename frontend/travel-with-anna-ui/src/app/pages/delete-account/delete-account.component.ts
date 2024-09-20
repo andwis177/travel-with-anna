@@ -13,8 +13,8 @@ import {UserService} from "../../services/services/user.service";
 import {LogoutService} from "../../services/logout/logout.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {Router} from "@angular/router";
-import {UserRespond} from "../../services/models/user-respond";
 import {ErrorService} from "../../services/error/error.service";
+import {UserResponse} from "../../services/models/user-response";
 
 @Component({
   selector: 'app-delete-account',
@@ -42,7 +42,7 @@ import {ErrorService} from "../../services/error/error.service";
 export class DeleteAccountComponent {
   errorMsg: Array<string> = [];
   passwordRequest: PasswordRequest = {password: '' };
-  userRespond: UserRespond = {message: ''};
+  userRespond: UserResponse = {message: ''};
 
   constructor(private userService: UserService,
               private logoutService: LogoutService,

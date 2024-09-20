@@ -12,11 +12,11 @@ import java.util.List;
 @RequestMapping("/api/exchange")
 @RequiredArgsConstructor
 public class CurrencyExchangeController {
-    private final CurrencyExchangeService currencyExchangeService;
+    private final CurrencyExchangeClient currencyExchangeClient;
 
     @GetMapping("/rates")
-    public ResponseEntity<List<CurrencyExchangeDto>> getCurrencyExchangeRates() {
-        List<CurrencyExchangeDto> exchangeDtoList = currencyExchangeService.getAllExchangeRates();
-        return ResponseEntity.ok(exchangeDtoList);
+    public ResponseEntity<List<CurrencyExchangeResponse>> getCurrencyExchangeRates() {
+        List<CurrencyExchangeResponse> currencyRates = currencyExchangeClient.getAllExchangeRates();
+        return ResponseEntity.ok(currencyRates);
     }
 }

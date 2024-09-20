@@ -104,7 +104,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExpanseItemCreator"
+                "$ref": "#/components/schemas/ExpanseForItemRequest"
               }
             }
           },
@@ -116,7 +116,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExpanseItem"
+                  "$ref": "#/components/schemas/ExpanseResponse"
                 }
               }
             }
@@ -278,7 +278,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentials"
+                "$ref": "#/components/schemas/UserCredentialsRequest"
               }
             }
           },
@@ -320,7 +320,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserRespond"
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }
@@ -415,7 +415,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ItemCreator"
+                "$ref": "#/components/schemas/ItemWithExpanseRequest"
               }
             }
           },
@@ -493,7 +493,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserCredentials"
+                  "$ref": "#/components/schemas/UserCredentialsResponse"
                 }
               }
             }
@@ -535,7 +535,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageResponseTripRequest"
+                  "$ref": "#/components/schemas/PageResponseTripResponse"
                 }
               }
             }
@@ -566,7 +566,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TripRequest"
+                  "$ref": "#/components/schemas/TripResponse"
                 }
               }
             }
@@ -622,7 +622,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ItemRequest"
+                    "$ref": "#/components/schemas/ItemResponse"
                   }
                 }
               }
@@ -654,7 +654,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExpanseItem"
+                  "$ref": "#/components/schemas/ExpanseResponse"
                 }
               }
             }
@@ -700,7 +700,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TripCurrencyValue"
+                  "$ref": "#/components/schemas/ExpanseInTripCurrency"
                 }
               }
             }
@@ -777,6 +777,46 @@
         }
       }
     },
+    "/budget/{budgetId}/expanses/{tripId}": {
+      "get": {
+        "tags": [
+          "Budget"
+        ],
+        "operationId": "getBudgetExpanses",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "budgetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetExpensesRespond"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/backpack/{backpackId}": {
       "get": {
         "tags": [
@@ -800,7 +840,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BackpackRequest"
+                  "$ref": "#/components/schemas/BackpackResponse"
                 }
               }
             }
@@ -869,7 +909,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CurrencyExchangeDto"
+                    "$ref": "#/components/schemas/CurrencyExchangeResponse"
                   }
                 }
               }
@@ -890,7 +930,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CountryNameResponse"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CountryName"
+                  }
                 }
               }
             }
@@ -955,7 +998,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageResponseUserAdminView"
+                  "$ref": "#/components/schemas/PageResponseUserAdminResponse"
                 }
               }
             }
@@ -985,7 +1028,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserAdminView"
+                  "$ref": "#/components/schemas/UserAdminResponse"
                 }
               }
             }
@@ -1039,7 +1082,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserAvatar"
+                  "$ref": "#/components/schemas/AvatarImg"
                 }
               }
             }
@@ -1069,7 +1112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserRespond"
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }
@@ -1147,7 +1190,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserRespond"
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }
@@ -1211,7 +1254,23 @@
           }
         }
       },
-      "ExpanseItem": {
+      "ExpanseForItemRequest": {
+        "type": "object",
+        "properties": {
+          "expanseItem": {
+            "$ref": "#/components/schemas/ExpanseRequest"
+          },
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ExpanseRequest": {
         "required": [
           "currency",
           "exchangeRate",
@@ -1247,19 +1306,33 @@
           }
         }
       },
-      "ExpanseItemCreator": {
+      "ExpanseResponse": {
         "type": "object",
         "properties": {
-          "expanseItem": {
-            "$ref": "#/components/schemas/ExpanseItem"
-          },
-          "tripId": {
+          "expanseId": {
             "type": "integer",
             "format": "int64"
           },
-          "itemId": {
-            "type": "integer",
-            "format": "int64"
+          "expanseName": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "paid": {
+            "type": "number"
+          },
+          "exchangeRate": {
+            "type": "number"
+          },
+          "priceInTripCurrency": {
+            "type": "number"
+          },
+          "paidInTripCurrency": {
+            "type": "number"
           }
         }
       },
@@ -1450,7 +1523,7 @@
           }
         }
       },
-      "UserCredentials": {
+      "UserCredentialsRequest": {
         "required": [
           "email",
           "userName"
@@ -1495,7 +1568,7 @@
           }
         }
       },
-      "UserRespond": {
+      "UserResponse": {
         "type": "object",
         "properties": {
           "message": {
@@ -1525,7 +1598,7 @@
           }
         }
       },
-      "ItemCreator": {
+      "ItemWithExpanseRequest": {
         "type": "object",
         "properties": {
           "item": {
@@ -1538,8 +1611,8 @@
             "minLength": 0,
             "type": "string"
           },
-          "expanseItem": {
-            "$ref": "#/components/schemas/ExpanseItem"
+          "expanseRequest": {
+            "$ref": "#/components/schemas/ExpanseRequest"
           },
           "packed": {
             "type": "boolean"
@@ -1557,7 +1630,7 @@
           }
         }
       },
-      "UserAdminEdit": {
+      "UserAdminEditRequest": {
         "type": "object",
         "properties": {
           "userId": {
@@ -1578,21 +1651,35 @@
       "UserAdminUpdateRequest": {
         "type": "object",
         "properties": {
-          "userAdminEdit": {
-            "$ref": "#/components/schemas/UserAdminEdit"
+          "userAdminEditRequest": {
+            "$ref": "#/components/schemas/UserAdminEditRequest"
           },
           "password": {
             "type": "string"
           }
         }
       },
-      "PageResponseTripRequest": {
+      "UserCredentialsResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "PageResponseTripResponse": {
         "type": "object",
         "properties": {
           "content": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TripRequest"
+              "$ref": "#/components/schemas/TripResponse"
             }
           },
           "number": {
@@ -1619,7 +1706,7 @@
           }
         }
       },
-      "TripRequest": {
+      "TripResponse": {
         "type": "object",
         "properties": {
           "tripId": {
@@ -1635,8 +1722,6 @@
             "format": "int64"
           },
           "tripName": {
-            "maxLength": 100,
-            "minLength": 0,
             "type": "string"
           },
           "startDate": {
@@ -1653,7 +1738,25 @@
           }
         }
       },
-      "TripCurrencyValue": {
+      "ItemResponse": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "item": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "string"
+          },
+          "isPacked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ExpanseInTripCurrency": {
         "type": "object",
         "properties": {
           "price": {
@@ -1667,6 +1770,10 @@
       "BudgetRequest": {
         "type": "object",
         "properties": {
+          "budgetId": {
+            "type": "integer",
+            "format": "int64"
+          },
           "currency": {
             "maxLength": 10,
             "minLength": 0,
@@ -1681,7 +1788,56 @@
           }
         }
       },
-      "BackpackRequest": {
+      "BudgetExpensesRespond": {
+        "type": "object",
+        "properties": {
+          "budgetRequest": {
+            "$ref": "#/components/schemas/BudgetRequest"
+          },
+          "expanses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpanseResponse"
+            }
+          },
+          "sumsByCurrency": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ExpanseCalculator"
+            }
+          },
+          "overallPriceInTripCurrency": {
+            "type": "number"
+          },
+          "overallPaidInTripCurrency": {
+            "type": "number"
+          },
+          "totalDebtInTripCurrency": {
+            "type": "number"
+          }
+        }
+      },
+      "ExpanseCalculator": {
+        "type": "object",
+        "properties": {
+          "totalPrice": {
+            "type": "number"
+          },
+          "totalPaid": {
+            "type": "number"
+          },
+          "totalPriceInTripCurrency": {
+            "type": "number"
+          },
+          "totalPaidInTripCurrency": {
+            "type": "number"
+          },
+          "totalDebt": {
+            "type": "number"
+          }
+        }
+      },
+      "BackpackResponse": {
         "type": "object",
         "properties": {
           "backpackId": {
@@ -1697,7 +1853,7 @@
           }
         }
       },
-      "CurrencyExchangeDto": {
+      "CurrencyExchangeResponse": {
         "type": "object",
         "properties": {
           "code": {
@@ -1714,22 +1870,11 @@
           "name": {
             "type": "string"
           },
-          "Iso2": {
+          "iso2": {
             "type": "string"
           },
-          "Iso3": {
+          "iso3": {
             "type": "string"
-          }
-        }
-      },
-      "CountryNameResponse": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CountryName"
-            }
           }
         }
       },
@@ -1741,13 +1886,13 @@
           }
         }
       },
-      "PageResponseUserAdminView": {
+      "PageResponseUserAdminResponse": {
         "type": "object",
         "properties": {
           "content": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UserAdminView"
+              "$ref": "#/components/schemas/UserAdminResponse"
             }
           },
           "number": {
@@ -1774,7 +1919,7 @@
           }
         }
       },
-      "UserAdminView": {
+      "UserAdminResponse": {
         "type": "object",
         "properties": {
           "userId": {
@@ -1813,7 +1958,7 @@
           }
         }
       },
-      "UserAvatar": {
+      "AvatarImg": {
         "type": "object",
         "properties": {
           "avatar": {

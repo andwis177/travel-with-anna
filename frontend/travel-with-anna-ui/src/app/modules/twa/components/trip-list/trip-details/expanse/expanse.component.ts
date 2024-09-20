@@ -9,7 +9,6 @@ import {MatOption, MatSelect} from "@angular/material/select";
 import {MatIconButton} from "@angular/material/button";
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {ExpanseService} from "../../../../../../services/services/expanse.service";
-import {ExpanseItem} from "../../../../../../services/models/expanse-item";
 import {FormsModule} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {GetExpanseForItem$Params} from "../../../../../../services/fn/expanse/get-expanse-for-item";
@@ -20,6 +19,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {GetExchangeRate$Params} from "../../../../../../services/fn/expanse/get-exchange-rate";
 import {GetTripCurrencyValues$Params} from "../../../../../../services/fn/expanse/get-trip-currency-values";
 import {CreateOrUpdateExpanse$Params} from "../../../../../../services/fn/expanse/create-or-update-expanse";
+import {ExpanseResponse} from "../../../../../../services/models/expanse-response";
 
 @Component({
   selector: 'app-expanse',
@@ -52,7 +52,7 @@ export class ExpanseComponent implements OnInit {
   item: string = '';
   itemId: number = 0;
 
-  expanse: ExpanseItem = {
+  expanse: ExpanseResponse = {
     expanseName: '',
     currency: '',
     price: 0,
@@ -115,7 +115,7 @@ export class ExpanseComponent implements OnInit {
 
   getExchangeRate(event: Event) {
     event.preventDefault();
-    const params : GetExchangeRate$Params = {currencyFrom: this.expanse.currency, currencyTo: this.currency};
+    const params : GetExchangeRate$Params = {currencyFrom: this.expanse.currency!, currencyTo: this.currency};
     this.expanseService.getExchangeRate(params)
       .subscribe({
         next: (rate) => {
@@ -129,7 +129,7 @@ export class ExpanseComponent implements OnInit {
   }
 
   calculateTripValue() {
-    const params: GetTripCurrencyValues$Params = {price: this.expanse.price, paid: this.expanse.paid, exchangeRate: this.expanse.exchangeRate};
+    const params: GetTripCurrencyValues$Params = {price: this.expanse.price!, paid: this.expanse.paid!, exchangeRate: this.expanse.exchangeRate!};
     this.expanseService.getTripCurrencyValues(params)
       .subscribe({
         next: (tripCurrencyValue) => {
@@ -147,11 +147,11 @@ export class ExpanseComponent implements OnInit {
     const params: CreateOrUpdateExpanse$Params = {
       body: {
         expanseItem: {
-          currency: this.expanse.currency,
-          exchangeRate: this.expanse.exchangeRate,
+          currency: this.expanse.currency!,
+          exchangeRate: this.expanse.exchangeRate!,
           expanseName: this.expanse.expanseName,
-          paid: this.expanse.paid,
-          price: this.expanse.price,
+          paid: this.expanse.paid!,
+          price: this.expanse.price!,
           paidInTripCurrency: this.expanse.paidInTripCurrency,
           priceInTripCurrency: this.expanse.priceInTripCurrency
         },
@@ -160,7 +160,7 @@ export class ExpanseComponent implements OnInit {
       }};
     this.expanseService.createOrUpdateExpanse(params)
       .subscribe({
-        next: (response) => {
+        next: () => {
           this.onClose();
         },
         error: (err) => {

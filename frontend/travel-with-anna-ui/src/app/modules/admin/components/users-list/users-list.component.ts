@@ -1,5 +1,4 @@
 import {AfterViewInit, Component, HostListener, inject, OnInit, ViewChild} from '@angular/core';
-import {PageResponseUserAdminView} from "../../../../services/models/page-response-user-admin-view";
 import {LiveAnnouncer} from "@angular/cdk/a11y";
 import {
   MatCell,
@@ -11,7 +10,6 @@ import {
 } from "@angular/material/table";
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
 import {SelectionModel} from "@angular/cdk/collections";
-import {UserAdminView} from "../../../../services/models/user-admin-view";
 import {MatDialog} from "@angular/material/dialog";
 import {AdminService} from "../../../../services/services/admin.service";
 import {SharedService} from "../../../../services/shared/shared.service";
@@ -28,6 +26,8 @@ import {FormsModule} from "@angular/forms";
 import {UserListButtonsComponent} from "./user-list-buttons/user-list-buttons.component";
 import {LogoComponent} from "../../../components/menu/logo/logo.component";
 import {UserComponent} from "../../../components/menu/user/user.component";
+import {PageResponseUserAdminResponse} from "../../../../services/models/page-response-user-admin-response";
+import {UserAdminResponse} from "../../../../services/models/user-admin-response";
 
 @Component({
   selector: 'app-users-list',
@@ -62,7 +62,7 @@ import {UserComponent} from "../../../components/menu/user/user.component";
 export class UsersListComponent implements OnInit, AfterViewInit {
 
   errorMsg: Array<string> = [];
-  userAdminViewList: PageResponseUserAdminView = {
+  userAdminViewList: PageResponseUserAdminResponse = {
     content: [],
     first: false,
     last: false,
@@ -91,7 +91,7 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   ];
   dataSource = new MatTableDataSource<any>([]);
   @ViewChild(MatSort) sort!: MatSort;
-  selection = new SelectionModel<UserAdminView>(false, []);
+  selection = new SelectionModel<UserAdminResponse>(false, []);
   identifier: string = '';
   currentRowIndex = -1;
 
@@ -99,7 +99,6 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   constructor(public dialog: MatDialog,
               private adminService: AdminService,
               private shareService: SharedService,
-              private router: Router
   ) {
   }
 
@@ -184,7 +183,7 @@ export class UsersListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  toggleRow(row: UserAdminView) {
+  toggleRow(row: UserAdminResponse) {
     this.currentRowIndex = this.dataSource.data.indexOf(row);
     this.selection.clear();
     this.selection.select(row);

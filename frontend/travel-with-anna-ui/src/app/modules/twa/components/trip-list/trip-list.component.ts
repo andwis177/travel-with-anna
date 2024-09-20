@@ -3,9 +3,9 @@ import {TripService} from "../../../../services/services/trip.service";
 import {NgForOf} from "@angular/common";
 import {TripCardComponent} from "./trip-card/trip-card.component";
 import {TripListButtons} from "./trip-list-buttons/trip-list-buttons.component";
-import {PageResponseTripRequest} from "../../../../services/models/page-response-trip-request";
 import {LogoComponent} from "../../../components/menu/logo/logo.component";
 import {UserComponent} from "../../../components/menu/user/user.component";
+import {PageResponseTripResponse} from "../../../../services/models/page-response-trip-response";
 
 @Component({
   selector: 'app-trip-list',
@@ -22,7 +22,7 @@ import {UserComponent} from "../../../components/menu/user/user.component";
 })
 export class TripListComponent implements OnInit  {
   errorMsg: string[] = [];
-  tripResponse: PageResponseTripRequest = {};
+  tripResponse: PageResponseTripResponse = {};
   page: number = 0;
   size: number = 20;
 

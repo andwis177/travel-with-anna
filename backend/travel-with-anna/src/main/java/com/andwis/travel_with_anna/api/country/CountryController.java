@@ -13,16 +13,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CountryController {
 
-    private final CountryService countryService;
+    private final CountryClient countryClient;
 
     @GetMapping("/names-all")
-    public CountryNameResponse findAllCountryNames() {
-        return countryService.findAllCountryNames();
+    public ResponseEntity<List<CountryName>> findAllCountryNames() {
+        List<CountryName> countryNames = countryClient.fetchAllCountryNames();
+        return ResponseEntity.ok(countryNames);
     }
 
     @GetMapping("/currencies-all")
     public ResponseEntity<List<CountryCurrency>> findAllCountryCurrencies() {
-        List<CountryCurrency> currencies = countryService.findAllCurrencies();
+        List<CountryCurrency> currencies = countryClient.fetchAllCurrencies();
         return  ResponseEntity.ok(currencies);
     }
 }

@@ -28,7 +28,6 @@ import {
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
 import {SelectionModel} from "@angular/cdk/collections";
 import {LiveAnnouncer} from "@angular/cdk/a11y";
-import {BackpackRequest} from "../../../../../../services/models/backpack-request";
 import {MatTooltip} from "@angular/material/tooltip";
 import {ItemRequest} from "../../../../../../services/models/item-request";
 import {MatCheckbox} from "@angular/material/checkbox";
@@ -41,6 +40,8 @@ import {ExpanseComponent} from "../expanse/expanse.component";
 import {ErrorService} from "../../../../../../services/error/error.service";
 import {LogoComponent} from "../../../../../components/menu/logo/logo.component";
 import {UserComponent} from "../../../../../components/menu/user/user.component";
+import {ItemResponse} from "../../../../../../services/models/item-response";
+import {BackpackResponse} from "../../../../../../services/models/backpack-response";
 
 @Component({
   selector: 'app-backpack',
@@ -89,13 +90,13 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   backpackId: number;
   tripId: number;
   tripCurrency: string = '';
-  backpackRequest: BackpackRequest = {};
-  items: ItemRequest[] = [];
+  backpackRequest: BackpackResponse = {};
+  items: ItemResponse[] = [];
   itemRequest: ItemRequest = {itemId: -1, item: "", packed: false, qty: '1'};
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
-    'packed',
+    'isPacked',
     'item',
     'qty',
     'action'

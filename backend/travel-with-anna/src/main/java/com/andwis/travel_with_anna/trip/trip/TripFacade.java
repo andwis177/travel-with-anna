@@ -14,11 +14,11 @@ public class TripFacade {
         return tripMgr.createTrip(request, connectedUser);
     }
 
-    public PageResponse<TripRequest> getAllOwnersTrips(int page, int size, Authentication connectedUser) {
+    public PageResponse<TripResponse> getAllOwnersTrips(int page, int size, Authentication connectedUser) {
         return tripMgr.getAllOwnersTrips(page, size, connectedUser);
     }
 
-    public TripRequest getTripById(Long tripId) {
+    public TripResponse getTripById(Long tripId) {
         return tripMgr.getTripById(tripId);
     }
 

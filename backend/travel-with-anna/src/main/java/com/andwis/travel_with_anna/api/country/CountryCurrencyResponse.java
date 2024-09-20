@@ -1,6 +1,8 @@
 package com.andwis.travel_with_anna.api.country;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 

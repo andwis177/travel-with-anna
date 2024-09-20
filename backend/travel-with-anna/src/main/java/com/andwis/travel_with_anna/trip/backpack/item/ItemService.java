@@ -19,17 +19,17 @@ public class ItemService {
         return itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
     }
 
-    public Item createItem(ItemCreator itemCreator) {
+    public Item createItem(ItemWithExpanseRequest itemWithExpanseRequest) {
         return Item.builder()
-                .item(itemCreator.getItem())
-                .quantity(itemCreator.getQty())
-                .isPacked(itemCreator.isPacked())
+                .item(itemWithExpanseRequest.getItem())
+                .quantity(itemWithExpanseRequest.getQty())
+                .isPacked(itemWithExpanseRequest.isPacked())
                 .build();
     }
 
-    public List<ItemRequest> getAllItemsByBackpackId(Long backpackId) {
+    public List<ItemResponse> getAllItemsByBackpackId(Long backpackId) {
         return itemRepository.findAllByBackpackId(backpackId).stream()
-                .map(ItemMapper::toItemRequest)
+                .map(ItemMapper::toItemResponse)
                 .toList();
     }
 

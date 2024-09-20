@@ -4,6 +4,7 @@ import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.trip.TripRepository;
 import com.andwis.travel_with_anna.user.*;
+import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,7 +68,6 @@ class AdminControllerTest {
     private Role retrivedAdminRole;
     private User adminUser;
 
-
     @BeforeEach
     void setup() {
         Role role = new Role();
@@ -75,8 +75,6 @@ class AdminControllerTest {
         role.setAuthority(getUserAuthority());
         Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
-
-
 
         user = User.builder()
                 .userName("userName")
@@ -117,19 +115,19 @@ class AdminControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "Admin")
     void shouldGetAllUsers() throws Exception {
         // Getter
-        UserAdminView userResponse = UserAdminView.builder()
-                .userId(1L)
-                .userName("TestUser")
-                .email("testuser@example.com")
-                .accountLocked(false)
-                .enabled(true)
-                .createdDate(LocalDate.of(2024, 8, 19))
-                .lastModifiedDate(LocalDate.of(2024, 8, 19))
-                .roleName("USER")
-                .avatar(null)
-                .build();
+        UserAdminResponse userResponse = new UserAdminResponse(
+                1L,
+                "TestUser",
+                "testuser@example.com",
+                false,
+                true,
+                LocalDate.of(2024, 8, 19),
+                LocalDate.of(2024, 8, 19),
+                "USER",
+                null
+        );
 
-        PageResponse<UserAdminView> response = new PageResponse<>(
+        PageResponse<UserAdminResponse> response = new PageResponse<>(
                 List.of(userResponse),
                 0, 10, 1, 1, true, true
         );
@@ -177,17 +175,17 @@ class AdminControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "Admin")
     void shouldGetUserAdminViewByIdentifier() throws Exception {
         // Given
-        UserAdminView userResponse = UserAdminView.builder()
-                .userId(1L)
-                .userName("TestUser")
-                .email("email@example.com")
-                .accountLocked(false)
-                .enabled(true)
-                .createdDate(LocalDate.of(2024, 8, 19))
-                .lastModifiedDate(LocalDate.of(2024, 9, 19))
-                .roleName(getUserRole())
-                .avatar(new byte[0])
-                .build();
+        UserAdminResponse userResponse = new UserAdminResponse(
+                1L,
+                "TestUser",
+                "email@example.com",
+                false,
+                true,
+                LocalDate.of(2024, 8, 19),
+                LocalDate.of(2024, 9, 19),
+                getUserRole(),
+                new byte[0]
+        );
 
         String identifier = "TestUser";
         String jsonContent = objectMapper.writeValueAsString(userResponse);
@@ -206,14 +204,12 @@ class AdminControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "Admin")
     void shouldGetAvatar() throws Exception {
         // Given
-
-        byte[] avatarBytes = hexToBytes(AvatarImg.DEFAULT.getImg());
-        UserAvatar userAvatar = UserAvatar.builder()
-                .avatar(avatarBytes)
-                .build();
+        byte[] avatarBytes = hexToBytes(AvatarDefaultImg.DEFAULT.getImg());
+        AvatarImg userAvatar = new AvatarImg(
+                avatarBytes
+        );
         String jsonContent = objectMapper.writeValueAsString(userAvatar);
         when(adminService.getAvatar(any(Long.class))).thenReturn(userAvatar);
-
 
         // When & Then
         mockMvc.perform(get("/admin/avatar/{userId}", 1L)
@@ -226,13 +222,12 @@ class AdminControllerTest {
     @WithMockUser(username = "adminEmail@example.com", authorities = "Admin")
     void shouldUpdateUser() throws Exception {
         // Given
-        UserAdminEdit userAdminEdit = new UserAdminEdit(
+        UserAdminEditRequest userAdminEdit = new UserAdminEditRequest(
                 1L ,true, false, getUserRole());
-
 
         UserAdminUpdateRequest request = UserAdminUpdateRequest.builder()
                 .password("adminPassword")
-                .userAdminEdit(userAdminEdit)
+                .userAdminEditRequest(userAdminEdit)
                 .build();
 
         User updatedUser = User.builder()
@@ -265,7 +260,7 @@ class AdminControllerTest {
     void shouldDeleteUser() throws Exception {
         // Given
         Long userId = 1L;
-        UserRespond userRespond = UserRespond.builder()
+        UserResponse userRespond = UserResponse.builder()
                 .message("User deleted successfully")
                 .build();
         UserAdminDeleteRequest request = new UserAdminDeleteRequest(userId, "password");
@@ -300,10 +295,8 @@ class AdminControllerTest {
                 .andExpect(content().json(jsonContent));
     }
 
-
     private Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
         return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }
-
 }

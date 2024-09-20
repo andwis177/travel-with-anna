@@ -1,6 +1,4 @@
 import {Component, HostListener, OnInit, signal} from '@angular/core';
-import {UserAdminView} from "../../../../../services/models/user-admin-view";
-import {UserAdminEdit} from "../../../../../services/models/user-admin-edit";
 import {UserAdminUpdateRequest} from "../../../../../services/models/user-admin-update-request";
 import {AdminService} from "../../../../../services/services/admin.service";
 import {MatDialogRef} from "@angular/material/dialog";
@@ -19,6 +17,8 @@ import {MatOption, MatSelect} from "@angular/material/select";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatDivider} from "@angular/material/divider";
 import {MatInput} from "@angular/material/input";
+import {UserAdminResponse} from "../../../../../services/models/user-admin-response";
+import {UserAdminEditRequest} from "../../../../../services/models/user-admin-edit-request";
 
 @Component({
   selector: 'app-edit',
@@ -47,8 +47,8 @@ export class EditComponent implements OnInit{
   errorMsg: Array<string> = [];
   userId: number = 0;
   roles: Array<string> = [];
-  userAdminView: UserAdminView = {};
-  userAdminEdit: UserAdminEdit = {userId: 0, accountLocked: false, enabled: true, roleName: ''};
+  userAdminResponse: UserAdminResponse = {};
+  userAdminEditRequest: UserAdminEditRequest = {userId: 0, accountLocked: false, enabled: true, roleName: ''};
   passwordRequest: string = '';
   userAdminUpdateRequest: UserAdminUpdateRequest = {};
 
@@ -86,7 +86,7 @@ export class EditComponent implements OnInit{
           const params: GetUserAdminViewByIdentifier$Params = {identifier: userId.toString()};
           this.adminService.getUserAdminViewByIdentifier(params).subscribe({
             next: (data) => {
-              this.userAdminView = data;
+              this.userAdminResponse = data;
               this.getRoles();
             },
             error: (err) => {
@@ -121,12 +121,12 @@ export class EditComponent implements OnInit{
 
   update() {
     this.errorMsg = [];
-    this.userAdminEdit.userId = this.userAdminView.userId;
-    this.userAdminEdit.accountLocked = this.userAdminView.accountLocked;
-    this.userAdminEdit.enabled = this.userAdminView.enabled;
-    this.userAdminEdit.roleName = this.userAdminView.roleName;
+    this.userAdminEditRequest.userId = this.userAdminResponse.userId;
+    this.userAdminEditRequest.accountLocked = this.userAdminResponse.accountLocked;
+    this.userAdminEditRequest.enabled = this.userAdminResponse.enabled;
+    this.userAdminEditRequest.roleName = this.userAdminResponse.roleName;
     this.userAdminUpdateRequest.password = this.passwordRequest;
-    this.userAdminUpdateRequest.userAdminEdit = this.userAdminEdit;
+    this.userAdminUpdateRequest.userAdminEditRequest = this.userAdminEditRequest;
     const params: UpdateUser$Params = {body: this.userAdminUpdateRequest};
     this.adminService.updateUser(params).subscribe({
       next: () => {

@@ -11,14 +11,14 @@ import { StrictHttpResponse } from '../strict-http-response';
 
 import { createOrUpdateExpanse } from '../fn/expanse/create-or-update-expanse';
 import { CreateOrUpdateExpanse$Params } from '../fn/expanse/create-or-update-expanse';
-import { ExpanseItem } from '../models/expanse-item';
+import { ExpanseInTripCurrency } from '../models/expanse-in-trip-currency';
+import { ExpanseResponse } from '../models/expanse-response';
 import { getExchangeRate } from '../fn/expanse/get-exchange-rate';
 import { GetExchangeRate$Params } from '../fn/expanse/get-exchange-rate';
 import { getExpanseForItem } from '../fn/expanse/get-expanse-for-item';
 import { GetExpanseForItem$Params } from '../fn/expanse/get-expanse-for-item';
 import { getTripCurrencyValues } from '../fn/expanse/get-trip-currency-values';
 import { GetTripCurrencyValues$Params } from '../fn/expanse/get-trip-currency-values';
-import { TripCurrencyValue } from '../models/trip-currency-value';
 
 @Injectable({ providedIn: 'root' })
 export class ExpanseService extends BaseService {
@@ -35,7 +35,7 @@ export class ExpanseService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  createOrUpdateExpanse$Response(params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseItem>> {
+  createOrUpdateExpanse$Response(params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
     return createOrUpdateExpanse(this.http, this.rootUrl, params, context);
   }
 
@@ -45,9 +45,9 @@ export class ExpanseService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  createOrUpdateExpanse(params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<ExpanseItem> {
+  createOrUpdateExpanse(params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<ExpanseResponse> {
     return this.createOrUpdateExpanse$Response(params, context).pipe(
-      map((r: StrictHttpResponse<ExpanseItem>): ExpanseItem => r.body)
+      map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
     );
   }
 
@@ -60,7 +60,7 @@ export class ExpanseService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getExpanseForItem$Response(params: GetExpanseForItem$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseItem>> {
+  getExpanseForItem$Response(params: GetExpanseForItem$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
     return getExpanseForItem(this.http, this.rootUrl, params, context);
   }
 
@@ -70,9 +70,9 @@ export class ExpanseService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getExpanseForItem(params: GetExpanseForItem$Params, context?: HttpContext): Observable<ExpanseItem> {
+  getExpanseForItem(params: GetExpanseForItem$Params, context?: HttpContext): Observable<ExpanseResponse> {
     return this.getExpanseForItem$Response(params, context).pipe(
-      map((r: StrictHttpResponse<ExpanseItem>): ExpanseItem => r.body)
+      map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
     );
   }
 
@@ -85,7 +85,7 @@ export class ExpanseService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getTripCurrencyValues$Response(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<StrictHttpResponse<TripCurrencyValue>> {
+  getTripCurrencyValues$Response(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseInTripCurrency>> {
     return getTripCurrencyValues(this.http, this.rootUrl, params, context);
   }
 
@@ -95,9 +95,9 @@ export class ExpanseService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getTripCurrencyValues(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<TripCurrencyValue> {
+  getTripCurrencyValues(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<ExpanseInTripCurrency> {
     return this.getTripCurrencyValues$Response(params, context).pipe(
-      map((r: StrictHttpResponse<TripCurrencyValue>): TripCurrencyValue => r.body)
+      map((r: StrictHttpResponse<ExpanseInTripCurrency>): ExpanseInTripCurrency => r.body)
     );
   }
 

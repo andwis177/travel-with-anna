@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.trip.backpack;
 
-import com.andwis.travel_with_anna.trip.backpack.item.ItemCreator;
+import com.andwis.travel_with_anna.trip.backpack.item.ItemWithExpanseRequest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,16 +21,16 @@ public class BackpackController {
     @PatchMapping("/{backpackId}/item-add")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> addItemToBackpack(
-            @RequestBody @Valid ItemCreator itemCreator,
+            @RequestBody @Valid ItemWithExpanseRequest itemWithExpanseRequest,
             @PathVariable("backpackId") Long backpackId) {
-        facade.addItemToBackpack(backpackId, itemCreator);
+        facade.addItemToBackpack(backpackId, itemWithExpanseRequest);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     @GetMapping("/{backpackId}")
-    public ResponseEntity<BackpackRequest> getBackpackById(@PathVariable("backpackId") Long backpackId) {
-        BackpackRequest backpackDto = facade.getBackpackById(backpackId);
-        return ResponseEntity.ok(backpackDto);
+    public ResponseEntity<BackpackResponse> getBackpackById(@PathVariable("backpackId") Long backpackId) {
+        BackpackResponse response = facade.getBackpackById(backpackId);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/delete/{itemId}/item")

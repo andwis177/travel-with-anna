@@ -17,14 +17,14 @@ public class ExpanseController {
     private final ExpanseFacade facade;
 
     @PostMapping("/save")
-    public ResponseEntity<ExpanseItem> createOrUpdateExpanse(@RequestBody @Valid ExpanseItemCreator creator) {
-        ExpanseItem respond = facade.createOrUpdateExpanse(creator);
+    public ResponseEntity<ExpanseResponse> createOrUpdateExpanse(@RequestBody @Valid ExpanseForItemRequest creator) {
+        ExpanseResponse respond = facade.createOrUpdateExpanse(creator);
         return ResponseEntity.status(HttpStatus.CREATED).body(respond);
     }
 
     @GetMapping("/{itemId}/expanse")
-    public ResponseEntity<ExpanseItem> getExpanseForItem(@PathVariable("itemId") Long itemId) {
-        ExpanseItem expanse = facade.getExpanseForItem(itemId);
+    public ResponseEntity<ExpanseResponse> getExpanseForItem(@PathVariable("itemId") Long itemId) {
+        ExpanseResponse expanse = facade.getExpanseForItem(itemId);
         return ResponseEntity.ok(expanse);
     }
 
@@ -35,9 +35,9 @@ public class ExpanseController {
     }
 
     @GetMapping("/trip-currency-values")
-    public ResponseEntity<TripCurrencyValue> getTripCurrencyValues(
+    public ResponseEntity<ExpanseInTripCurrency> getTripCurrencyValues(
             @RequestParam BigDecimal price, @RequestParam BigDecimal paid, @RequestParam BigDecimal exchangeRate) {
-        TripCurrencyValue tripCurrencyValue = facade.getTripCurrencyValues(price, paid, exchangeRate);
-        return ResponseEntity.ok(tripCurrencyValue);
+        ExpanseInTripCurrency expanseInTripCurrency = facade.getExpanseInTripCurrency(price, paid, exchangeRate);
+        return ResponseEntity.ok(expanseInTripCurrency);
     }
 }

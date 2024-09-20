@@ -2,9 +2,9 @@ import {Component, Input, OnInit} from '@angular/core';
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatDialog} from "@angular/material/dialog";
 import {BackpackComponent} from "../backpack/backpack.component";
-import {TripRequest} from "../../../../../../services/models/trip-request";
 import {BudgetService} from "../../../../../../services/services/budget.service";
 import {GetBudgetById$Params} from "../../../../../../services/fn/budget/get-budget-by-id";
+import {TripResponse} from "../../../../../../services/models/trip-response";
 
 @Component({
   selector: 'app-trip-details-buttons',
@@ -16,7 +16,7 @@ import {GetBudgetById$Params} from "../../../../../../services/fn/budget/get-bud
   styleUrl: './trip-details-buttons.component.scss'
 })
 export class TripDetailsButtonsComponent implements OnInit {
-  @Input()_trip: TripRequest = {};
+  @Input()_trip: TripResponse = {};
   tripCurrency: string = '';
 
   constructor(public dialog: MatDialog,
@@ -59,5 +59,9 @@ export class TripDetailsButtonsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log('Dialog closed, result:', result);
     });
+  }
+
+  openBudget($event: Event) {
+    $event.stopPropagation();
   }
 }

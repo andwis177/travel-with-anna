@@ -7,13 +7,13 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { PasswordRequest } from '../../models/password-request';
-import { UserRespond } from '../../models/user-respond';
+import { UserResponse } from '../../models/user-response';
 
 export interface Delete$Params {
       body: PasswordRequest
 }
 
-export function delete$(http: HttpClient, rootUrl: string, params: Delete$Params, context?: HttpContext): Observable<StrictHttpResponse<UserRespond>> {
+export function delete$(http: HttpClient, rootUrl: string, params: Delete$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
   const rb = new RequestBuilder(rootUrl, delete$.PATH, 'delete');
   if (params) {
     rb.body(params.body, 'application/json');
@@ -24,7 +24,7 @@ export function delete$(http: HttpClient, rootUrl: string, params: Delete$Params
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<UserRespond>;
+      return r as StrictHttpResponse<UserResponse>;
     })
   );
 }

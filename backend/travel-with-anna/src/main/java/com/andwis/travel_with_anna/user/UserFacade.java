@@ -12,21 +12,20 @@ import org.springframework.stereotype.Service;
 public class UserFacade {
     private final UserService userService;
 
-    public UserCredentials getCredentials(String email) {
+    public UserCredentialsResponse getCredentials(String email) {
         return userService.getCredentials(email);
     }
 
-    public AuthenticationResponse updateUserExecution(UserCredentials userCredentials, Authentication connectedUser) {
+    public AuthenticationResponse updateUserExecution(UserCredentialsRequest userCredentials, Authentication connectedUser) {
         return userService.updateUserExecution(userCredentials, connectedUser);
     }
 
-    public UserRespond changePassword(ChangePasswordRequest request, Authentication connectedUser) {
+    public UserResponse changePassword(ChangePasswordRequest request, Authentication connectedUser) {
         return userService.changePassword(request, connectedUser);
     }
 
-    public UserRespond deleteConnectedUser(PasswordRequest request, Authentication connectedUser)
+    public UserResponse deleteConnectedUser(PasswordRequest request, Authentication connectedUser)
             throws UsernameNotFoundException, WrongPasswordException {
         return userService.deleteConnectedUser(request, connectedUser);
     }
-
 }

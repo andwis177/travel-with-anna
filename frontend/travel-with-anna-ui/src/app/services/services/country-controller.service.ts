@@ -10,7 +10,7 @@ import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
 import { CountryCurrency } from '../models/country-currency';
-import { CountryNameResponse } from '../models/country-name-response';
+import { CountryName } from '../models/country-name';
 import { findAllCountryCurrencies } from '../fn/country-controller/find-all-country-currencies';
 import { FindAllCountryCurrencies$Params } from '../fn/country-controller/find-all-country-currencies';
 import { findAllCountryNames } from '../fn/country-controller/find-all-country-names';
@@ -31,7 +31,7 @@ export class CountryControllerService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryNames$Response(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<CountryNameResponse>> {
+  findAllCountryNames$Response(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CountryName>>> {
     return findAllCountryNames(this.http, this.rootUrl, params, context);
   }
 
@@ -41,9 +41,9 @@ export class CountryControllerService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryNames(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<CountryNameResponse> {
+  findAllCountryNames(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<Array<CountryName>> {
     return this.findAllCountryNames$Response(params, context).pipe(
-      map((r: StrictHttpResponse<CountryNameResponse>): CountryNameResponse => r.body)
+      map((r: StrictHttpResponse<Array<CountryName>>): Array<CountryName> => r.body)
     );
   }
 

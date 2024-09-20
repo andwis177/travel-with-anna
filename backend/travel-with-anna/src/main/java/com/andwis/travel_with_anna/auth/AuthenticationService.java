@@ -9,7 +9,7 @@ import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleService;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserCredentials;
+import com.andwis.travel_with_anna.user.UserCredentialsResponse;
 import com.andwis.travel_with_anna.user.UserService;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.user.token.Token;
@@ -135,10 +135,10 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticationWithCredentials(AuthenticationRequest request) throws WrongPasswordException {
         AuthenticationResponse response = authenticate(request);
-        UserCredentials userCredentials = userService.getCredentials(request.getEmail());
-        response.setUserName(userCredentials.getUserName());
-        response.setEmail(userCredentials.getEmail());
-        response.setRole(userCredentials.getRole());
+        UserCredentialsResponse userCredentials = userService.getCredentials(request.getEmail());
+        response.setUserName(userCredentials.userName());
+        response.setEmail(userCredentials.email());
+        response.setRole(userCredentials.role());
         return response;
     }
 

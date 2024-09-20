@@ -40,9 +40,9 @@ application:
 
 my_apis:
   country:
-    country_url: "https://mock-url-for-test"
+    country_url: ${API_COUNTRY}
   currency:
-    currency_url: "https://mock-currency-url"
+    currency_url: ${API_CURRENCY}
     header:
       apikey: "test-api-key"
 

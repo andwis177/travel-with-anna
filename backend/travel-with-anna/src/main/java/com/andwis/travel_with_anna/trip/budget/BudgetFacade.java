@@ -15,4 +15,8 @@ public class BudgetFacade {
     public BudgetRequest getBudgetById(Long budgetId) {
         return budgetService.getBudgetById(budgetId);
     }
+
+    public BudgetExpensesRespond getBudgetExpanses(Long tripId, Long budgetId) {
+        return budgetService.getBudgetExpanses(tripId, budgetId);
+    }
 }

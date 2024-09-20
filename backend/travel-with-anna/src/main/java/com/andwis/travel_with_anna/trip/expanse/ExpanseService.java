@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.trip.expanse;
 
 import com.andwis.travel_with_anna.api.currency.*;
 import com.andwis.travel_with_anna.handler.exception.CurrencyNotProvidedException;
+import com.andwis.travel_with_anna.handler.exception.ItemNotFoundException;
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
 import com.andwis.travel_with_anna.trip.backpack.item.ItemService;
 import com.andwis.travel_with_anna.trip.trip.Trip;
@@ -22,7 +23,7 @@ public class ExpanseService {
 
     private final ExpanseRepository expanseRepository;
     private final CurrencyRepository currencyRepository;
-    private final CurrencyExchangeService currencyExchangeService;
+    private final CurrencyExchangeClient currencyExchangeService;
     private final TripService tripService;
     private final ItemService itemService;
 
@@ -34,7 +35,7 @@ public class ExpanseService {
         return currencyRepository.findByCode(code).orElseThrow(() -> new CurrencyNotProvidedException(code));
     }
 
-    public ExpanseItem createOrUpdateExpanse(ExpanseItemCreator expanseCreator) {
+    public ExpanseResponse createOrUpdateExpanse(ExpanseForItemRequest expanseCreator) {
         Item item = itemService.findById(expanseCreator.itemId());
         Expanse expanse;
         if (item.getExpanse() != null) {
@@ -42,31 +43,29 @@ public class ExpanseService {
         } else {
             expanse = createNewItemExpanse(expanseCreator, item);
         }
-        ExpanseItem respond = ExpanseMapper.mapToExpanseItem(expanse);
-        respond.setPriceInTripCurrency(expanse.getPriceInTripCurrency());
-        respond.setPaidInTripCurrency(expanse.getPaidInTripCurrency());
-        return respond;
+        return ExpanseMapper.mapToExpanseItem(expanse);
     }
 
     private Expanse createNewItemExpanse(
-            ExpanseItemCreator expanseCreator, Item item) {
+            ExpanseForItemRequest request,
+            Item item
+    ) {
         Expanse expanse = ExpanseMapper.mapToExpanse(
-                expanseCreator.expanseItem());
+                request.expanseItem());
 
         Trip trip = tripService.getTripById(
-                expanseCreator.tripId());
+                request.tripId());
         trip.addExpanse(expanse);
-        expanse.setItem(item);
-        item.setExpanse(expanse);
+        item.addExpanse(expanse);
 
         saveExpanse(expanse);
         return expanse;
     }
 
     private Expanse updateItemExpanse(
-            ExpanseItemCreator expanseCreator, Item item) {
+            ExpanseForItemRequest expanseCreator, Item item) {
         Expanse expanse = item.getExpanse();
-        ExpanseItem expanseItem = expanseCreator.expanseItem();
+        ExpanseRequest expanseItem = expanseCreator.expanseItem();
         expanse.setExpanseName(expanseItem.getExpanseName());
         expanse.setCurrency(expanseItem.getCurrency());
         expanse.setPrice(expanseItem.getPrice());
@@ -76,24 +75,26 @@ public class ExpanseService {
         return expanse;
     }
 
-    public ExpanseItem getExpanseById(Long expanseId) {
+    public ExpanseResponse getExpanseById(Long expanseId) {
         Expanse expanse = expanseRepository.findById(expanseId).orElseThrow();
-        ExpanseItem expanseItem = ExpanseMapper.mapToExpanseItem(expanse);
-        expanseItem.setPriceInTripCurrency(expanse.getPriceInTripCurrency());
-        expanseItem.setPaidInTripCurrency(expanse.getPaidInTripCurrency());
-        return expanseItem;
+        return ExpanseMapper.mapToExpanseItem(expanse);
     }
 
-    public ExpanseItem getExpanseForItem(Long itemId) {
+    public List<ExpanseResponse> getExpansesForTrip(Long tripId) {
+        List<Expanse> expanses = expanseRepository.findByTripId(tripId);
+        return ExpanseMapper.mapToExpanseItemList(expanses);
+    }
+
+    public ExpanseResponse getExpanseForItem(Long itemId) {
         if (itemId == null || itemId == 0) {
             return null;
         }
-        Item item = itemService.findById(itemId);
         try{
+            Item item = itemService.findById(itemId);
             Long expanseId = item.getExpanse().getExpanseId();
 
             return getExpanseById(expanseId);
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | ItemNotFoundException e) {
             return null;
         }
     }
@@ -109,9 +110,12 @@ public class ExpanseService {
     }
 
     private BigDecimal calculateExchangeRate(String currencyFrom, String currencyTo) {
-        CurrencyExchange currencyFromExchange = getCurrencyExchangeByCode(currencyFrom);
-        CurrencyExchange currencyToExchange = getCurrencyExchangeByCode(currencyTo);
-        if (currencyFromExchange == null || currencyToExchange == null) {
+        CurrencyExchange currencyFromExchange;
+        CurrencyExchange currencyToExchange;
+        try {
+            currencyFromExchange = getCurrencyExchangeByCode(currencyFrom);
+            currencyToExchange = getCurrencyExchangeByCode(currencyTo);
+        } catch (CurrencyNotProvidedException e) {
             return null;
         }
         BigDecimal getUSD = BigDecimal.ONE.divide(currencyFromExchange.getExchangeValue(), 12, RoundingMode.HALF_UP);
@@ -138,14 +142,14 @@ public class ExpanseService {
 
     private void saveAllCurrencyExchange() {
         currencyRepository.deleteAll();
-        List<CurrencyExchangeDto> currencyApiFetch = currencyExchangeService.getAllExchangeRates();
+        List<CurrencyExchangeResponse> currencyApiFetch = currencyExchangeService.getAllExchangeRates();
         List<CurrencyExchange> currencyExchangeList = currencyApiFetch.stream()
                 .map(CurrencyExchangeMapper::mapToCurrencyExchange)
                 .toList();
         currencyRepository.saveAll(currencyExchangeList);
     }
 
-    public TripCurrencyValue getTripCurrencyValues(BigDecimal price, BigDecimal paid, BigDecimal exchangeRate) {
+    public ExpanseInTripCurrency getExpanseInTripCurrency(BigDecimal price, BigDecimal paid, BigDecimal exchangeRate) {
 
         BigDecimal priceInTripCurrency = calculatePriceInTripCurrency(price, exchangeRate);
         priceInTripCurrency = priceInTripCurrency.setScale(2, RoundingMode.HALF_UP);
@@ -153,11 +157,10 @@ public class ExpanseService {
         BigDecimal paidInTripCurrency = calculatePriceInTripCurrency(paid, exchangeRate);
         paidInTripCurrency = paidInTripCurrency.setScale(2, RoundingMode.HALF_UP);
 
-        return new TripCurrencyValue(priceInTripCurrency, paidInTripCurrency);
+        return new ExpanseInTripCurrency(priceInTripCurrency, paidInTripCurrency);
     }
 
     private BigDecimal calculatePriceInTripCurrency(BigDecimal value, BigDecimal exchangeRate) {
         return value.multiply(exchangeRate);
     }
-
 }

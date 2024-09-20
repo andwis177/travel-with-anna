@@ -7,6 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class UserAdminUpdateRequest {
-    private UserAdminEdit userAdminEdit;
+    private UserAdminEditRequest userAdminEditRequest;
     private String password;
 }

@@ -193,18 +193,18 @@ class UserServiceTest {
     void testGetCredentials() {
         // Given
         // When
-        UserCredentials credentials = userService.getCredentials(user.getEmail());
+        UserCredentialsResponse credentials = userService.getCredentials(user.getEmail());
 
         // Then
         assertNotNull(credentials);
-        assertEquals(user.getEmail(), credentials.getEmail());
-        assertEquals(user.getUserName(), credentials.getUserName());
+        assertEquals(user.getEmail(), credentials.email());
+        assertEquals(user.getUserName(), credentials.userName());
     }
 
     @Test
     void testUpdateUserExecution_Success() {
         // Given
-        UserCredentials userCredentials = UserCredentials.builder()
+        UserCredentialsRequest userCredentials = UserCredentialsRequest.builder()
                 .email("newEmail@example.com")
                 .userName("newUserName")
                 .password("password")
@@ -226,7 +226,7 @@ class UserServiceTest {
     @Test
     void testUpdateUserExecution_UserExistsByEmail() {
         // Given
-        UserCredentials userCredentials = UserCredentials.builder()
+        UserCredentialsRequest userCredentials = UserCredentialsRequest.builder()
                 .email("email2@example.com")
                 .userName("newUserName")
                 .password("password")
@@ -240,7 +240,7 @@ class UserServiceTest {
     @Test
     void testUpdateUserExecution_UserExistsByUsername() {
         // Given
-        UserCredentials userCredentials = UserCredentials.builder()
+        UserCredentialsRequest userCredentials = UserCredentialsRequest.builder()
                 .email("email@example.com")
                 .userName("userName2")
                 .password("password")
@@ -254,7 +254,7 @@ class UserServiceTest {
     @Test
     void testUpdateUserExecution_PasswordMismatch() {
         // Given
-        UserCredentials userCredentials = UserCredentials.builder()
+        UserCredentialsRequest userCredentials = UserCredentialsRequest.builder()
                 .email("newEmail@example.com")
                 .userName("newUserName")
                 .password("wrongPassword")
@@ -276,7 +276,7 @@ class UserServiceTest {
                 .build();
         testUser.setEnabled(true);
 
-        UserCredentials userCredentials = UserCredentials.builder()
+        UserCredentialsRequest userCredentials = UserCredentialsRequest.builder()
                 .email("newEmail@example.com")
                 .userName("newUserName")
                 .password("wrongPassword")
@@ -288,12 +288,12 @@ class UserServiceTest {
     }
 
     @Test
-    void testChangePassword_Success () throws RoleNotFoundException {
+    void testChangePassword_Success () {
         // Given
         ChangePasswordRequest request = new ChangePasswordRequest("password", "newPassword", "newPassword");
 
         // When
-        UserRespond response = userService.changePassword(request, createAuthentication(user));
+        UserResponse response = userService.changePassword(request, createAuthentication(user));
 
         // Then
         assertNotNull(response);
@@ -317,7 +317,7 @@ class UserServiceTest {
         PasswordRequest request = new PasswordRequest("password");
 
         // When
-        UserRespond response = userService.deleteConnectedUser(request, createAuthentication(user));
+        UserResponse response = userService.deleteConnectedUser(request, createAuthentication(user));
         long userQtyAfterDelete = userRepository.count();
 
         // Then

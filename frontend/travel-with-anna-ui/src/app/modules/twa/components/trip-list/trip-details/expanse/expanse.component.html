@@ -51,6 +51,7 @@
           </mat-form-field>
         </form>
 
+
         <form class="full-width">
           <mat-form-field appearance="outline" class="insert-size">
             <mat-label>Paid</mat-label>
@@ -67,6 +68,11 @@
           </mat-form-field>
         </form>
 
+        <form class="full-width" style="margin-bottom: 5%">
+            <label>Left to pay: </label>
+              <label>{{expanse.paid}}</label>
+              <label class="currency">{{expanse.currency}}</label>
+        </form>
 
         <form class="full-width">
           <mat-form-field appearance="outline" class="insert-size">

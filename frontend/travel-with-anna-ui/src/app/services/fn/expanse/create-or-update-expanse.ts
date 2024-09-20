@@ -6,14 +6,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ExpanseItem } from '../../models/expanse-item';
-import { ExpanseItemCreator } from '../../models/expanse-item-creator';
+import { ExpanseForItemRequest } from '../../models/expanse-for-item-request';
+import { ExpanseResponse } from '../../models/expanse-response';
 
 export interface CreateOrUpdateExpanse$Params {
-      body: ExpanseItemCreator
+      body: ExpanseForItemRequest
 }
 
-export function createOrUpdateExpanse(http: HttpClient, rootUrl: string, params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseItem>> {
+export function createOrUpdateExpanse(http: HttpClient, rootUrl: string, params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
   const rb = new RequestBuilder(rootUrl, createOrUpdateExpanse.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/json');
@@ -24,7 +24,7 @@ export function createOrUpdateExpanse(http: HttpClient, rootUrl: string, params:
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<ExpanseItem>;
+      return r as StrictHttpResponse<ExpanseResponse>;
     })
   );
 }

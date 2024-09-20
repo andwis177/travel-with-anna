@@ -6,10 +6,9 @@ import {TripListButtons} from "../trip-list-buttons/trip-list-buttons.component"
 import {MatFormField} from "@angular/material/form-field";
 import {TripDetailsButtonsComponent} from "./trip-details-buttons/trip-details-buttons.component";
 import {NgIf} from "@angular/common";
-import {TripRequest} from "../../../../../services/models/trip-request";
-import {BudgetRequest} from "../../../../../services/models/budget-request";
 import {UserComponent} from "../../../../components/menu/user/user.component";
 import {LogoComponent} from "../../../../components/menu/logo/logo.component";
+import {TripResponse} from "../../../../../services/models/trip-response";
 
 @Component({
   selector: 'app-trip-details',
@@ -26,8 +25,7 @@ import {LogoComponent} from "../../../../components/menu/logo/logo.component";
   styleUrl: './trip-details.component.scss'
 })
 export class TripDetailsComponent implements OnInit {
-  trip: TripRequest = {};
-  budget: BudgetRequest = {};
+  trip: TripResponse = {};
 
   constructor(
     private route: ActivatedRoute,

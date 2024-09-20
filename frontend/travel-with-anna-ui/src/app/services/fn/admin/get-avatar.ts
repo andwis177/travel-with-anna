@@ -6,13 +6,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { UserAvatar } from '../../models/user-avatar';
+import { AvatarImg } from '../../models/avatar-img';
 
 export interface GetAvatar$Params {
   userId: number;
 }
 
-export function getAvatar(http: HttpClient, rootUrl: string, params: GetAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAvatar>> {
+export function getAvatar(http: HttpClient, rootUrl: string, params: GetAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<AvatarImg>> {
   const rb = new RequestBuilder(rootUrl, getAvatar.PATH, 'get');
   if (params) {
     rb.path('userId', params.userId, {});
@@ -23,7 +23,7 @@ export function getAvatar(http: HttpClient, rootUrl: string, params: GetAvatar$P
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<UserAvatar>;
+      return r as StrictHttpResponse<AvatarImg>;
     })
   );
 }

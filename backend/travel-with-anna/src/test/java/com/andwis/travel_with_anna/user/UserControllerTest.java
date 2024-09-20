@@ -36,11 +36,11 @@ class UserControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void getCredentials_ShouldReturnOkWithCredentials() throws Exception {
         // Given
-        UserCredentials userCredentials = UserCredentials.builder()
-                .email("email@example.com")
-                .userName("username")
-                .password("password")
-                .build();
+        UserCredentialsResponse userCredentials = new UserCredentialsResponse(
+                "email@example.com",
+               "username",
+                "USER"
+        );
 
         when(service.getCredentials("email@example.com")).thenReturn(userCredentials);
         when(connectedUser.getName()).thenReturn("email@example.com");
@@ -57,7 +57,7 @@ class UserControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void update_ShouldReturnOkWithUpdatedResponse() throws Exception {
         // Given
-        UserCredentials userCredentials = UserCredentials.builder()
+        UserCredentialsRequest userCredentials = UserCredentialsRequest.builder()
                 .email("email@example.com")
                 .userName("username")
                 .password("newPassword").build();
@@ -69,7 +69,7 @@ class UserControllerTest {
                 .userName("username")
                 .build();
 
-        when(service.updateUserExecution(any(UserCredentials.class), any(Authentication.class)))
+        when(service.updateUserExecution(any(UserCredentialsRequest.class), any(Authentication.class)))
                 .thenReturn(expectedResponse);
         when(connectedUser.getName()).thenReturn("email@example.com");
 
@@ -92,7 +92,7 @@ class UserControllerTest {
                 .build();
 
         String jsonContent = objectMapper.writeValueAsString(request);
-        UserRespond expectedResponse = new UserRespond("Password changed successfully");
+        UserResponse expectedResponse = new UserResponse("Password changed successfully");
 
         when(service.changePassword(any(ChangePasswordRequest.class), any(Authentication.class)))
                 .thenReturn(expectedResponse);
@@ -113,7 +113,7 @@ class UserControllerTest {
         // Given
         PasswordRequest request = new PasswordRequest("password");
         String jsonContent = objectMapper.writeValueAsString(request);
-        UserRespond expectedResponse = new UserRespond("User deleted successfully");
+        UserResponse expectedResponse = new UserResponse("User deleted successfully");
 
         when(service.deleteConnectedUser(any(PasswordRequest.class), any(Authentication.class)))
                 .thenReturn(expectedResponse);

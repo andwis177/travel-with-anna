@@ -9,9 +9,12 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
+import { BudgetExpensesRespond } from '../models/budget-expenses-respond';
 import { BudgetRequest } from '../models/budget-request';
 import { getBudgetById } from '../fn/budget/get-budget-by-id';
 import { GetBudgetById$Params } from '../fn/budget/get-budget-by-id';
+import { getBudgetExpanses } from '../fn/budget/get-budget-expanses';
+import { GetBudgetExpanses$Params } from '../fn/budget/get-budget-expanses';
 import { saveBudget } from '../fn/budget/save-budget';
 import { SaveBudget$Params } from '../fn/budget/save-budget';
 
@@ -68,6 +71,31 @@ export class BudgetService extends BaseService {
   getBudgetById(params: GetBudgetById$Params, context?: HttpContext): Observable<BudgetRequest> {
     return this.getBudgetById$Response(params, context).pipe(
       map((r: StrictHttpResponse<BudgetRequest>): BudgetRequest => r.body)
+    );
+  }
+
+  /** Path part for operation `getBudgetExpanses()` */
+  static readonly GetBudgetExpansesPath = '/budget/{budgetId}/expanses/{tripId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getBudgetExpanses()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getBudgetExpanses$Response(params: GetBudgetExpanses$Params, context?: HttpContext): Observable<StrictHttpResponse<BudgetExpensesRespond>> {
+    return getBudgetExpanses(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getBudgetExpanses$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getBudgetExpanses(params: GetBudgetExpanses$Params, context?: HttpContext): Observable<BudgetExpensesRespond> {
+    return this.getBudgetExpanses$Response(params, context).pipe(
+      map((r: StrictHttpResponse<BudgetExpensesRespond>): BudgetExpensesRespond => r.body)
     );
   }
 

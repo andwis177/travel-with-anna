@@ -2,7 +2,6 @@ package com.andwis.travel_with_anna.user.avatar;
 
 import com.andwis.travel_with_anna.handler.exception.AvatarNotFoundException;
 import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.admin.UserAvatar;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +44,7 @@ public class AvatarService {
         }
     }
 
-    public UserAvatar getAvatar(User user) {
+    public AvatarImg getAvatar(User user) {
         Avatar avatar = findById(user.getAvatarId());
         String avatarHex = (
                 avatar != null &&
@@ -53,10 +52,10 @@ public class AvatarService {
                         !avatar.getAvatar().isEmpty()
         )
                 ? avatar.getAvatar()
-                : AvatarImg.DEFAULT.getImg();
-        return UserAvatar.builder()
-                .avatar(hexToBytes(avatarHex))
-                .build();
+                : AvatarDefaultImg.DEFAULT.getImg();
+        return new AvatarImg(
+                hexToBytes(avatarHex)
+        );
     }
 
     public Map<Long, byte[]> getAvatars(List<Long> avatarsId) {
@@ -72,7 +71,7 @@ public class AvatarService {
                                             !avatar.getAvatar().isEmpty()
                             )
                                     ? avatar.getAvatar()
-                                    : AvatarImg.DEFAULT.getImg();
+                                    : AvatarDefaultImg.DEFAULT.getImg();
                             return hexToBytes(avatarHex);
                         }
                 ));

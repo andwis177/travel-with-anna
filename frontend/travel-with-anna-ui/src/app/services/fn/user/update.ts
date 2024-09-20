@@ -7,10 +7,10 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { AuthenticationResponse } from '../../models/authentication-response';
-import { UserCredentials } from '../../models/user-credentials';
+import { UserCredentialsRequest } from '../../models/user-credentials-request';
 
 export interface Update$Params {
-      body: UserCredentials
+      body: UserCredentialsRequest
 }
 
 export function update(http: HttpClient, rootUrl: string, params: Update$Params, context?: HttpContext): Observable<StrictHttpResponse<AuthenticationResponse>> {

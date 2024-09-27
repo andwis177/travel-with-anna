@@ -1,0 +1,32 @@
+.second-container {
+  width: 100% !important;
+}
+
+.warning-icon {
+  font-size: 32px;
+  width: 100%;
+  margin-bottom: 20px;
+  color: darkred;
+  text-align: center;
+}
+
+.error-msg {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.text-size {
+  font-size: 18px !important;
+}
+
+.button-font {
+  font-weight: bold;
+}
+
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}

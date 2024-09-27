@@ -6,16 +6,16 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { Note } from '../../models/note';
+import { PdfDocRequest } from '../../models/pdf-doc-request';
 
-export interface SaveNote$Params {
-  note: Note;
+export interface SetPdfDoc$Params {
+  request: PdfDocRequest;
 }
 
-export function saveNote(http: HttpClient, rootUrl: string, params: SaveNote$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, saveNote.PATH, 'post');
+export function setPdfDoc(http: HttpClient, rootUrl: string, params: SetPdfDoc$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, setPdfDoc.PATH, 'post');
   if (params) {
-    rb.query('note', params.note, {});
+    rb.query('request', params.request, {});
   }
 
   return http.request(
@@ -28,4 +28,4 @@ export function saveNote(http: HttpClient, rootUrl: string, params: SaveNote$Par
   );
 }
 
-saveNote.PATH = '/note/create';
+setPdfDoc.PATH = '/pdf_doc/set';

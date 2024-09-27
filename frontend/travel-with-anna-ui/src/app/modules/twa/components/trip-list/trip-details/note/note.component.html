@@ -1,0 +1,24 @@
+<mat-toolbar-row class="dialog-header">
+  <div class="dialog-title">Note</div>
+  <button mat-icon-button class="close-button"
+          (click)="onClose()"
+          (keydown.enter)="$event.preventDefault()">
+    <mat-icon class="close-icon">close</mat-icon>
+  </button>
+</mat-toolbar-row>
+
+<div class="dialog-container">
+  <div>
+    <textarea class="text-area mat-elevation-z5" [(ngModel)]="noteRequest.note" rows="15" cols="70"></textarea>
+
+    <div class="note-button-area ">
+      <button class="custom-button-0 " (click)="saveNote()" type="submit">Save</button>
+      <button class="custom-button-1 " (click)="onClose()" type="submit">Cancel</button>
+    </div>
+
+    <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+      <mat-divider></mat-divider>
+      <p *ngFor="let msg of errorMsg">{{msg}}</p>
+    </div>
+  </div>
+</div>

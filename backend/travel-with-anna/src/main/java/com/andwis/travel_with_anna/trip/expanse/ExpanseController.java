@@ -18,13 +18,19 @@ public class ExpanseController {
 
     @PostMapping("/save")
     public ResponseEntity<ExpanseResponse> createOrUpdateExpanse(@RequestBody @Valid ExpanseForItemRequest creator) {
-        ExpanseResponse respond = facade.createOrUpdateExpanse(creator);
-        return ResponseEntity.status(HttpStatus.CREATED).body(respond);
+        ExpanseResponse response = facade.createOrUpdateExpanse(creator.getExpanseRequest());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{itemId}/expanse")
-    public ResponseEntity<ExpanseResponse> getExpanseForItem(@PathVariable("itemId") Long itemId) {
-        ExpanseResponse expanse = facade.getExpanseForItem(itemId);
+    @GetMapping("/{expanseId}/expanse")
+    public ResponseEntity<ExpanseResponse> getExpanseById(@PathVariable("expanseId") Long expanseId) {
+        ExpanseResponse expanse = facade.getExpanseById(expanseId);
+        return ResponseEntity.ok(expanse);
+    }
+
+    @GetMapping("/{itemId}/item")
+    public ResponseEntity<ExpanseResponse> getExpanseByItemId(@PathVariable("itemId") Long itemId) {
+        ExpanseResponse expanse = facade.getExpanseByItemId(itemId);
         return ResponseEntity.ok(expanse);
     }
 

@@ -7,7 +7,6 @@ import {NgIf} from "@angular/common";
 import {AccountComponent} from "./account/account.component";
 import {LogoutService} from "../../../../services/logout/logout.service";
 import {SharedService} from "../../../../services/shared/shared.service";
-import {UserInformationService} from "../../../../services/user-information/user-information-service";
 
 @Component({
   selector: 'app-user',
@@ -33,7 +32,6 @@ export class UserComponent implements OnInit {
   )
   {}
 
-
   ngOnInit(): void {
     this.sharedService.getUserName().subscribe((name) => {
       this.userName = name;
@@ -45,10 +43,10 @@ export class UserComponent implements OnInit {
 
   openAccountDetails() {
     const dialogRef = this.dialog.open(AccountComponent, {
-      width: '50vw',
-      height: '90vh',
-      maxWidth: '50vw',
+      maxWidth: '90vw',
       maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
       id: 'account-dialog',
     })
     dialogRef.afterClosed().subscribe(() => {

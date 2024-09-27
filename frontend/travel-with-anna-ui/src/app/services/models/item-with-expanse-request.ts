@@ -3,7 +3,7 @@
 import { ExpanseRequest } from '../models/expanse-request';
 export interface ItemWithExpanseRequest {
   expanseRequest?: ExpanseRequest;
-  item?: string;
+  itemName?: string;
   packed?: boolean;
   qty?: string;
 }

@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.budget;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,8 @@ public class BudgetController {
     }
 
     @GetMapping("/{budgetId}")
-    public ResponseEntity<BudgetRequest> getBudgetById(@PathVariable("budgetId") Long budgetId) {
-        BudgetRequest budgetDto = facade.getBudgetById(budgetId);
+    public ResponseEntity<BudgetResponse> getBudgetById(@PathVariable("budgetId") Long budgetId) {
+        BudgetResponse budgetDto = facade.getBudgetById(budgetId);
         return ResponseEntity.ok(budgetDto);
     }
 
@@ -28,5 +29,11 @@ public class BudgetController {
     public ResponseEntity<BudgetExpensesRespond> getBudgetExpanses(@PathVariable("tripId") Long tripId, @PathVariable("budgetId") Long budgetId) {
         BudgetExpensesRespond budgetExpensesRespond = facade.getBudgetExpanses(tripId, budgetId);
         return ResponseEntity.ok(budgetExpensesRespond);
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<Void> updateBudget(@RequestBody @Valid BudgetRequest request) {
+        facade.updateBudget(request);
+        return ResponseEntity.ok().build();
     }
 }

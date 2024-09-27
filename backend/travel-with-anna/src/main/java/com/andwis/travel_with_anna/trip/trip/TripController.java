@@ -25,9 +25,9 @@ public class TripController {
 
     @GetMapping("")
     public PageResponse<TripResponse> getAllOwnersTrips(
-        @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-        @RequestParam(name = "size", defaultValue = "10", required = false) int size,
-        Authentication connectedUser) {
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size,
+            Authentication connectedUser) {
         return facade.getAllOwnersTrips(page, size, connectedUser);
     }
 
@@ -43,9 +43,9 @@ public class TripController {
         return ResponseEntity.status(HttpStatus.OK).body(returnedTripId);
     }
 
-    @DeleteMapping("/{tripId}/delete")
-    public ResponseEntity<Void> deleteTrip(@PathVariable("tripId") Long tripId, Authentication connectedUser) {
-        facade.deleteTrip(tripId, connectedUser);
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteTrip(@RequestBody TripRequest request, Authentication connectedUser) {
+        facade.deleteTrip(request, connectedUser);
         return ResponseEntity.noContent().build();
     }
 }

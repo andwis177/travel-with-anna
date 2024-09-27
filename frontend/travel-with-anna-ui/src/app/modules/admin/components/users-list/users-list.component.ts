@@ -20,7 +20,6 @@ import {ImageComponent} from "./image/image.component";
 import {DeleteComponent} from "./delete/delete.component";
 import {MatIconButton} from "@angular/material/button";
 import {NgOptimizedImage} from "@angular/common";
-import {Router} from "@angular/router";
 import {MatInput} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
 import {UserListButtonsComponent} from "./user-list-buttons/user-list-buttons.component";
@@ -28,6 +27,7 @@ import {LogoComponent} from "../../../components/menu/logo/logo.component";
 import {UserComponent} from "../../../components/menu/user/user.component";
 import {PageResponseUserAdminResponse} from "../../../../services/models/page-response-user-admin-response";
 import {UserAdminResponse} from "../../../../services/models/user-admin-response";
+import {ErrorService} from "../../../../services/error/error.service";
 
 @Component({
   selector: 'app-users-list',
@@ -99,28 +99,13 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   constructor(public dialog: MatDialog,
               private adminService: AdminService,
               private shareService: SharedService,
+              private errorService: ErrorService,
   ) {
   }
 
   @HostListener('document:keydown.escape', ['$event'])
   onEscapeKeydownHandler(event: KeyboardEvent): void {
     this.selection.clear();
-  }
-
-  @HostListener('document:keydown.ArrowDown', ['$event'])
-  onArrowDownKeydownHandler(event: KeyboardEvent): void {
-    if (this.currentRowIndex < this.dataSource.data.length - 1) {
-      this.currentRowIndex++;
-      this.selectRowByIndex(this.currentRowIndex);
-    }
-  }
-
-  @HostListener('document:keydown.ArrowUp', ['$event'])
-  onArrowUpKeydownHandler(event: KeyboardEvent): void {
-    if (this.currentRowIndex > 0) {
-      this.currentRowIndex--;
-      this.selectRowByIndex(this.currentRowIndex);
-    }
   }
 
   @HostListener('document:keydown.ArrowRight', ['$event'])
@@ -237,13 +222,23 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   }
 
   onEdit() {
-    const dialogRef = this.dialog.open(EditComponent, {})
+    const dialogRef = this.dialog.open(EditComponent, {
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
+    })
     dialogRef.afterClosed().subscribe(() => {
     });
   }
 
   onAvatar() {
-    const dialogRef = this.dialog.open(ImageComponent, {})
+    const dialogRef = this.dialog.open(ImageComponent, {
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
+    })
     dialogRef.afterClosed().subscribe(() => {
     });
   }
@@ -269,12 +264,7 @@ export class UsersListComponent implements OnInit, AfterViewInit {
         this.dataSource.data = this.userAdminViewList.content;
       },
       error: (err) => {
-        console.log(err.error.errors);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Failed to load User details', err);
-        }
+        this.errorMsg = this.errorService.errorHandler(err);
       }
     })
   }

@@ -1,15 +1,15 @@
 /* tslint:disable */
 /* eslint-disable */
-import { BudgetRequest } from '../models/budget-request';
-import { ExpanseCalculator } from '../models/expanse-calculator';
+import { BudgetResponse } from '../models/budget-response';
+import { ExpanseByCurrency } from '../models/expanse-by-currency';
 import { ExpanseResponse } from '../models/expanse-response';
 export interface BudgetExpensesRespond {
-  budgetRequest?: BudgetRequest;
+  budgetResponse?: BudgetResponse;
   expanses?: Array<ExpanseResponse>;
   overallPaidInTripCurrency?: number;
   overallPriceInTripCurrency?: number;
-  sumsByCurrency?: {
-[key: string]: ExpanseCalculator;
-};
+  paidBalanceDue?: number;
+  priceBalanceDue?: number;
+  sumsByCurrency?: Array<ExpanseByCurrency>;
   totalDebtInTripCurrency?: number;
 }

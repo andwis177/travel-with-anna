@@ -38,7 +38,7 @@ class BackpackControllerTest {
         // Given
         Long backpackId = 1L;
         ItemWithExpanseRequest itemWithExpanseRequest = ItemWithExpanseRequest.builder()
-                .item("Tent")
+                .itemName("Tent")
                 .qty("1")
                 .isPacked(false)
                 .build();

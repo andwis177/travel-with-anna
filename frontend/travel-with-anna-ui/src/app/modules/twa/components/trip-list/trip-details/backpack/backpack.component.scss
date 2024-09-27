@@ -4,30 +4,18 @@ body, html {
   overflow-x: hidden;
 }
 
-.second-container {
-  display: flex;
-  flex-direction: column;
-  width: 100% !important;
-  height: 100% !important;
-  box-sizing: border-box;
-  padding: 20px;
-  background-color: #EDEAE5;
-  color: #2E3944;
-
-  border: none !important;
-}
-
 .table-container {
+  max-width: 200vw;
+  max-height: 50vh;
   width: 100%;
-  height: 350px;
+  height: auto;
   overflow-y: auto;
   overflow-x: hidden;
+  table-layout: fixed;
 }
 
-table {
-  width: 100%;
-  height: 100%;
-  table-layout: fixed;
+.mdc-data-table__table {
+  background-color: whitesmoke !important;
 }
 
 th, td {
@@ -37,20 +25,6 @@ th, td {
   word-wrap: break-word;
 }
 
-.table-container {
-  width: 100%;
-}
-
-mat-card-actions {
-  margin-top: auto;
-  padding: 20px 0;
-}
-
-mat-form-field.insert-size {
-  width: 80px;
-}
-
-
 .backpack-button-area {
   display: flex !important;
   justify-content: start !important;
@@ -58,7 +32,6 @@ mat-form-field.insert-size {
   text-align: center !important;
   align-items: center !important;
   margin-top: 20px;
-
 }
 
 .user-button-area {
@@ -74,8 +47,8 @@ mat-form-field.insert-size {
 }
 
 .user-button-image {
-  background-color: whitesmoke;
-  border: 2px solid green;
+  background-color: #2E3944;
+  border: 2px solid royalblue;
   border-radius: 50% !important;
 }
 
@@ -87,47 +60,16 @@ mat-form-field.insert-size {
   display: none;
 }
 
-mat-form-field {
-  width: 100%;
-  max-width: 500px;
-}
-
 .selected {
-  background-color: #EEF5F6 !important;
+  background-color: lightgrey !important;
 }
-
 
 th.mat-sort-header-sorted {
   color: black;
 }
 
-.insert-size {
-  height: 20px !important;
-  font-size: 12px;
-}
-
-.insert-size input {
-  height: 20px !important;
-  font-size: 12px;
-}
-
-mat-form-field.insert-size {
-  width: 90px;
-}
-
-
-.insert-size .mat-form-field-wrapper {
-  padding-bottom: 0 !important;
-}
-
-.insert-size input {
-  max-height: 10px !important;
-  font-size: 18px !important;
-  padding: 0 4px !important;
-  box-sizing: border-box !important;
-}
-
 .input-field {
+  width: 100% !important;
   border: none !important;
   background-color: transparent !important;
   font-family: 'Montserrat', sans-serif;
@@ -137,11 +79,16 @@ mat-form-field.insert-size {
   outline: none !important;
 }
 
-.packed-column {
-  width: 8% !important;
+textarea {
+  height: auto !important;
+  resize: none !important;
 }
 
-.item-column {
+.packed-column {
+  width: 15% !important;
+}
+
+.description-column {
   width: 45% !important;
 }
 
@@ -150,7 +97,7 @@ mat-form-field.insert-size {
 }
 
 .action-column {
-  width: 15% !important;
+  width: 20% !important;
 
 }
 
@@ -160,16 +107,16 @@ mat-form-field.insert-size {
   border-radius: 15%;
   color: #D46A6A;
   cursor: pointer;
-  padding: 5px;
+  padding: 3px;
 }
 
 .expanse-button {
   background-color: #EDEAE5;
-  border: 2px solid green;
+  border: 1px solid forestgreen;
   border-radius: 15%;
-  color: green;
+  color: forestgreen;
   cursor: pointer;
-  padding: 5px;
+  padding: 3px;
 }
 
 .margin {

@@ -28,12 +28,12 @@ class ItemServiceTest {
     @BeforeEach
     void setUp() {
         item = Item.builder()
-                .item("Flight Ticket")
+                .itemName("Flight Ticket")
                 .quantity("1")
                 .build();
 
         itemWithExpanseRequest = ItemWithExpanseRequest.builder()
-                .item("Flight Ticket")
+                .itemName("Flight Ticket")
                 .qty("1")
                 .isPacked(false)
                 .build();
@@ -50,7 +50,7 @@ class ItemServiceTest {
     void testSaveItem() {
         // Given
         Item newItem = Item.builder()
-                .item("Hotel Booking")
+                .itemName("Hotel Booking")
                 .quantity("2")
                 .build();
 
@@ -60,7 +60,7 @@ class ItemServiceTest {
         // Then
         Item savedItem = itemRepository.findById(newItem.getItemId()).orElseThrow();
         assertNotNull(savedItem);
-        assertEquals("Hotel Booking", savedItem.getItem());
+        assertEquals("Hotel Booking", savedItem.getItemName());
         assertEquals("2", savedItem.getQuantity());
     }
 
@@ -74,7 +74,7 @@ class ItemServiceTest {
         // Then
         assertNotNull(foundItem);
         assertEquals(item.getItemId(), foundItem.getItemId());
-        assertEquals("Flight Ticket", foundItem.getItem());
+        assertEquals("Flight Ticket", foundItem.getItemName());
     }
 
     @Test
@@ -97,7 +97,7 @@ class ItemServiceTest {
 
         // Then
         assertNotNull(createdItem);
-        assertEquals("Flight Ticket", createdItem.getItem());
+        assertEquals("Flight Ticket", createdItem.getItemName());
         assertEquals("1", createdItem.getQuantity());
         assertFalse(createdItem.isPacked());
     }
@@ -127,7 +127,7 @@ class ItemServiceTest {
 
         // Then
         Item updatedItem = itemRepository.findById(item.getItemId()).orElseThrow();
-        assertEquals("Updated Flight Ticket", updatedItem.getItem());
+        assertEquals("Updated Flight Ticket", updatedItem.getItemName());
         assertEquals("2", updatedItem.getQuantity());
     }
 

@@ -1,6 +1,5 @@
 package com.andwis.travel_with_anna.trip.trip;
 
-import com.andwis.travel_with_anna.api.currency.CurrencyRepository;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.User;
@@ -11,12 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @DisplayName("Trip Service tests")
 class TripServiceTest {
-
 
     @Autowired
     private TripService tripService;
@@ -46,7 +42,6 @@ class TripServiceTest {
     private PasswordEncoder passwordEncoder;
 
     private User user;
-
 
     @BeforeEach
     void setUp() {
@@ -156,7 +151,7 @@ class TripServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        tripService.deleteTrip(savedTripId);
+        tripService.deleteById(savedTripId);
         List<Trip> trips = tripService.getTripsByOwnerId(user.getUserId(), pageable).getContent();
 
         // Then

@@ -5,7 +5,7 @@ public class ItemMapper {
     public static ItemResponse toItemResponse(Item item) {
         return new ItemResponse(
                 item.getItemId(),
-                item.getItem(),
+                item.getItemName(),
                 item.getQuantity(),
                 item.isPacked()
         );

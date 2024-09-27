@@ -72,11 +72,11 @@ public class TripMgr {
         return tripService.saveTrip(trip);
     }
 
-    public void deleteTrip(Long tripId, Authentication connectedUser) {
-        User user = userService.getConnectedUser(connectedUser);
-        Trip trip = tripService.getTripById(tripId);
-        user.removeTrip(trip);
-        userService.saveUser(user);
-        tripService.deleteTrip(tripId);
+    public void deleteTrip(TripRequest request, Authentication connectedUser) {
+        User adminUser = userService.getConnectedUser(connectedUser);
+        userService.verifyPassword(adminUser, request.password());
+        Trip trip = tripService.getTripById(request.tripId());
+        trip.removeTripAssociations();
+        tripService.deleteById(request.tripId());
     }
 }

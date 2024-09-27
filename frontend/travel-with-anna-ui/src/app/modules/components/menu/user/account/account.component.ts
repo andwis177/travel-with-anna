@@ -17,8 +17,8 @@ import {UserService} from "../../../../../services/services/user.service";
 import {AuthService} from "../../../../../services/auth/auth.service";
 import {UserInformationService} from "../../../../../services/user-information/user-information-service";
 import {ImageFileService} from "../../../../../services/image-file-service/image-file-service";
-import {ErrorService} from "../../../../../services/error/error.service";
 import {UserCredentialsRequest} from "../../../../../services/models/user-credentials-request";
+import {ErrorService} from "../../../../../services/error/error.service";
 
 @Component({
   selector: 'app-account',
@@ -163,22 +163,17 @@ export class AccountComponent implements OnInit {
           this.userCredentials.password = '';
         },
         error: (err) => {
-          console.log(err);
-          if (err.error.errors && err.error.errors.length > 0) {
-            this.errorMsg = err.error.errors;
-          } else {
-            this.errorMsg.push('Unexpected error occurred');
-          }
+          this.errorMsg = this.errorService.errorHandler(err);
         }
       })
   }
 
   managePassword() {
     const dialogRef = this.dialog.open(PasswordComponent, {
-      width: '50vw',
-      height: '90vh',
-      maxWidth: '50vw',
+      maxWidth: '90vw',
       maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
       id: 'password-dialog',
     })
     this.dialog.getDialogById("account-dialog")?.close();

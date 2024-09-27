@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.user.avatar;
 
-import com.andwis.travel_with_anna.handler.exception.SaveAvatarException;
+import com.andwis.travel_with_anna.handler.exception.FileNotSaved;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +26,7 @@ public class AvatarController {
         return ResponseEntity.ok().build();
     }
     @GetMapping("/get-avatar")
-    public ResponseEntity<byte[]> getCurrentUserAvatar(Authentication connectedUser) throws SaveAvatarException {
+    public ResponseEntity<byte[]> getCurrentUserAvatar(Authentication connectedUser) throws FileNotSaved {
         byte[] avatarBytes = facade.getAvatar(connectedUser);
 
         HttpHeaders headers = new HttpHeaders();

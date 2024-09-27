@@ -1,13 +1,14 @@
-<mat-card class="second-container" appearance="outlined">
-  <mat-toolbar-row class="dialog-header">
-    <div class="dialog-title">Edit user</div>
-    <button mat-icon-button class="close-button"
-            (click)="onClose()"
-            (keydown.enter)="$event.preventDefault()">
-      <mat-icon class="close-icon">close</mat-icon>
-    </button>
-  </mat-toolbar-row>
 
+<mat-toolbar-row class="dialog-header">
+  <div class="dialog-title">Edit user</div>
+  <button mat-icon-button class="close-button"
+          (click)="onClose()"
+          (keydown.enter)="$event.preventDefault()">
+    <mat-icon class="close-icon">close</mat-icon>
+  </button>
+</mat-toolbar-row>
+
+<div class="dialog-container">
   <div class="main-container">
 
     <div class = "info-area mat-elevation-z8">
@@ -90,5 +91,5 @@
     <mat-divider class="padding-bottom"></mat-divider>
     <p *ngFor="let msg of errorMsg">{{msg}}</p>
   </div>
-</mat-card>
+</div>
 

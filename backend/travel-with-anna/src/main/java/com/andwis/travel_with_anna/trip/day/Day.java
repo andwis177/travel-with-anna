@@ -3,7 +3,6 @@ package com.andwis.travel_with_anna.trip.day;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.note.Note;
 import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -35,7 +34,6 @@ public class Day {
 
     @ManyToOne
     @JoinColumn(name = "trip_id")
-    @JsonIgnore
     private Trip trip;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)

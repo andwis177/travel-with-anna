@@ -4,10 +4,10 @@ import com.andwis.travel_with_anna.handler.exception.BackpackNotFoundException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
-import com.andwis.travel_with_anna.trip.backpack.item.ItemWithExpanseRequest;
 import com.andwis.travel_with_anna.trip.backpack.item.ItemRepository;
-import com.andwis.travel_with_anna.trip.note.Note;
+import com.andwis.travel_with_anna.trip.backpack.item.ItemWithExpanseRequest;
 import com.andwis.travel_with_anna.trip.note.NoteRepository;
+import com.andwis.travel_with_anna.trip.note.NoteService;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripRepository;
 import com.andwis.travel_with_anna.user.User;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import java.util.Optional;
 import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
 import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 
 @SpringBootTest
@@ -61,9 +63,11 @@ class BackpackServiceTest {
     @Autowired
     private EntityManager entityManager;
 
+    @MockBean
+    private NoteService noteService;
+
     private Backpack backpack;
     private Long backpackId;
-    private User user;
 
 
     @BeforeEach
@@ -74,7 +78,7 @@ class BackpackServiceTest {
         Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         Role retrievedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
-        user = User.builder()
+        User user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
@@ -84,10 +88,18 @@ class BackpackServiceTest {
         user.setEnabled(true);
         userRepository.save(user);
 
+        Trip trip = Trip.builder()
+                .tripName("Trip to Paris")
+                .owner(user)
+                .build();
+
+        tripRepository.save(trip);
 
         backpack = Backpack.builder()
                 .items(new HashSet<>())
                 .build();
+
+        backpack.setTrip(trip);
         backpackId = backpackRepository.save(backpack).getBackpackId();
     }
 
@@ -125,7 +137,7 @@ class BackpackServiceTest {
     void testAddItemToBackpack() {
         // Given
         ItemWithExpanseRequest itemWithExpanseRequest = ItemWithExpanseRequest.builder()
-                .item("Water Bottle")
+                .itemName("Water Bottle")
                 .build();
 
         // When
@@ -137,37 +149,24 @@ class BackpackServiceTest {
         assertEquals(1, updatedBackpack.getItems().size());
 
         Item item = itemRepository.findAll().getFirst();
-        assertEquals("Water Bottle", item.getItem());
+        assertEquals("Water Bottle", item.getItemName());
 
     }
 
     @Test
     @Transactional
-    void testReturnBackpackRequestWithNotes() {
+    void testGetBackpackById() {
         // Given
-        Trip trip = Trip.builder()
-                .tripName("Trip")
-                .owner(user)
-                .build();
-
-        tripRepository.save(trip);
-
-        Note note = Note.builder()
-                .note("My note")
-                .backpack(backpack)
-                .build();
-
-        backpack.setNote(note);
-        trip.setBackpack(backpack);
-        backpackRepository.save(backpack);
+        boolean isNote = true;  // Mock note existence
+        when(noteService.isNoteExists(backpackId)).thenReturn(isNote);
 
         // When
         BackpackResponse backpackResponse = backpackService.getBackpackById(backpackId);
 
         // Then
         assertNotNull(backpackResponse);
-        assertTrue(backpackResponse.isNote());
         assertEquals(backpackId, backpackResponse.backpackId());
+        assertEquals(isNote, backpackResponse.isNote());
     }
 
     @Transactional
@@ -175,7 +174,7 @@ class BackpackServiceTest {
     void testDeleteItem() {
         // Given
         Item item = Item.builder()
-                .item("Sleeping Bag")
+                .itemName("Sleeping Bag")
                 .build();
         backpack.addItem(item);
         itemRepository.save(item);

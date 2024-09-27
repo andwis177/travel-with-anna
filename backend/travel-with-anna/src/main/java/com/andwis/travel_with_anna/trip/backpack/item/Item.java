@@ -2,7 +2,6 @@ package com.andwis.travel_with_anna.trip.backpack.item;
 
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -23,8 +22,8 @@ public class Item{
     private Long itemId;
 
     @Size(max = 60)
-    @Column(name = "item", length = 60)
-    private String item;
+    @Column(name = "item_name", length = 60)
+    private String itemName;
 
     @Size(max = 40)
     @Column(name = "quantity", length = 40)
@@ -35,7 +34,6 @@ public class Item{
 
     @ManyToOne
     @JoinColumn(name = "backpack_id")
-    @JsonIgnore
     private Backpack backpack;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -53,13 +51,13 @@ public class Item{
         if (o == null || getClass() != o.getClass()) return false;
         Item item1 = (Item) o;
         return isPacked == item1.isPacked && Objects.equals(itemId, item1.itemId)
-                && Objects.equals(item, item1.item) && Objects.equals(quantity, item1.quantity)
+                && Objects.equals(itemName, item1.itemName) && Objects.equals(quantity, item1.quantity)
                 && Objects.equals(backpack, item1.backpack
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(itemId, item, quantity, isPacked);
+        return Objects.hash(itemId, itemName, quantity, isPacked);
     }
 }

@@ -11,12 +11,10 @@ table {
 }
 
 .center-align {
-  text-align: center !important;
+  text-align: start !important;
 }
 
 .image {
-  display: block;
-  margin-left: auto;
   margin-right: auto;
   border-radius: 50%;
   width: 35px;
@@ -65,9 +63,21 @@ table {
   margin-top: 12px;
 }
 
-:host ::ng-deep .mat-sort-header-container {
-  display: flex;
-  justify-content: center;
-  width: auto;
+.mdc-data-table__table {
+  background-color: whitesmoke !important;
 }
 
+.mat-mdc-header-row {
+  background-color: #2E3944 !important;
+  color: whitesmoke !important;
+}
+
+:host ::ng-deep .mat-sort-header-arrow{
+  color: whitesmoke !important;
+}
+
+:host ::ng-deep .mat-sort-header-container {
+  display: flex;
+  justify-content: start;
+  width: auto;
+}

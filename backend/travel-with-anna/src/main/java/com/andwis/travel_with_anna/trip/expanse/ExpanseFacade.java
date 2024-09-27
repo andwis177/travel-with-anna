@@ -11,12 +11,16 @@ public class ExpanseFacade {
 
     private final ExpanseService expanseService;
 
-    public ExpanseResponse createOrUpdateExpanse(ExpanseForItemRequest expanseCreator) {
-      return expanseService.createOrUpdateExpanse(expanseCreator);
+    public ExpanseResponse createOrUpdateExpanse(ExpanseRequest expanseRequest) {
+      return expanseService.createOrUpdateExpanse(expanseRequest);
     }
 
-    public ExpanseResponse getExpanseForItem(Long itemId) {
-        return expanseService.getExpanseForItem(itemId);
+    public ExpanseResponse getExpanseById(Long expanseId) {
+        return expanseService.getExpanseById(expanseId);
+    }
+
+    public ExpanseResponse getExpanseByItemId(Long itemId) {
+        return expanseService.getExpanseByItemId(itemId);
     }
 
     public BigDecimal getExchangeRate(String currencyFrom, String currencyTo) {
@@ -25,5 +29,4 @@ public class ExpanseFacade {
     public ExpanseInTripCurrency getExpanseInTripCurrency(BigDecimal price, BigDecimal paid, BigDecimal exchangeRate) {
         return expanseService.getExpanseInTripCurrency(price, paid, exchangeRate);
     }
-
 }

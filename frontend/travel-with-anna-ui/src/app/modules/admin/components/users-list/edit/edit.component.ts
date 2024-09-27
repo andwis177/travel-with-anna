@@ -3,7 +3,6 @@ import {UserAdminUpdateRequest} from "../../../../../services/models/user-admin-
 import {AdminService} from "../../../../../services/services/admin.service";
 import {MatDialogRef} from "@angular/material/dialog";
 import {SharedService} from "../../../../../services/shared/shared.service";
-import {ErrorService} from "../../../../../services/error/error.service";
 import {GetUserAdminViewByIdentifier$Params} from "../../../../../services/fn/admin/get-user-admin-view-by-identifier";
 import {UpdateUser$Params} from "../../../../../services/fn/admin/update-user";
 import {MatIcon} from "@angular/material/icon";
@@ -19,6 +18,7 @@ import {MatDivider} from "@angular/material/divider";
 import {MatInput} from "@angular/material/input";
 import {UserAdminResponse} from "../../../../../services/models/user-admin-response";
 import {UserAdminEditRequest} from "../../../../../services/models/user-admin-edit-request";
+import {ErrorService} from "../../../../../services/error/error.service";
 
 @Component({
   selector: 'app-edit',

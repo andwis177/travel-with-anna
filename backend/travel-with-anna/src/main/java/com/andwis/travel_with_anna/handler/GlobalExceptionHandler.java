@@ -16,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.HashSet;
@@ -136,6 +137,32 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(ExpanseNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(ExpanseNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(EXPANSE_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(EXPANSE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(ExpanseNotSaveException.class)
+    public ResponseEntity<ExceptionResponse> handleException(ExpanseNotSaveException exp) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(EXPANSE_NOT_SAVED.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(EXPANSE_NOT_SAVED.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
     @ExceptionHandler(ExpiredTokenException.class)
     public ResponseEntity<ExceptionResponse> handleException(ExpiredTokenException exp) {
         return ResponseEntity
@@ -145,6 +172,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(EXPIRED_TOKEN.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(EXPIRED_TOKEN.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(FileNotSaved.class)
+    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(FileNotSaved exp) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(FILE_NOT_SAVED.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(FILE_NOT_SAVED.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -231,6 +271,19 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ExceptionResponse> handleException(MaxUploadSizeExceededException exp) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(FILE_TOO_BIG.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(FILE_TOO_BIG.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
     @ExceptionHandler(MessagingException.class)
     public ResponseEntity<ExceptionResponse> handleException(MessagingException exp) {
         return ResponseEntity
@@ -263,19 +316,6 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(NoteNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(NoteNotFoundException exp) {
-        return ResponseEntity
-                .status(NOT_FOUND)
-                .body(
-                        ExceptionResponse.builder()
-                                .errorCode(NOTE_NOT_FOUND.getCode())
-                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
-                                        ? List.of(NOTE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
-                                .build()
-                );
-    }
-
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(RoleNotFoundException exp) {
         return ResponseEntity
@@ -285,19 +325,6 @@ public class GlobalExceptionHandler {
                                 .errorCode(ROLE_NOT_FOUND.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(ROLE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
-                                .build()
-                );
-    }
-
-    @ExceptionHandler(SaveAvatarException.class)
-    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(SaveAvatarException exp) {
-        return ResponseEntity
-                .status(INTERNAL_SERVER_ERROR)
-                .body(
-                        ExceptionResponse.builder()
-                                .errorCode(AVATAR_NOT_SAVED.getCode())
-                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
-                                        ? List.of(AVATAR_NOT_SAVED.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }

@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.trip;
 
 import com.andwis.travel_with_anna.handler.exception.TripNotFoundException;
+import com.andwis.travel_with_anna.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TripService {
     private final TripRepository tripRepository;
+    private final UserService userService;
 
     public Long saveTrip(Trip trip) {
         return tripRepository.save(trip).getTripId();
@@ -23,7 +25,7 @@ public class TripService {
         return tripRepository.findById(tripId).orElseThrow(() -> new TripNotFoundException("Trip not found"));
     }
 
-    public void deleteTrip(Long tripId) {
+    public void deleteById(Long tripId) {
         tripRepository.deleteById(tripId);
     }
 }

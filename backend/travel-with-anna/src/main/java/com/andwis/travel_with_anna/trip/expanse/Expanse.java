@@ -2,9 +2,7 @@ package com.andwis.travel_with_anna.trip.expanse;
 
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
-import com.andwis.travel_with_anna.trip.pdf_doc.Pdf;
 import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -48,20 +46,14 @@ public class Expanse {
     @Column(name = "exchange_rate")
     private BigDecimal exchangeRate;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Pdf pdf;
-
     @OneToOne(mappedBy = "expanse")
-    @JsonIgnore
     private Item item;
 
     @OneToOne(mappedBy = "expanse")
-    @JsonIgnore
     private Activity activity;
 
     @ManyToOne
     @JoinColumn(name = "trip_id")
-    @JsonIgnore
     private Trip trip;
 
     @Override
@@ -72,14 +64,13 @@ public class Expanse {
         return Objects.equals(expanseId, expanse.expanseId) && Objects.equals(expanseName, expanse.expanseName)
                 && Objects.equals(currency, expanse.currency) && Objects.equals(price, expanse.price)
                 && Objects.equals(paid, expanse.paid) && Objects.equals(exchangeRate, expanse.exchangeRate)
-                && Objects.equals(pdf, expanse.pdf) &&  Objects.equals(activity, expanse.activity);
+                &&  Objects.equals(activity, expanse.activity);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(expanseId, expanseName, currency, price, paid, exchangeRate);
     }
-
 
     public BigDecimal getPriceInTripCurrency() {
         if(exchangeRate == null || price == null) {

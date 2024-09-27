@@ -1,301 +1,250 @@
 package com.andwis.travel_with_anna.trip.expanse;
 
 import com.andwis.travel_with_anna.api.currency.CurrencyExchange;
+import com.andwis.travel_with_anna.api.currency.CurrencyExchangeClient;
 import com.andwis.travel_with_anna.api.currency.CurrencyRepository;
+import com.andwis.travel_with_anna.handler.exception.CurrencyNotProvidedException;
+import com.andwis.travel_with_anna.handler.exception.ExpanseNotFoundException;
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
-import com.andwis.travel_with_anna.trip.backpack.item.ItemRepository;
+import com.andwis.travel_with_anna.trip.backpack.item.ItemService;
+import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.andwis.travel_with_anna.trip.trip.TripRepository;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.AfterEach;
+import com.andwis.travel_with_anna.trip.trip.TripService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
 @DisplayName("Expanse Service tests")
 class ExpanseServiceTest {
-
-    @Autowired
+    @InjectMocks
     private ExpanseService expanseService;
 
-    @Autowired
+    @Mock
     private ExpanseRepository expanseRepository;
 
-    @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
-    private TripRepository tripRepository;
-
-    @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
+    @Mock
     private CurrencyRepository currencyRepository;
 
+    @Mock
+    private CurrencyExchangeClient currencyExchangeService;
 
-    private Trip trip;
-    private Item item;
+    @Mock
+    private TripService tripService;
+
+    @Mock
+    private ItemService itemService;
 
     @BeforeEach
     void setUp() {
-        trip = Trip.builder()
-                .tripName("Vacation")
-                .expanses(new ArrayList<>())
-                .days(new ArrayList<>())
-                .build();
-        tripRepository.save(trip);
-
-        item = Item.builder()
-                .item("Flight Ticket")
-                .quantity("1")
-                .build();
-        itemRepository.save(item);
-
-        currencyRepository.deleteAll();
-
-        CurrencyExchange usdToEur = CurrencyExchange.builder()
-                .code("USD")
-                .exchangeValue(BigDecimal.valueOf(0.9))
-                .timeStamp(LocalDateTime.now())
-                .build();
-        CurrencyExchange eurToGbp = CurrencyExchange.builder()
-                .code("EUR")
-                .exchangeValue(BigDecimal.valueOf(0.8))
-                .timeStamp(LocalDateTime.now())
-                .build();
-
-        currencyRepository.saveAll(List.of(usdToEur, eurToGbp));
-    }
-
-    @AfterEach
-    void tearDown() {
-        expanseRepository.deleteAll();
-        itemRepository.deleteAll();
-        tripRepository.deleteAll();
-        currencyRepository.deleteAll();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    @Transactional
-    void testCreateNewExpanse() {
+    void testSaveExpanse() {
         // Given
-        ExpanseForItemRequest expanseItemCreator = new ExpanseForItemRequest(
-                ExpanseRequest.builder()
-                        .expanseName("Flight Ticket")
-                        .currency("USD")
-                        .price(BigDecimal.valueOf(300))
-                        .paid(BigDecimal.valueOf(300))
-                        .exchangeRate(BigDecimal.valueOf(1.0))
-                        .build(),
-                trip.getTripId(),
-                item.getItemId()
-        );
+        Expanse expanse = new Expanse();
+        when(expanseRepository.save(expanse)).thenReturn(expanse);
 
         // When
-        ExpanseResponse createdExpanse = expanseService.createOrUpdateExpanse(expanseItemCreator);
-        entityManager.flush();
-        Expanse savedExpanse = expanseRepository.findById(createdExpanse.expanseId()).orElseThrow();
+        Expanse savedExpanse = expanseService.save(expanse);
 
         // Then
         assertNotNull(savedExpanse);
-        assertEquals("Flight Ticket", savedExpanse.getExpanseName());
-        assertEquals(BigDecimal.valueOf(300), savedExpanse.getPrice());
-        assertEquals(item.getItemId(), savedExpanse.getItem().getItemId());
-        assertEquals(BigDecimal.valueOf(300.0), createdExpanse.paidInTripCurrency());
-        assertEquals(BigDecimal.valueOf(300.0), createdExpanse.priceInTripCurrency());
+        verify(expanseRepository, times(1)).save(expanse);
     }
 
     @Test
-    @Transactional
-    void testUpdateExpanse() {
+    void testFindById() {
         // Given
-        Expanse expanse = Expanse.builder()
-                .expanseName("Hotel")
-                .currency("USD")
-                .price(BigDecimal.valueOf(500))
-                .paid(BigDecimal.valueOf(500))
-                .exchangeRate(BigDecimal.valueOf(1.0))
-                .item(item)
-                .trip(trip)
-                .build();
-        expanseRepository.save(expanse);
-        item.setExpanse(expanse);
-
-        ExpanseForItemRequest expanseItemCreator = new ExpanseForItemRequest(
-                ExpanseRequest.builder()
-                        .expanseName("Updated Hotel")
-                        .currency("USD")
-                        .price(BigDecimal.valueOf(600))
-                        .paid(BigDecimal.valueOf(600))
-                        .exchangeRate(BigDecimal.valueOf(1.0))
-                        .build(),
-                trip.getTripId(),
-                item.getItemId()
-        );
+        Long expanseId = 1L;
+        Expanse expanse = new Expanse();
+        when(expanseRepository.findById(expanseId)).thenReturn(Optional.of(expanse));
 
         // When
-        ExpanseResponse updatedExpanse = expanseService.createOrUpdateExpanse(expanseItemCreator);
-        Expanse savedExpanse = expanseRepository.findById(updatedExpanse.expanseId()).orElseThrow();
-
-        // Then
-        assertNotNull(savedExpanse);
-        assertEquals("Updated Hotel", savedExpanse.getExpanseName());
-        assertEquals(BigDecimal.valueOf(600), savedExpanse.getPrice());
-        assertEquals(BigDecimal.valueOf(600.0), updatedExpanse.paidInTripCurrency());
-        assertEquals(BigDecimal.valueOf(600.0), updatedExpanse.priceInTripCurrency());
-    }
-
-    @Test
-    @Transactional
-    void testAddExpanseToTrip() {
-        // Given
-        Expanse expanse = Expanse.builder()
-                .expanseName("Dinner")
-                .currency("USD")
-                .price(BigDecimal.valueOf(100))
-                .paid(BigDecimal.valueOf(100))
-                .exchangeRate(BigDecimal.valueOf(1.0))
-                .build();
-
-        // When
-        trip.addExpanse(expanse);
-        expanseRepository.save(expanse);
-        entityManager.flush();
-        Expanse savedExpanse = expanseRepository.findById(expanse.getExpanseId()).orElseThrow();
-
-        // Then
-        assertTrue(trip.getExpanses().contains(savedExpanse));
-        assertEquals(trip.getTripId(), savedExpanse.getTrip().getTripId());
-    }
-
-    @Test
-    @Transactional
-    void testGetExpanseForItemWithValidId() {
-        // Given
-        Expanse expanse = Expanse.builder()
-                .expanseName("Dinner")
-                .currency("USD")
-                .price(BigDecimal.valueOf(100))
-                .paid(BigDecimal.valueOf(100))
-                .exchangeRate(BigDecimal.valueOf(1.0))
-                .item(item)
-                .trip(trip)
-                .build();
-        expanseRepository.save(expanse);
-        item.setExpanse(expanse);
-
-        // When
-        ExpanseResponse foundExpanse = expanseService.getExpanseForItem(item.getItemId());
-        entityManager.flush();
-
+        Expanse foundExpanse = expanseService.findById(expanseId);
         // Then
         assertNotNull(foundExpanse);
-        assertEquals("Dinner", foundExpanse.expanseName());
-        assertEquals(BigDecimal.valueOf(100), foundExpanse.price());
+        verify(expanseRepository, times(1)).findById(expanseId);
     }
 
     @Test
-    @DisplayName("Test get expanse for item returns null if no expanse")
-    void testGetExpanseForItemReturnsNullIfNoExpanse() {
+    void testFindByIdThrowsExpanseNotFoundException() {
         // Given
-        Long itemIdWithoutExpanse = item.getItemId();
+        Long expanseId = 1L;
+        when(expanseRepository.findById(expanseId)).thenReturn(Optional.empty());
+        // When & Then
+        assertThrows(ExpanseNotFoundException.class, () -> expanseService.findById(expanseId));
+        verify(expanseRepository, times(1)).findById(expanseId);
+    }
+
+    @Test
+    void testGetCurrencyExchangeByCode() {
+        // Given
+        String code = "USD";
+        CurrencyExchange currencyExchange = new CurrencyExchange();
+        when(currencyRepository.findByCode(code)).thenReturn(Optional.of(currencyExchange));
 
         // When
-        ExpanseResponse foundExpanse = expanseService.getExpanseForItem(itemIdWithoutExpanse);
+        CurrencyExchange foundCurrency = expanseService.getCurrencyExchangeByCode(code);
 
         // Then
-        assertNull(foundExpanse);
+        assertNotNull(foundCurrency);
+        verify(currencyRepository, times(1)).findByCode(code);
     }
 
     @Test
-    @DisplayName("Test get expanse for item returns null for invalid itemId")
-    void testGetExpanseForItemReturnsNullForInvalidId() {
+    void testGetCurrencyExchangeByCodeThrowsException() {
         // Given
-        Long invalidItemId = 999L;
+        String code = "USD";
+        when(currencyRepository.findByCode(code)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(CurrencyNotProvidedException.class, () -> expanseService.getCurrencyExchangeByCode(code));
+    }
+
+    @Test
+    void testCreateOrUpdateExpanseWhenUpdatingExistingExpanse() {
+        // Given
+        ExpanseRequest request = ExpanseRequest.builder().expanseId(1L).build();
+        Expanse expanse = new Expanse();
+        when(expanseRepository.findById(1L)).thenReturn(Optional.of(expanse));
+        when(expanseRepository.save(any(Expanse.class))).thenReturn(expanse);
 
         // When
-        ExpanseResponse foundExpanse = expanseService.getExpanseForItem(invalidItemId);
+        ExpanseResponse response = expanseService.createOrUpdateExpanse(request);
 
         // Then
-        assertNull(foundExpanse);
+        assertNotNull(response);
+        verify(expanseRepository, times(1)).findById(1L);
+        verify(expanseRepository, times(1)).save(any(Expanse.class));
     }
 
     @Test
-    @DisplayName("Test get expanse for item returns null for null itemId")
-    void testGetExpanseForItemReturnsNullForNullId() {
+    void testCreateOrUpdateExpanseWhenSavingNewExpanse() {
         // Given
+        ExpanseRequest request = ExpanseRequest.builder().itemId(1L).tripId(2L).build();
+        Item item = new Item();
+        Trip trip = new Trip();
+        when(itemService.findById(1L)).thenReturn(item);
+        when(tripService.getTripById(2L)).thenReturn(trip);
+        when(expanseRepository.save(any(Expanse.class))).thenReturn(new Expanse());
+
         // When
-        ExpanseResponse foundExpanse = expanseService.getExpanseForItem(null);
+        ExpanseResponse response = expanseService.createOrUpdateExpanse(request);
 
         // Then
-        assertNull(foundExpanse);
+        assertNotNull(response);
+        verify(itemService, times(1)).findById(1L);
+        verify(tripService, times(1)).getTripById(2L);
+        verify(expanseRepository, times(1)).save(any(Expanse.class));
     }
 
     @Test
-    @DisplayName("Test get expanse for item returns null for zero itemId")
-    void testGetExpanseForItemReturnsNullForZeroId() {
-        // Given
-        // When
-        ExpanseResponse foundExpanse = expanseService.getExpanseForItem(0L);
-
-        // Then
-        assertNull(foundExpanse);
-    }
-
-    @Test
-    @DisplayName("Test getExchangeRate with valid currencies")
-    @Transactional
     void testGetExchangeRate() {
         // Given
+        CurrencyExchange usd = new CurrencyExchange();
+        usd.setExchangeValue(BigDecimal.ONE);
+
+        CurrencyExchange eur = new CurrencyExchange();
+        eur.setExchangeValue(BigDecimal.valueOf(0.85));
+
+        when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(usd));
+        when(currencyRepository.findByCode("EUR")).thenReturn(Optional.of(eur));
+
         // When
         BigDecimal exchangeRate = expanseService.getExchangeRate("USD", "EUR");
 
         // Then
         assertNotNull(exchangeRate);
-        assertEquals(BigDecimal.valueOf(0.88889), exchangeRate);
+        assertEquals(BigDecimal.valueOf(0.85).setScale(5, RoundingMode.HALF_UP), exchangeRate);
     }
 
     @Test
-    @DisplayName("Test getExchangeRate with invalid currencies")
-    @Transactional
-    void testGetExchangeRateInvalidCurrency() {
+    void testGetExchangeRateReturnsOneWhenCurrencyNotProvided() {
         // Given
+        when(currencyRepository.findByCode("USD")).thenReturn(Optional.empty());
+        when(currencyRepository.findByCode("EUR")).thenReturn(Optional.empty());
+
         // When
-        BigDecimal exchangeRate = expanseService.getExchangeRate("USD", "GBP");
+        BigDecimal exchangeRate = expanseService.getExchangeRate("USD", "EUR");
 
         // Then
-        assertEquals(BigDecimal.ZERO, exchangeRate);
+        assertEquals(BigDecimal.ONE, exchangeRate);
     }
 
     @Test
-    @Transactional
-    void testGetTripCurrencyValues() {
+    void testChangeTripCurrency() {
         // Given
-        BigDecimal price = BigDecimal.valueOf(100);
-        BigDecimal paid = BigDecimal.valueOf(90);
-        BigDecimal exchangeRate = BigDecimal.valueOf(0.9);
+        Budget budget = new Budget();
+        Trip trip = new Trip();
+        trip.setTripId(1L);
+        budget.setTrip(trip);
+        budget.setCurrency("EUR");
+
+        Expanse expanse1 = new Expanse();
+        expanse1.setCurrency("USD");
+        Expanse expanse2 = new Expanse();
+        expanse2.setCurrency("GBP");
+
+        when(expanseRepository.findByTripId(1L)).thenReturn(Arrays.asList(expanse1, expanse2));
+        when(currencyRepository.findByCode(anyString())).thenReturn(Optional.of(
+                new CurrencyExchange(
+                        1L,
+                        "USD",
+                        BigDecimal.ONE,
+                        LocalDateTime.now()
+                )));
 
         // When
-        ExpanseInTripCurrency tripCurrencyValues = expanseService.getExpanseInTripCurrency(price, paid, exchangeRate);
+        expanseService.changeTripCurrency(budget);
 
         // Then
-        assertNotNull(tripCurrencyValues);
-        assertEquals(BigDecimal.valueOf(90.00)
-                .setScale(2, RoundingMode.HALF_UP), tripCurrencyValues.price());
-        assertEquals(BigDecimal.valueOf(81.00)
-                .setScale(2, RoundingMode.HALF_UP), tripCurrencyValues.paid());
+        verify(expanseRepository, times(1)).findByTripId(1L);
+        verify(expanseRepository, times(1)).saveAll(anyList());
+    }
+    @Test
+    void testGetExpanseByItemId() {
+        // Given
+        Item item = new Item();
+        Expanse expanse = new Expanse();
+        expanse.setExpanseId(1L);
+        item.setExpanse(expanse);
+
+        when(itemService.findById(1L)).thenReturn(item);
+        when(expanseRepository.findById(1L)).thenReturn(Optional.of(expanse));
+
+        // When
+        ExpanseResponse response = expanseService.getExpanseByItemId(1L);
+
+        // Then
+        assertNotNull(response);
+        verify(itemService, times(1)).findById(1L);
+        verify(expanseRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void testGetExpanseById() {
+        // Given
+        Expanse expanse = new Expanse();
+        when(expanseRepository.findById(1L)).thenReturn(Optional.of(expanse));
+
+        // When
+        ExpanseResponse response = expanseService.getExpanseById(1L);
+
+        // Then
+        assertNotNull(response);
+        verify(expanseRepository, times(1)).findById(1L);
     }
 }

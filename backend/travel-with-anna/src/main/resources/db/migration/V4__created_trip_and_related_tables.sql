@@ -50,11 +50,6 @@ CREATE TABLE budget (
                         to_spend DECIMAL(19, 2) NOT NULL
 );
 
-CREATE TABLE pdf (
-                     pdf_id BIGSERIAL PRIMARY KEY,
-                     name VARCHAR(100),
-                     pdf TEXT
-);
 
 CREATE TABLE expanses (
                           expanse_id BIGSERIAL PRIMARY KEY,
@@ -69,7 +64,7 @@ CREATE TABLE expanses (
 
 CREATE TABLE items (
                        item_id BIGSERIAL PRIMARY KEY,
-                       item VARCHAR(60) NOT NULL,
+                       item_name VARCHAR(60) NOT NULL,
                        quantity VARCHAR(40),
                        is_packed BOOLEAN DEFAULT FALSE,
                        backpack_id BIGINT,
@@ -95,10 +90,10 @@ ALTER TABLE trips
     ADD FOREIGN KEY (budget_id) REFERENCES budget(budget_id);
 
 --
-ALTER TABLE backpack
+ALTER TABLE trips
     ADD COLUMN note_id BIGINT;
 
-ALTER TABLE backpack
+ALTER TABLE trips
     ADD FOREIGN KEY (note_id) REFERENCES notes(note_id);
 
 --
@@ -133,21 +128,9 @@ ALTER TABLE days
 ALTER TABLE days
     ADD FOREIGN KEY (trip_id) REFERENCES trips(trip_id);
 
-ALTER TABLE expanses
-    ADD COLUMN pdf_pdf_id BIGINT;
-
-ALTER TABLE expanses
-    ADD FOREIGN KEY (pdf_pdf_id) REFERENCES pdf(pdf_id);
-
 ALTER TABLE items
     ADD COLUMN expanse_id BIGINT;
 
 ALTER TABLE items
     ADD FOREIGN KEY (expanse_id) REFERENCES expanses(expanse_id);
 
---
--- ALTER TABLE expanses
---     ADD COLUMN item_id BIGINT;
---
--- ALTER TABLE expanses
---     ADD FOREIGN KEY (item_id) REFERENCES items(id);

@@ -8,14 +8,14 @@ import { RequestBuilder } from '../../request-builder';
 
 import { ExpanseResponse } from '../../models/expanse-response';
 
-export interface GetExpanseForItem$Params {
-  itemId: number;
+export interface GetExpanseById$Params {
+  expanseId: number;
 }
 
-export function getExpanseForItem(http: HttpClient, rootUrl: string, params: GetExpanseForItem$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
-  const rb = new RequestBuilder(rootUrl, getExpanseForItem.PATH, 'get');
+export function getExpanseById(http: HttpClient, rootUrl: string, params: GetExpanseById$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
+  const rb = new RequestBuilder(rootUrl, getExpanseById.PATH, 'get');
   if (params) {
-    rb.path('itemId', params.itemId, {});
+    rb.path('expanseId', params.expanseId, {});
   }
 
   return http.request(
@@ -28,4 +28,4 @@ export function getExpanseForItem(http: HttpClient, rootUrl: string, params: Get
   );
 }
 
-getExpanseForItem.PATH = '/expanse/{itemId}/expanse';
+getExpanseById.PATH = '/expanse/{expanseId}/expanse';

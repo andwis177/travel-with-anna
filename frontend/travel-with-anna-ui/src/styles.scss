@@ -5,8 +5,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Alumni+Sans+Collegiate+One:ital@0;1&family=Belanosima:wght@400;600;700&family=Chicle&family=Fjalla+One&family=Fruktur:ital@0;1&family=Nothing+You+Could+Do&family=Odor+Mean+Chey&family=Purple+Purse&family=Rubik+Doodle+Shadow&family=Sigmar&family=Sirin+Stencil&family=Tourney:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"');
 @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet"');
 
-
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Montserrat, "Montserrat", sans-serif; }
 
@@ -21,11 +19,9 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Montserrat', sans-serif;
 }
 
-
 p, a, span {
   font-family: 'Montserrat', sans-serif;
 }
-
 
 .header,
 .subheader,
@@ -68,10 +64,8 @@ p, a, span {
     justify-content: center;
   }
 
-
   .mdc-text-field--outlined {
     background-color: whitesmoke !important;
-
   }
 
   .mdc-text-field--outlined .mdc-notched-outline__leading,
@@ -85,7 +79,44 @@ p, a, span {
   .mdc-notched-outline--upgraded,
   .mdc-floating-label--float-above {
     color: #2E3944 !important;
+  }
+}
 
+.dialog-container {
+  align-items: center !important;
+  text-align: center;
+  background-color: #EDEAE5 !important;
+  color: #2E3944 !important;
+  margin: auto;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: start !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box;
+  padding: 5% !important;
+  border: none !important;
+
+  .toolbar-row {
+    padding: 4% !important;
+    justify-content: center;
+  }
+
+  .mdc-text-field--outlined {
+    background-color: whitesmoke !important;
+  }
+
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__notch,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: #2E3944 !important;
+  }
+
+  .mdc-form-field,
+  .mdc-text-field--outlined,
+  .mdc-notched-outline--upgraded,
+  .mdc-floating-label--float-above {
+    color: #2E3944 !important;
   }
 }
 
@@ -220,7 +251,6 @@ p, a, span {
 .dialog-title{
   display: flex;
   align-items: center;
-
   font-size: 18px;
   font-weight: 500;
   color: #2E3944;
@@ -275,13 +305,11 @@ p, a, span {
   font-family: 'Kalam', sans-serif !important;
 }
 
-// -Start- Menu Component
-
 .admin-background {
   background-color: black;
 }
 
-.user-background {
+.component-background {
   background-color: #2E3944;
 }
 
@@ -321,8 +349,6 @@ p, a, span {
   margin-right: 20px;
 }
 
-// -End- Menu Component
-
 .user-button {
   width: 40px;
   height: 40px;
@@ -339,13 +365,15 @@ p, a, span {
   height: 100%;
   object-fit: cover;
   border-radius: 15%;
-  background-color: #A6ACB1;
+  background-color: lightsteelblue;
   border: 2px solid whitesmoke;
   padding:5px;
   cursor: pointer;
 }
 
-.user-button-image:hover {
+.user-button-image:hover,
+.user-button:hover,
+{
   opacity: 0.5;
-
 }
+

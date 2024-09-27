@@ -1,9 +1,8 @@
 package com.andwis.travel_with_anna.trip.note;
 
-import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.andwis.travel_with_anna.trip.trip.Trip;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -24,27 +23,28 @@ public class Note {
     private Long noteId;
 
     @Size(max = 500)
-    @Column(length = 500)
+    @Column(name = "note", length = 500)
     private String note;
 
     @OneToOne(mappedBy = "note")
-    @JsonIgnore
     private Day day;
 
     @OneToOne(mappedBy = "note")
-    @JsonIgnore
-    private Backpack backpack;
+    private Trip trip;
 
     @OneToOne(mappedBy = "note")
-    @JsonIgnore
     private Activity activity;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Note note1 = (Note) o;
-        return Objects.equals(noteId, note1.noteId) && Objects.equals(note, note1.note) && Objects.equals(day, note1.day) && Objects.equals(backpack, note1.backpack) && Objects.equals(activity, note1.activity);
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Note objectNote = (Note) object;
+        return Objects.equals(noteId, objectNote.noteId)
+                && Objects.equals(note, objectNote.note)
+                && Objects.equals(day, objectNote.day)
+                && Objects.equals(trip, objectNote.trip)
+                && Objects.equals(activity, objectNote.activity);
     }
 
     @Override

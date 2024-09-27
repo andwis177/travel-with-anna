@@ -12,11 +12,15 @@ public class BudgetFacade {
         budgetService.saveBudget(budget);
     }
 
-    public BudgetRequest getBudgetById(Long budgetId) {
+    public BudgetResponse getBudgetById(Long budgetId) {
         return budgetService.getBudgetById(budgetId);
     }
 
     public BudgetExpensesRespond getBudgetExpanses(Long tripId, Long budgetId) {
         return budgetService.getBudgetExpanses(tripId, budgetId);
+    }
+
+    public void updateBudget(BudgetRequest request) {
+        budgetService.updateBudget(request);
     }
 }

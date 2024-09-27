@@ -1,7 +1,6 @@
 package com.andwis.travel_with_anna.trip.backpack.item;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,7 @@ public class ItemController {
     }
 
     @PatchMapping("/save-list")
-    public ResponseEntity<Void> saveAllItemsFromTheList(@RequestBody @Valid List<ItemRequest> items) {
+    public ResponseEntity<Void> saveAllItemsFromTheList(@RequestBody List<ItemRequest> items) {
         itemFacade.saveAllItems(items);
         return ResponseEntity.ok().build();
     }

@@ -71,14 +71,14 @@ class ItemControllerTest {
         // Given
         ItemRequest itemRequest1 = ItemRequest.builder()
                 .itemId(1L)
-                .item("Water Bottle")
+                .itemName("Water Bottle")
                 .qty("2")
                 .isPacked(true)
                 .build();
 
         ItemRequest itemRequest2 = ItemRequest.builder()
                 .itemId(2L)
-                .item("Sleeping Bag")
+                .itemName("Sleeping Bag")
                 .qty("1")
                 .isPacked(false)
                 .build();

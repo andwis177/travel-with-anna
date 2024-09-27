@@ -5,6 +5,9 @@ import {BackpackComponent} from "../backpack/backpack.component";
 import {BudgetService} from "../../../../../../services/services/budget.service";
 import {GetBudgetById$Params} from "../../../../../../services/fn/budget/get-budget-by-id";
 import {TripResponse} from "../../../../../../services/models/trip-response";
+import {Router} from "@angular/router";
+import {NoteComponent} from "../note/note.component";
+import {DeleteTripComponent} from "../delete-trip/delete-trip.component";
 
 @Component({
   selector: 'app-trip-details-buttons',
@@ -20,6 +23,7 @@ export class TripDetailsButtonsComponent implements OnInit {
   tripCurrency: string = '';
 
   constructor(public dialog: MatDialog,
+              private router: Router,
               private budgetService: BudgetService) {
   }
 
@@ -32,7 +36,6 @@ export class TripDetailsButtonsComponent implements OnInit {
     this.budgetService.getBudgetById(params).subscribe({
       next: (budget) => {
         this.tripCurrency = budget.currency!;
-        console.log(this.tripCurrency)
       },
       error: (err) => {
         console.error(err.error.errors);
@@ -43,11 +46,10 @@ export class TripDetailsButtonsComponent implements OnInit {
   openBackpack(event: Event) {
     event.preventDefault();
     const dialogRef = this.dialog.open(BackpackComponent, {
-      width: '70vw',
-      height: '90vh',
-      maxWidth: '70vw',
+      maxWidth: '90vw',
       maxHeight: '90vh',
-      panelClass: 'full-screen-dialog',
+      width: '70%',
+      height: 'auto',
       id: 'backpack-dialog',
       data: {
         backpackId: this._trip.backpackId,
@@ -57,11 +59,44 @@ export class TripDetailsButtonsComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Dialog closed, result:', result);
     });
   }
 
-  openBudget($event: Event) {
-    $event.stopPropagation();
+  openBudget(event: Event) {
+    event.preventDefault();
+    console.log('open budget: ' + this._trip.budgetId);
+    this.router.navigate(['/twa/budget', this._trip.tripId, this._trip.budgetId]).then();
+  }
+
+  openNote(event: Event) {
+    event.preventDefault();
+    const dialogRef = this.dialog.open(NoteComponent, {
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
+      id: 'note-dialog',
+      data: {
+        tripId: this._trip.tripId,
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+  deleteTrip(event: Event) {
+    event.preventDefault();
+    const dialogRef = this.dialog.open(DeleteTripComponent, {
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
+      id: 'delete-trip-dialog',
+      data: {
+        tripId: this._trip.tripId,
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+    });
   }
 }

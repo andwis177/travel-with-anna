@@ -9,6 +9,7 @@ import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {EditComponent} from "../edit/edit.component";
 import {AvatarImg} from "../../../../../services/models/avatar-img";
+import {ErrorService} from "../../../../../services/error/error.service";
 
 @Component({
   selector: 'app-image',
@@ -23,12 +24,13 @@ import {AvatarImg} from "../../../../../services/models/avatar-img";
   styleUrl: './image.component.scss'
 })
 export class ImageComponent implements OnInit{
-
+  errorMsg: Array<string> = [];
   userAvatar: AvatarImg | null = null;
 
   constructor(private adminService: AdminService,
               public dialogRef: MatDialogRef<EditComponent>,
-              private shareService: SharedService ){
+              private shareService: SharedService,
+              private errorService: ErrorService) {
   }
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -58,7 +60,7 @@ export class ImageComponent implements OnInit{
         }
       },
       error: (err) => {
-        console.log(err.error.errors);
+        this.errorMsg = this.errorService.errorHandler(err);
       }
     });
   }

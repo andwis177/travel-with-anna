@@ -2,7 +2,7 @@
 /* eslint-disable */
 export interface ItemResponse {
   isPacked?: boolean;
-  item?: string;
   itemId?: number;
+  itemName?: string;
   qty?: string;
 }

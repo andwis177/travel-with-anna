@@ -37,11 +37,11 @@ import {AddItemToBackpack$Params} from "../../../../../../services/fn/backpack/a
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {DeleteItem$Params} from "../../../../../../services/fn/backpack/delete-item";
 import {ExpanseComponent} from "../expanse/expanse.component";
-import {ErrorService} from "../../../../../../services/error/error.service";
 import {LogoComponent} from "../../../../../components/menu/logo/logo.component";
 import {UserComponent} from "../../../../../components/menu/user/user.component";
 import {ItemResponse} from "../../../../../../services/models/item-response";
 import {BackpackResponse} from "../../../../../../services/models/backpack-response";
+import {ErrorService} from "../../../../../../services/error/error.service";
 
 @Component({
   selector: 'app-backpack',
@@ -90,14 +90,14 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   backpackId: number;
   tripId: number;
   tripCurrency: string = '';
-  backpackRequest: BackpackResponse = {};
+  backpackResponse: BackpackResponse = {};
   items: ItemResponse[] = [];
-  itemRequest: ItemRequest = {itemId: -1, item: "", packed: false, qty: '1'};
+  itemRequest: ItemRequest = {itemId: -1, itemName: "", packed: false, qty: '1'};
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
     'isPacked',
-    'item',
+    'itemName',
     'qty',
     'action'
   ];
@@ -122,28 +122,12 @@ export class BackpackComponent implements OnInit, AfterViewInit {
     this.selection.clear();
   }
 
-  @HostListener('document:keydown.ArrowDown', ['$event'])
-  onArrowDownKeydownHandler(event: KeyboardEvent): void {
-    if (this.currentRowIndex < this.dataSource.data.length - 1) {
-      this.currentRowIndex++;
-      this.selectRowByIndex(this.currentRowIndex);
-    }
-  }
-
-  @HostListener('document:keydown.ArrowUp', ['$event'])
-  onArrowUpKeydownHandler(event: KeyboardEvent): void {
-    if (this.currentRowIndex > 0) {
-      this.currentRowIndex--;
-      this.selectRowByIndex(this.currentRowIndex);
-    }
-  }
-
   ngOnInit() {
     this.selection.clear()
     this.receiveBackpack();
     this.receiveItems();
 
-    if (this.dataSource.data.length > 0) {
+    if (this.dataSource.filteredData.length > 0) {
       this.currentRowIndex = 0;
       this.selectRowByIndex(this.currentRowIndex);
     }
@@ -154,7 +138,7 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   }
 
   selectRowByIndex(index: number): void {
-    const row = this.dataSource.data[index];
+    const row = this.dataSource.filteredData[index];
     if (row) {
       this.selection.clear();
       this.selection.select(row);
@@ -162,27 +146,33 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   }
 
   toggleRow(row: ItemRequest) {
-    this.currentRowIndex = this.dataSource.data.indexOf(row);
+    this.currentRowIndex = this.dataSource.filteredData.indexOf(row);
     this.selection.clear();
     this.selection.select(row);
   }
 
   receiveBackpack(): void {
     this.backpackService.getBackpackById({ backpackId: this.backpackId }).subscribe((backpack) => {
-      this.backpackRequest = backpack;
+      this.backpackResponse = backpack;
     });
   }
 
   receiveItems(): void {
-    this.itemService.getAllItemsByBackpackId({ backpackId: this.backpackId }).subscribe((items) => {
-      this.items = items;
-      this.dataSource = new MatTableDataSource(items);
-      if(this.dataSource.data.length > 0) {
-        this.selectRowByIndex(0)
-        this.toggleRow(this.dataSource.data[0]);
-      }
-      this.dataSource.sort = this.sort;
-    });
+    this.itemService.getAllItemsByBackpackId({ backpackId: this.backpackId })
+      .subscribe({
+        next:(items) => {
+          this.items = items;
+          this.dataSource = new MatTableDataSource(items);
+          if (this.dataSource.filteredData.length > 0) {
+            this.selectRowByIndex(0)
+            this.toggleRow(this.dataSource.filteredData[0]);
+          }
+          this.dataSource.sort = this.sort;
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
   }
 
   announceSortChange(sortState: Sort) {
@@ -201,8 +191,8 @@ export class BackpackComponent implements OnInit, AfterViewInit {
     this.errorMsg = [];
     const params: AddItemToBackpack$Params = {backpackId: this.backpackId, body: this.itemRequest};
     this.backpackService.addItemToBackpack(params).subscribe({
-      next: (response) => {
-        this.itemRequest = {itemId: -1, item: "", packed: false, qty: '1'}
+      next: () => {
+        this.itemRequest = {itemId: -1, itemName: "", packed: false, qty: '1'}
         this.receiveItems();
         this.selectRowByIndex(0);
       },
@@ -212,13 +202,11 @@ export class BackpackComponent implements OnInit, AfterViewInit {
     });
   }
 
-  saveItems($event: MouseEvent) {
-    $event.preventDefault();
+  saveItems() {
     this.errorMsg = [];
     this.itemService.saveAllItemsFromTheList({ body: this.items}).subscribe({
-      next: (response) => {
+      next: () => {
         this._liveAnnouncer.announce('Items were saved successfully').then(r =>(this._snackBar.open("All items were saved", 'Close')));
-        console.log(response);
       },
       error: (err) => {
         this.errorMsg = this.errorService.errorHandler(err);
@@ -245,20 +233,20 @@ export class BackpackComponent implements OnInit, AfterViewInit {
     this.selectRowByIndex(index)
     console.log('openExpanse', item.itemId);
     const dialogRef = this.dialog.open(ExpanseComponent, {
-      width: '90vw',
-      height: '90vh',
       maxWidth: '90vw',
-      maxHeight: '90vh',
+      maxHeight: '100vh',
+      width: 'auto',
+      height: 'auto',
       id: 'expanse-dialog',
       data: {
-        item: item.item,
+        description: item.itemName,
         itemId: item.itemId,
         currency: this.tripCurrency,
         tripId: this.tripId,
       }
     });
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Dialog closed, result:', result);
+      this.saveItems()
     });
   }
 }

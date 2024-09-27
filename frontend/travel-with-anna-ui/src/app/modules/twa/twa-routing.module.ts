@@ -5,6 +5,7 @@ import {AuthGuard} from "../../services/auth/auth.guard";
 import {TripListComponent} from "./components/trip-list/trip-list.component";
 import {TripDetailsComponent} from "./components/trip-list/trip-details/trip-details.component";
 import {BackpackComponent} from "./components/trip-list/trip-details/backpack/backpack.component";
+import {BudgetComponent} from "./components/trip-list/trip-details/budget/budget.component";
 
 const routes: Routes = [
   {
@@ -42,9 +43,13 @@ const routes: Routes = [
         component: BackpackComponent,
         canActivate: [AuthGuard]
       },
+      {
+        path: 'budget/:trip_id/:budget_id',
+        component: BudgetComponent,
+        canActivate: [AuthGuard]
+      }
     ]
   },
-
 ];
 
 @NgModule({

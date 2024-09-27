@@ -1,1 +1,158 @@
-<h2>Budget</h2>
+<div class="component-background">
+  <div class="menu-components-background toolbar-menu">
+    <div class="logo">
+      <app-logo></app-logo>
+    </div>
+    <div class="menu-buttons">
+      <app-budget-buttons
+        *ngIf="tripId"
+        [_tripId]="tripId"
+        [_budget]="budgetExpanse.budgetResponse!"
+        [_sumsByCurrency]="budgetExpanse.sumsByCurrency!"
+        (afterSave)="getBudgetExpenses()"
+      ></app-budget-buttons>
+    </div>
+    <div class="user">
+      <app-user></app-user>
+    </div>
+  </div>
+</div>
+
+<div class="summary-container">
+  <div class="full-width expanse-container">
+    <div class="full-width budget label-color-light">
+      <div>
+        <label class="label">Budget: </label>
+        <label class="amount-label label-color-blue ">{{budgetExpanse.budgetResponse?.toSpend}} </label>
+        <label class="currency-label">{{budgetExpanse.budgetResponse?.currency}}</label>
+      </div>
+
+      <div class="left">
+        <label class="label label-color-light">Left to spend: </label>
+        <label [ngClass]="getColorAmount(budgetExpanse.paidBalanceDue!)" class="amount-label">{{budgetExpanse.paidBalanceDue}} </label>
+        <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
+      </div>
+    </div>
+
+    <div class="full-width price-paid">
+
+      <div>
+        <label class="label label-color-light">Price : </label>
+        <label class="amount-label label-color-blue ">{{budgetExpanse.overallPriceInTripCurrency}} </label>
+        <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
+        <label class="label-color-light"> (</label>
+        <label [ngClass]="getColorAmount(budgetExpanse.priceBalanceDue!)" class="amount-label">{{budgetExpanse.priceBalanceDue}} </label>
+        <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
+        <label class="label-color-light">)</label>
+      </div>
+
+      <div>
+        <label class="label label-color-light">Paid: </label>
+        <label class="amount-label label-color-blue ">{{budgetExpanse.overallPaidInTripCurrency}}</label>
+        <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
+        <label class="label-color-light label-color-light"> (</label>
+        <label [ngClass]="getColorAmount(budgetExpanse.totalDebtInTripCurrency!)" class="amount-label">{{budgetExpanse.totalDebtInTripCurrency}} </label>
+        <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
+        <label class="label-color-light label-color-light">)</label>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="second-container">
+  <div class="table-container mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)">
+
+      <ng-container matColumnDef="expanseName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="description-column" sortActionDescription="Sort by expanseName" >
+          Description
+        </th>
+        <td mat-cell *matCellDef="let element" class="description-column">
+          {{element.expanseName}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="currency">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="currency-column" sortActionDescription="Sort by currency">
+          Currency
+        </th>
+        <td mat-cell *matCellDef="let element" class="currency-column">
+          {{element.currency}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-currency-column" sortActionDescription="Sort by price">
+          Price
+        </th>
+        <td mat-cell *matCellDef="let element" class="amount-currency-column">
+          {{element.price}}
+          <label style="font-size: 10px">{{element.currency}} </label>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="paid">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-currency-column" sortActionDescription="Sort by paid">
+          Paid
+        </th>
+        <td mat-cell *matCellDef="let element" class="amount-currency-column">
+          {{element.paid}}
+          <label style="font-size: 10px">{{element.currency}} </label>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="exchangeRate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="trip-currency-column" sortActionDescription="Sort by exchangeRate">
+          Exchange rate
+        </th>
+        <td mat-cell *matCellDef="let element" class="trip-currency-column">
+          <div *ngIf="element.exchangeRate!==1">  {{element.exchangeRate}}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="priceInTripCurrency">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="trip-currency-column" sortActionDescription="Sort by priceInTripCurrency">
+          Price
+        </th>
+        <td mat-cell *matCellDef="let element" class="trip-currency-column">
+          {{element.priceInTripCurrency}}
+          <label style="font-size: 10px">{{budgetExpanse.budgetResponse!.currency}} </label>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="paidInTripCurrency">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="trip-currency-column" sortActionDescription="Sort by paidInTripCurrency">
+          Paid
+        </th>
+        <td mat-cell *matCellDef="let element" class="trip-currency-column">
+          {{element.paidInTripCurrency}}
+          <label style="font-size: 10px">{{budgetExpanse.budgetResponse!.currency}} </label>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef class="action-column"></th>
+        <td mat-cell *matCellDef="let element; let i = index" class="action-column">
+          <div class="action-container">
+            <button class="expanse-button" matTooltip="Add expance"
+                    (click)="openExpanse(i)"
+                    [disabled]="currentRowIndex === -1">
+              <i class="fas fa-dollar-sign fa-1x"></i></button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="toggleRow(row)" [class.selected]="selection.isSelected(row)"></tr>
+    </table>
+  </div>
+
+  <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+    <mat-divider></mat-divider>
+    <p *ngFor="let msg of errorMsg">{{msg}}</p>
+  </div>
+</div>
+
+
+

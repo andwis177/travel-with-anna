@@ -7,7 +7,7 @@
   </button>
 </mat-toolbar-row>
 
-<mat-card class="second-container" style="padding: 5%;" appearance="outlined">
+<div class="dialog-container" >
   <div class="image-container">
     <img [src]="'data:image/jpeg;base64,' + userAvatar?.avatar"
          alt="/"
@@ -17,4 +17,4 @@
   <div>
     <button class="custom-button-0" (click)="onClose()" type="submit">Close</button>
   </div>
-</mat-card>
+</div>

@@ -1,4 +1,3 @@
-
 <mat-toolbar-row class="dialog-header">
   <div class="dialog-title">Account</div>
   <button mat-icon-button class="close-button"
@@ -7,10 +6,11 @@
     <mat-icon class="close-icon">close</mat-icon>
   </button>
 </mat-toolbar-row>
-<mat-card class="second-container" >
+
+<div class="dialog-container">
   <div class="image-button-container">
     <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" />
-    <button mat-icon-button class="profile-button" matTooltip="Account settings"
+    <button mat-icon-button class="profile-button" matTooltip="Set Avatar"
             (click)="triggerFileInput()" type="submit">
       <img *ngIf="avatarImg" [src]="avatarImg" class="profile-image" alt="User Avatar" fill priority>
     </button>
@@ -18,18 +18,19 @@
 
   <form class="main-form">
     <div *ngIf="!isEdit else edit_template_input">
-      <div class="information-area mat-elevation-z8">
-        <div>
-          <p class="label-text">Name: </p>
-          <p class="custom-header wrap-text">{{userCredentials.userName}}</p>
-        </div>
-        <div>
-          <p class="label-text">Email: </p>
-          <p class="custom-header wrap-text">{{userCredentials.email}}</p>
+      <div class="full-width center-align">
+        <div class="information-area mat-elevation-z8">
+          <div>
+            <p class="label-text">Name: </p>
+            <p class="custom-header wrap-text">{{userCredentials.userName}}</p>
+          </div>
+          <div>
+            <p class="label-text">Email: </p>
+            <p class="custom-header wrap-text">{{userCredentials.email}}</p>
+          </div>
         </div>
       </div>
     </div>
-
     <mat-card-actions class="button-area">
       <div *ngIf="!isEdit else edit_template_button">
         <button class="custom-button-0" (click)="edit()" type="submit">Edit</button>
@@ -41,12 +42,12 @@
       <p *ngFor="let msg of errorMsg">{{msg}}</p>
     </div>
 
-    <div class="delete-button-area" *ngIf="isEdit">
+    <div class="center-align" *ngIf="isEdit">
       <mat-divider></mat-divider>
       <button class="custom-button-2" (click)="deleteAccount()" type="submit">DELETE ACCOUNT</button>
     </div>
   </form>
-</mat-card>
+</div>
 
 <ng-template #edit_template_button>
   <button class="custom-button-0 full-width" (click)="saveUserCredentials()" type="submit">Save</button>
@@ -98,3 +99,4 @@
     </mat-form-field>
   </div>
 </ng-template>
+

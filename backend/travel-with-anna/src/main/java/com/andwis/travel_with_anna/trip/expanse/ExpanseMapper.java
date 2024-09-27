@@ -6,17 +6,25 @@ import java.util.stream.Collectors;
 
 public class ExpanseMapper {
 
-    public static Expanse mapToExpanse(ExpanseRequest expanseRequest) {
-        return Expanse.builder()
-                .expanseName(expanseRequest.getExpanseName())
-                .currency(expanseRequest.getCurrency())
-                .price(expanseRequest.getPrice() != null ? expanseRequest.getPrice() : BigDecimal.ZERO)
-                .paid(expanseRequest.getPaid() != null ? expanseRequest.getPaid() : BigDecimal.ZERO)
-                .exchangeRate(expanseRequest.getExchangeRate() != null ? expanseRequest.getExchangeRate() : BigDecimal.ONE)
-                .build();
+    public static void mapToExpanse(Expanse expanse, ExpanseRequest expanseRequest) {
+        if (expanseRequest == null) {
+            throw new IllegalArgumentException("Expanse and ExpanseRequest cannot be null");
+        }
+        if (expanse == null) {
+            expanse = Expanse.builder()
+                    .expanseName(expanseRequest.getExpanseName())
+                    .currency(expanseRequest.getCurrency())
+                    .price(expanseRequest.getPrice() != null ? expanseRequest.getPrice() : BigDecimal.ZERO)
+                    .paid(expanseRequest.getPaid() != null ? expanseRequest.getPaid() : BigDecimal.ZERO)
+                    .exchangeRate(expanseRequest.getExchangeRate() != null ? expanseRequest.getExchangeRate() : BigDecimal.ONE)
+                    .build();
+        }
+        if (expanse != null) {
+            updateExpanse(expanse, expanseRequest);
+        }
     }
 
-    public static ExpanseResponse mapToExpanseItem(Expanse expanse) {
+    public static ExpanseResponse mapToExpanseResponse(Expanse expanse) {
         return new ExpanseResponse(
                 expanse.getExpanseId(),
                 expanse.getExpanseName(),
@@ -27,12 +35,19 @@ public class ExpanseMapper {
                 expanse.getPriceInTripCurrency(),
                 expanse.getPaidInTripCurrency()
         );
-
     }
 
-    public static List<ExpanseResponse> mapToExpanseItemList(List<Expanse> expanses) {
+    public static void updateExpanse(Expanse expanse, ExpanseRequest expanseRequest) {
+        expanse.setExpanseName(expanseRequest.getExpanseName());
+        expanse.setCurrency(expanseRequest.getCurrency());
+        expanse.setPrice(expanseRequest.getPrice());
+        expanse.setPaid(expanseRequest.getPaid());
+        expanse.setExchangeRate(expanseRequest.getExchangeRate());
+    }
+
+    public static List<ExpanseResponse> mapToExpanseResponseList(List<Expanse> expanses) {
         return expanses.stream()
-                .map(ExpanseMapper::mapToExpanseItem)
+                .map(ExpanseMapper::mapToExpanseResponse)
                 .collect(Collectors.toList());
     }
 }

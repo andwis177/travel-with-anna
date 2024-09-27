@@ -45,12 +45,16 @@ class UserControllerTest {
         when(service.getCredentials("email@example.com")).thenReturn(userCredentials);
         when(connectedUser.getName()).thenReturn("email@example.com");
 
-        // When
+        // When & Then
         mockMvc.perform(get("/user/credentials")
                         .principal(connectedUser))
                 .andExpect(status().isOk())
                 .andExpect(content().json(
-                        "{'email': 'email@example.com', 'userName': 'username', 'password': 'password'}"));
+                        "{" +
+                                "'email': 'email@example.com'," +
+                                " 'userName': 'username'," +
+                                " 'role': 'USER'" +
+                                "}"));
     }
 
     @Test
@@ -73,7 +77,7 @@ class UserControllerTest {
                 .thenReturn(expectedResponse);
         when(connectedUser.getName()).thenReturn("email@example.com");
 
-        // When
+        // When & Then
         mockMvc.perform(patch("/user/update")
                         .principal(connectedUser)
                         .contentType("application/json")
@@ -98,7 +102,7 @@ class UserControllerTest {
                 .thenReturn(expectedResponse);
         when(connectedUser.getName()).thenReturn("email@example.com");
 
-        // When
+        // When & Then
         mockMvc.perform(patch("/user/change-password")
                         .principal(connectedUser)
                         .contentType("application/json")
@@ -118,7 +122,7 @@ class UserControllerTest {
         when(service.deleteConnectedUser(any(PasswordRequest.class), any(Authentication.class)))
                 .thenReturn(expectedResponse);
 
-        // When
+        // When & Then
         mockMvc.perform(delete("/user/delete")
                         .contentType("application/json")
                         .content(jsonContent))

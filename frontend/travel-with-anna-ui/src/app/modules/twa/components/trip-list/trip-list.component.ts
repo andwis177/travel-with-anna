@@ -6,6 +6,7 @@ import {TripListButtons} from "./trip-list-buttons/trip-list-buttons.component";
 import {LogoComponent} from "../../../components/menu/logo/logo.component";
 import {UserComponent} from "../../../components/menu/user/user.component";
 import {PageResponseTripResponse} from "../../../../services/models/page-response-trip-response";
+import {ErrorService} from "../../../../services/error/error.service";
 
 @Component({
   selector: 'app-trip-list',
@@ -27,7 +28,8 @@ export class TripListComponent implements OnInit  {
   size: number = 20;
 
 
-  constructor(private tripService: TripService) {}
+  constructor(private tripService: TripService,
+              private errorService: ErrorService) {}
 
   ngOnInit(): void {
     this.getAllTrips();
@@ -43,12 +45,7 @@ export class TripListComponent implements OnInit  {
         this.tripResponse = trips;
       },
       error: (err) => {
-        console.log(err.error.errors);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Unexpected error occurred');
-        }
+        this.errorMsg = this.errorService.errorHandler(err);
       }
     })
   }

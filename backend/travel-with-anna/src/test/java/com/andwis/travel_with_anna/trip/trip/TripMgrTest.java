@@ -17,6 +17,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +32,7 @@ import java.util.Optional;
 import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
 import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
@@ -55,6 +59,10 @@ class TripMgrTest {
 
     @Autowired
     private BudgetRepository budgetRepository;
+
+    @MockBean
+    private AuthenticationManager authenticationManager;
+
 
     @Autowired
     private TripMgr tripMgr;
@@ -106,11 +114,14 @@ class TripMgrTest {
 
     @Test
     void testCreateTrip() {
+        // Given
         TripCreatorRequest request = new TripCreatorRequest("New Trip", "USD", BigDecimal.valueOf(1000));
 
+        // When
         Long tripId = tripMgr.createTrip(request, createAuthentication(testUser));
-
         Trip createdTrip = tripService.getTripById(tripId);
+
+        // Then
         assertNotNull(createdTrip);
         assertEquals("New Trip", createdTrip.getTripName());
         assertNotNull(createdTrip.getBackpack());
@@ -119,9 +130,11 @@ class TripMgrTest {
 
     @Test
     void testGetAllOwnersTrips() {
-
+        // Given
+        // When
         PageResponse<TripResponse> pageResponse = tripMgr.getAllOwnersTrips(0, 10, createAuthentication(testUser));
 
+        // Then
         assertNotNull(pageResponse);
         assertEquals(1, pageResponse.getTotalElements());
         assertEquals("Initial Trip", pageResponse.getContent().getFirst().tripName());
@@ -129,35 +142,62 @@ class TripMgrTest {
 
     @Test
     void testGetTripById() {
+        // Given
+        // When
         TripResponse tripRequest = tripMgr.getTripById(testTrip.getTripId());
 
+        // Then
         assertNotNull(tripRequest);
         assertEquals("Initial Trip", tripRequest.tripName());
     }
 
     @Test
     void testChangeTripName() {
+        // Given
         String newName = "Updated Trip Name";
-        Long updatedTripId = tripMgr.changeTripName(testTrip.getTripId(), newName);
 
+        // When
+        Long updatedTripId = tripMgr.changeTripName(testTrip.getTripId(), newName);
         Trip updatedTrip = tripService.getTripById(updatedTripId);
+
+        // Then
         assertNotNull(updatedTrip);
         assertEquals(newName, updatedTrip.getTripName());
     }
 
     @Test
     void testDeleteTrip() {
-        Long tripIdToDelete = testTrip.getTripId();
+        // Given
+        TripRequest request = new TripRequest(testTrip.getTripId(), "password");
 
-        tripMgr.deleteTrip(tripIdToDelete, createAuthentication(testUser));
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(mock(Authentication.class));
 
-        assertThrows(TripNotFoundException.class, () -> tripService.getTripById(tripIdToDelete));
+        // When
+        tripMgr.deleteTrip(request, createAuthentication(testUser));
+
+        // Then
+        assertThrows(TripNotFoundException.class, () -> tripService.getTripById(request.tripId()));
         User updatedUser = userService.getConnectedUser(createAuthentication(testUser));
-        assertFalse(updatedUser.getOwnedTrips().stream().anyMatch(trip -> trip.getTripId().equals(tripIdToDelete)));
+        assertFalse(updatedUser.getOwnedTrips().stream().anyMatch(trip -> trip.getTripId().equals(request.tripId())));
+    }
+
+    @Test
+    void testDeleteTripWithWrongPassword_ShouldThrowException() {
+        // Given
+        TripRequest request = new TripRequest(testTrip.getTripId(), "wrong_password");
+
+        // Mock failed password verification
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Wrong password"));
+
+        // When & Then
+        assertThrows(BadCredentialsException.class, () -> tripMgr.deleteTrip(request, createAuthentication(testUser)));
     }
 
     private Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
         return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }
+
 }

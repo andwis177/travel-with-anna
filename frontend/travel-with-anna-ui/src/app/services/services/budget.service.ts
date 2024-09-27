@@ -10,13 +10,15 @@ import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
 import { BudgetExpensesRespond } from '../models/budget-expenses-respond';
-import { BudgetRequest } from '../models/budget-request';
+import { BudgetResponse } from '../models/budget-response';
 import { getBudgetById } from '../fn/budget/get-budget-by-id';
 import { GetBudgetById$Params } from '../fn/budget/get-budget-by-id';
 import { getBudgetExpanses } from '../fn/budget/get-budget-expanses';
 import { GetBudgetExpanses$Params } from '../fn/budget/get-budget-expanses';
 import { saveBudget } from '../fn/budget/save-budget';
 import { SaveBudget$Params } from '../fn/budget/save-budget';
+import { updateBudget } from '../fn/budget/update-budget';
+import { UpdateBudget$Params } from '../fn/budget/update-budget';
 
 @Injectable({ providedIn: 'root' })
 export class BudgetService extends BaseService {
@@ -49,6 +51,31 @@ export class BudgetService extends BaseService {
     );
   }
 
+  /** Path part for operation `updateBudget()` */
+  static readonly UpdateBudgetPath = '/budget/update';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `updateBudget()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  updateBudget$Response(params: UpdateBudget$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return updateBudget(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `updateBudget$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  updateBudget(params: UpdateBudget$Params, context?: HttpContext): Observable<void> {
+    return this.updateBudget$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
   /** Path part for operation `getBudgetById()` */
   static readonly GetBudgetByIdPath = '/budget/{budgetId}';
 
@@ -58,7 +85,7 @@ export class BudgetService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getBudgetById$Response(params: GetBudgetById$Params, context?: HttpContext): Observable<StrictHttpResponse<BudgetRequest>> {
+  getBudgetById$Response(params: GetBudgetById$Params, context?: HttpContext): Observable<StrictHttpResponse<BudgetResponse>> {
     return getBudgetById(this.http, this.rootUrl, params, context);
   }
 
@@ -68,9 +95,9 @@ export class BudgetService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getBudgetById(params: GetBudgetById$Params, context?: HttpContext): Observable<BudgetRequest> {
+  getBudgetById(params: GetBudgetById$Params, context?: HttpContext): Observable<BudgetResponse> {
     return this.getBudgetById$Response(params, context).pipe(
-      map((r: StrictHttpResponse<BudgetRequest>): BudgetRequest => r.body)
+      map((r: StrictHttpResponse<BudgetResponse>): BudgetResponse => r.body)
     );
   }
 

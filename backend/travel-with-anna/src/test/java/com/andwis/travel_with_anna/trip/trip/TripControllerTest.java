@@ -57,7 +57,6 @@ class TripControllerTest {
 
     private User user;
 
-
     @BeforeEach
     void setup() {
         Role role = new Role();
@@ -65,8 +64,6 @@ class TripControllerTest {
         role.setAuthority(getUserAuthority());
         Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
-
-
 
         user = User.builder()
                 .userName("userName")
@@ -102,7 +99,6 @@ class TripControllerTest {
         roleRepository.deleteAll();
         tripRepository.deleteAll();
     }
-
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")
@@ -172,12 +168,17 @@ class TripControllerTest {
     void deleteTrip_ShouldReturnNoContent() throws Exception {
         // Given
         Long tripId = 1L;
+        String password = "password";
+        TripRequest request = new TripRequest(tripId, password);
+
+        String requestBody = objectMapper.writeValueAsString(request);
 
         // When & Then
         mockMvc
                 .perform(MockMvcRequestBuilders
-                        .delete("/trip/{tripId}/delete", tripId)
+                        .delete("/trip/delete")
                         .principal(createAuthentication(user))
+                        .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }

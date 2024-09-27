@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class ItemWithExpanseRequest {
     @Size(max = 60, message = "Item name should be 60 characters or less")
-    private String item;
+    private String itemName;
     @Size(max = 40, message = "Item qty description should be 40 characters or less")
     private String qty;
     private boolean isPacked;

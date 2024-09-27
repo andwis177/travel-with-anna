@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 
 import { TripService } from './services/trip.service';
-import { PdfDocService } from './services/pdf-doc.service';
 import { NoteService } from './services/note.service';
 import { ExpanseService } from './services/expanse.service';
 import { DayService } from './services/day.service';
@@ -29,7 +28,6 @@ import { CountryControllerService } from './services/country-controller.service'
   declarations: [],
   providers: [
     TripService,
-    PdfDocService,
     NoteService,
     ExpanseService,
     DayService,

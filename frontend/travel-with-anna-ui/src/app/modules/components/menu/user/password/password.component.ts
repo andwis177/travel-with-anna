@@ -12,10 +12,10 @@ import {MatDivider} from "@angular/material/divider";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ChangePasswordRequest} from "../../../../../services/models/change-password-request";
 import {UserService} from "../../../../../services/services/user.service";
-import {ErrorService} from "../../../../../services/error/error.service";
 import {ChangePassword$Params} from "../../../../../services/fn/user/change-password";
 import {UserResponse} from "../../../../../services/models/user-response";
 import {AccountComponent} from "../account/account.component";
+import {ErrorService} from "../../../../../services/error/error.service";
 
 @Component({
   selector: 'app-password',
@@ -85,18 +85,16 @@ export class PasswordComponent {
         this._snackBar.open(<string> this.userRespond.message, 'Close');
       },
       error: (err) => {
-        console.log(err.error.errors);
-        this.errorService.errorHandler(err);
         this.errorMsg = this.errorService.errorHandler(err);
       }
     });
   }
   openAccountDetails() {
     const dialogRef = this.dialog.open(AccountComponent, {
-      width: '50vw',
-      height: '90vh',
-      maxWidth: '50vw',
+      maxWidth: '90vw',
       maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
       id: 'account-dialog',
     })
     dialogRef.afterClosed().subscribe(() => {

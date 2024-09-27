@@ -2,9 +2,11 @@ package com.andwis.travel_with_anna.trip.expanse;
 
 import com.andwis.travel_with_anna.api.currency.*;
 import com.andwis.travel_with_anna.handler.exception.CurrencyNotProvidedException;
-import com.andwis.travel_with_anna.handler.exception.ItemNotFoundException;
+import com.andwis.travel_with_anna.handler.exception.ExpanseNotFoundException;
+import com.andwis.travel_with_anna.handler.exception.ExpanseNotSaveException;
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
 import com.andwis.travel_with_anna.trip.backpack.item.ItemService;
+import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
 import lombok.RequiredArgsConstructor;
@@ -27,76 +29,92 @@ public class ExpanseService {
     private final TripService tripService;
     private final ItemService itemService;
 
-    public void saveExpanse(Expanse expanse) {
-        expanseRepository.save(expanse);
+    public Expanse save(Expanse expanse) {
+        return expanseRepository.save(expanse);
+    }
+
+    public Expanse findById(Long expanseId) {
+        return expanseRepository.findById(expanseId).orElseThrow(() -> new ExpanseNotFoundException(
+                "Expanse not found"));
     }
 
     public CurrencyExchange getCurrencyExchangeByCode(String code) {
         return currencyRepository.findByCode(code).orElseThrow(() -> new CurrencyNotProvidedException(code));
     }
 
-    public ExpanseResponse createOrUpdateExpanse(ExpanseForItemRequest expanseCreator) {
-        Item item = itemService.findById(expanseCreator.itemId());
-        Expanse expanse;
-        if (item.getExpanse() != null) {
-            expanse = updateItemExpanse(expanseCreator, item);
-        } else {
-            expanse = createNewItemExpanse(expanseCreator, item);
+    public ExpanseResponse createOrUpdateExpanse(ExpanseRequest expanseRequest) {
+        validateExpanseRequest(expanseRequest);
+
+        if (isValidId(expanseRequest.getExpanseId())) {
+            return ExpanseMapper.mapToExpanseResponse(updateExpanse(expanseRequest));
         }
-        return ExpanseMapper.mapToExpanseItem(expanse);
+
+        if (isValidId(expanseRequest.getItemId()) && isValidId(expanseRequest.getTripId())) {
+            return ExpanseMapper.mapToExpanseResponse(saveExpanseWithItem(expanseRequest));
+        }
+        throw new ExpanseNotSaveException("Expanse not saved");
     }
 
-    private Expanse createNewItemExpanse(
-            ExpanseForItemRequest request,
-            Item item
-    ) {
-        Expanse expanse = ExpanseMapper.mapToExpanse(
-                request.expanseItem());
+    private boolean isValidId(Long id) {
+        return id != null && id != 0;
+    }
 
-        Trip trip = tripService.getTripById(
-                request.tripId());
-        trip.addExpanse(expanse);
+    private void validateExpanseRequest(ExpanseRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+    }
+
+    private Expanse saveExpanseWithItem(
+            ExpanseRequest request) {
+
+        Expanse expanse;
+
+        Item item = itemService.findById(request.getItemId());
+        if (item.getExpanse() != null) {
+            expanse = item.getExpanse();
+        } else {
+            expanse = new Expanse();
+        }
+        ExpanseMapper.mapToExpanse(expanse, request);
+
         item.addExpanse(expanse);
 
-        saveExpanse(expanse);
+        Trip trip = tripService.getTripById(request.getTripId());
+        trip.addExpanse(expanse);
+
+        save(expanse);
         return expanse;
     }
 
-    private Expanse updateItemExpanse(
-            ExpanseForItemRequest expanseCreator, Item item) {
-        Expanse expanse = item.getExpanse();
-        ExpanseRequest expanseItem = expanseCreator.expanseItem();
-        expanse.setExpanseName(expanseItem.getExpanseName());
-        expanse.setCurrency(expanseItem.getCurrency());
-        expanse.setPrice(expanseItem.getPrice());
-        expanse.setPaid(expanseItem.getPaid());
-        expanse.setExchangeRate(expanseItem.getExchangeRate());
-        saveExpanse(expanse);
+    private Expanse updateExpanse(ExpanseRequest request) {
+        Expanse expanse = findById(request.getExpanseId());
+        ExpanseMapper.mapToExpanse(expanse, request);
+        save(expanse);
         return expanse;
     }
 
     public ExpanseResponse getExpanseById(Long expanseId) {
         Expanse expanse = expanseRepository.findById(expanseId).orElseThrow();
-        return ExpanseMapper.mapToExpanseItem(expanse);
+        return ExpanseMapper.mapToExpanseResponse(expanse);
     }
 
     public List<ExpanseResponse> getExpansesForTrip(Long tripId) {
         List<Expanse> expanses = expanseRepository.findByTripId(tripId);
-        return ExpanseMapper.mapToExpanseItemList(expanses);
+        return ExpanseMapper.mapToExpanseResponseList(expanses);
     }
 
-    public ExpanseResponse getExpanseForItem(Long itemId) {
-        if (itemId == null || itemId == 0) {
+    public ExpanseResponse getExpanseByItemId(Long itemId) {
+        Item item = itemService.findById(itemId);
+        if (item == null) {
             return null;
         }
-        try{
-            Item item = itemService.findById(itemId);
-            Long expanseId = item.getExpanse().getExpanseId();
-
-            return getExpanseById(expanseId);
-        } catch (NullPointerException | ItemNotFoundException e) {
+        Expanse expanse = item.getExpanse();
+        if (expanse == null) {
             return null;
         }
+        Long expanseId = expanse.getExpanseId();
+        return getExpanseById(expanseId);
     }
 
     public BigDecimal getExchangeRate(String currencyFrom, String currencyTo) {
@@ -104,7 +122,7 @@ public class ExpanseService {
         updateCurrencyExchange();
         BigDecimal exchangeRate = calculateExchangeRate(currencyFrom, currencyTo);
         if (exchangeRate == null) {
-            return BigDecimal.ZERO;
+            return BigDecimal.ONE;
         }
         return exchangeRate.setScale(5, RoundingMode.HALF_UP);
     }
@@ -162,5 +180,14 @@ public class ExpanseService {
 
     private BigDecimal calculatePriceInTripCurrency(BigDecimal value, BigDecimal exchangeRate) {
         return value.multiply(exchangeRate);
+    }
+
+    public void changeTripCurrency(Budget budget) {
+        List<Expanse> expanses = expanseRepository.findByTripId(budget.getTrip().getTripId());
+        expanses.forEach(expanse -> {
+            BigDecimal exchangeRate = getExchangeRate(expanse.getCurrency(), budget.getCurrency());
+            expanse.setExchangeRate(exchangeRate);
+        });
+        expanseRepository.saveAll(expanses);
     }
 }

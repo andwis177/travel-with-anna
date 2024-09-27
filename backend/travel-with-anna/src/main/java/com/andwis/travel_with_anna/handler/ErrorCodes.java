@@ -22,15 +22,18 @@ public enum ErrorCodes {
     VALIDATION_ERROR(1700, "Validation error", BAD_REQUEST),
     JWT_PARSING_ERROR(1800, "JWT parsing error", UNAUTHORIZED),
 
-    AVATAR_NOT_SAVED(2000, "Avatar was not saved", INTERNAL_SERVER_ERROR),
-    AVATAR_NOT_FOUND(2100, "Avatar not found", NOT_FOUND),
+    FILE_NOT_SAVED(1900, "Avatar was not saved", INTERNAL_SERVER_ERROR),
+    FILE_TOO_BIG(1901, "File is too big", BAD_REQUEST),
+
+    AVATAR_NOT_FOUND(2000, "Avatar not found", NOT_FOUND),
 
     TRIP_NOT_FOUND(3000, "Trip not found", NOT_FOUND),
     BACKPACK_NOT_FOUND(3100, "Backpack not found", NOT_FOUND),
     ITEM_NOT_FOUND(3200, "Item not found", NOT_FOUND),
     BUDGET_NOT_FOUND(3300, "Budget not found", NOT_FOUND),
-    NOTE_NOT_FOUND(3400, "Note not found", NOT_FOUND),
-    CURRENCY_NOT_PROVIDED(3500, "Currency is required", BAD_REQUEST);
+    CURRENCY_NOT_PROVIDED(3400, "Currency is required", BAD_REQUEST),
+    EXPANSE_NOT_FOUND(3500, "Expanse not found", NOT_FOUND),
+    EXPANSE_NOT_SAVED(3501, "Expanse was not saved", BAD_REQUEST);
 
 
     private final int code;

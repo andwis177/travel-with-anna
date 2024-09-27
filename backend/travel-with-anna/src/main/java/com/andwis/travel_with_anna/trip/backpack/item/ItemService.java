@@ -21,7 +21,7 @@ public class ItemService {
 
     public Item createItem(ItemWithExpanseRequest itemWithExpanseRequest) {
         return Item.builder()
-                .item(itemWithExpanseRequest.getItem())
+                .itemName(itemWithExpanseRequest.getItemName())
                 .quantity(itemWithExpanseRequest.getQty())
                 .isPacked(itemWithExpanseRequest.isPacked())
                 .build();
@@ -45,10 +45,19 @@ public class ItemService {
                             .findFirst()
                             .orElseThrow();
                     item.setPacked(itemRequest.isPacked());
-                    item.setQuantity(itemRequest.getQty());
-                    item.setItem(itemRequest.getItem());
+                    item.setQuantity(
+                            validateLength(itemRequest.getQty(), 40));
+                    item.setItemName(
+                            validateLength(itemRequest.getItemName(), 60));
                 });
         itemRepository.saveAll(itemsToSave);
+    }
+
+    private String validateLength(String string, int length) {
+        if (string.length() > length) {
+            return string.substring(0, length);
+        }
+        return string;
     }
 
     public void deleteItem(Long itemId) {

@@ -1,0 +1,160 @@
+.second-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start !important;
+  width: 100% !important;
+  height: 150vh !important;
+  box-sizing: border-box;
+  padding: 2%;
+  margin: 0;
+  background-color: #EDEAE5;
+  color: #2E3944;
+  border: none !important;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.expanse-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.summary-container{
+  background-color: #EDEAE5;
+  padding: 1% 3%;
+}
+
+.table-container {
+  width: 100%;
+  height: 80%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: whitesmoke;
+}
+
+.mdc-data-table__table {
+  background-color: whitesmoke !important;
+}
+
+.mat-mdc-header-row {
+  background-color: #2E3944 !important;
+  color: whitesmoke !important;
+}
+
+:host ::ng-deep .mat-sort-header-arrow{
+  color: whitesmoke !important;
+}
+
+:host ::ng-deep .mat-sort-header-container {
+  display: flex;
+  justify-content: start;
+  width: auto;
+}
+
+th, td {
+  white-space: nowrap;
+  text-overflow: unset;
+  overflow: visible;
+  word-wrap: break-word;
+  align-content: center !important;
+}
+
+.selected {
+  background-color: lightgrey !important;
+}
+
+th.mat-sort-header-sorted {
+  color: black;
+}
+
+.description-column {
+  width: 30% !important;
+  justify-content: start !important;
+}
+
+.currency-column {
+  width: 5% !important;
+}
+
+.amount-currency-column {
+  width: 15% !important;
+}
+
+.trip-currency-column {
+  width: 15% !important;
+}
+
+.action-column {
+  width: 5% !important;
+}
+
+.expanse-button {
+  background-color: #EDEAE5;
+  border: 1px solid forestgreen;
+  border-radius: 15%;
+  color: forestgreen;
+  cursor: pointer;
+  padding: 3px;
+}
+
+.action-container {
+  display: flex;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.positive{
+  color: forestgreen !important;
+}
+
+.negative{
+  color: palevioletred !important;
+}
+
+.budget{
+  text-align: center;
+  background-color: #2E3944 ;
+  padding: 0.5%;
+}
+
+.price-paid{
+  text-align: center;
+  background-color: #2E3944 ;
+  padding: 0.5%;
+}
+
+.left{
+  text-align: center;
+  background-color: #2E3944 ;
+  padding: 0.5%;
+}
+
+.label {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.label-color-light {
+  color: whitesmoke !important;
+}
+
+.label-color-blue {
+  color: lightsteelblue !important;
+}
+
+.currency-label {
+  font-size: 10px !important;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.amount-label {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  font-family: 'Montserrat', sans-serif;
+}

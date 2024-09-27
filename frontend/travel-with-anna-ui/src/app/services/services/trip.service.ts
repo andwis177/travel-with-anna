@@ -129,13 +129,13 @@ export class TripService extends BaseService {
   }
 
   /** Path part for operation `deleteTrip()` */
-  static readonly DeleteTripPath = '/trip/{tripId}/delete';
+  static readonly DeleteTripPath = '/trip/delete';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `deleteTrip()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
   deleteTrip$Response(params: DeleteTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     return deleteTrip(this.http, this.rootUrl, params, context);
@@ -145,7 +145,7 @@ export class TripService extends BaseService {
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `deleteTrip$Response()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
   deleteTrip(params: DeleteTrip$Params, context?: HttpContext): Observable<void> {
     return this.deleteTrip$Response(params, context).pipe(

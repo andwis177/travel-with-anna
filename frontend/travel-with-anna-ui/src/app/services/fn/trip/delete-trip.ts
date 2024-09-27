@@ -6,15 +6,16 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { TripRequest } from '../../models/trip-request';
 
 export interface DeleteTrip$Params {
-  tripId: number;
+      body: TripRequest
 }
 
 export function deleteTrip(http: HttpClient, rootUrl: string, params: DeleteTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, deleteTrip.PATH, 'delete');
   if (params) {
-    rb.path('tripId', params.tripId, {});
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(
@@ -27,4 +28,4 @@ export function deleteTrip(http: HttpClient, rootUrl: string, params: DeleteTrip
   );
 }
 
-deleteTrip.PATH = '/trip/{tripId}/delete';
+deleteTrip.PATH = '/trip/delete';

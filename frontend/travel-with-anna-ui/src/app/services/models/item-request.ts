@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export interface ItemRequest {
-  item?: string;
   itemId?: number;
+  itemName?: string;
   packed?: boolean;
   qty?: string;
 }

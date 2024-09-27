@@ -15,8 +15,10 @@ import { ExpanseInTripCurrency } from '../models/expanse-in-trip-currency';
 import { ExpanseResponse } from '../models/expanse-response';
 import { getExchangeRate } from '../fn/expanse/get-exchange-rate';
 import { GetExchangeRate$Params } from '../fn/expanse/get-exchange-rate';
-import { getExpanseForItem } from '../fn/expanse/get-expanse-for-item';
-import { GetExpanseForItem$Params } from '../fn/expanse/get-expanse-for-item';
+import { getExpanseById } from '../fn/expanse/get-expanse-by-id';
+import { GetExpanseById$Params } from '../fn/expanse/get-expanse-by-id';
+import { getExpanseByItemId } from '../fn/expanse/get-expanse-by-item-id';
+import { GetExpanseByItemId$Params } from '../fn/expanse/get-expanse-by-item-id';
 import { getTripCurrencyValues } from '../fn/expanse/get-trip-currency-values';
 import { GetTripCurrencyValues$Params } from '../fn/expanse/get-trip-currency-values';
 
@@ -51,27 +53,52 @@ export class ExpanseService extends BaseService {
     );
   }
 
-  /** Path part for operation `getExpanseForItem()` */
-  static readonly GetExpanseForItemPath = '/expanse/{itemId}/expanse';
+  /** Path part for operation `getExpanseByItemId()` */
+  static readonly GetExpanseByItemIdPath = '/expanse/{itemId}/item';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getExpanseForItem()` instead.
+   * To access only the response body, use `getExpanseByItemId()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getExpanseForItem$Response(params: GetExpanseForItem$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
-    return getExpanseForItem(this.http, this.rootUrl, params, context);
+  getExpanseByItemId$Response(params: GetExpanseByItemId$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
+    return getExpanseByItemId(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getExpanseForItem$Response()` instead.
+   * To access the full response (for headers, for example), `getExpanseByItemId$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getExpanseForItem(params: GetExpanseForItem$Params, context?: HttpContext): Observable<ExpanseResponse> {
-    return this.getExpanseForItem$Response(params, context).pipe(
+  getExpanseByItemId(params: GetExpanseByItemId$Params, context?: HttpContext): Observable<ExpanseResponse> {
+    return this.getExpanseByItemId$Response(params, context).pipe(
+      map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
+    );
+  }
+
+  /** Path part for operation `getExpanseById()` */
+  static readonly GetExpanseByIdPath = '/expanse/{expanseId}/expanse';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getExpanseById()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExpanseById$Response(params: GetExpanseById$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
+    return getExpanseById(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getExpanseById$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExpanseById(params: GetExpanseById$Params, context?: HttpContext): Observable<ExpanseResponse> {
+    return this.getExpanseById$Response(params, context).pipe(
       map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
     );
   }

@@ -1,0 +1,45 @@
+<mat-toolbar-row class="dialog-header">
+  <div class="dialog-title">Edit Budget</div>
+  <button mat-icon-button class="close-button"
+          (click)="onClose()"
+          (keydown.enter)="$event.preventDefault()">
+    <mat-icon class="close-icon">close</mat-icon>
+  </button>
+</mat-toolbar-row>
+
+<div class="dialog-container">
+  <form class="main-form">
+    <div>
+      <div>
+        <form class="full-width">
+          <mat-form-field appearance="outline">
+            <mat-label>Enter Amount</mat-label>
+            <input matInput placeholder="0.00" [(ngModel)]="budget.toSpend" type="number" name="amount" min="0" step="0.01">
+            <span matPrefix>$&nbsp;</span>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-select [(value)] = "budget.currency" >
+              <mat-option *ngFor="let currency of currency" [value]="currency.currency">
+                {{ currency.currency?.toString()}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        </form>
+        <div class="buttons-container" >
+          <button class="custom-button-0 full-width" (click)="saveBudget()" type="submit">Save</button>
+          <button class="custom-button-1 full-width" (click)="onClose()" type="submit">Close</button>
+        </div>
+
+        <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+          <mat-divider></mat-divider>
+          <p *ngFor="let msg of errorMsg">{{msg}}</p>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+

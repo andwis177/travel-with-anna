@@ -1,0 +1,50 @@
+<mat-card class="second-container" appearance="outlined">
+  <mat-card-header class="header-shadow">
+    <h3>DELETE TRIP</h3>
+  </mat-card-header>
+
+  <div class="label-padding">
+    <i class="fas fa-circle-exclamation fa-fade fa-1x warning-icon"></i>
+    <p class="error-msg full-width text-size">If you press 'DELETE,' your will permanently deleted this trip!</p>
+  </div>
+
+  <form>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Password: </mat-label>
+      <input type="password"
+             matInput
+             [type]="hide() ? 'password' : 'text'"
+             [(ngModel)]="tripRequest.password"
+             [ngModelOptions]="{standalone: true}"
+             placeholder="Password"
+             autocomplete="password"
+             (keydown.enter)="$event.preventDefault()">
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="clickEvent($event)"
+        (keydown.enter)="$event.preventDefault()"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hide()">
+        <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+    </mat-form-field>
+  </form>
+
+  <mat-card-content class="content">
+    <form>
+      <div>
+        <button class="custom-button-4 button-font" (click)="deleteTrip()" type="submit">DELETE</button>
+      </div>
+      <div>
+        <button class="custom-button-0 button-font" (click)="onClose()" type="submit">Cancel</button>
+      </div>
+    </form>
+  </mat-card-content>
+
+  <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+    <mat-divider class="padding-bottom"></mat-divider>
+    <p *ngFor="let msg of errorMsg">{{msg}}</p>
+    <mat-divider class="padding-bottom"></mat-divider>
+  </div>
+</mat-card>

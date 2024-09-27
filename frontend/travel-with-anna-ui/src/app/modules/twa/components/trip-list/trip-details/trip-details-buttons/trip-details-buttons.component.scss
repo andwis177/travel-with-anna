@@ -1,8 +1,38 @@
 .buttons-container {
   display: flex;
-  justify-content: space-evenly;
+  flex-direction: row;
+  justify-content: space-evenly !important;
+  width: 100% !important;
+  align-items: center;
 }
 
 .margin {
   margin: 20px;
+}
+
+.delete-button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.delete-button-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15%;
+  background-color: black;
+  border: 2px solid red;
+  padding:5px;
+  cursor: pointer;
+}
+
+.delete-button-image:hover {
+  opacity: 0.5;
+
 }

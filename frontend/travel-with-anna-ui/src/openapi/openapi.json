@@ -48,45 +48,22 @@
         }
       }
     },
-    "/pdf_doc/create": {
-      "post": {
-        "tags": [
-          "PdfDoc"
-        ],
-        "operationId": "savePdfDoc",
-        "parameters": [
-          {
-            "name": "pdfDoc",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Pdf"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/note/create": {
+    "/note/save": {
       "post": {
         "tags": [
           "Note"
         ],
-        "operationId": "saveNote",
-        "parameters": [
-          {
-            "name": "note",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Note"
+        "operationId": "createNewNoteForTrip",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteForTripRequest"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -104,7 +81,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExpanseForItemRequest"
+                "$ref": "#/components/schemas/ExpanseRequest"
               }
             }
           },
@@ -394,6 +371,29 @@
         }
       }
     },
+    "/budget/update": {
+      "patch": {
+        "tags": [
+          "Budget"
+        ],
+        "operationId": "updateBudget",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BudgetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/backpack/{backpackId}/item-add": {
       "patch": {
         "tags": [
@@ -597,6 +597,37 @@
         }
       }
     },
+    "/note/{tripId}": {
+      "get": {
+        "tags": [
+          "Note"
+        ],
+        "operationId": "getNoteById",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/item/{backpackId}": {
       "get": {
         "tags": [
@@ -631,15 +662,46 @@
         }
       }
     },
-    "/expanse/{itemId}/expanse": {
+    "/expanse/{itemId}/item": {
       "get": {
         "tags": [
           "Expanse"
         ],
-        "operationId": "getExpanseForItem",
+        "operationId": "getExpanseByItemId",
         "parameters": [
           {
             "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpanseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expanse/{expanseId}/expanse": {
+      "get": {
+        "tags": [
+          "Expanse"
+        ],
+        "operationId": "getExpanseById",
+        "parameters": [
+          {
+            "name": "expanseId",
             "in": "path",
             "required": true,
             "schema": {
@@ -769,7 +831,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BudgetRequest"
+                  "$ref": "#/components/schemas/BudgetResponse"
                 }
               }
             }
@@ -1120,23 +1182,22 @@
         }
       }
     },
-    "/trip/{tripId}/delete": {
+    "/trip/delete": {
       "delete": {
         "tags": [
           "Trip"
         ],
         "operationId": "deleteTrip",
-        "parameters": [
-          {
-            "name": "tripId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripRequest"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1219,52 +1280,15 @@
           }
         }
       },
-      "Pdf": {
+      "NoteForTripRequest": {
         "type": "object",
         "properties": {
-          "pdfId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "byte"
-            }
-          }
-        }
-      },
-      "Note": {
-        "type": "object",
-        "properties": {
-          "noteId": {
-            "type": "integer",
-            "format": "int64"
-          },
           "note": {
             "maxLength": 500,
             "minLength": 0,
             "type": "string"
-          }
-        }
-      },
-      "ExpanseForItemRequest": {
-        "type": "object",
-        "properties": {
-          "expanseItem": {
-            "$ref": "#/components/schemas/ExpanseRequest"
           },
           "tripId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "itemId": {
             "type": "integer",
             "format": "int64"
           }
@@ -1279,6 +1303,22 @@
         ],
         "type": "object",
         "properties": {
+          "expanseId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "activityId": {
+            "type": "integer",
+            "format": "int64"
+          },
           "expanseName": {
             "maxLength": 60,
             "minLength": 0,
@@ -1290,12 +1330,18 @@
             "type": "string"
           },
           "price": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
             "type": "number"
           },
           "paid": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
             "type": "number"
           },
           "exchangeRate": {
+            "minimum": 0.0,
+            "exclusiveMinimum": true,
             "type": "number"
           },
           "priceInTripCurrency": {
@@ -1354,6 +1400,22 @@
           }
         }
       },
+      "Backpack": {
+        "type": "object",
+        "properties": {
+          "backpackId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          }
+        }
+      },
       "Badge": {
         "required": [
           "name"
@@ -1377,6 +1439,26 @@
           }
         }
       },
+      "Budget": {
+        "required": [
+          "toSpend"
+        ],
+        "type": "object",
+        "properties": {
+          "budgetId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "currency": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string"
+          },
+          "toSpend": {
+            "type": "number"
+          }
+        }
+      },
       "Day": {
         "required": [
           "date"
@@ -1393,6 +1475,9 @@
           },
           "note": {
             "$ref": "#/components/schemas/Note"
+          },
+          "trip": {
+            "$ref": "#/components/schemas/Trip"
           },
           "activity": {
             "type": "array",
@@ -1434,34 +1519,187 @@
           "exchangeRate": {
             "type": "number"
           },
-          "pdf": {
-            "$ref": "#/components/schemas/Pdf"
+          "item": {
+            "$ref": "#/components/schemas/Item"
           },
-          "priceInTripCurrency": {
-            "type": "number"
+          "activity": {
+            "$ref": "#/components/schemas/Activity"
+          },
+          "trip": {
+            "$ref": "#/components/schemas/Trip"
           },
           "paidInTripCurrency": {
+            "type": "number"
+          },
+          "priceInTripCurrency": {
             "type": "number"
           }
         }
       },
-      "Budget": {
-        "required": [
-          "toSpend"
-        ],
+      "Item": {
         "type": "object",
         "properties": {
-          "budgetId": {
+          "itemId": {
             "type": "integer",
             "format": "int64"
           },
-          "currency": {
-            "maxLength": 10,
+          "itemName": {
+            "maxLength": 60,
             "minLength": 0,
             "type": "string"
           },
-          "toSpend": {
-            "type": "number"
+          "quantity": {
+            "maxLength": 40,
+            "minLength": 0,
+            "type": "string"
+          },
+          "backpack": {
+            "$ref": "#/components/schemas/Backpack"
+          },
+          "expanse": {
+            "$ref": "#/components/schemas/Expanse"
+          },
+          "packed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Note": {
+        "type": "object",
+        "properties": {
+          "noteId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "note": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string"
+          },
+          "day": {
+            "$ref": "#/components/schemas/Day"
+          },
+          "trip": {
+            "$ref": "#/components/schemas/Trip"
+          },
+          "activity": {
+            "$ref": "#/components/schemas/Activity"
+          }
+        }
+      },
+      "Role": {
+        "required": [
+          "authority",
+          "roleName"
+        ],
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roleName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "authority": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "Trip": {
+        "type": "object",
+        "properties": {
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tripName": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/User"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Day"
+            }
+          },
+          "backpack": {
+            "$ref": "#/components/schemas/Backpack"
+          },
+          "budget": {
+            "$ref": "#/components/schemas/Budget"
+          },
+          "expanses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Expanse"
+            }
+          },
+          "note": {
+            "$ref": "#/components/schemas/Note"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "avatarId",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "maxLength": 30,
+            "minLength": 0,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "accountLocked": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "avatarId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ownedTrips": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Trip"
+            }
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -1583,7 +1821,7 @@
             "type": "integer",
             "format": "int64"
           },
-          "item": {
+          "itemName": {
             "maxLength": 60,
             "minLength": 0,
             "type": "string"
@@ -1598,10 +1836,31 @@
           }
         }
       },
+      "BudgetRequest": {
+        "type": "object",
+        "properties": {
+          "budgetId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "currency": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string"
+          },
+          "toSpend": {
+            "type": "number"
+          },
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "ItemWithExpanseRequest": {
         "type": "object",
         "properties": {
-          "item": {
+          "itemName": {
             "maxLength": 60,
             "minLength": 0,
             "type": "string"
@@ -1738,6 +1997,14 @@
           }
         }
       },
+      "NoteResponse": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
+          }
+        }
+      },
       "ItemResponse": {
         "type": "object",
         "properties": {
@@ -1745,7 +2012,7 @@
             "type": "integer",
             "format": "int64"
           },
-          "item": {
+          "itemName": {
             "type": "string"
           },
           "qty": {
@@ -1767,7 +2034,7 @@
           }
         }
       },
-      "BudgetRequest": {
+      "BudgetResponse": {
         "type": "object",
         "properties": {
           "budgetId": {
@@ -1775,8 +2042,6 @@
             "format": "int64"
           },
           "currency": {
-            "maxLength": 10,
-            "minLength": 0,
             "type": "string"
           },
           "toSpend": {
@@ -1791,8 +2056,8 @@
       "BudgetExpensesRespond": {
         "type": "object",
         "properties": {
-          "budgetRequest": {
-            "$ref": "#/components/schemas/BudgetRequest"
+          "budgetResponse": {
+            "$ref": "#/components/schemas/BudgetResponse"
           },
           "expanses": {
             "type": "array",
@@ -1801,9 +2066,9 @@
             }
           },
           "sumsByCurrency": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ExpanseCalculator"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpanseByCurrency"
             }
           },
           "overallPriceInTripCurrency": {
@@ -1814,12 +2079,21 @@
           },
           "totalDebtInTripCurrency": {
             "type": "number"
+          },
+          "priceBalanceDue": {
+            "type": "number"
+          },
+          "paidBalanceDue": {
+            "type": "number"
           }
         }
       },
-      "ExpanseCalculator": {
+      "ExpanseByCurrency": {
         "type": "object",
         "properties": {
+          "currency": {
+            "type": "string"
+          },
           "totalPrice": {
             "type": "number"
           },
@@ -1870,10 +2144,10 @@
           "name": {
             "type": "string"
           },
-          "iso2": {
+          "iso3": {
             "type": "string"
           },
-          "iso3": {
+          "iso2": {
             "type": "string"
           }
         }
@@ -1973,6 +2247,18 @@
       "PasswordRequest": {
         "type": "object",
         "properties": {
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "TripRequest": {
+        "type": "object",
+        "properties": {
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          },
           "password": {
             "type": "string"
           }

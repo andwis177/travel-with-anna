@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.user;
 
-import com.andwis.travel_with_anna.handler.exception.SaveAvatarException;
+import com.andwis.travel_with_anna.handler.exception.FileNotSaved;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.avatar.Avatar;
@@ -111,7 +111,7 @@ class UserAvatarFacadeTest {
         );
 
         // When & Then
-        SaveAvatarException exception = assertThrows(SaveAvatarException.class, () -> {
+        FileNotSaved exception = assertThrows(FileNotSaved.class, () -> {
             userAvatarMgr.setAvatar(file, createAuthentication(user));
         });
 
@@ -130,7 +130,7 @@ class UserAvatarFacadeTest {
         );
 
         // When & Then
-        SaveAvatarException exception = assertThrows(SaveAvatarException.class, () -> {
+        FileNotSaved exception = assertThrows(FileNotSaved.class, () -> {
             userAvatarMgr.setAvatar(file, createAuthentication(user));
         });
 
@@ -139,6 +139,7 @@ class UserAvatarFacadeTest {
 
     @Test
     void testSetAvatar_UserWithoutAvatar() throws IOException {
+        // Given
         MultipartFile file = new MockMultipartFile(
                 "avatar",
                 "avatar.jpg",

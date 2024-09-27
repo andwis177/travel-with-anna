@@ -16,6 +16,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {CountryCurrency} from "../../../../../services/models/country-currency";
 import {CountryControllerService} from "../../../../../services/services/country-controller.service";
+import {ErrorService} from "../../../../../services/error/error.service";
 
 @Component({
   selector: 'app-trip-new',
@@ -47,13 +48,11 @@ export class TripNewComponent implements OnInit {
   tripCreatorRequest: TripCreatorRequest = {tripName:'', currency: '', toSpend: 0};
   currency: CountryCurrency[] = [];
 
-  amount: number = 0;
-
   constructor(private router: Router,
               private tripService: TripService,
               private countryControllerService: CountryControllerService,
+              private errorService: ErrorService,
               public dialog: MatDialog) {
-
   }
 
   ngOnInit(): void {
@@ -62,22 +61,15 @@ export class TripNewComponent implements OnInit {
 
   createNewTrip() {
     this.errorMsg = [];
-    console.log("tripCreatorRequest", this.tripCreatorRequest);
     this.tripService.createTrip({
       body: this.tripCreatorRequest
     }).subscribe({
       next: (tripId) => {
         this.onClose();
         this.router.navigate(['/twa/trip-details', tripId]).then();
-        console.log("response", tripId);
       },
       error: (err) => {
-        console.log("error message", err.error.errors || err.error.message);
-        if (err.error.errors && err.error.errors.length > 0) {
-          this.errorMsg = err.error.errors;
-        } else {
-          this.errorMsg.push('Unexpected error occurred');
-        }
+       this.errorMsg = this.errorService.errorHandler(err);
       }
     });
   }

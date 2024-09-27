@@ -6,13 +6,13 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { BudgetRequest } from '../../models/budget-request';
+import { BudgetResponse } from '../../models/budget-response';
 
 export interface GetBudgetById$Params {
   budgetId: number;
 }
 
-export function getBudgetById(http: HttpClient, rootUrl: string, params: GetBudgetById$Params, context?: HttpContext): Observable<StrictHttpResponse<BudgetRequest>> {
+export function getBudgetById(http: HttpClient, rootUrl: string, params: GetBudgetById$Params, context?: HttpContext): Observable<StrictHttpResponse<BudgetResponse>> {
   const rb = new RequestBuilder(rootUrl, getBudgetById.PATH, 'get');
   if (params) {
     rb.path('budgetId', params.budgetId, {});
@@ -23,7 +23,7 @@ export function getBudgetById(http: HttpClient, rootUrl: string, params: GetBudg
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<BudgetRequest>;
+      return r as StrictHttpResponse<BudgetResponse>;
     })
   );
 }

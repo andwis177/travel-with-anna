@@ -27,3 +27,11 @@
   height: 100%;
   object-fit: cover;
 }
+.app-image:hover,
+.profile-image:hover,
+.image-container:hover,
+.app-button:hover {
+  cursor: pointer;
+  opacity: 0.5;
+
+}

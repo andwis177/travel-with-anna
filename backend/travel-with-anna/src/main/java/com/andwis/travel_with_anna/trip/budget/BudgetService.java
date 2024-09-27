@@ -1,5 +1,7 @@
 package com.andwis.travel_with_anna.trip.budget;
 
+import com.andwis.travel_with_anna.handler.exception.BudgetNotFoundException;
+import com.andwis.travel_with_anna.trip.expanse.ExpanseByCurrency;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseCalculator;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseService;
@@ -21,26 +23,44 @@ public class BudgetService {
         budgetRepository.save(budget);
     }
 
-    public BudgetRequest getBudgetById(Long budgetId) {
-        Budget budget = budgetRepository.findById(budgetId).orElseThrow();
-        return BudgetMapper.toBudgetRequest(budget);
+    public void updateBudget(BudgetRequest request) {
+        Budget budget = findById(request.getBudgetId());
+        budget.setToSpend(request.getToSpend());
+        if (!request.getCurrency().equals(budget.getCurrency()) && !request.getCurrency().isEmpty()) {
+            budget.setCurrency(request.getCurrency());
+            expanseService.changeTripCurrency(budget);
+        }
+        budgetRepository.save(budget);
+    }
+
+    public Budget findById(Long budgetId) {
+        return budgetRepository.findById(budgetId).orElseThrow(BudgetNotFoundException::new);
+    }
+
+    public BudgetResponse getBudgetById(Long budgetId) {
+        Budget budget = findById(budgetId);
+        return BudgetMapper.toBudgetResponse(budget);
     }
 
     public BudgetExpensesRespond getBudgetExpanses(Long tripId, Long budgetId) {
 
-        BudgetRequest budgetRequest = getBudgetById(budgetId);
+        BudgetResponse budgetRequest = getBudgetById(budgetId);
         List<ExpanseResponse> expanses = expanseService.getExpansesForTrip(tripId);
         BigDecimal overallPriceInTripCurrency = overallPriceInTripCurrency(expanses);
         BigDecimal overallPaidInTripCurrency = overallPaidInTripCurrency(expanses);
         BigDecimal totalDebt = calculateTotalDepth(expanses);
-        Map<String, ExpanseCalculator> sumsByCurrency = calculateSumsByCurrency(expanses);
+        List<ExpanseByCurrency> sumsByCurrency =
+                BudgetMapper.toExpansesByCurrency(calculateSumsByCurrency(expanses));
         return new BudgetExpensesRespond(
                 budgetRequest,
                 expanses,
                 sumsByCurrency,
                 overallPriceInTripCurrency,
                 overallPaidInTripCurrency,
-                totalDebt);
+                totalDebt,
+                budgetRequest.toSpend().subtract(overallPriceInTripCurrency),
+                budgetRequest.toSpend().subtract(overallPaidInTripCurrency)
+        );
     }
 
     public Map<String, ExpanseCalculator> calculateSumsByCurrency(List<ExpanseResponse> expanses) {

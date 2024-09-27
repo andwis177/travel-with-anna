@@ -58,10 +58,14 @@ class ExpanseControllerTest {
                 BigDecimal.valueOf(96.00)
         );
 
-        ExpanseForItemRequest creator = new ExpanseForItemRequest(request, 1L, 1L);
+        ExpanseForItemRequest creator = ExpanseForItemRequest.builder()
+                .expanseRequest(request)
+                .tripId(1L)
+                .itemId(1L)
+                .build();
         String requestBody = objectMapper.writeValueAsString(creator);
         String jsonResponse = objectMapper.writeValueAsString(response);
-        when(expanseFacade.createOrUpdateExpanse(any(ExpanseForItemRequest.class))).thenReturn(response);
+        when(expanseFacade.createOrUpdateExpanse(any(ExpanseRequest.class))).thenReturn(response);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -74,7 +78,7 @@ class ExpanseControllerTest {
 
     @Test
     @WithMockUser(username = "user@example.com", authorities = "User")
-    void testGetExpanseForItem_ShouldReturnExpanseResponse() throws Exception {
+    void testGetExpanseByItemId_ShouldReturnExpanseResponse() throws Exception {
         // Given
         Long itemId = 1L;
         ExpanseResponse response = new ExpanseResponse(
@@ -87,17 +91,16 @@ class ExpanseControllerTest {
                 BigDecimal.valueOf(120.00),
                 BigDecimal.valueOf(96.00)
         );
-
         String jsonResponse = objectMapper.writeValueAsString(response);
 
-        when(expanseFacade.getExpanseForItem(itemId)).thenReturn(response);
+        when(expanseFacade.getExpanseByItemId(itemId)).thenReturn(response);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/expanse/{itemId}/expanse", itemId)
+                        .get("/expanse/{itemId}/item", itemId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(jsonResponse)));
+                .andExpect(content().json(jsonResponse));
     }
 
     @Test

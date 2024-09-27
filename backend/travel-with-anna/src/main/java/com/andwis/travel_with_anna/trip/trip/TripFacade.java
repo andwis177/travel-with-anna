@@ -26,7 +26,7 @@ public class TripFacade {
         return tripMgr.changeTripName(tripId, tripName);
     }
 
-    public void deleteTrip(Long tripId, Authentication connectedUser) {
-        tripMgr.deleteTrip(tripId, connectedUser);
+    public void deleteTrip(TripRequest request, Authentication connectedUser) {
+        tripMgr.deleteTrip(request, connectedUser);
     }
 }

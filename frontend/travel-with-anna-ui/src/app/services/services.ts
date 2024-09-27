@@ -1,5 +1,4 @@
 export { TripService } from './services/trip.service';
-export { PdfDocService } from './services/pdf-doc.service';
 export { NoteService } from './services/note.service';
 export { ExpanseService } from './services/expanse.service';
 export { DayService } from './services/day.service';

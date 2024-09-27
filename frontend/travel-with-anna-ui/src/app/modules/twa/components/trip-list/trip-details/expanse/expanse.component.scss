@@ -4,24 +4,6 @@ body, html {
   overflow-x: hidden;
 }
 
-.second-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  width: 100% !important;
-  height: 100% !important;
-  box-sizing: border-box;
-  padding: 20px;
-  background-color: #EDEAE5;
-  color: #2E3944;
-
-  border: none !important;
-}
-
-.main-form{
-  padding: 5%;
-}
-
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
   display: none;
 }
@@ -32,7 +14,6 @@ mat-form-field {
 
 .insert-size {
   width: 40% !important;
-  margin-right: 10px;
 }
 
 .insert-description-size {
@@ -41,13 +22,11 @@ mat-form-field {
 }
 
 .insert-currency-size {
-  width: 40% !important;
-  margin-right: 10px;
+  width: 60% !important;
 }
 
 .insert-size {
-  width: 50% !important;
-  margin-right: 10px;
+  width: 70% !important;
 }
 
 .input-with-currency {
@@ -59,25 +38,26 @@ mat-form-field {
   font-size: 0.8em;
   font-weight: 400;
   color: #2E3944;
-  margin-left: 10px;
 }
 
 .main-expanse-container{
+  width: 100% !important;
+  height: 100% !important;
   display: flex;
-  justify-content: space-evenly;
+  flex-direction: row;
+  justify-content: center;
   align-items: start;
-  padding: 10px;
 }
 
 .expanse-container {
-  width: 28% !important;
-  height: 38vh !important;
+  width: 35% !important;
+  height: 50% !important;
   border-radius: 5% !important;
   border: 2px solid #2E3944 !important;
-  margin-top: 1% !important;
-  margin-bottom: 2% !important;
-  padding: 4% 2% 2% 2% !important;
+  margin: 1% !important;
+  padding: 4% 4% 2% 2% !important;
   background-color: #D1E0E2 !important;
+  text-align: start !important;
 }
 
 .center-align {
@@ -85,7 +65,8 @@ mat-form-field {
 }
 
 .padding-label{
-  padding: 2% !important;
+  padding: 3% !important;
+  width: 30vh !important;
   font-size: 22px !important;
   font-weight: 550 !important;
   color: whitesmoke !important;
@@ -97,7 +78,6 @@ mat-form-field {
   display: flex !important;
   justify-content: start !important;
   align-items: baseline !important;
-  margin-left: 25% !important;
   margin-top: 5% !important;
   padding: 2% !important;
 }
@@ -106,7 +86,7 @@ mat-form-field {
   font-size: 18px !important;
   font-weight: 500 !important;
   color: #7B9D9C !important;
-  margin-right: 4% !important;
+  margin-right: 7% !important;
   font-family: 'Montserrat', sans-serif;
 }
 
@@ -125,4 +105,10 @@ mat-form-field {
   font-family: 'Montserrat', sans-serif;
 }
 
+.positive{
+  color: forestgreen !important;
+}
 
+.negative{
+  color: palevioletred !important;
+}

@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MatDivider} from "@angular/material/divider";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {MatIcon} from "@angular/material/icon";
 import {MatCard, MatCardActions} from "@angular/material/card";
@@ -11,8 +11,6 @@ import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {ExpanseService} from "../../../../../../services/services/expanse.service";
 import {FormsModule} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
-import {GetExpanseForItem$Params} from "../../../../../../services/fn/expanse/get-expanse-for-item";
-import {ErrorService} from "../../../../../../services/error/error.service";
 import {CountryControllerService} from "../../../../../../services/services/country-controller.service";
 import {CountryCurrency} from "../../../../../../services/models/country-currency";
 import {MatTooltip} from "@angular/material/tooltip";
@@ -20,6 +18,9 @@ import {GetExchangeRate$Params} from "../../../../../../services/fn/expanse/get-
 import {GetTripCurrencyValues$Params} from "../../../../../../services/fn/expanse/get-trip-currency-values";
 import {CreateOrUpdateExpanse$Params} from "../../../../../../services/fn/expanse/create-or-update-expanse";
 import {ExpanseResponse} from "../../../../../../services/models/expanse-response";
+import {GetExpanseByItemId$Params} from "../../../../../../services/fn/expanse/get-expanse-by-item-id";
+import {GetExpanseById$Params} from "../../../../../../services/fn/expanse/get-expanse-by-id";
+import {ErrorService} from "../../../../../../services/error/error.service";
 
 @Component({
   selector: 'app-expanse',
@@ -40,7 +41,8 @@ import {ExpanseResponse} from "../../../../../../services/models/expanse-respons
     FormsModule,
     MatInput,
     MatTooltip,
-    MatSuffix
+    MatSuffix,
+    NgClass
   ],
   templateUrl: './expanse.component.html',
   styleUrl: './expanse.component.scss'
@@ -49,51 +51,88 @@ export class ExpanseComponent implements OnInit {
   errorMsg: Array<string> = [];
   currencyList: CountryCurrency[] = [];
 
-  item: string = '';
-  itemId: number = 0;
+  description: string = '';
 
   expanse: ExpanseResponse = {
     expanseName: '',
     currency: '',
     price: 0,
     paid: 0,
-    exchangeRate: 0,
+    exchangeRate: 1,
     priceInTripCurrency:0,
     paidInTripCurrency: 0
   };
+  leftToPay: number = 0;
 
-  currency: string = '';
+  expanseId: number;
+  itemId: number;
   tripId: number;
+  activityId: number;
+  currency: string = '';
 
   constructor(public dialog: MatDialog,
               private expanseService: ExpanseService,
               private errorService: ErrorService,
               private countryControllerService: CountryControllerService,
-              @Inject(MAT_DIALOG_DATA) public data: { item: string, currency: string, tripId: number, itemId: number }) {
-    this.item = data.item;
+              @Inject(MAT_DIALOG_DATA) public data: { description: string,
+                currency: string,
+                tripId: number,
+                itemId: number,
+                expanseId: number,
+                activityId: number,
+              }) {
+    this.expanseId = data.expanseId;
+    this.description = data.description;
     this.itemId = data.itemId;
-    this.currency = data.currency;
     this.tripId = data.tripId;
-
-    this.expanse.expanseName = this.item;
+    this.activityId = data.activityId;
+    this.currency = data.currency;
+    this.expanse.expanseName = this.description;
     this.expanse.currency = this.currency;
   }
 
   ngOnInit(): void {
-    this.getExpanseItem();
+    this.getExpanse()
     this.getCurrency()
   }
 
-  getExpanseItem() {
+  getExpanse() {
+    if (this.expanseId > 0) {
+      this.getExpanseById();
+    } else {
+      if (this.itemId > 0) {
+        this.getExpanseByItemId();
+      }
+    }
+  }
+
+  getExpanseById() {
     this.errorMsg = [];
-    const params : GetExpanseForItem$Params = {itemId: this.itemId};
-    console.log("Params: ", params);
-    this.expanseService.getExpanseForItem(params)
+    const params: GetExpanseById$Params = {expanseId: this.expanseId};
+    this.expanseService.getExpanseById(params)
       .subscribe({
-        next:(data) => {
-          console.log(data);
+        next: (data) => {
           if (data) {
             this.expanse = data;
+            this.leftToPay = data.price! - data.paid!;
+          }
+        },
+        error: (err) => {
+          this.errorMsg = this.errorService.errorHandler(err);
+        }
+      });
+  }
+
+  getExpanseByItemId() {
+    this.errorMsg = [];
+    const params : GetExpanseByItemId$Params = {itemId: this.itemId};
+    this.expanseService.getExpanseByItemId(params)
+      .subscribe({
+        next:(data) => {
+          if (data) {
+            this.expanse = data;
+            this.expanseId = this.expanse.expanseId!;
+            this.leftToPay = data.price! - data.paid!;
           }
         },
         error: (err) => {
@@ -142,22 +181,23 @@ export class ExpanseComponent implements OnInit {
       });
   }
 
-  saveExpanses() {
+  saveItemExpanses() {
     this.errorMsg = [];
     const params: CreateOrUpdateExpanse$Params = {
       body: {
-        expanseItem: {
-          currency: this.expanse.currency!,
-          exchangeRate: this.expanse.exchangeRate!,
-          expanseName: this.expanse.expanseName,
-          paid: this.expanse.paid!,
-          price: this.expanse.price!,
-          paidInTripCurrency: this.expanse.paidInTripCurrency,
-          priceInTripCurrency: this.expanse.priceInTripCurrency
-        },
         itemId: this.itemId,
-        tripId: this.tripId
-      }};
+        tripId: this.tripId,
+        activityId: this.activityId,
+        expanseId: this.expanseId,
+        currency: this.expanse.currency!,
+        exchangeRate: this.expanse.exchangeRate!,
+        expanseName: this.expanse.expanseName,
+        paid: this.expanse.paid!,
+        price: this.expanse.price!,
+        paidInTripCurrency: this.expanse.paidInTripCurrency,
+        priceInTripCurrency: this.expanse.priceInTripCurrency
+      },
+    };
     this.expanseService.createOrUpdateExpanse(params)
       .subscribe({
         next: () => {
@@ -174,7 +214,15 @@ export class ExpanseComponent implements OnInit {
     if (dialogRef) {
       dialogRef.close();
     } else {
-      console.warn('Dialog with ID "expanse-dialog" is not open.');
+      console.warn('Dialog is not open.');
+    }
+  }
+
+  getColorAmount(amount: number): string {
+    if (amount < 0) {
+      return 'negative';
+    } else {
+      return 'positive';
     }
   }
 }

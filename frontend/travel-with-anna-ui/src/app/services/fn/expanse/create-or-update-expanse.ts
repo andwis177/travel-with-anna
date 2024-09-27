@@ -6,11 +6,11 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ExpanseForItemRequest } from '../../models/expanse-for-item-request';
+import { ExpanseRequest } from '../../models/expanse-request';
 import { ExpanseResponse } from '../../models/expanse-response';
 
 export interface CreateOrUpdateExpanse$Params {
-      body: ExpanseForItemRequest
+      body: ExpanseRequest
 }
 
 export function createOrUpdateExpanse(http: HttpClient, rootUrl: string, params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {

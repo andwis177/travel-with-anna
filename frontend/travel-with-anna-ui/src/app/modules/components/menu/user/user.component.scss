@@ -52,8 +52,11 @@
   text-align: center;
 }
 
-.app-button:hover .app-image,
-.profile-button:hover .profile-image {
+.app-button:hover,
+.app-image:hover,
+.profile-button:hover,
+.profile-image:hover,
+.avatar-button-container:hover {
   opacity: 0.5;
 }
 
@@ -68,3 +71,4 @@
     opacity: 0.5;
   }
 }
+

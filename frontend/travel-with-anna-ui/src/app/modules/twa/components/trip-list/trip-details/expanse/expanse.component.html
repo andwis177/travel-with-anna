@@ -7,9 +7,9 @@
   </button>
 </mat-toolbar-row>
 
-<div class="second-container">
-  <div class="full-width main-form" style="padding:10px">
-    <div class="main-expanse-container " >
+<div class="dialog-container">
+  <div class="full-width">
+    <div class="main-expanse-container">
       <div class="expanse-container mat-elevation-z8">
         <mat-form-field appearance="outline" class="insert-description-size">
           <mat-label>Description </mat-label>
@@ -20,7 +20,6 @@
                   placeholder="Description"
                   autocomplete="name"
                   (keydown.enter)="$event.preventDefault()">
-
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="insert-currency-size">
@@ -68,10 +67,10 @@
           </mat-form-field>
         </form>
 
-        <form class="full-width" style="margin-bottom: 5%">
-            <label>Left to pay: </label>
-              <label>{{expanse.paid}}</label>
-              <label class="currency">{{expanse.currency}}</label>
+        <form class="full-width" style="margin-bottom: 10%">
+          <label style="font-size: 14px">Left to pay: </label>
+          <label [ngClass]="getColorAmount(leftToPay)" style="font-size: 18px; font-weight: 500;">{{leftToPay}}</label>
+          <label class="currency"> {{expanse.currency}}</label>
         </form>
 
         <form class="full-width">
@@ -100,15 +99,15 @@
       <div class="expanse-container center-align mat-elevation-z8">
         <div class="padding-label mat-elevation-z8">{{ currency }}</div>
         <div class="value-container">
-          <label class="title-label">PRICE: </label>
+          <label class="title-label">PRICE:</label>
           <label class="value-label">{{expanse.priceInTripCurrency}}</label>
-          <label class="currency-label">{{ currency}}</label>
+          <label class="currency-label">{{ currency}} </label>
         </div>
 
         <div class="value-container">
-          <label class="title-label">PAID: </label>
-          <label class="value-label" style="margin-left: 3%">{{expanse.paidInTripCurrency}}</label>
-          <label class="currency-label">{{ currency}}</label>
+          <label class="title-label">PAID:</label>
+          <label class="value-label" > {{expanse.paidInTripCurrency}}</label>
+          <label class="currency-label"> {{ currency}} </label>
         </div>
 
       </div>
@@ -116,7 +115,7 @@
 
     <div class="full-width center-align">
       <button
-        class="custom-button-0 full-width" (click)="saveExpanses()" type="submit">Save</button>
+        class="custom-button-0 full-width" (click)="saveItemExpanses()" type="submit">Save</button>
       <button class="custom-button-1 full-width" (click)="onClose()" type="submit">Close</button>
     </div>
 

@@ -1,15 +1,29 @@
 <form class="buttons-container">
-    <button class="user-button margin" (click)="openBackpack($event)" matTooltip="Backpack">
-      <img src="../../../../../assets/images/backpack.png" class="user-button-image" alt="">
-    </button>
-    <button class="user-button margin" (click)="openBudget($event)" matTooltip="Budget">
-      <img src="../../../../../assets/images/budget.png" class="user-button-image" alt="">
-    </button>
+
+  <button class="user-button margin" (click)="openBackpack($event)" matTooltip="Backpack">
+    <img src="../../../../../assets/images/backpack.png" class="user-button-image" alt="">
+  </button>
+  <button class="user-button margin" (click)="openBudget($event)" matTooltip="Budget">
+    <img src="../../../../../assets/images/budget.png" class="user-button-image" alt="">
+  </button>
   <button class="user-button margin" (click)="openNote($event)" matTooltip="Note">
     <img src="../../../../../assets/images/notes.png" class="user-button-image" alt="">
   </button>
+
+  <button class="user-button margin" (click)="addFirst($event)" matTooltip="Add Day at the beginning">
+    <img src="../../../../../assets/images/add-day-first.png" class="user-button-image button-first" alt="">
+  </button>
+
+  <button class="user-button margin" (click)="addLast($event)" matTooltip="Add Day at the end">
+    <img src="../../../../../assets/images/add-day-last.png" class="user-button-image button-last" alt="">
+  </button>
+
+  <button class="user-button margin" (click)="editTrip($event)" matTooltip="Edit Trip">
+    <img src="../../../../../assets/images/edit.png" class="user-button-image" alt="">
+  </button>
+
   <button class="delete-button margin" (click)="deleteTrip($event)" matTooltip="Delete Trip">
-    <img src="../../../../../assets/images/delete.png" class="delete-button-image" alt="">
+    <img src="../../../../../assets/images/delete.png" class="delete-button-image" style="opacity: 0.7" alt="">
   </button>
 </form>
 

@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.trip.backpack.item;
 
 import com.andwis.travel_with_anna.handler.exception.ItemNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ItemService {
         return itemRepository.findById(itemId).orElseThrow(ItemNotFoundException::new);
     }
 
-    public Item createItem(ItemWithExpanseRequest itemWithExpanseRequest) {
+    public Item createItem(@NotNull ItemWithExpanseRequest itemWithExpanseRequest) {
         return Item.builder()
                 .itemName(itemWithExpanseRequest.getItemName())
                 .quantity(itemWithExpanseRequest.getQty())
@@ -33,7 +34,7 @@ public class ItemService {
                 .toList();
     }
 
-    public void saveAllItems(List<ItemRequest> items) {
+    public void saveAllItems(@NotNull List<ItemRequest> items) {
         List<Long> idList = items.stream()
                 .map(ItemRequest::getItemId)
                 .toList();
@@ -53,7 +54,7 @@ public class ItemService {
         itemRepository.saveAll(itemsToSave);
     }
 
-    private String validateLength(String string, int length) {
+    private @NotNull String validateLength(@NotNull String string, int length) {
         if (string.length() > length) {
             return string.substring(0, length);
         }

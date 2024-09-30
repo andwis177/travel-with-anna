@@ -5,15 +5,18 @@
       <img src="https://flagsapi.com/BE/flat/32.png" class="image"  alt="">
     </div>
     <div class="trip-name trip-font mat-elevation-z8 ">
-      {{trip.tripName}}
+      <div>{{trip.tripName}}</div>
     </div>
-    <div class="days">
-      {{trip.amountOfDays}} days
+    <div class="days trip-font">
+      <div class="label-text">Number of days:</div>
+      <div class="days-text">{{trip.amountOfDays}}</div>
     </div>
 
-    <div class="date trip-font mat-elevation-z8">
-      10/12/2020
-      {{trip.startDate}}
+    <div class="date main-font mat-elevation-z8">
+      <div class="label-text trip-font"> from </div>
+      <div class="main-font margin-form main-font-size">{{trip.startDate}}</div>
+      <div class="label-text trip-font"> to </div>
+      <div class="main-font margin-form main-font-size">{{trip.endDate}}</div>
     </div>
   </button>
 </div>

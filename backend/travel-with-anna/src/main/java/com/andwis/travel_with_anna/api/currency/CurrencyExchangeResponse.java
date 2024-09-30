@@ -3,6 +3,7 @@ package com.andwis.travel_with_anna.api.currency;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 
@@ -14,7 +15,7 @@ public class CurrencyExchangeResponse implements Comparable<CurrencyExchangeResp
     private BigDecimal value;
 
     @Override
-    public int compareTo(CurrencyExchangeResponse obj) {
+    public int compareTo(@NotNull CurrencyExchangeResponse obj) {
         return this.code.compareTo(obj.code);
     }
 }

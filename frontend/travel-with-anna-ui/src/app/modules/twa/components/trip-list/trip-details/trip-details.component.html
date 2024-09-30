@@ -4,7 +4,11 @@
       <app-logo></app-logo>
     </div>
     <div class="menu-buttons">
-      <app-trip-details-buttons *ngIf="trip.budgetId" [_trip]="trip"></app-trip-details-buttons>
+      <app-trip-details-buttons
+        *ngIf="trip.budgetId"
+        [_trip]="trip"
+        (afterAddDay)="getDays(trip.tripId!); receiveTrip()"
+      ></app-trip-details-buttons>
     </div>
     <div class="user">
       <app-user></app-user>
@@ -12,6 +16,18 @@
   </div>
 </div>
 
-<div *ngIf="trip.tripName">
-  <h3 class="trip-name trip-font mat-elevation-z8">{{ trip.tripName }}</h3>
+<div class="main-form">
+  <div *ngIf="trip.tripName">
+    <h3 class="trip-name trip-name-padding trip-font">{{ trip.tripName }}</h3>
+
+  </div>
+  <div class="days-container">
+    <app-day
+      [day]="day"
+      *ngFor="let day of days"
+      (afterDayDelete)="getDays(trip.tripId!); receiveTrip()"
+    >{{day}}</app-day>
+
+  </div>
 </div>
+

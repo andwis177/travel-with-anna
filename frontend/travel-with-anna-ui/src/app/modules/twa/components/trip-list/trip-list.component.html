@@ -13,7 +13,7 @@
 
   <div class="main-form">
     <div class="top-container">
-      <app-trip-card [trip]="trip" *ngFor="let trip of tripResponse.content">{{trip.tripName}} !!!! </app-trip-card>
+      <app-trip-card [trip]="trip" *ngFor="let trip of tripResponse.content">{{trip.tripName}}</app-trip-card>
     </div>
     <div class="pagination-container full-width">
       <button class="pagination-button" (click)="goToFirstPage()" type="submit" [class.disabled]="page === 0"> << </button>

@@ -6,16 +6,16 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { Day } from '../../models/day';
+import { DayAddRequest } from '../../models/day-add-request';
 
-export interface SaveDay$Params {
-  day: Day;
+export interface AddDay$Params {
+      body: DayAddRequest
 }
 
-export function saveDay(http: HttpClient, rootUrl: string, params: SaveDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, saveDay.PATH, 'post');
+export function addDay(http: HttpClient, rootUrl: string, params: AddDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, addDay.PATH, 'post');
   if (params) {
-    rb.query('day', params.day, {});
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(
@@ -28,4 +28,4 @@ export function saveDay(http: HttpClient, rootUrl: string, params: SaveDay$Param
   );
 }
 
-saveDay.PATH = '/day/create';
+addDay.PATH = '/day/add';

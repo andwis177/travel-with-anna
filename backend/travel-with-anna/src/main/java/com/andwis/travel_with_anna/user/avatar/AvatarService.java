@@ -3,6 +3,7 @@ package com.andwis.travel_with_anna.user.avatar;
 import com.andwis.travel_with_anna.handler.exception.AvatarNotFoundException;
 import com.andwis.travel_with_anna.user.User;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class AvatarService {
                 .orElseThrow(() -> new AvatarNotFoundException("Avatar not found"));
     }
 
-    public Avatar createAvatar(User user) {
+    public Avatar createAvatar(@NotNull User user) {
         Avatar avatar = avatarRepository.save(Avatar.builder()
                 .avatar(null)
                 .build());
@@ -37,14 +38,14 @@ public class AvatarService {
         return avatar;
     }
 
-    public void deleteAvatar(User user) {
+    public void deleteAvatar(@NotNull User user) {
         if (user.getAvatarId() != null) {
             avatarRepository.deleteById(user.getAvatarId());
             user.setAvatarId(null);
         }
     }
 
-    public AvatarImg getAvatar(User user) {
+    public AvatarImg getAvatar(@NotNull User user) {
         Avatar avatar = findById(user.getAvatarId());
         String avatarHex = (
                 avatar != null &&
@@ -58,7 +59,7 @@ public class AvatarService {
         );
     }
 
-    public Map<Long, byte[]> getAvatars(List<Long> avatarsId) {
+    public Map<Long, byte[]> getAvatars(@NotNull List<Long> avatarsId) {
         return avatarsId.stream()
                 .filter(this::existsById)
                 .collect(Collectors.toMap(

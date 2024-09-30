@@ -4,6 +4,8 @@ import com.andwis.travel_with_anna.handler.exception.JwtParsingException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,10 +28,6 @@ public class JwtService {
         this.key = Jwts.SIG.HS256.key().build();
     }
 
-//    private SecretKey getSignInKey() {
-//        return this.key;
-//    }
-
     public String generateJwtToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Map<String, Object> claims = createClaims(userDetails);
@@ -43,7 +41,7 @@ public class JwtService {
                 .compact();
     }
 
-    private Map<String, Object> createClaims(UserDetails userDetails) {
+    private @NotNull @Unmodifiable Map<String, Object> createClaims(@NotNull UserDetails userDetails) {
         List<String> authorities = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
@@ -52,7 +50,7 @@ public class JwtService {
                 "authorities", authorities);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+    public <T> T extractClaim(String token, @NotNull Function<Claims, T> claimResolver) {
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
@@ -74,7 +72,7 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, @NotNull UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }

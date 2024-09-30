@@ -1,0 +1,25 @@
+.trip-name {
+  display: flex;
+  justify-content: space-between;
+  color: #2E3944;
+  font-weight: 500;
+  background-color: transparent;
+  font-size: 24px;
+  margin-top: 0 !important;
+}
+
+.trip-name-padding {
+  padding: 0 3% 0 3%;
+}
+
+.main-form {
+  width: 100%;
+  min-height: 400vh;
+  height: 100%;
+  padding-top: 10px;
+  background-color: #F0F2F2 !important;
+}
+
+.activity-container > * {
+  margin: 1%;
+}

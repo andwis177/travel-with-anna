@@ -40,7 +40,10 @@ public class Budget {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Budget budget = (Budget) o;
-        return Objects.equals(budgetId, budget.budgetId) && Objects.equals(currency, budget.currency) && Objects.equals(toSpend, budget.toSpend) && Objects.equals(trip, budget.trip);
+        return Objects.equals(budgetId, budget.budgetId)
+                && Objects.equals(currency, budget.currency)
+                && Objects.equals(toSpend, budget.toSpend)
+                && Objects.equals(trip, budget.trip);
     }
 
     @Override

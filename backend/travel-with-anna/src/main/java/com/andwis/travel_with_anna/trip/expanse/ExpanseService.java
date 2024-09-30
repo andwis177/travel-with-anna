@@ -10,6 +10,9 @@ import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -66,7 +69,7 @@ public class ExpanseService {
     }
 
     private Expanse saveExpanseWithItem(
-            ExpanseRequest request) {
+            @NotNull ExpanseRequest request) {
 
         Expanse expanse;
 
@@ -87,7 +90,7 @@ public class ExpanseService {
         return expanse;
     }
 
-    private Expanse updateExpanse(ExpanseRequest request) {
+    private Expanse updateExpanse(@NotNull ExpanseRequest request) {
         Expanse expanse = findById(request.getExpanseId());
         ExpanseMapper.mapToExpanse(expanse, request);
         save(expanse);
@@ -127,7 +130,7 @@ public class ExpanseService {
         return exchangeRate.setScale(5, RoundingMode.HALF_UP);
     }
 
-    private BigDecimal calculateExchangeRate(String currencyFrom, String currencyTo) {
+    private @Nullable BigDecimal calculateExchangeRate(String currencyFrom, String currencyTo) {
         CurrencyExchange currencyFromExchange;
         CurrencyExchange currencyToExchange;
         try {
@@ -178,11 +181,12 @@ public class ExpanseService {
         return new ExpanseInTripCurrency(priceInTripCurrency, paidInTripCurrency);
     }
 
-    private BigDecimal calculatePriceInTripCurrency(BigDecimal value, BigDecimal exchangeRate) {
+    @Contract(pure = true)
+    private @NotNull BigDecimal calculatePriceInTripCurrency(@NotNull BigDecimal value, BigDecimal exchangeRate) {
         return value.multiply(exchangeRate);
     }
 
-    public void changeTripCurrency(Budget budget) {
+    public void changeTripCurrency(@NotNull Budget budget) {
         List<Expanse> expanses = expanseRepository.findByTripId(budget.getTrip().getTripId());
         expanses.forEach(expanse -> {
             BigDecimal exchangeRate = getExchangeRate(expanse.getCurrency(), budget.getCurrency());

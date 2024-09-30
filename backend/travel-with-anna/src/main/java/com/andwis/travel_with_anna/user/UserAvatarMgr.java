@@ -5,6 +5,7 @@ import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +22,7 @@ public class UserAvatarMgr {
     private final AvatarService avatarService;
 
 
-    public void setAvatar(MultipartFile file, Authentication connectedUser)
+    public void setAvatar(@NotNull MultipartFile file, Authentication connectedUser)
             throws IOException {
         String contentType = file.getContentType();
 
@@ -37,8 +38,8 @@ public class UserAvatarMgr {
         }
 
         if (user.getAvatarId() == null) {
-          Avatar newAvatar = avatarService.createAvatar(user);
-          user.setAvatarId(newAvatar.getAvatarId());
+            Avatar newAvatar = avatarService.createAvatar(user);
+            user.setAvatarId(newAvatar.getAvatarId());
             userService.saveUser(user);
         }
 

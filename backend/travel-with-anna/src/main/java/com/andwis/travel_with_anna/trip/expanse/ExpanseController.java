@@ -17,8 +17,8 @@ public class ExpanseController {
     private final ExpanseFacade facade;
 
     @PostMapping("/save")
-    public ResponseEntity<ExpanseResponse> createOrUpdateExpanse(@RequestBody @Valid ExpanseForItemRequest creator) {
-        ExpanseResponse response = facade.createOrUpdateExpanse(creator.getExpanseRequest());
+    public ResponseEntity<ExpanseResponse> createOrUpdateExpanse(@RequestBody @Valid ExpanseRequest creator) {
+        ExpanseResponse response = facade.createOrUpdateExpanse(creator);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

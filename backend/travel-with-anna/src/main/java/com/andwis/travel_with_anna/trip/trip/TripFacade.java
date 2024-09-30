@@ -22,11 +22,11 @@ public class TripFacade {
         return tripMgr.getTripById(tripId);
     }
 
-    public Long changeTripName(Long tripId, String tripName) {
-        return tripMgr.changeTripName(tripId, tripName);
-    }
-
     public void deleteTrip(TripRequest request, Authentication connectedUser) {
         tripMgr.deleteTrip(request, connectedUser);
+    }
+
+    public void updateTrip(TripEditRequest request) {
+        tripMgr.updateTrip(request);
     }
 }

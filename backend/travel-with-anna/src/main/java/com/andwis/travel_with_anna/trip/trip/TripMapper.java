@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.trip;
 
 import com.andwis.travel_with_anna.trip.day.Day;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,7 +10,8 @@ import java.util.List;
 
 public class TripMapper {
 
-    public static TripResponse toTripResponse(Trip trip) {
+
+    public static @NotNull TripResponse toTripResponse(@NotNull Trip trip) {
         LocalDate startDate = null;
         LocalDate endDate = null;
         int amountOfDays;
@@ -34,7 +36,6 @@ public class TripMapper {
                 startDate,
                 endDate,
                 amountOfDays
-
-                );
+        );
     }
 }

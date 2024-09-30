@@ -58,12 +58,7 @@ class ExpanseControllerTest {
                 BigDecimal.valueOf(96.00)
         );
 
-        ExpanseForItemRequest creator = ExpanseForItemRequest.builder()
-                .expanseRequest(request)
-                .tripId(1L)
-                .itemId(1L)
-                .build();
-        String requestBody = objectMapper.writeValueAsString(creator);
+        String requestBody = objectMapper.writeValueAsString(request);
         String jsonResponse = objectMapper.writeValueAsString(response);
         when(expanseFacade.createOrUpdateExpanse(any(ExpanseRequest.class))).thenReturn(response);
 

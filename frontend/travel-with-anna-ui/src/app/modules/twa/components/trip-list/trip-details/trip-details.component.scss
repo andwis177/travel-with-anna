@@ -1,10 +1,31 @@
 .trip-name {
+  display: flex;
+  justify-content: space-between;
   color: #2E3944;
   font-weight: 500;
-  background-color: #d0d7e2;
-  padding-right: 50px;
-  text-align: center;
+  background-color: transparent;
+  padding-right: 1%;
   font-size: 24px;
-  margin: 10px !important;
 }
 
+.trip-name-padding {
+  padding: 0 3% 0 3%;
+}
+
+.main-form {
+  width: 100%;
+  min-height: 400vh;
+  height: 100%;
+  padding-top: 10px;
+  background-color: #F0F2F2 !important;
+}
+
+.days-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-flow: row wrap;
+}
+.days-container > * {
+  margin: 1%;
+}

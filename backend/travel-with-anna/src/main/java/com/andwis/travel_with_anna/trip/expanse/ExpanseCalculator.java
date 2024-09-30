@@ -1,6 +1,8 @@
 package com.andwis.travel_with_anna.trip.expanse;
 
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 
 @Data
@@ -23,7 +25,7 @@ public class ExpanseCalculator {
         this.totalDebt = totalDebt;
     }
 
-    public ExpanseCalculator add(ExpanseCalculator other) {
+    public ExpanseCalculator add(@NotNull ExpanseCalculator other) {
         return new ExpanseCalculator(
                 this.totalPrice.add(other.totalPrice),
                 this.totalPaid.add(other.totalPaid),

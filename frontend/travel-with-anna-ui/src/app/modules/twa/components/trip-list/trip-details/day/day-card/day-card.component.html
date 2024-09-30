@@ -1,0 +1,17 @@
+<div class="item" [ngClass]="getTodayClass(day.isToday!)">
+  <button class="button" (click)="openDay($event)">
+    <div>
+      <div class="day-date trip-font mat-elevation-z4">
+        <div>{{day.date}}</div>
+        <div>{{day.dayOfWeek}}</div>
+      </div>
+      <div class="places">
+
+      </div>
+    </div>
+  </button>
+  <div class="bottom-menu">
+    <button class="delete-button" matTooltip="Delete Day"
+            (click)="onDelete($event)"><i class="fas fa-trash-alt fa-1x"></i></button>
+  </div>
+</div>

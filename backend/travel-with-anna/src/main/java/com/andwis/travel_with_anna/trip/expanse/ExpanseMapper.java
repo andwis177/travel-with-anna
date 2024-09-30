@@ -1,5 +1,7 @@
 package com.andwis.travel_with_anna.trip.expanse;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +26,8 @@ public class ExpanseMapper {
         }
     }
 
-    public static ExpanseResponse mapToExpanseResponse(Expanse expanse) {
+
+    public static @NotNull ExpanseResponse mapToExpanseResponse(@NotNull Expanse expanse) {
         return new ExpanseResponse(
                 expanse.getExpanseId(),
                 expanse.getExpanseName(),
@@ -37,7 +40,7 @@ public class ExpanseMapper {
         );
     }
 
-    public static void updateExpanse(Expanse expanse, ExpanseRequest expanseRequest) {
+    public static void updateExpanse(@NotNull Expanse expanse, @NotNull ExpanseRequest expanseRequest) {
         expanse.setExpanseName(expanseRequest.getExpanseName());
         expanse.setCurrency(expanseRequest.getCurrency());
         expanse.setPrice(expanseRequest.getPrice());
@@ -45,7 +48,7 @@ public class ExpanseMapper {
         expanse.setExchangeRate(expanseRequest.getExchangeRate());
     }
 
-    public static List<ExpanseResponse> mapToExpanseResponseList(List<Expanse> expanses) {
+    public static List<ExpanseResponse> mapToExpanseResponseList(@NotNull List<Expanse> expanses) {
         return expanses.stream()
                 .map(ExpanseMapper::mapToExpanseResponse)
                 .collect(Collectors.toList());

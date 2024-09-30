@@ -11,8 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.andwis.travel_with_anna.role.Role.*;
@@ -30,19 +28,17 @@ class RoleServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    private Role role;
-    private Role role2;
     private User user;
 
 
     @BeforeEach
     void setUp() {
-        role = new Role();
+        Role role = new Role();
         role.setRoleName(getUserRole());
         role.setAuthority(getUserAuthority());
         roleRepository.save(role);
 
-        role2 = new Role();
+        Role role2 = new Role();
         role2.setRoleName(getAdminRole());
         role2.setAuthority(getAdminAuthority());
         roleRepository.save(role2);
@@ -87,7 +83,7 @@ class RoleServiceTest {
         // Then
         assertNotNull(roles);
         assertEquals(1, roles.size());
-        assertEquals(getUserRole(), roles.get(0));
+        assertEquals(getUserRole(), roles.getFirst());
     }
 
     @Test

@@ -9,8 +9,19 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { saveDay } from '../fn/day/save-day';
-import { SaveDay$Params } from '../fn/day/save-day';
+import { addDay } from '../fn/day/add-day';
+import { AddDay$Params } from '../fn/day/add-day';
+import { createDay } from '../fn/day/create-day';
+import { CreateDay$Params } from '../fn/day/create-day';
+import { DayResponse } from '../models/day-response';
+import { deleteDay } from '../fn/day/delete-day';
+import { DeleteDay$Params } from '../fn/day/delete-day';
+import { generateDays } from '../fn/day/generate-days';
+import { GenerateDays$Params } from '../fn/day/generate-days';
+import { getDayById } from '../fn/day/get-day-by-id';
+import { GetDayById$Params } from '../fn/day/get-day-by-id';
+import { getDays } from '../fn/day/get-days';
+import { GetDays$Params } from '../fn/day/get-days';
 
 @Injectable({ providedIn: 'root' })
 export class DayService extends BaseService {
@@ -18,27 +29,152 @@ export class DayService extends BaseService {
     super(config, http);
   }
 
-  /** Path part for operation `saveDay()` */
-  static readonly SaveDayPath = '/day/create';
+  /** Path part for operation `generateDays()` */
+  static readonly GenerateDaysPath = '/day/generate';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `saveDay()` instead.
+   * To access only the response body, use `generateDays()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
-  saveDay$Response(params: SaveDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return saveDay(this.http, this.rootUrl, params, context);
+  generateDays$Response(params: GenerateDays$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return generateDays(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `saveDay$Response()` instead.
+   * To access the full response (for headers, for example), `generateDays$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  generateDays(params: GenerateDays$Params, context?: HttpContext): Observable<void> {
+    return this.generateDays$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `createDay()` */
+  static readonly CreateDayPath = '/day/create';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `createDay()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  createDay$Response(params: CreateDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return createDay(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `createDay$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  createDay(params: CreateDay$Params, context?: HttpContext): Observable<void> {
+    return this.createDay$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `addDay()` */
+  static readonly AddDayPath = '/day/add';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `addDay()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  addDay$Response(params: AddDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return addDay(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `addDay$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  addDay(params: AddDay$Params, context?: HttpContext): Observable<void> {
+    return this.addDay$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `getDays()` */
+  static readonly GetDaysPath = '/day/{tripId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getDays()` instead.
    *
    * This method doesn't expect any request body.
    */
-  saveDay(params: SaveDay$Params, context?: HttpContext): Observable<void> {
-    return this.saveDay$Response(params, context).pipe(
+  getDays$Response(params: GetDays$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<DayResponse>>> {
+    return getDays(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getDays$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getDays(params: GetDays$Params, context?: HttpContext): Observable<Array<DayResponse>> {
+    return this.getDays$Response(params, context).pipe(
+      map((r: StrictHttpResponse<Array<DayResponse>>): Array<DayResponse> => r.body)
+    );
+  }
+
+  /** Path part for operation `getDayById()` */
+  static readonly GetDayByIdPath = '/day/{dayId}/day';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getDayById()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getDayById$Response(params: GetDayById$Params, context?: HttpContext): Observable<StrictHttpResponse<DayResponse>> {
+    return getDayById(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getDayById$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getDayById(params: GetDayById$Params, context?: HttpContext): Observable<DayResponse> {
+    return this.getDayById$Response(params, context).pipe(
+      map((r: StrictHttpResponse<DayResponse>): DayResponse => r.body)
+    );
+  }
+
+  /** Path part for operation `deleteDay()` */
+  static readonly DeleteDayPath = '/day/{dayId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `deleteDay()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  deleteDay$Response(params: DeleteDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return deleteDay(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `deleteDay$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  deleteDay(params: DeleteDay$Params, context?: HttpContext): Observable<void> {
+    return this.deleteDay$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }

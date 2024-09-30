@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export { Activity } from './models/activity';
+export { ActivityResponse } from './models/activity-response';
 export { AuthenticationRequest } from './models/authentication-request';
 export { AuthenticationResponse } from './models/authentication-response';
 export { AvatarImg } from './models/avatar-img';
@@ -16,6 +17,10 @@ export { CountryCurrency } from './models/country-currency';
 export { CountryName } from './models/country-name';
 export { CurrencyExchangeResponse } from './models/currency-exchange-response';
 export { Day } from './models/day';
+export { DayAddRequest } from './models/day-add-request';
+export { DayGeneratorRequest } from './models/day-generator-request';
+export { DayRequest } from './models/day-request';
+export { DayResponse } from './models/day-response';
 export { Expanse } from './models/expanse';
 export { ExpanseByCurrency } from './models/expanse-by-currency';
 export { ExpanseInTripCurrency } from './models/expanse-in-trip-currency';
@@ -36,6 +41,7 @@ export { ResetPasswordRequest } from './models/reset-password-request';
 export { Role } from './models/role';
 export { Trip } from './models/trip';
 export { TripCreatorRequest } from './models/trip-creator-request';
+export { TripEditRequest } from './models/trip-edit-request';
 export { TripRequest } from './models/trip-request';
 export { TripResponse } from './models/trip-response';
 export { User } from './models/user';

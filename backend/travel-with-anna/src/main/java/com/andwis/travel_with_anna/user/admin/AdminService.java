@@ -11,6 +11,7 @@ import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.utility.NumberUtils;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -82,7 +83,7 @@ public class AdminService {
         throw new UserNotFoundException("User not found");
     }
 
-    public Long updateUser(UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
+    public Long updateUser(@NotNull UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.getPassword());
         UserAdminEditRequest userAdminEditRequest = request.getUserAdminEditRequest();
@@ -94,7 +95,7 @@ public class AdminService {
         return user.getUserId();
     }
 
-    public UserResponse deleteUser(UserAdminDeleteRequest request, Authentication authentication) {
+    public UserResponse deleteUser(@NotNull UserAdminDeleteRequest request, Authentication authentication) {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.password());
         userService.deleteUserById(request.userId());

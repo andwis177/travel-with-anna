@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,5 +51,16 @@ public class Day {
     @Override
     public int hashCode() {
         return Objects.hash(dayId, date);
+    }
+
+    public void addActivity(Activity activity) {
+        this.activity = new ArrayList<>();
+        this.activity.add(activity);
+        activity.setDay(this);
+    }
+
+    public void removeActivity(Activity activity) {
+        this.activity.remove(activity);
+        activity.setDay(null);
     }
 }

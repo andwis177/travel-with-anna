@@ -6,6 +6,7 @@ import com.andwis.travel_with_anna.trip.expanse.ExpanseCalculator;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,7 +24,7 @@ public class BudgetService {
         budgetRepository.save(budget);
     }
 
-    public void updateBudget(BudgetRequest request) {
+    public void updateBudget(@NotNull BudgetRequest request) {
         Budget budget = findById(request.getBudgetId());
         budget.setToSpend(request.getToSpend());
         if (!request.getCurrency().equals(budget.getCurrency()) && !request.getCurrency().isEmpty()) {
@@ -63,7 +64,7 @@ public class BudgetService {
         );
     }
 
-    public Map<String, ExpanseCalculator> calculateSumsByCurrency(List<ExpanseResponse> expanses) {
+    public Map<String, ExpanseCalculator> calculateSumsByCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
                 .collect(Collectors.groupingBy(
                         ExpanseResponse::currency,
@@ -81,19 +82,19 @@ public class BudgetService {
                 ));
     }
 
-    public BigDecimal overallPriceInTripCurrency(List<ExpanseResponse> expanses) {
+    public BigDecimal overallPriceInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
                 .map(ExpanseResponse::priceInTripCurrency)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal overallPaidInTripCurrency(List<ExpanseResponse> expanses) {
+    public BigDecimal overallPaidInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
                 .map(ExpanseResponse::paidInTripCurrency)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal calculateTotalDepth(List<ExpanseResponse> expanses) {
+    public BigDecimal calculateTotalDepth(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
                 .map(expanse -> expanse.priceInTripCurrency().doubleValue() > expanse.paidInTripCurrency().doubleValue()
                         ? expanse.priceInTripCurrency().subtract(expanse.paidInTripCurrency())

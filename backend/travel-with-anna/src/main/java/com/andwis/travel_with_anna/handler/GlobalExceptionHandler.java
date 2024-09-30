@@ -3,6 +3,7 @@ package com.andwis.travel_with_anna.handler;
 import com.andwis.travel_with_anna.handler.exception.*;
 import jakarta.mail.MessagingException;
 import jakarta.validation.ConstraintViolationException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(AvatarNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(AvatarNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull AvatarNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -45,7 +46,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BackpackNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(BackpackNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull BackpackNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -71,7 +72,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BudgetNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(BudgetNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull BudgetNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -84,7 +85,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ExceptionResponse> handleException(ConstraintViolationException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull ConstraintViolationException exp) {
         Set<String> errors = new HashSet<>();
         exp.getConstraintViolations().forEach(violation -> errors.add(violation.getMessage()));
         List<String> errorsSorted = errors.stream().sorted().toList();
@@ -99,7 +100,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CurrencyNotProvidedException.class)
-    public ResponseEntity<ExceptionResponse> handleException(CurrencyNotProvidedException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull CurrencyNotProvidedException exp) {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(
@@ -112,7 +113,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<ExceptionResponse> handleException(DisabledException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull DisabledException exp) {
         return ResponseEntity
                 .status(UNAUTHORIZED)
                 .body(
@@ -125,7 +126,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EmailNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(EmailNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull EmailNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -138,7 +139,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ExpanseNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(ExpanseNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull ExpanseNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -151,7 +152,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ExpanseNotSaveException.class)
-    public ResponseEntity<ExceptionResponse> handleException(ExpanseNotSaveException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull ExpanseNotSaveException exp) {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(
@@ -164,7 +165,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ExpiredTokenException.class)
-    public ResponseEntity<ExceptionResponse> handleException(ExpiredTokenException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull ExpiredTokenException exp) {
         return ResponseEntity
                 .status(UNAUTHORIZED)
                 .body(
@@ -177,7 +178,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(FileNotSaved.class)
-    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(FileNotSaved exp) {
+    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(@NotNull FileNotSaved exp) {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(
@@ -190,7 +191,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ExceptionResponse> handleException(HandlerMethodValidationException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull HandlerMethodValidationException exp) {
         Set<String> errors = new HashSet<>();
         exp.getAllValidationResults().forEach(violation -> errors.add(violation.toString()));
         List<String> errorsSorted = errors.stream().sorted().toList();
@@ -205,7 +206,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ExceptionResponse> handleException(IllegalArgumentException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull IllegalArgumentException exp) {
         return ResponseEntity
                 .status(NOT_ACCEPTABLE)
                 .body(
@@ -219,7 +220,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<ExceptionResponse> handleException(InvalidTokenException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull InvalidTokenException exp) {
         return ResponseEntity
                 .status(UNAUTHORIZED)
                 .body(
@@ -232,7 +233,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ItemNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(ItemNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull ItemNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -246,7 +247,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(JwtParsingException.class)
-    public ResponseEntity<ExceptionResponse> handleException(JwtParsingException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull JwtParsingException exp) {
         return ResponseEntity
                 .status(UNAUTHORIZED)
                 .body(
@@ -259,7 +260,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(LockedException.class)
-    public ResponseEntity<ExceptionResponse> handleException(LockedException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull LockedException exp) {
         return ResponseEntity
                 .status(UNAUTHORIZED)
                 .body(
@@ -272,7 +273,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ExceptionResponse> handleException(MaxUploadSizeExceededException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull MaxUploadSizeExceededException exp) {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(
@@ -285,7 +286,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MessagingException.class)
-    public ResponseEntity<ExceptionResponse> handleException(MessagingException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull MessagingException exp) {
         return ResponseEntity
                 .status(INTERNAL_SERVER_ERROR)
                 .body(
@@ -298,7 +299,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exp) {
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(@NotNull MethodArgumentNotValidException exp) {
         Set<String> errors = new HashSet<>();
         exp.getBindingResult().getAllErrors().forEach(error -> {
             var errorMessage = error.getDefaultMessage();
@@ -317,7 +318,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RoleNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(RoleNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull RoleNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -330,7 +331,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TransactionSystemException.class)
-    public ResponseEntity<ExceptionResponse> handleException(TransactionSystemException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull TransactionSystemException exp) {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(
@@ -343,7 +344,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TripNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(TripNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(@NotNull TripNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -356,7 +357,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserExistsException.class)
-    public ResponseEntity<ExceptionResponse> handleException(UserExistsException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull UserExistsException exp) {
         return ResponseEntity
                 .status(CONFLICT)
                 .body(
@@ -369,7 +370,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(UsernameNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull UsernameNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -382,7 +383,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleException(UserNotFoundException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull UserNotFoundException exp) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(
@@ -395,7 +396,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(WrongPasswordException.class)
-    public ResponseEntity<ExceptionResponse> handleException(WrongPasswordException exp) {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull WrongPasswordException exp) {
         return ResponseEntity
                 .status(NOT_ACCEPTABLE)
                 .body(

@@ -1,7 +1,10 @@
 package com.andwis.travel_with_anna.trip.backpack;
 
+import org.jetbrains.annotations.NotNull;
+
 public class BackpackMapper {
-    public static BackpackResponse toBackpackResponse(Backpack backpack, boolean isNote) {
+
+    public static @NotNull BackpackResponse toBackpackResponse(@NotNull Backpack backpack, boolean isNote) {
         return new BackpackResponse(
                 backpack.getBackpackId(),
                 backpack.getTrip().getTripId(),

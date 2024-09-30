@@ -1,45 +1,34 @@
 package com.andwis.travel_with_anna.trip.day.activity.badge;
 
-import com.andwis.travel_with_anna.trip.day.activity.Activity;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
-import java.util.Objects;
 
 @Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@Entity
-@Table(name = "badge")
-public class Badge{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "badge_id")
-    private Long badgeId;
+public enum Badge{
+    ACCOMMODATION_CHECK_IN("Accommodation Check-In"),
+    ACCOMMODATION_CHECK_OUT("Accommodation Check-Out"),
+    TRAVELING("Traveling"),
+    RENT("Rent"),
+    SHOPPING("Shopping"),
+    EVENT("Event"),
+    EAT("Eat"),
+    OTHER("Other");
 
-    @NotNull
-    @Size(max = 40)
-    @Column(name = "name", length = 40)
-    private String name;
+    private final String badge;
 
-    @OneToMany(mappedBy = "badge", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Activity> activity;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Badge badge = (Badge) o;
-        return Objects.equals(badgeId, badge.badgeId) && Objects.equals(name, badge.name) && Objects.equals(activity, badge.activity);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(badgeId, name);
+    public static @Unmodifiable List<String> getBadges() {
+        return List.of(
+                ACCOMMODATION_CHECK_IN.badge,
+                ACCOMMODATION_CHECK_OUT.badge, TRAVELING.badge,
+                RENT.badge,
+                SHOPPING.badge,
+                EVENT.badge,
+                EAT.badge,
+                OTHER.badge
+        );
     }
 }

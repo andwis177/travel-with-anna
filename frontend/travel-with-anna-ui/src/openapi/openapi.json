@@ -101,22 +101,68 @@
         }
       }
     },
+    "/day/generate": {
+      "post": {
+        "tags": [
+          "Day"
+        ],
+        "operationId": "generateDays",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DayGeneratorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/day/create": {
       "post": {
         "tags": [
           "Day"
         ],
-        "operationId": "saveDay",
-        "parameters": [
-          {
-            "name": "day",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Day"
+        "operationId": "createDay",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DayRequest"
+              }
             }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
+        }
+      }
+    },
+    "/day/add": {
+      "post": {
+        "tags": [
+          "Day"
         ],
+        "operationId": "addDay",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DayAddRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -305,42 +351,25 @@
         }
       }
     },
-    "/trip/{tripId}/name/change": {
+    "/trip/update": {
       "patch": {
         "tags": [
           "Trip"
         ],
-        "operationId": "changeTripName",
-        "parameters": [
-          {
-            "name": "tripId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "tripName",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                }
+        "operationId": "updateTrip",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripEditRequest"
               }
             }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -808,6 +837,71 @@
         }
       }
     },
+    "/day/{tripId}": {
+      "get": {
+        "tags": [
+          "Day"
+        ],
+        "operationId": "getDays",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DayResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/day/{dayId}/day": {
+      "get": {
+        "tags": [
+          "Day"
+        ],
+        "operationId": "getDayById",
+        "parameters": [
+          {
+            "name": "dayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DayResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/budget/{budgetId}": {
       "get": {
         "tags": [
@@ -1205,6 +1299,30 @@
         }
       }
     },
+    "/day/{dayId}": {
+      "delete": {
+        "tags": [
+          "Day"
+        ],
+        "operationId": "deleteDay",
+        "parameters": [
+          {
+            "name": "dayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/backpack/delete/{itemId}/item": {
       "delete": {
         "tags": [
@@ -1382,60 +1500,49 @@
           }
         }
       },
-      "Activity": {
-        "type": "object",
-        "properties": {
-          "activityId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "badge": {
-            "$ref": "#/components/schemas/Badge"
-          },
-          "note": {
-            "$ref": "#/components/schemas/Note"
-          },
-          "expanse": {
-            "$ref": "#/components/schemas/Expanse"
-          }
-        }
-      },
-      "Backpack": {
-        "type": "object",
-        "properties": {
-          "backpackId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Item"
-            }
-          }
-        }
-      },
-      "Badge": {
+      "DayGeneratorRequest": {
         "required": [
-          "name"
+          "endDate",
+          "startDate"
         ],
         "type": "object",
         "properties": {
-          "badgeId": {
+          "tripId": {
             "type": "integer",
             "format": "int64"
           },
-          "name": {
-            "maxLength": 40,
-            "minLength": 0,
-            "type": "string"
+          "startDate": {
+            "type": "string",
+            "format": "date"
           },
-          "activity": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Activity"
-            }
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "DayRequest": {
+        "type": "object",
+        "properties": {
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "DayAddRequest": {
+        "type": "object",
+        "properties": {
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first": {
+            "type": "boolean"
           }
         }
       },
@@ -1456,250 +1563,6 @@
           },
           "toSpend": {
             "type": "number"
-          }
-        }
-      },
-      "Day": {
-        "required": [
-          "date"
-        ],
-        "type": "object",
-        "properties": {
-          "dayId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "date": {
-            "type": "string",
-            "format": "date"
-          },
-          "note": {
-            "$ref": "#/components/schemas/Note"
-          },
-          "trip": {
-            "$ref": "#/components/schemas/Trip"
-          },
-          "activity": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Activity"
-            }
-          }
-        }
-      },
-      "Expanse": {
-        "required": [
-          "currency",
-          "exchangeRate",
-          "paid",
-          "price"
-        ],
-        "type": "object",
-        "properties": {
-          "expanseId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "expanseName": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
-          },
-          "currency": {
-            "maxLength": 10,
-            "minLength": 0,
-            "type": "string"
-          },
-          "price": {
-            "type": "number"
-          },
-          "paid": {
-            "type": "number"
-          },
-          "exchangeRate": {
-            "type": "number"
-          },
-          "item": {
-            "$ref": "#/components/schemas/Item"
-          },
-          "activity": {
-            "$ref": "#/components/schemas/Activity"
-          },
-          "trip": {
-            "$ref": "#/components/schemas/Trip"
-          },
-          "paidInTripCurrency": {
-            "type": "number"
-          },
-          "priceInTripCurrency": {
-            "type": "number"
-          }
-        }
-      },
-      "Item": {
-        "type": "object",
-        "properties": {
-          "itemId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "itemName": {
-            "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
-          },
-          "quantity": {
-            "maxLength": 40,
-            "minLength": 0,
-            "type": "string"
-          },
-          "backpack": {
-            "$ref": "#/components/schemas/Backpack"
-          },
-          "expanse": {
-            "$ref": "#/components/schemas/Expanse"
-          },
-          "packed": {
-            "type": "boolean"
-          }
-        }
-      },
-      "Note": {
-        "type": "object",
-        "properties": {
-          "noteId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "note": {
-            "maxLength": 500,
-            "minLength": 0,
-            "type": "string"
-          },
-          "day": {
-            "$ref": "#/components/schemas/Day"
-          },
-          "trip": {
-            "$ref": "#/components/schemas/Trip"
-          },
-          "activity": {
-            "$ref": "#/components/schemas/Activity"
-          }
-        }
-      },
-      "Role": {
-        "required": [
-          "authority",
-          "roleName"
-        ],
-        "type": "object",
-        "properties": {
-          "roleId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "roleName": {
-            "maxLength": 50,
-            "minLength": 0,
-            "type": "string"
-          },
-          "authority": {
-            "maxLength": 50,
-            "minLength": 0,
-            "type": "string"
-          }
-        }
-      },
-      "Trip": {
-        "type": "object",
-        "properties": {
-          "tripId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "tripName": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string"
-          },
-          "owner": {
-            "$ref": "#/components/schemas/User"
-          },
-          "days": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Day"
-            }
-          },
-          "backpack": {
-            "$ref": "#/components/schemas/Backpack"
-          },
-          "budget": {
-            "$ref": "#/components/schemas/Budget"
-          },
-          "expanses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Expanse"
-            }
-          },
-          "note": {
-            "$ref": "#/components/schemas/Note"
-          }
-        }
-      },
-      "User": {
-        "required": [
-          "avatarId",
-          "role"
-        ],
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "userName": {
-            "maxLength": 30,
-            "minLength": 0,
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "accountLocked": {
-            "type": "boolean"
-          },
-          "enabled": {
-            "type": "boolean"
-          },
-          "createdDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lastModifiedDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "role": {
-            "$ref": "#/components/schemas/Role"
-          },
-          "avatarId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "ownedTrips": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Trip"
-            }
-          },
-          "name": {
-            "type": "string"
           }
         }
       },
@@ -1810,6 +1673,17 @@
         "type": "object",
         "properties": {
           "message": {
+            "type": "string"
+          }
+        }
+      },
+      "TripEditRequest": {
+        "type": "object",
+        "properties": {
+          "dayGeneratorRequest": {
+            "$ref": "#/components/schemas/DayGeneratorRequest"
+          },
+          "tripName": {
             "type": "string"
           }
         }
@@ -2031,6 +1905,354 @@
           },
           "paid": {
             "type": "number"
+          }
+        }
+      },
+      "Activity": {
+        "type": "object",
+        "properties": {
+          "activityId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "badge": {
+            "$ref": "#/components/schemas/Badge"
+          },
+          "note": {
+            "$ref": "#/components/schemas/Note"
+          },
+          "day": {
+            "$ref": "#/components/schemas/Day"
+          },
+          "expanse": {
+            "$ref": "#/components/schemas/Expanse"
+          }
+        }
+      },
+      "ActivityResponse": {
+        "type": "object",
+        "properties": {
+          "activityId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "badge": {
+            "$ref": "#/components/schemas/Badge"
+          }
+        }
+      },
+      "Backpack": {
+        "type": "object",
+        "properties": {
+          "backpackId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          }
+        }
+      },
+      "Badge": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "badgeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "maxLength": 40,
+            "minLength": 0,
+            "type": "string"
+          },
+          "activity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            }
+          }
+        }
+      },
+      "Day": {
+        "required": [
+          "date"
+        ],
+        "type": "object",
+        "properties": {
+          "dayId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "note": {
+            "$ref": "#/components/schemas/Note"
+          },
+          "trip": {
+            "$ref": "#/components/schemas/Trip"
+          },
+          "activity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            }
+          }
+        }
+      },
+      "DayResponse": {
+        "type": "object",
+        "properties": {
+          "dayId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "dayOfWeek": {
+            "type": "string"
+          },
+          "isToday": {
+            "type": "boolean"
+          },
+          "note": {
+            "$ref": "#/components/schemas/Note"
+          },
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "activity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityResponse"
+            }
+          }
+        }
+      },
+      "Expanse": {
+        "required": [
+          "currency",
+          "exchangeRate",
+          "paid",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "expanseId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "expanseName": {
+            "maxLength": 60,
+            "minLength": 0,
+            "type": "string"
+          },
+          "currency": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "paid": {
+            "type": "number"
+          },
+          "exchangeRate": {
+            "type": "number"
+          },
+          "item": {
+            "$ref": "#/components/schemas/Item"
+          },
+          "activity": {
+            "$ref": "#/components/schemas/Activity"
+          },
+          "trip": {
+            "$ref": "#/components/schemas/Trip"
+          },
+          "priceInTripCurrency": {
+            "type": "number"
+          },
+          "paidInTripCurrency": {
+            "type": "number"
+          }
+        }
+      },
+      "Item": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemName": {
+            "maxLength": 60,
+            "minLength": 0,
+            "type": "string"
+          },
+          "quantity": {
+            "maxLength": 40,
+            "minLength": 0,
+            "type": "string"
+          },
+          "backpack": {
+            "$ref": "#/components/schemas/Backpack"
+          },
+          "expanse": {
+            "$ref": "#/components/schemas/Expanse"
+          },
+          "packed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Note": {
+        "type": "object",
+        "properties": {
+          "noteId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "note": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string"
+          },
+          "day": {
+            "$ref": "#/components/schemas/Day"
+          },
+          "trip": {
+            "$ref": "#/components/schemas/Trip"
+          },
+          "activity": {
+            "$ref": "#/components/schemas/Activity"
+          }
+        }
+      },
+      "Role": {
+        "required": [
+          "authority",
+          "roleName"
+        ],
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roleName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "authority": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "Trip": {
+        "type": "object",
+        "properties": {
+          "tripId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tripName": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/User"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Day"
+            }
+          },
+          "backpack": {
+            "$ref": "#/components/schemas/Backpack"
+          },
+          "budget": {
+            "$ref": "#/components/schemas/Budget"
+          },
+          "expanses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Expanse"
+            }
+          },
+          "note": {
+            "$ref": "#/components/schemas/Note"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "avatarId",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "maxLength": 30,
+            "minLength": 0,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "accountLocked": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "avatarId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ownedTrips": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Trip"
+            }
+          },
+          "name": {
+            "type": "string"
           }
         }
       },

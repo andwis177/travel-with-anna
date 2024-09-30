@@ -9,8 +9,6 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { changeTripName } from '../fn/trip/change-trip-name';
-import { ChangeTripName$Params } from '../fn/trip/change-trip-name';
 import { createTrip } from '../fn/trip/create-trip';
 import { CreateTrip$Params } from '../fn/trip/create-trip';
 import { deleteTrip } from '../fn/trip/delete-trip';
@@ -21,6 +19,8 @@ import { getTripById } from '../fn/trip/get-trip-by-id';
 import { GetTripById$Params } from '../fn/trip/get-trip-by-id';
 import { PageResponseTripResponse } from '../models/page-response-trip-response';
 import { TripResponse } from '../models/trip-response';
+import { updateTrip } from '../fn/trip/update-trip';
+import { UpdateTrip$Params } from '../fn/trip/update-trip';
 
 @Injectable({ providedIn: 'root' })
 export class TripService extends BaseService {
@@ -53,28 +53,28 @@ export class TripService extends BaseService {
     );
   }
 
-  /** Path part for operation `changeTripName()` */
-  static readonly ChangeTripNamePath = '/trip/{tripId}/name/change';
+  /** Path part for operation `updateTrip()` */
+  static readonly UpdateTripPath = '/trip/update';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `changeTripName()` instead.
+   * To access only the response body, use `updateTrip()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
-  changeTripName$Response(params: ChangeTripName$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
-    return changeTripName(this.http, this.rootUrl, params, context);
+  updateTrip$Response(params: UpdateTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return updateTrip(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `changeTripName$Response()` instead.
+   * To access the full response (for headers, for example), `updateTrip$Response()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
-  changeTripName(params: ChangeTripName$Params, context?: HttpContext): Observable<number> {
-    return this.changeTripName$Response(params, context).pipe(
-      map((r: StrictHttpResponse<number>): number => r.body)
+  updateTrip(params: UpdateTrip$Params, context?: HttpContext): Observable<void> {
+    return this.updateTrip$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 

@@ -88,7 +88,7 @@ class NoteServiceTest {
         Long tripId = 1L;
         Note note = Note.builder().note("Sample note").build();
         Trip trip = new Trip();
-        trip.setNote(note);
+        trip.addNote(note);
         when(tripService.getTripById(tripId)).thenReturn(trip);
 
         // When
@@ -125,7 +125,7 @@ class NoteServiceTest {
         Long tripId = 1L;
         Note existingNote = Note.builder().note("Old note").build();
         Trip trip = new Trip();
-        trip.setNote(existingNote);
+        trip.addNote(existingNote);
         NoteForTripRequest request = NoteForTripRequest.builder()
                 .tripId(tripId)
                 .note("Updated note")

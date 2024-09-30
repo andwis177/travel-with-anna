@@ -5,6 +5,7 @@ import com.andwis.travel_with_anna.trip.expanse.Expanse;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class Item{
     @JoinColumn(name = "expanse_id")
     private Expanse expanse;
 
-    public void addExpanse(Expanse expanse) {
+    public void addExpanse(@NotNull Expanse expanse) {
         this.expanse = expanse;
         expanse.setItem(this);
     }

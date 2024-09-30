@@ -39,6 +39,10 @@ p, a, span {
   font-family: 'Montserrat', sans-serif;
 }
 
+.main-font {
+  font-family: 'Montserrat', sans-serif;
+}
+
 .container {
   padding-top: 2%;
   display: block;
@@ -365,8 +369,8 @@ p, a, span {
   height: 100%;
   object-fit: cover;
   border-radius: 15%;
-  background-color: lightsteelblue;
-  border: 2px solid whitesmoke;
+  background-color: #EBE9E1;
+  border: 2px solid black;
   padding:5px;
   cursor: pointer;
 }

@@ -48,7 +48,7 @@ public class Trip {
     private Budget budget;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Expanse> expanses = new ArrayList<>();
+    private List<Expanse> expanses;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "note_id")
@@ -72,17 +72,17 @@ public class Trip {
         return Objects.hash(tripId, tripName);
     }
 
-    public void setBackpack(Backpack backpack) {
+    public void addBackpack(Backpack backpack) {
         this.backpack = backpack;
         backpack.setTrip(this);
     }
 
-    public void setBudget(Budget budget) {
+    public void addBudget(Budget budget) {
         this.budget = budget;
         budget.setTrip(this);
     }
 
-    public void setNote(Note note) {
+    public void addNote(Note note) {
         this.note = note;
         note.setTrip(this);
     }
@@ -92,6 +92,13 @@ public class Trip {
         day.setTrip(this);
     }
 
+    public void addDays(List<Day> days) {
+        this.days.clear();
+        this.days.addAll(days);
+        for (Day day : days) {
+            day.setTrip(this);
+        }
+    }
 
     public void addExpanse(Expanse expanse) {
         this.expanses.add(expanse);

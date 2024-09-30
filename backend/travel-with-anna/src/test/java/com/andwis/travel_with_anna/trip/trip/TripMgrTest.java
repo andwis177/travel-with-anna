@@ -97,8 +97,8 @@ class TripMgrTest {
         testTrip = Trip.builder()
                 .tripName("Initial Trip")
                 .build();
-        testTrip.setBackpack(new Backpack());
-        testTrip.setBudget(budget);
+        testTrip.addBackpack(new Backpack());
+        testTrip.addBudget(budget);
         tripService.saveTrip(testTrip);
         testUser.addTrip(testTrip);
         userService.saveUser(testUser);
@@ -149,20 +149,6 @@ class TripMgrTest {
         // Then
         assertNotNull(tripRequest);
         assertEquals("Initial Trip", tripRequest.tripName());
-    }
-
-    @Test
-    void testChangeTripName() {
-        // Given
-        String newName = "Updated Trip Name";
-
-        // When
-        Long updatedTripId = tripMgr.changeTripName(testTrip.getTripId(), newName);
-        Trip updatedTrip = tripService.getTripById(updatedTripId);
-
-        // Then
-        assertNotNull(updatedTrip);
-        assertEquals(newName, updatedTrip.getTripName());
     }
 
     @Test

@@ -6,17 +6,16 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { DayResponse } from '../../models/day-response';
 
-export interface ChangeTripName$Params {
+export interface GetDays$Params {
   tripId: number;
-  tripName: string;
 }
 
-export function changeTripName(http: HttpClient, rootUrl: string, params: ChangeTripName$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
-  const rb = new RequestBuilder(rootUrl, changeTripName.PATH, 'patch');
+export function getDays(http: HttpClient, rootUrl: string, params: GetDays$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<DayResponse>>> {
+  const rb = new RequestBuilder(rootUrl, getDays.PATH, 'get');
   if (params) {
     rb.path('tripId', params.tripId, {});
-    rb.query('tripName', params.tripName, {});
   }
 
   return http.request(
@@ -24,9 +23,9 @@ export function changeTripName(http: HttpClient, rootUrl: string, params: Change
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: parseFloat(String((r as HttpResponse<any>).body)) }) as StrictHttpResponse<number>;
+      return r as StrictHttpResponse<Array<DayResponse>>;
     })
   );
 }
 
-changeTripName.PATH = '/trip/{tripId}/name/change';
+getDays.PATH = '/day/{tripId}';

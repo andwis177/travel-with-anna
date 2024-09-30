@@ -37,10 +37,10 @@ public class TripController {
         return ResponseEntity.status(HttpStatus.OK).body(tripDto);
     }
 
-    @PatchMapping("/{tripId}/name/change")
-    public ResponseEntity<Long> changeTripName(@PathVariable("tripId") Long tripId, @RequestParam String tripName) {
-        Long returnedTripId = facade.changeTripName(tripId, tripName);
-        return ResponseEntity.status(HttpStatus.OK).body(returnedTripId);
+    @PatchMapping("/update")
+    public ResponseEntity<Void> updateTrip(@RequestBody TripEditRequest request) {
+        facade.updateTrip(request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete")

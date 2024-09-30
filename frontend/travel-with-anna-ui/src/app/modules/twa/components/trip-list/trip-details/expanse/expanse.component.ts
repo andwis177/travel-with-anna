@@ -185,17 +185,17 @@ export class ExpanseComponent implements OnInit {
     this.errorMsg = [];
     const params: CreateOrUpdateExpanse$Params = {
       body: {
-        itemId: this.itemId,
-        tripId: this.tripId,
         activityId: this.activityId,
-        expanseId: this.expanseId,
         currency: this.expanse.currency!,
         exchangeRate: this.expanse.exchangeRate!,
+        expanseId: this.expanseId,
         expanseName: this.expanse.expanseName,
+        itemId: this.itemId,
         paid: this.expanse.paid!,
-        price: this.expanse.price!,
         paidInTripCurrency: this.expanse.paidInTripCurrency,
-        priceInTripCurrency: this.expanse.priceInTripCurrency
+        price: this.expanse.price!,
+        priceInTripCurrency: this.expanse.priceInTripCurrency,
+        tripId: this.tripId,
       },
     };
     this.expanseService.createOrUpdateExpanse(params)

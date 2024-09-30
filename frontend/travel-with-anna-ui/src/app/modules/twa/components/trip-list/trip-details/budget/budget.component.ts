@@ -122,8 +122,6 @@ export class BudgetComponent implements OnInit, AfterViewInit {
       this.currentRowIndex = 0;
       this.selectRowByIndex(this.currentRowIndex);
     }
-    console.log(this.tripId);
-    console.log(this.budgetId);
   }
 
   ngAfterViewInit(): void {

@@ -1,0 +1,67 @@
+.item {
+  display: flex;
+  flex-direction: column;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+  border: 2px solid #6D7373;
+  border-radius: 10px;
+}
+
+
+.button {
+  width: 33vh;
+  height: auto;
+  background-color: transparent;
+  border: none;
+  border-radius: 10px;
+  padding: 10%;
+}
+
+.button:hover {
+  background-color: #D6E6E9  ;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.day-date {
+  width: 100%;
+  font-size: 16px;
+  font-weight: 400;
+  background-color: #2E3944;
+  color: whitesmoke;
+}
+
+.places {
+  margin-top: 15%;
+  text-align: start;
+  font-size: 14px;
+  padding: 5%;
+}
+
+.today{
+  background-color: #A1C3D1 !important;
+}
+
+.default{
+  background-color: whitesmoke !important;
+}
+
+.delete-button {
+  background: transparent !important;
+  color: #D46A6A !important;
+  font-size: 16px !important;
+  width: auto;
+  height: auto;
+  border: none;
+  padding: 2%;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  opacity: 0.4;
+}
+
+.bottom-menu{
+  display: flex;
+  justify-content: end;
+  background-color: transparent;
+}

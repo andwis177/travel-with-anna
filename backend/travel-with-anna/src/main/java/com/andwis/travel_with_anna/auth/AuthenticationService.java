@@ -16,6 +16,7 @@ import com.andwis.travel_with_anna.user.token.Token;
 import com.andwis.travel_with_anna.user.token.TokenRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,7 +49,7 @@ public class AuthenticationService {
     private String loginUrl;
 
     @Transactional
-    public void register(RegistrationRequest request) throws RoleNotFoundException, MessagingException {
+    public void register(@NotNull RegistrationRequest request) throws RoleNotFoundException, MessagingException {
         Role role = roleService.getRoleByName(request.getRoleName());
 
         if (role.getRoleName().equals(getAdminRole())) {
@@ -94,7 +95,7 @@ public class AuthenticationService {
         );
     }
 
-    private String generateAndSaveActivationToken(User user) {
+    private @NotNull String generateAndSaveActivationToken(User user) {
         String generatedToken = generateCode(6);
         var token = Token.builder()
                 .token(generatedToken)
@@ -106,7 +107,7 @@ public class AuthenticationService {
         return generatedToken;
     }
 
-    private String generateCode(int length) {
+    private @NotNull String generateCode(int length) {
         final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
@@ -118,7 +119,7 @@ public class AuthenticationService {
         return codeBuilder.toString();
     }
 
-    private AuthenticationResponse authenticate(AuthenticationRequest request) throws WrongPasswordException {
+    private AuthenticationResponse authenticate(@NotNull AuthenticationRequest request) throws WrongPasswordException {
         try {
             var auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -157,14 +158,14 @@ public class AuthenticationService {
         tokenRepository.delete(tokenEntity);
     }
 
-    private String generateAndSaveNewPassword(User user) {
+    private @NotNull String generateAndSaveNewPassword(@NotNull User user) {
         String generatedPassword = generateCode(20);
         user.setPassword(passwordEncoder.encode(generatedPassword));
         userService.saveUser(user);
         return generatedPassword;
     }
 
-    protected void resetPassword(ResetPasswordRequest request) throws MessagingException {
+    protected void resetPassword(@NotNull ResetPasswordRequest request) throws MessagingException {
         User user;
         if (request.getCredential().contains("@")) {
             user = userService.getUserByEmail(request.getCredential());

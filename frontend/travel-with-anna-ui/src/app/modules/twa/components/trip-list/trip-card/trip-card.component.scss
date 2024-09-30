@@ -30,12 +30,11 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   width: 240px;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 500;
   padding: 5px;
   background-color: #2E3944;
   color: whitesmoke;
-  opacity: 0.9;
 }
 
 .days {
@@ -46,9 +45,28 @@
 
 .date {
   margin-bottom: 30px;
-  opacity: 0.9;
-  font-size: 24px;
+  font-size: 20px;
   padding: 10px;
   background-color: #2E3944;
   color: whitesmoke;
 }
+
+.days-text {
+  margin-top:3%;
+  font-weight: 600;
+  font-size: 22px
+}
+
+.label-text {
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.margin-form {
+  margin: 3%;
+}
+
+.main-font-size {
+  font-size: 16px;
+}
+

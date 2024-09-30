@@ -10,6 +10,7 @@ import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -92,7 +93,7 @@ public class UserService {
         );
     }
 
-    public AuthenticationResponse updateUserExecution(UserCredentialsRequest userCredentials, Authentication connectedUser) {
+    public AuthenticationResponse updateUserExecution(@NotNull UserCredentialsRequest userCredentials, Authentication connectedUser) {
         var user = getSecurityUser(connectedUser).getUser();
         verifyPassword(user, userCredentials.getPassword());
         updateUser(userCredentials, user);
@@ -107,7 +108,7 @@ public class UserService {
     }
 
 
-    private void updateUser(UserCredentialsRequest userCredentials, User user) {
+    private void updateUser(@NotNull UserCredentialsRequest userCredentials, User user) {
         boolean isChanged = false;
         String newUserName = userCredentials.getUserName();
         String newEmail = userCredentials.getEmail();
@@ -148,7 +149,7 @@ public class UserService {
     }
 
 
-    public UserResponse changePassword(ChangePasswordRequest request, Authentication connectedUser) {
+    public UserResponse changePassword(@NotNull ChangePasswordRequest request, Authentication connectedUser) {
         var user = getSecurityUser(connectedUser);
         var currentUser = user.getUser();
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
@@ -163,7 +164,7 @@ public class UserService {
                 .build();
     }
 
-    public UserResponse deleteConnectedUser(PasswordRequest request, Authentication connectedUser)
+    public UserResponse deleteConnectedUser(@NotNull PasswordRequest request, Authentication connectedUser)
             throws UsernameNotFoundException, WrongPasswordException {
         var securityUser = getSecurityUser(connectedUser);
         var currentUser = securityUser.getUser();
@@ -180,7 +181,7 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public void verifyPassword(User user, String password) throws WrongPasswordException {
+    public void verifyPassword(@NotNull User user, String password) throws WrongPasswordException {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getEmail(), password));
@@ -189,7 +190,7 @@ public class UserService {
         }
     }
 
-    private static SecurityUser getSecurityUser(Authentication connectedUser) throws UsernameNotFoundException {
+    private static @NotNull SecurityUser getSecurityUser(@NotNull Authentication connectedUser) throws UsernameNotFoundException {
         var securityUser  = (SecurityUser) connectedUser.getPrincipal();
         if (securityUser  == null) {
             throw new UsernameNotFoundException("User not found");

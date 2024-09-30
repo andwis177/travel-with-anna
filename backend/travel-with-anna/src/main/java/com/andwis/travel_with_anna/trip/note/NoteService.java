@@ -3,6 +3,7 @@ package com.andwis.travel_with_anna.trip.note;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,7 +28,7 @@ public class NoteService {
         return new NoteResponse(trip.getNote().getNote());
     }
 
-    public void createNewNoteForTrip(NoteForTripRequest noteRequest) {
+    public void createNewNoteForTrip(@NotNull NoteForTripRequest noteRequest) {
         Trip trip = tripService.getTripById(noteRequest.getTripId());
         Note note;
         if (trip.getNote() != null) {
@@ -37,7 +38,7 @@ public class NoteService {
             note = Note.builder()
                     .note(noteRequest.getNote())
                     .build();
-            trip.setNote(note);
+            trip.addNote(note);
         }
         saveNote(note);
     }

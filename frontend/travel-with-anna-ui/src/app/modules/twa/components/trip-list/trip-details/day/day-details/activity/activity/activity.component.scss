@@ -1,0 +1,119 @@
+.dialog-container {
+  height: 90vh !important;
+  padding: 2% !important;
+  width: 100% !important;
+}
+
+.activity-container {
+  display: inline-flex;
+  justify-content: space-evenly;
+}
+
+.data-time-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center !important;
+  margin: 0 5% 0 0;
+}
+
+.activity-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.group-container {
+  border: #2E3944 1px solid;
+  width: 32vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  background-color: #D1E0E2;
+  margin-bottom: 5px;
+}
+
+.country-city-container {
+  display: inline-flex;
+  justify-content: center!important;
+}
+
+.insert-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 1% 0 1% !important;
+}
+
+.phone-email-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.column-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  margin-bottom: 7px;
+}
+
+.label {
+  font-size: 10px;
+  color: #2E3944;
+  font-family: 'Montserrat', sans-serif;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.country-city-width {
+  width: 14vw !important;
+}
+
+.insert {
+  width: 10vw;
+  height: 1.2vw;
+  border-radius: 4px;
+  border: 1px solid #2E3944;
+  font-size: 14px;
+  padding: 3px;
+  text-align: start;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.email-width{
+  width: 19vw !important;
+}
+
+.insert-width {
+  width: 30vw !important;
+}
+
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+
+.drop-list-background {
+  background-color: whitesmoke;
+}
+
+.mat-mdc-option,
+.mdc-list-item {
+  background-color: whitesmoke !important;
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.mat-mdc-option:hover,
+.mdc-list-item:hover {
+  background-color: white !important;
+}
+
+.mdc-list-item--selected,
+.mat-mdc-option-active {
+  background-color: #D1E0E2 !important;
+}

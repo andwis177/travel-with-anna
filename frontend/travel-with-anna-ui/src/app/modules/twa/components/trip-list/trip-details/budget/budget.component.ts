@@ -30,11 +30,13 @@ import {BudgetExpensesRespond} from "../../../../../../services/models/budget-ex
 import {ExpanseResponse} from "../../../../../../services/models/expanse-response";
 import {BudgetService} from "../../../../../../services/services/budget.service";
 import {GetBudgetExpanses$Params} from "../../../../../../services/fn/budget/get-budget-expanses";
-import {ActivatedRoute} from "@angular/router";
 import {LogoComponent} from "../../../../../components/menu/logo/logo.component";
 import {TripDetailsButtonsComponent} from "../trip-details-buttons/trip-details-buttons.component";
 import {UserComponent} from "../../../../../components/menu/user/user.component";
 import {BudgetButtonsComponent} from "./budget-buttons/budget-buttons.component";
+import {SharedService} from "../../../../../../services/shared/shared.service";
+import {TripResponse} from "../../../../../../services/models/trip-response";
+import {firstValueFrom} from "rxjs";
 
 @Component({
   selector: 'app-budget',
@@ -74,6 +76,7 @@ import {BudgetButtonsComponent} from "./budget-buttons/budget-buttons.component"
 })
 export class BudgetComponent implements OnInit, AfterViewInit {
   errorMsg: Array<string> = [];
+  trip: TripResponse = {};
   tripId: number;
   budgetId: number;
   expanseId: number | undefined;
@@ -85,6 +88,7 @@ export class BudgetComponent implements OnInit, AfterViewInit {
     sumsByCurrency: [],
     totalDebtInTripCurrency: 0
   };
+  expanses: Array<ExpanseResponse> = [];
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
@@ -104,9 +108,21 @@ export class BudgetComponent implements OnInit, AfterViewInit {
 
   constructor(private budgetService: BudgetService,
               public dialog: MatDialog,
-              private route: ActivatedRoute,) {
-    this.tripId = this.route.snapshot.paramMap.get('trip_id') as unknown as number;
-    this.budgetId = this.route.snapshot.paramMap.get('budget_id') as unknown as number;
+              private sharedService: SharedService) {
+
+    this.sharedService.getTrip().subscribe({
+      next: (trip) => {
+        this.trip = trip!;
+      }
+    });
+
+    this.tripId = this.trip.tripId!;
+    this.budgetId = this.trip.budgetId!;
+
+    if (this.dataSource.filteredData.length > 0) {
+      this.currentRowIndex = 0;
+      this.selectRowByIndex(this.currentRowIndex);
+    }
   }
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -116,7 +132,8 @@ export class BudgetComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.selection.clear()
-    this.getBudgetExpenses();
+    this.getBudgetExpenses().then();
+
 
     if (this.dataSource.filteredData.length > 0) {
       this.currentRowIndex = 0;
@@ -150,32 +167,33 @@ export class BudgetComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getBudgetExpenses() {
+  async getBudgetExpenses(): Promise<void> {
     this.errorMsg = [];
     const params: GetBudgetExpanses$Params = {budgetId: this.budgetId, tripId: this.tripId};
-    this.budgetService.getBudgetExpanses(params).subscribe({
-      next: (budgetExpanse) => {
-        this.budgetExpanse = budgetExpanse;
+    try {
+      this.budgetExpanse = await firstValueFrom(this.budgetService.getBudgetExpanses(params));
+      if (this.budgetExpanse) {
         this.dataSource = new MatTableDataSource(this.budgetExpanse.expanses);
         if (this.dataSource.data.length > 0) {
           this.selectRowByIndex(0)
           this.toggleRow(this.dataSource.data[0]);
         }
         this.dataSource.sort = this.sort;
-      },
-      error: (err) => {
-        console.error(err.error.errors);
       }
-    });
+
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  openExpanse(index: number) {
+  openExpanse(index: number): void {
     this.selectRowByIndex(index)
     if (this.budgetExpanse && this.budgetExpanse.expanses && this.budgetExpanse.expanses[index]) {
       this.expanseId = this.budgetExpanse.expanses[index].expanseId;
     } else {
       this.expanseId = -1;
     }
+    console.log(index);
     const dialogRef = this.dialog.open(ExpanseComponent, {
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -183,12 +201,11 @@ export class BudgetComponent implements OnInit, AfterViewInit {
       height: 'auto',
       id: 'expanse-dialog',
       data: {
-        currency: this.budgetExpanse.budgetResponse!.currency,
-        expanseId: this.expanseId,
+        expanse: this.budgetExpanse.expanses![index],
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
-      this.getBudgetExpenses();
+    dialogRef.afterClosed().subscribe(() => {
+      this.getBudgetExpenses().then(() => {});
     });
   }
 

@@ -1,18 +1,21 @@
 import {Component, OnInit} from '@angular/core';
 import {LogoComponent} from "../../../../../../components/menu/logo/logo.component";
-import {NgForOf} from "@angular/common";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {TripCardComponent} from "../../../trip-card/trip-card.component";
 import {TripListButtons} from "../../../trip-list-buttons/trip-list-buttons.component";
 import {UserComponent} from "../../../../../../components/menu/user/user.component";
 import {DayDetailsButtonsComponent} from "./day-details-buttons/day-details-buttons.component";
-import {ActivatedRoute} from "@angular/router";
 import {DayResponse} from "../../../../../../../services/models/day-response";
 import {TripResponse} from "../../../../../../../services/models/trip-response";
-import {DayService} from "../../../../../../../services/services/day.service";
-import {TripService} from "../../../../../../../services/services/trip.service";
 import {ErrorService} from "../../../../../../../services/error/error.service";
-import {GetTripById$Params} from "../../../../../../../services/fn/trip/get-trip-by-id";
-import {GetDayById$Params} from "../../../../../../../services/fn/day/get-day-by-id";
+import {BudgetButtonsComponent} from "../../budget/budget-buttons/budget-buttons.component";
+import {ActivityService} from "../../../../../../../services/services/activity.service";
+import {FetchActivitiesByDayId$Params} from "../../../../../../../services/fn/activity/fetch-activities-by-day-id";
+import {ActivityDetailsComponent} from "./activity-details/activity-details.component";
+import {ActivityDetailedResponse} from "../../../../../../../services/models/activity-detailed-response";
+import {SharedService} from "../../../../../../../services/shared/shared.service";
+import {MatTooltip} from "@angular/material/tooltip";
+
 
 @Component({
   selector: 'app-day-details',
@@ -23,37 +26,100 @@ import {GetDayById$Params} from "../../../../../../../services/fn/day/get-day-by
     TripCardComponent,
     TripListButtons,
     UserComponent,
-    DayDetailsButtonsComponent
+    DayDetailsButtonsComponent,
+    BudgetButtonsComponent,
+    NgIf,
+    ActivityDetailsComponent,
+    MatTooltip,
+    NgClass
   ],
   templateUrl: './day-details.component.html',
   styleUrl: './day-details.component.scss'
 })
 export class DayDetailsComponent implements OnInit {
   errorMsg: Array<string> = [];
-  day_id: number = -1;
+  days: Array<DayResponse> = [];
+  amountOfDays: number = 0;
   day: DayResponse = {};
+  dayNumber: number = 0;
   trip: TripResponse = {};
+  activities: ActivityDetailedResponse = {};
+  tripCurrency: string = "";
 
+  constructor(private activityService: ActivityService,
+              private errorService: ErrorService,
+              private sharedService: SharedService) {
 
-  constructor(private route: ActivatedRoute,
-              private dayService: DayService,
-              private tripService: TripService,
-              private errorService: ErrorService) {
-    this.day_id = this.route.snapshot.paramMap.get('day_id') as unknown as number;
+    this.sharedService.getTrip().subscribe({
+      next: (trip) => {
+        this.trip = trip!;
+      }
+    });
+
+    this.sharedService.getTripDays().subscribe({
+      next: (days) => {
+        this.days = days!;
+      }
+    });
+
+    this.sharedService.getDay().subscribe({
+      next: (day) => {
+        this.day = day!;
+      }
+    });
+
+    this.dayNumber = this.day.dayNumber!;
+    this.amountOfDays = this.days.length;
   }
 
   ngOnInit(): void {
-    this.getDay()
-
+    this.getActivities();
+    this.getTripCurrency()
   }
 
-  getDay(): void {
+  formatAmount(amount: number): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'decimal',  // No currency styling
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount)
+  }
+
+  getTripCurrency(){
+    this.sharedService.getTripCurrency().subscribe({
+      next: (currency) => {
+        this.tripCurrency = currency!;
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
+  getNextDay() {
+    if (this.dayNumber <= this.amountOfDays) {
+      this.dayNumber++;
+      this.day = this.days.find(day => day.dayNumber === this.dayNumber)!;
+      this.sharedService.setDay(this.day);
+      this.getActivities()
+    }
+  }
+
+  getPreviousDay() {
+    if (this.dayNumber > 1) {
+      this.dayNumber--;
+      this.day = this.days.find(day => day.dayNumber === this.dayNumber)!;
+      this.sharedService.setDay(this.day);
+      this.getActivities()
+    }
+  }
+
+  getActivities(){
     this.errorMsg = [];
-    const params: GetDayById$Params = {dayId: this.day_id};
-    this.dayService.getDayById(params).subscribe({
-      next: (day: DayResponse) => {
-        this.day = day;
-        this.getTrip(day.tripId!);
+    const params: FetchActivitiesByDayId$Params = {dayId: this.day.dayId!};
+    this.activityService.fetchActivitiesByDayId(params).subscribe({
+      next: (activities: any) => {
+        this.activities = activities
       },
       error: (error) => {
         this.errorMsg = this.errorService.errorHandler(error);
@@ -61,16 +127,12 @@ export class DayDetailsComponent implements OnInit {
     });
   }
 
-  getTrip(tripId: number): void {
-    this.errorMsg = [];
-    const params: GetTripById$Params = {tripId: tripId};
-    this.tripService.getTripById(params).subscribe({
-      next: (trip: TripResponse) => {
-        this.trip = trip;
-      },
-      error: (error) => {
-        this.errorMsg = this.errorService.errorHandler(error);
-      }
-    });
+  getToPayClass(firstAmount: number, secondAmount: number): string {
+    switch (firstAmount > secondAmount) {
+      case false:
+        return 'negative';
+      default:
+        return 'default-color';
+    }
   }
 }

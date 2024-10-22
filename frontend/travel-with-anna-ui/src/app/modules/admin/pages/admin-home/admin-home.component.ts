@@ -13,12 +13,14 @@ import {Router, RouterOutlet} from "@angular/router";
 export class AdminHomeComponent implements OnInit  {
 
   constructor(private router : Router)
-  { }
+  {}
+
+  // @HostListener('window:beforeunload', ['$event'])
+  // clearLocalStorage(event: any): void {
+  //   localStorage.clear();
+  // }
 
   ngOnInit(): void {
     this.router.navigate(['/admin/users-list']).then();
   }
-
-
-
 }

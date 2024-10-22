@@ -6,6 +6,7 @@ export interface DayResponse {
   activity?: Array<ActivityResponse>;
   date?: string;
   dayId?: number;
+  dayNumber?: number;
   dayOfWeek?: string;
   isToday?: boolean;
   note?: Note;

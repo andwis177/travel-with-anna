@@ -27,8 +27,8 @@ public class Trip {
     @Column(name = "trip_id")
     private Long tripId;
 
-    @Size(max = 100)
-    @Column(name = "trip_name", length = 100)
+    @Size(max = 60)
+    @Column(name = "trip_name", length = 60)
     private String tripName;
 
     @ManyToOne
@@ -37,7 +37,6 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Day> days = new ArrayList<>();
-
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "backpack_id")

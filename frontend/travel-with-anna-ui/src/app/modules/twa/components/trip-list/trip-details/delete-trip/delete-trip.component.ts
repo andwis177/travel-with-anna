@@ -72,7 +72,7 @@ export class DeleteTripComponent {
     this.tripService.deleteTrip(params).subscribe({
       next: () => {
         this.dialog.closeAll();
-        this.router.navigate(['/twa/trip-list']);
+        this.router.navigate(['/twa/trip-list']).then(() => {});
       },
       error: (err) => {
         this.errorMsg = this.errorService.errorHandlerWithJson(err);

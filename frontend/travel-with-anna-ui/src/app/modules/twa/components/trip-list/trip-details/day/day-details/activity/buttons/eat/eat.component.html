@@ -1,0 +1,52 @@
+<form class="buttons-container full-width" style="margin: 20px 0 0 0; display: inline-flex; justify-content: center">
+
+  <button class="user-button margin" (click)="provideBadgeToParent('eat');
+                                              provideTypeToParent('breakfast');
+                                              createEat()"
+          [ngClass]="getButtonType('breakfast')"
+          matTooltip="Breakfast">
+    <img src="../../../../../assets/images/activity/breakfast.png" class="user-button-image mat-elevation-z4" alt="">
+  </button>
+
+  <button class="user-button margin" (click)="provideBadgeToParent('eat');
+                                              provideTypeToParent('lunch');
+                                              createEat()"
+          [ngClass]="getButtonType('lunch')"
+          matTooltip="Lunch">
+    <img src="../../../../../assets/images/activity/lunch.png" class="user-button-image mat-elevation-z4" alt="">
+  </button>
+
+  <button class="user-button margin" (click)="provideBadgeToParent('eat');
+                                              provideTypeToParent('dinner');
+                                              createEat()"
+          [ngClass]="getButtonType('dinner')"
+          matTooltip="Dinner">
+    <img src="../../../../../assets/images/activity/dinner.png" class="user-button-image mat-elevation-z4" alt="">
+  </button>
+
+
+  <button class="user-button margin" (click)="provideBadgeToParent('eat');
+                                              provideTypeToParent('supper');
+                                              createEat()"
+          [ngClass]="getButtonType('supper')"
+          matTooltip="Supper">
+    <img src="../../../../../assets/images/activity/supper.png" class="user-button-image mat-elevation-z4" alt="">
+  </button>
+
+  <button class="user-button margin" (click)="provideBadgeToParent('eat');
+                                              provideTypeToParent('snack');
+                                              createEat()"
+          [ngClass]="getButtonType('snack')"
+          matTooltip="Snack">
+    <img src="../../../../../assets/images/activity/snack.png" class="user-button-image mat-elevation-z4" alt="">
+  </button>
+
+  <button class="user-button margin" (click)="provideBadgeToParent('eat');
+                                              provideTypeToParent('eat');
+                                              createEat()"
+          [ngClass]="getButtonType('eat')"
+          matTooltip="Other">
+    <img src="../../../../../assets/images/activity/eat.png" class="user-button-image mat-elevation-z4" alt="">
+  </button>
+
+</form>

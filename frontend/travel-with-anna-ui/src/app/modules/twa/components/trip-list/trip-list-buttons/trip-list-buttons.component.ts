@@ -14,10 +14,8 @@ import {MatTooltip} from "@angular/material/tooltip";
 })
 export class TripListButtons {
 
-  constructor(
-    public dialog: MatDialog,
-  )
-  {}
+  constructor(public dialog: MatDialog) {
+  }
 
   newTrip(event: Event) {
     event.preventDefault();
@@ -25,5 +23,4 @@ export class TripListButtons {
     dialogRef.afterClosed().subscribe(() => {
     });
   }
-
 }

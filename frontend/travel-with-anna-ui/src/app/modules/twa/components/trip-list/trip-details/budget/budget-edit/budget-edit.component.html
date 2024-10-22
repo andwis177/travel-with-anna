@@ -18,10 +18,14 @@
             <span matPrefix>$&nbsp;</span>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-select [(value)] = "budget.currency" >
+          <mat-form-field appearance="outline" class="insert-size">
+            <mat-select [(ngModel)]="budget.currency" name="currency">
+              <mat-select-trigger>
+                {{ budget.currency }}
+              </mat-select-trigger>
               <mat-option *ngFor="let currency of currency" [value]="currency.currency">
-                {{ currency.currency?.toString()}}
+                {{ currency.currency?.toString() }}
+                <p style="font-size:10px">{{ currency.country?.toUpperCase() }}</p>
               </mat-option>
             </mat-select>
           </mat-form-field>
@@ -32,7 +36,7 @@
           <button class="custom-button-1 full-width" (click)="onClose()" type="submit">Close</button>
         </div>
 
-        <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+        <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
           <mat-divider></mat-divider>
           <p *ngFor="let msg of errorMsg">{{msg}}</p>
         </div>

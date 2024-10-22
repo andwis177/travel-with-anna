@@ -1,0 +1,26 @@
+<mat-card class="second-container" appearance="outlined">
+  <mat-card-header class="header-shadow">
+    <h3>DELETE ACTIVITY</h3>
+  </mat-card-header>
+
+  <div class="label-padding">
+    <p class="error-msg full-width text-size">Are you sure you want to delete this activity?</p>
+  </div>
+
+  <mat-card-content class="content">
+    <form>
+      <div>
+        <button class="custom-button-4 button-font" (click)="deleteActivity()" type="submit">Yes</button>
+      </div>
+      <div>
+        <button class="custom-button-0 button-font" (click)="onClose()" type="submit">No</button>
+      </div>
+    </form>
+  </mat-card-content>
+
+  <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+    <mat-divider class="padding-bottom"></mat-divider>
+    <p *ngFor="let msg of errorMsg">{{msg}}</p>
+    <mat-divider class="padding-bottom"></mat-divider>
+  </div>
+</mat-card>

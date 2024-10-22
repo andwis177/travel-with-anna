@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.day;
 
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
+import com.andwis.travel_with_anna.trip.day.log.ActivityLog;
 import com.andwis.travel_with_anna.trip.note.Note;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import jakarta.persistence.*;
@@ -37,6 +38,11 @@ public class Day {
     @JoinColumn(name = "trip_id")
     private Trip trip;
 
+    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ActivityLog> logId;
+
+
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Activity> activity;
 
@@ -45,7 +51,11 @@ public class Day {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Day day = (Day) o;
-        return Objects.equals(dayId, day.dayId) && Objects.equals(date, day.date) && Objects.equals(note, day.note) && Objects.equals(trip, day.trip) && Objects.equals(activity, day.activity);
+        return Objects.equals(dayId, day.dayId)
+                && Objects.equals(date, day.date)
+                && Objects.equals(note, day.note)
+                && Objects.equals(trip, day.trip)
+                && Objects.equals(activity, day.activity);
     }
 
     @Override
@@ -54,7 +64,9 @@ public class Day {
     }
 
     public void addActivity(Activity activity) {
-        this.activity = new ArrayList<>();
+        if (this.activity == null) {
+            this.activity = new ArrayList<>();
+        }
         this.activity.add(activity);
         activity.setDay(this);
     }

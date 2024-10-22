@@ -16,7 +16,7 @@ public class CurrencyExchangeController {
 
     @GetMapping("/rates")
     public ResponseEntity<List<CurrencyExchangeResponse>> getCurrencyExchangeRates() {
-        List<CurrencyExchangeResponse> currencyRates = currencyExchangeClient.getAllExchangeRates();
+        List<CurrencyExchangeResponse> currencyRates = currencyExchangeClient.fetchAllExchangeRates();
         return ResponseEntity.ok(currencyRates);
     }
 }

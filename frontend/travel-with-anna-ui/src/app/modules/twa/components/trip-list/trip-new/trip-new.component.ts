@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatCard, MatCardActions, MatCardHeader} from "@angular/material/card";
 import {MatDivider} from "@angular/material/divider";
@@ -13,7 +13,7 @@ import {TripCreatorRequest} from "../../../../../services/models/trip-creator-re
 import {Router} from "@angular/router";
 import {TripService} from "../../../../../services/services/trip.service";
 import {MatDialog} from "@angular/material/dialog";
-import {MatOption, MatSelect} from "@angular/material/select";
+import {MatOption, MatSelect, MatSelectModule} from "@angular/material/select";
 import {CountryCurrency} from "../../../../../services/models/country-currency";
 import {CountryControllerService} from "../../../../../services/services/country-controller.service";
 import {ErrorService} from "../../../../../services/error/error.service";
@@ -23,7 +23,7 @@ import {
   MatDatepickerModule,
   MatDatepickerToggle,
   MatDateRangeInput,
-  MatDateRangePicker
+  MatDateRangePicker,
 } from "@angular/material/datepicker";
 
 import {provideNativeDateAdapter} from "@angular/material/core";
@@ -60,18 +60,17 @@ import {GenerateDays$Params} from "../../../../../services/fn/day/generate-days"
     MatDatepicker,
     MatButton,
     MatFormFieldModule,
-    MatDatepickerModule
-
+    MatDatepickerModule,
+    MatSelectModule
   ],
   providers: [provideNativeDateAdapter(), DatePipe],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './trip-new.component.html',
   styleUrl: './trip-new.component.scss'
 })
 export class TripNewComponent implements OnInit {
   errorMsg: Array<string> = [];
-  tripCreatorRequest: TripCreatorRequest = {tripName:'', currency: '', toSpend: 0};
-  currency: Array<CountryCurrency> = [];
+  tripCreatorRequest: TripCreatorRequest  = {tripName:'', currency: '', toSpend: 0} ;
+  currency: Array<CountryCurrency> = [] ;
   startDate: Date = new Date();
   endDate: Date = new Date();
 
@@ -95,7 +94,9 @@ export class TripNewComponent implements OnInit {
         body: this.tripCreatorRequest
       }).subscribe({
         next: (tripId) => {
+          console.log('Trip created');
           this.generateDays(tripId);
+          this.onClose();
         },
         error: (err) => {
           this.errorMsg = this.errorService.errorHandler(err);
@@ -119,16 +120,16 @@ export class TripNewComponent implements OnInit {
       this.errorMsg.push('Start Date and End Date are required.');
       return;
     }
-
+    console.log('Generating days', this.startDate, this.endDate);
     const formattedStartDate = this.formatDateToJson(this.startDate);
     const formattedEndDate = this.formatDateToJson(this.endDate);
+    console.log('Formatted dates', formattedStartDate, formattedEndDate);
     const params: GenerateDays$Params = {body:
         {startDate: formattedStartDate,  endDate: formattedEndDate, tripId: tripId}};
     this.dayService.generateDays(params)
       .subscribe({
         next: () => {
           console.log('Days generated');
-          this.onClose();
           this.router.navigate(['/twa/trip-details', tripId]).then();
         },
         error: (err) => {
@@ -145,8 +146,9 @@ export class TripNewComponent implements OnInit {
     this.countryControllerService.findAllCountryCurrencies().subscribe( {
       next: (currency) => {
         this.currency = currency;
-        if(this.currency.length > 0) {
-          this.tripCreatorRequest.currency = "PLN" || '';
+        if(currency.length > 0) {
+          this.tripCreatorRequest.currency = currency[0].currency!;
+          this.currency = currency;
         }
       },
       error: (error) => {

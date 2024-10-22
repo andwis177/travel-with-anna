@@ -12,9 +12,8 @@ import java.math.BigDecimal;
 @Builder
 public class ExpanseRequest {
        private Long expanseId;
-       private Long itemId;
+       private Long entityId;
        private Long tripId;
-       private Long activityId;
        @Size(max = 60, message = "Expanse name should be 60 characters or less")
        private String expanseName;
        @NotEmpty(message = "Currency is required")
@@ -32,4 +31,5 @@ public class ExpanseRequest {
        private BigDecimal exchangeRate;
        private BigDecimal priceInTripCurrency;
        private BigDecimal paidInTripCurrency;
+       private String entityType;
 }

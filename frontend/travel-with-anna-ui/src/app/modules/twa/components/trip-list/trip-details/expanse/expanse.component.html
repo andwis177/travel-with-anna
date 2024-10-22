@@ -15,18 +15,23 @@
           <mat-label>Description </mat-label>
           <input  type="text"
                   matInput
-                  [(ngModel)]=expanse.expanseName
+                  [(ngModel)]=expanseRequest.expanseName
                   [ngModelOptions]="{standalone: true}"
                   placeholder="Description"
                   autocomplete="name"
                   (keydown.enter)="$event.preventDefault()">
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="insert-currency-size">
-          <mat-label>Currency</mat-label>
-          <mat-select [(value)] = "expanse.currency" >
+        <mat-form-field appearance="outline" class="insert-size">
+          <mat-select [(ngModel)]="expanseRequest.currency"
+                      name="currency"
+                      (ngModelChange)="getExchangeRate()">
+            <mat-select-trigger>
+              {{ expanseRequest.currency }}
+            </mat-select-trigger>
             <mat-option *ngFor="let currency of currencyList" [value]="currency.currency">
-              {{ currency.currency?.toString()}}
+              {{ currency.currency?.toString() }}
+              <p style="font-size:10px">{{ currency.country?.toUpperCase() }}</p>
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -39,12 +44,14 @@
             <div class="input-with-currency">
               <input
                 matInput placeholder="0.00"
-                [(ngModel)]="expanse.price"
+                [(ngModel)]="expanseRequest.price"
+                (ngModelChange)="calculateLeftToPay()"
+                (blur)="calculateTripValue()"
                 type="number"
                 name="price"
                 min="0"
                 step="0.01">
-              <label class="currency">{{expanse.currency}}</label>
+              <label class="currency">{{expanseRequest.currency}}</label>
             </div>
             <span matPrefix>$ </span>
           </mat-form-field>
@@ -52,25 +59,36 @@
 
 
         <form class="full-width">
-          <mat-form-field appearance="outline" class="insert-size">
+          <mat-form-field appearance="outline" class="insert-size-paid">
             <mat-label>Paid</mat-label>
             <div class="input-with-currency">
               <input
                 matInput placeholder="0.00"
-                [(ngModel)]="expanse.paid"
+                [(ngModel)]="expanseRequest.paid"
+                (ngModelChange)="calculateLeftToPay()"
+                (blur)="calculateTripValue()"
                 type="number" name="paid"
                 min="0"
                 step="0.01">
-              <label class="currency">{{expanse.currency}}</label>
+              <label class="currency">{{expanseRequest.currency}}</label>
             </div>
             <span matPrefix>$ </span>
+            <button
+              class="button-input"
+              mat-icon-button
+              matSuffix
+              (click)="setAsPaid()"
+              (keydown.enter)="$event.preventDefault()"
+              matTooltip="Paid">
+              <mat-icon>check_circle</mat-icon>
+            </button>
           </mat-form-field>
         </form>
 
         <form class="full-width" style="margin-bottom: 10%">
-          <label style="font-size: 14px">Left to pay: </label>
+          <label style="font-size: 14px">To pay: </label>
           <label [ngClass]="getColorAmount(leftToPay)" style="font-size: 18px; font-weight: 500;">{{leftToPay}}</label>
-          <label class="currency"> {{expanse.currency}}</label>
+          <label class="currency"> {{expanseRequest.currency}}</label>
         </form>
 
         <form class="full-width">
@@ -78,15 +96,16 @@
             <mat-label>Exchange Rate</mat-label>
             <input
               matInput placeholder="0.00"
-              [(ngModel)]="expanse.exchangeRate"
+              [(ngModel)]="expanseRequest.exchangeRate"
               type="number"
               name="exchangeRate"
               min="0"
               step="0.01">
             <button
+              class="button-input"
               mat-icon-button
               matSuffix
-              (click)="getExchangeRate($event)"
+              (click)="getExchangeRate()"
               (keydown.enter)="$event.preventDefault()"
               matTooltip="Get exchnage">
               <mat-icon>attach_money</mat-icon>
@@ -97,17 +116,17 @@
       </div>
 
       <div class="expanse-container center-align mat-elevation-z8">
-        <div class="padding-label mat-elevation-z8">{{ currency }}</div>
+        <div class="padding-label mat-elevation-z8">{{ expanseRequest.currency }}</div>
         <div class="value-container">
           <label class="title-label">PRICE:</label>
-          <label class="value-label">{{expanse.priceInTripCurrency}}</label>
-          <label class="currency-label">{{ currency}} </label>
+          <label class="value-label">{{expanseRequest.priceInTripCurrency}}</label>
+          <label class="currency-label">{{ tripCurrency}} </label>
         </div>
 
         <div class="value-container">
           <label class="title-label">PAID:</label>
-          <label class="value-label" > {{expanse.paidInTripCurrency}}</label>
-          <label class="currency-label"> {{ currency}} </label>
+          <label class="value-label" > {{expanseRequest.paidInTripCurrency}}</label>
+          <label class="currency-label"> {{ tripCurrency}} </label>
         </div>
 
       </div>
@@ -115,11 +134,11 @@
 
     <div class="full-width center-align">
       <button
-        class="custom-button-0 full-width" (click)="saveItemExpanses()" type="submit">Save</button>
+        class="custom-button-0 full-width" (click)="saveExpanse()" type="submit">Save</button>
       <button class="custom-button-1 full-width" (click)="onClose()" type="submit">Close</button>
     </div>
 
-    <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+    <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
       <mat-divider></mat-divider>
       <p *ngFor="let msg of errorMsg">{{msg}}</p>
     </div>

@@ -14,6 +14,9 @@ import {DayResponse} from "../../../../../services/models/day-response";
 import {GetDays$Params} from "../../../../../services/fn/day/get-days";
 import {TripCardComponent} from "../trip-card/trip-card.component";
 import {DayCardComponent} from "./day/day-card/day-card.component";
+import {SharedService} from "../../../../../services/shared/shared.service";
+import {BudgetService} from "../../../../../services/services/budget.service";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-trip-details',
@@ -27,7 +30,8 @@ import {DayCardComponent} from "./day/day-card/day-card.component";
     NgIf,
     NgForOf,
     TripCardComponent,
-    DayCardComponent
+    DayCardComponent,
+    MatTooltip
   ],
   templateUrl: './trip-details.component.html',
   styleUrl: './trip-details.component.scss'
@@ -40,8 +44,11 @@ export class TripDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private tripService: TripService,
-    private dayService: DayService
-  ) {}
+    private dayService: DayService,
+    private budgetService: BudgetService,
+    private sharedService: SharedService
+  ) {
+  }
 
   ngOnInit(): void {
     this.receiveTrip();
@@ -64,6 +71,9 @@ export class TripDetailsComponent implements OnInit {
       next: (trip) => {
         this.trip = trip;
         this.getDays(trip.tripId!);
+        this.sharedService.setTrip(trip);
+        this.sharedService.setTripDays(this.days);
+        this.setTripCurrency();
       },
       error: (err) => {
         console.error(err.error.errors);
@@ -76,6 +86,18 @@ export class TripDetailsComponent implements OnInit {
     this.dayService.getDays(params).subscribe({
       next: (days) => {
         this.days = days;
+        this.sharedService.setTripDays(days);
+      },
+      error: (err) => {
+        console.error(err.error.errors);
+      }
+    });
+  }
+
+  setTripCurrency(): void {
+    this.budgetService.getBudgetById({budgetId: this.trip.budgetId!}).subscribe({
+      next: (budget) => {
+        this.sharedService.setTripCurrency(budget.currency!);
       },
       error: (err) => {
         console.error(err.error.errors);

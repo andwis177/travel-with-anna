@@ -2,7 +2,6 @@ package com.andwis.travel_with_anna.trip.backpack;
 
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
 import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +25,6 @@ public class Backpack {
     private Set<Item> items;
 
     @OneToOne(mappedBy = "backpack")
-    @JsonIgnore
     private Trip trip;
 
     public void addItem(Item item) {

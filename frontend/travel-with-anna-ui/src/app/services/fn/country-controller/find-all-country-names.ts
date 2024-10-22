@@ -6,12 +6,12 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CountryName } from '../../models/country-name';
+import { Country } from '../../models/country';
 
 export interface FindAllCountryNames$Params {
 }
 
-export function findAllCountryNames(http: HttpClient, rootUrl: string, params?: FindAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CountryName>>> {
+export function findAllCountryNames(http: HttpClient, rootUrl: string, params?: FindAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Country>>> {
   const rb = new RequestBuilder(rootUrl, findAllCountryNames.PATH, 'get');
   if (params) {
   }
@@ -21,7 +21,7 @@ export function findAllCountryNames(http: HttpClient, rootUrl: string, params?: 
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<CountryName>>;
+      return r as StrictHttpResponse<Array<Country>>;
     })
   );
 }

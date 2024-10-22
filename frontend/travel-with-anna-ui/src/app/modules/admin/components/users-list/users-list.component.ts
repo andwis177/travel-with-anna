@@ -4,8 +4,13 @@ import {
   MatCell,
   MatCellDef,
   MatColumnDef,
-  MatHeaderCell, MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef, MatTable,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
   MatTableDataSource
 } from "@angular/material/table";
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
@@ -75,7 +80,6 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   size = 1;
   pages: any = [];
   message = '';
-  level: 'success' | 'error' = 'success';
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
     'avatar',
@@ -94,7 +98,6 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   selection = new SelectionModel<UserAdminResponse>(false, []);
   identifier: string = '';
   currentRowIndex = -1;
-
 
   constructor(public dialog: MatDialog,
               private adminService: AdminService,
@@ -151,7 +154,7 @@ export class UsersListComponent implements OnInit, AfterViewInit {
   }
 
   findUserData() {
-    this.shareService.userAdminViewIdentifier$.subscribe((identifier: string) => {
+    this.shareService.getUserAdminViewIdentifier().subscribe((identifier: string) => {
       if (identifier !== '') {
         this.getUserAdminView(identifier);
       } else {

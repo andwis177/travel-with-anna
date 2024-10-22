@@ -1,24 +1,29 @@
 .item {
   display: flex;
   flex-direction: column;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
-  border: 2px solid #6D7373;
+  justify-content: start;
+  width: 200px;
+  height: 250px;
   border-radius: 10px;
+  background-color: #2E3944;
 }
 
+.item:hover {
+  box-shadow: 0 8px 10px 1px #7B9D9C;
+}
 
 .button {
-  width: 33vh;
-  height: auto;
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 250px;
   background-color: transparent;
   border: none;
   border-radius: 10px;
-  padding: 10%;
+  align-items: center !important;
 }
 
 .button:hover {
-  background-color: #D6E6E9  ;
-  opacity: 0.5;
   cursor: pointer;
 }
 
@@ -26,42 +31,32 @@
   width: 100%;
   font-size: 16px;
   font-weight: 400;
-  background-color: #2E3944;
+  background-color: transparent;
   color: whitesmoke;
+  align-items: center;
+  padding: 10px 0 10px 0;
 }
 
 .places {
-  margin-top: 15%;
   text-align: start;
-  font-size: 14px;
-  padding: 5%;
-}
-
-.today{
-  background-color: #A1C3D1 !important;
-}
-
-.default{
-  background-color: whitesmoke !important;
-}
-
-.delete-button {
-  background: transparent !important;
-  color: #D46A6A !important;
-  font-size: 16px !important;
-  width: auto;
-  height: auto;
-  border: none;
-  padding: 2%;
-  cursor: pointer;
-}
-
-.delete-button:hover {
-  opacity: 0.4;
+  color: #7B9D9C;
+  padding: 0 15px 0 15px;
 }
 
 .bottom-menu{
   display: flex;
-  justify-content: end;
-  background-color: transparent;
+  justify-content: space-between;
+  background-color: whitesmoke;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border: 1.5px solid #2E3944;
+  padding: 3px;
+}
+
+.day-number {
+  display: flex;
+  justify-content: center;
+  font-size:10px;
+  font-weight: 500;
+  color: whitesmoke;
 }

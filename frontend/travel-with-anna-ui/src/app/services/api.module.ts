@@ -11,13 +11,15 @@ import { DayService } from './services/day.service';
 import { BudgetService } from './services/budget.service';
 import { AvatarService } from './services/avatar.service';
 import { AuthenticationService } from './services/authentication.service';
+import { CountryControllerService } from './services/country-controller.service';
+import { ActivityService } from './services/activity.service';
 import { UserService } from './services/user.service';
 import { ItemService } from './services/item.service';
 import { BackpackService } from './services/backpack.service';
 import { AdminService } from './services/admin.service';
 import { RoleService } from './services/role.service';
+import { BadgeService } from './services/badge.service';
 import { CurrencyExchangeControllerService } from './services/currency-exchange-controller.service';
-import { CountryControllerService } from './services/country-controller.service';
 
 /**
  * Module that provides all services and configuration.
@@ -34,13 +36,15 @@ import { CountryControllerService } from './services/country-controller.service'
     BudgetService,
     AvatarService,
     AuthenticationService,
+    CountryControllerService,
+    ActivityService,
     UserService,
     ItemService,
     BackpackService,
     AdminService,
     RoleService,
+    BadgeService,
     CurrencyExchangeControllerService,
-    CountryControllerService,
     ApiConfiguration
   ],
 })

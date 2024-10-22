@@ -57,7 +57,7 @@ class CurrencyExchangeClientTest {
                 .andExpect(header("apikey", apiKey))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(mockResponse), MediaType.APPLICATION_JSON));
 
-        List<CurrencyExchangeResponse> exchangeRates = currencyExchangeService.getAllExchangeRates();
+        List<CurrencyExchangeResponse> exchangeRates = currencyExchangeService.fetchAllExchangeRates();
 
         // Then:
         assertThat(exchangeRates).hasSize(2);

@@ -35,14 +35,14 @@ class NoteControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void testCreateNewNoteForTrip_ShouldReturnAccepted() throws Exception {
         // Given
-        NoteForTripRequest request = NoteForTripRequest.builder()
-                .tripId(1L)
+        NoteRequest request = NoteRequest.builder()
+                .entityId(1L)
                 .note("Note content")
                 .build();
 
         String requestBody = objectMapper.writeValueAsString(request);
 
-        doNothing().when(noteFacade).createNewNoteForTrip(request);
+        doNothing().when(noteFacade).saveNoteForEntity(request);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -59,7 +59,7 @@ class NoteControllerTest {
         Long tripId = 1L;
         NoteResponse noteResponse = new NoteResponse("Note content");
 
-        when(noteFacade.getNoteById(tripId)).thenReturn(noteResponse);
+        when(noteFacade.getNoteByTripId(tripId)).thenReturn(noteResponse);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders

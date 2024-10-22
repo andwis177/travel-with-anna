@@ -7,6 +7,7 @@ import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final ExpanseService expanseService;
+    private final DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
 
     public void saveBudget(Budget budget) {
         budgetRepository.save(budget);
@@ -44,8 +46,7 @@ public class BudgetService {
     }
 
     public BudgetExpensesRespond getBudgetExpanses(Long tripId, Long budgetId) {
-
-        BudgetResponse budgetRequest = getBudgetById(budgetId);
+        BudgetResponse budgetResponse = getBudgetById(budgetId);
         List<ExpanseResponse> expanses = expanseService.getExpansesForTrip(tripId);
         BigDecimal overallPriceInTripCurrency = overallPriceInTripCurrency(expanses);
         BigDecimal overallPaidInTripCurrency = overallPaidInTripCurrency(expanses);
@@ -53,14 +54,14 @@ public class BudgetService {
         List<ExpanseByCurrency> sumsByCurrency =
                 BudgetMapper.toExpansesByCurrency(calculateSumsByCurrency(expanses));
         return new BudgetExpensesRespond(
-                budgetRequest,
+                budgetResponse,
                 expanses,
                 sumsByCurrency,
                 overallPriceInTripCurrency,
                 overallPaidInTripCurrency,
                 totalDebt,
-                budgetRequest.toSpend().subtract(overallPriceInTripCurrency),
-                budgetRequest.toSpend().subtract(overallPaidInTripCurrency)
+                budgetResponse.toSpend().subtract(overallPriceInTripCurrency),
+                budgetResponse.toSpend().subtract(overallPaidInTripCurrency)
         );
     }
 

@@ -80,8 +80,6 @@ export class EditTripComponent {
     const formattedEndDate = this.formatDateToJson(this.endDate);
     const params: UpdateTrip$Params = { body:{dayGeneratorRequest: {
           tripId: this.tripId, startDate: formattedStartDate, endDate: formattedEndDate}, tripName: this.tripName }};
-
-    console.log('params', formattedStartDate, formattedEndDate, params);
     this.tripService.updateTrip(params).subscribe({next: () => {
         this.onClose();
       },

@@ -36,19 +36,19 @@ class CountryClientTest {
     @Test
     void testFetchAllCountryNames() throws JsonProcessingException {
         // Given
-        List<CountryName> data = List.of(
-                CountryName.builder().name("Afghanistan").Iso2("AF").Iso3("AFG").build(),
-                CountryName.builder().name("Albania").Iso2("AL").Iso3("ALB").build()
+        List<Country> data = List.of(
+                Country.builder().name("Afghanistan").iso2("AF").iso3("AFG").build(),
+                Country.builder().name("Albania").iso2("AL").iso3("ALB").build()
         );
 
         //When
         this.server
                 .expect(requestTo(baseUrl + "/api/v0.1/countries/currency"))
                 .andRespond(withSuccess
-                        (objectMapper.writeValueAsString(CountryNameResponse.builder().data(data).build()),
+                        (objectMapper.writeValueAsString(CountryResponse.builder().data(data).build()),
                                 MediaType.APPLICATION_JSON));
 
-        List<CountryName> countryNames = countryClient.fetchAllCountryNames();
+        List<Country> countryNames = countryClient.fetchAllCountryNames();
 
         //Then
         assertThat(countryNames).hasSize(2);

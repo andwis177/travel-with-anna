@@ -9,56 +9,56 @@
   display: grid;
   justify-content: center;
   width: 300px;
-  height: 350px;
-  background-color: #ECECEC;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
-  border: 1px solid #6D7373;
+  height: 320px;
+  background-color: #1C252D;
   border-radius: 3%;
 }
 
 .button:hover {
-  border: 3px solid #2E3944;
+  border: 3px solid #1C252D;
   opacity: 0.5;
 }
 
-.image {
-  margin:3px;
-  opacity: 0.8;
+.display-flag {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-evenly !important;
+  margin: 1px;
 }
 
 .trip-name {
   word-wrap: break-word;
   overflow-wrap: break-word;
   width: 240px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   padding: 5px;
-  background-color: #2E3944;
-  color: whitesmoke;
+  color: goldenrod;
 }
 
 .days {
   opacity: 0.8;
-  margin:20px;
-  font-size: 16px
+  margin:10px;
 }
 
 .date {
   margin-bottom: 30px;
   font-size: 20px;
   padding: 10px;
-  background-color: #2E3944;
   color: whitesmoke;
 }
 
 .days-text {
+  display: inline-flex;
+  color: whitesmoke;
   margin-top:3%;
-  font-weight: 600;
-  font-size: 22px
+  font-weight: 400;
+  font-size: 16px
 }
 
 .label-text {
-  font-size: 14px;
+  color: whitesmoke;
+  font-size: 16px;
   font-weight: 300;
 }
 
@@ -69,4 +69,6 @@
 .main-font-size {
   font-size: 16px;
 }
+
+
 

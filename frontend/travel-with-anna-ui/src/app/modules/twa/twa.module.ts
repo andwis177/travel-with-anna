@@ -5,6 +5,7 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonModule} from '@angular/material/button';
 import { TwaRoutingModule } from './twa-routing.module';
 import {provideHttpClient} from "@angular/common/http";
+import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
 
 
 @NgModule({
@@ -15,6 +16,9 @@ import {provideHttpClient} from "@angular/common/http";
     MatButtonModule,
     MatMenuModule,
     MatIconModule,
+    NgxMaterialTimepickerModule.setOpts(
+      'HH:mm',
+    ),
   ],
   providers: [provideHttpClient()]
 })

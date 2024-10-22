@@ -2,7 +2,7 @@
 /* eslint-disable */
 export interface UserAdminResponse {
   accountLocked?: boolean;
-  avatar?: Array<string>;
+  avatar?: string;
   createdDate?: string;
   email?: string;
   enabled?: boolean;

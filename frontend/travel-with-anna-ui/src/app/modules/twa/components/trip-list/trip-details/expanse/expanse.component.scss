@@ -1,9 +1,3 @@
-body, html {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
   display: none;
 }
@@ -21,12 +15,18 @@ mat-form-field {
   margin-right: 10px;
 }
 
-.insert-currency-size {
-  width: 60% !important;
-}
-
 .insert-size {
   width: 70% !important;
+}
+
+.insert-size-paid {
+  width: 80% !important;
+}
+
+
+
+.button-input:hover {
+  opacity: 0.5;
 }
 
 .input-with-currency {
@@ -34,6 +34,7 @@ mat-form-field {
   justify-content: center;
   align-items: center;
 }
+
 .currency {
   font-size: 0.8em;
   font-weight: 400;

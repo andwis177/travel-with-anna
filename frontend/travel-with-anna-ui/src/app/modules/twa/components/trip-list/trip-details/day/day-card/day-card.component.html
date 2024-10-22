@@ -1,17 +1,19 @@
-<div class="item" [ngClass]="getTodayClass(day.isToday!)">
+<div class="item mat-elevation-z8" >
   <button class="button" (click)="openDay($event)">
-    <div>
-      <div class="day-date trip-font mat-elevation-z4">
-        <div>{{day.date}}</div>
-        <div>{{day.dayOfWeek}}</div>
-      </div>
-      <div class="places">
+    <div class="day-number trip-font">- {{day.dayNumber}} -</div>
 
+    <div class="day-date trip-font" [ngClass]="getTodayClass(day.isToday!)">
+      <div>{{day.date}}</div>
+      <div>{{day.dayOfWeek}}</div>
+    </div>
+    <div class="full-width">
+      <div class="places" *ngFor="let city of addressDetails.cities">
+        <div>- {{city.city}}</div>
       </div>
     </div>
+
   </button>
   <div class="bottom-menu">
-    <button class="delete-button" matTooltip="Delete Day"
-            (click)="onDelete($event)"><i class="fas fa-trash-alt fa-1x"></i></button>
   </div>
 </div>
+

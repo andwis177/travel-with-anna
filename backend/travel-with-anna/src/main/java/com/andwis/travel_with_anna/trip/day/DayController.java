@@ -29,7 +29,9 @@ public class DayController {
 
     @GetMapping("/{dayId}/day")
     public ResponseEntity<DayResponse> getDayById(@PathVariable("dayId") Long dayId) {
-        return ResponseEntity.ok(facade.getDayById(dayId));
+        DayResponse dayResponse = facade.getDayById(dayId);
+        dayResponse.activity().forEach(activity -> System.out.println("!!! End Time:  " + activity.getEndTime()));
+        return ResponseEntity.ok(dayResponse);
     }
 
     @GetMapping("/{tripId}")

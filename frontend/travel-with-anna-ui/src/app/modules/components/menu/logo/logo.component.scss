@@ -11,8 +11,8 @@
 }
 
 .app-button {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,11 +27,11 @@
   height: 100%;
   object-fit: cover;
 }
+
 .app-image:hover,
 .profile-image:hover,
 .image-container:hover,
 .app-button:hover {
   cursor: pointer;
   opacity: 0.5;
-
 }

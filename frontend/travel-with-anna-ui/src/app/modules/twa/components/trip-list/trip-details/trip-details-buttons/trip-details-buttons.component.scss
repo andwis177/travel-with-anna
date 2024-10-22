@@ -35,13 +35,31 @@
 .delete-button:hover,
 .delete-button-image:hover {
   opacity: 0.5 !important;
-
 }
 
-.button-first {
-  background-color: #C2D4D7 !important;
+.add-delete-button {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: none;
+  display: flex;
+  justify-content: center !important;
+  cursor: pointer;
+  border-radius: 5px;
+  color: black;
+  background-color: whitesmoke;
 }
 
-.button-last {
-  background-color: #D9C3BB !important;
+.plus-team {
+  border: 1px solid limegreen;
+  background-color: limegreen;
+  font-size: 1.6vw;
 }
+
+.minus-team {
+  border:1px solid indianred;
+  background-color: indianred;
+  font-size: 1.6vw;
+}
+
+

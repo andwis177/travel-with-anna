@@ -46,7 +46,6 @@ export class DeleteComponent implements OnInit {
               private shareService: SharedService,
               private errorService: ErrorService
   ) {
-
   }
 
   ngOnInit(): void {
@@ -86,7 +85,7 @@ export class DeleteComponent implements OnInit {
         if (userId !== null) {
           const userAdminDeleteRequest = {userId: userId, password: this.passwordRequest.password};
           this.adminService.deleteUser({body: userAdminDeleteRequest}).subscribe({
-            next: (response) => {
+            next: () => {
               this.dialogRef.close();
               window.location.reload()
             },

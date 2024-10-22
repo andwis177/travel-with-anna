@@ -10,38 +10,4 @@
   margin: 20px;
 }
 
-.delete-button {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-}
 
-.delete-button-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 15%;
-  background-color: black;
-  border: 2px solid #B85C5C;
-  padding:5px;
-  cursor: pointer;
-}
-
-.delete-button:hover,
-.delete-button-image:hover {
-  opacity: 0.5 !important;
-
-}
-
-.button-first {
-  background-color: #C2D4D7 !important;
-}
-
-.button-last {
-  background-color: #D9C3BB !important;
-}

@@ -9,8 +9,11 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
+import { City } from '../models/city';
+import { Country } from '../models/country';
 import { CountryCurrency } from '../models/country-currency';
-import { CountryName } from '../models/country-name';
+import { findAllCountryCities } from '../fn/country-controller/find-all-country-cities';
+import { FindAllCountryCities$Params } from '../fn/country-controller/find-all-country-cities';
 import { findAllCountryCurrencies } from '../fn/country-controller/find-all-country-currencies';
 import { FindAllCountryCurrencies$Params } from '../fn/country-controller/find-all-country-currencies';
 import { findAllCountryNames } from '../fn/country-controller/find-all-country-names';
@@ -22,6 +25,31 @@ export class CountryControllerService extends BaseService {
     super(config, http);
   }
 
+  /** Path part for operation `findAllCountryCities()` */
+  static readonly FindAllCountryCitiesPath = '/api/country/cities-all';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `findAllCountryCities()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  findAllCountryCities$Response(params: FindAllCountryCities$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<City>>> {
+    return findAllCountryCities(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `findAllCountryCities$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  findAllCountryCities(params: FindAllCountryCities$Params, context?: HttpContext): Observable<Array<City>> {
+    return this.findAllCountryCities$Response(params, context).pipe(
+      map((r: StrictHttpResponse<Array<City>>): Array<City> => r.body)
+    );
+  }
+
   /** Path part for operation `findAllCountryNames()` */
   static readonly FindAllCountryNamesPath = '/api/country/names-all';
 
@@ -31,7 +59,7 @@ export class CountryControllerService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryNames$Response(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CountryName>>> {
+  findAllCountryNames$Response(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Country>>> {
     return findAllCountryNames(this.http, this.rootUrl, params, context);
   }
 
@@ -41,9 +69,9 @@ export class CountryControllerService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryNames(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<Array<CountryName>> {
+  findAllCountryNames(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<Array<Country>> {
     return this.findAllCountryNames$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<CountryName>>): Array<CountryName> => r.body)
+      map((r: StrictHttpResponse<Array<Country>>): Array<Country> => r.body)
     );
   }
 

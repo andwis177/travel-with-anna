@@ -6,6 +6,7 @@ import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserService;
 import com.andwis.travel_with_anna.utility.PageResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -27,7 +28,7 @@ public class TripMgr {
     private final UserService userService;
     private final DayService dayService;
 
-    public Long createTrip(@NotNull TripCreatorRequest request, Authentication connectedUser) {
+    public Long createTrip(@NotNull @Valid TripCreatorRequest request, Authentication connectedUser) {
         User user = userService.getConnectedUser(connectedUser);
 
         Backpack backpack = Backpack.builder()

@@ -1,7 +1,9 @@
 package com.andwis.travel_with_anna.trip.day;
 
+import com.andwis.travel_with_anna.handler.exception.DayNotFoundException;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
+import com.andwis.travel_with_anna.utility.NumberDistributor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,14 @@ public class DayService {
     public void saveDay(Day day) {
         dayRepository.save(day);
     }
+    public void saveAllDays(List<Day> days) {
+        dayRepository.saveAll(days);
+    }
 
     public void createDay(@NotNull DayRequest request) {
         Trip trip = tripService.getTripById(request.getTripId());
         Day day = Day.builder()
                 .date(request.getDate())
-                .activity(new ArrayList<>())
                 .build();
         trip.addDay(day);
         saveDay(day);
@@ -33,7 +37,12 @@ public class DayService {
 
     public Day findById(Long dayId) {
         return dayRepository.findById(dayId)
-                .orElseThrow(() -> new IllegalArgumentException("Day not found"));
+                .orElseThrow(() -> new DayNotFoundException("Day not found"));
+    }
+
+    public Day findByTripIdAndDate(Long tripId, LocalDate date) {
+        return dayRepository.findByTripTripIdAndDate(tripId, date)
+                .orElseThrow(() -> new DayNotFoundException("Day not found"));
     }
 
     public DayResponse getDayById(Long dayId) {
@@ -66,9 +75,11 @@ public class DayService {
 
     public List<DayResponse> getDays(Long tripId) {
         List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(tripId);
-        return days.stream()
+        List<DayResponse> response = days.stream()
                 .map(DayMapper::toDayResponse)
                 .toList();
+        NumberDistributor.reset();
+        return response;
     }
 
     public List<Day> createDays(LocalDate startDate, LocalDate endDate) {
@@ -78,7 +89,6 @@ public class DayService {
         startDate.datesUntil(endDate.plusDays(1)).forEach(date ->
                 days.add(Day.builder()
                         .date(date)
-                        .activity(new ArrayList<>())
                         .build())
         );
         return days;

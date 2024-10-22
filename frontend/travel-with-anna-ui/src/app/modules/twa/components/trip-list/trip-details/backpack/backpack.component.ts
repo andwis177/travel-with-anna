@@ -42,6 +42,8 @@ import {UserComponent} from "../../../../../components/menu/user/user.component"
 import {ItemResponse} from "../../../../../../services/models/item-response";
 import {BackpackResponse} from "../../../../../../services/models/backpack-response";
 import {ErrorService} from "../../../../../../services/error/error.service";
+import {GetBudgetById$Params} from "../../../../../../services/fn/budget/get-budget-by-id";
+import {BudgetService} from "../../../../../../services/services/budget.service";
 
 @Component({
   selector: 'app-backpack',
@@ -90,6 +92,7 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   backpackId: number;
   tripId: number;
   tripCurrency: string = '';
+  budgetId: number;
   backpackResponse: BackpackResponse = {};
   items: ItemResponse[] = [];
   itemRequest: ItemRequest = {itemId: -1, itemName: "", packed: false, qty: '1'};
@@ -111,10 +114,11 @@ export class BackpackComponent implements OnInit, AfterViewInit {
               public dialog: MatDialog,
               private _snackBar: MatSnackBar,
               private errorService: ErrorService,
-              @Inject(MAT_DIALOG_DATA) public data: { backpackId: number, tripId: number, tripCurrency: string }) {
+              private budgetService: BudgetService,
+              @Inject(MAT_DIALOG_DATA) public data: { backpackId: number, tripId: number, budgetId: number }) {
     this.backpackId = data.backpackId;
     this.tripId = data.tripId;
-    this.tripCurrency = data.tripCurrency;
+    this.budgetId = data.budgetId;
   }
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -126,7 +130,6 @@ export class BackpackComponent implements OnInit, AfterViewInit {
     this.selection.clear()
     this.receiveBackpack();
     this.receiveItems();
-
     if (this.dataSource.filteredData.length > 0) {
       this.currentRowIndex = 0;
       this.selectRowByIndex(this.currentRowIndex);
@@ -135,6 +138,22 @@ export class BackpackComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
+  }
+
+  getTripCurrency(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const params: GetBudgetById$Params = {budgetId: this.budgetId!};
+      this.budgetService.getBudgetById(params).subscribe({
+        next: (budget) => {
+          this.tripCurrency = budget.currency!;
+          resolve();
+        },
+        error: (err) => {
+          console.error(err.error.errors);
+          reject(err);
+        }
+      });
+    });
   }
 
   selectRowByIndex(index: number): void {
@@ -166,6 +185,7 @@ export class BackpackComponent implements OnInit, AfterViewInit {
           if (this.dataSource.filteredData.length > 0) {
             this.selectRowByIndex(0)
             this.toggleRow(this.dataSource.filteredData[0]);
+            console.log(this.items);
           }
           this.dataSource.sort = this.sort;
         },
@@ -206,7 +226,8 @@ export class BackpackComponent implements OnInit, AfterViewInit {
     this.errorMsg = [];
     this.itemService.saveAllItemsFromTheList({ body: this.items}).subscribe({
       next: () => {
-        this._liveAnnouncer.announce('Items were saved successfully').then(r =>(this._snackBar.open("All items were saved", 'Close')));
+        this.receiveItems();
+        this._liveAnnouncer.announce('Items were saved successfully').then(() =>(this._snackBar.open("All items were saved", 'Close')));
       },
       error: (err) => {
         this.errorMsg = this.errorService.errorHandler(err);
@@ -229,24 +250,30 @@ export class BackpackComponent implements OnInit, AfterViewInit {
     });
   }
 
-  openExpanse(item: ItemRequest, index: number) {
-    this.selectRowByIndex(index)
-    console.log('openExpanse', item.itemId);
-    const dialogRef = this.dialog.open(ExpanseComponent, {
-      maxWidth: '90vw',
-      maxHeight: '100vh',
-      width: 'auto',
-      height: 'auto',
-      id: 'expanse-dialog',
-      data: {
-        description: item.itemName,
-        itemId: item.itemId,
-        currency: this.tripCurrency,
-        tripId: this.tripId,
-      }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.saveItems()
-    });
+
+  async openExpanse(item: ItemRequest, index: number) {
+    try {
+      await this.getTripCurrency()
+      this.selectRowByIndex(index)
+      const dialogRef = this.dialog.open(ExpanseComponent, {
+        maxWidth: '90vw',
+        maxHeight: '100vh',
+        width: 'auto',
+        height: 'auto',
+        id: 'expanse-dialog',
+        data: {
+          expanse: item.expanse,
+          description: item.itemName,
+          entityId: item.itemId,
+          currency: this.tripCurrency,
+          tripId: this.tripId,
+          entityType: 'item',
+        }
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.saveItems();
+      });
+    } catch (error) {
+      console.error(error);}
   }
 }

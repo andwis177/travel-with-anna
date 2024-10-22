@@ -74,7 +74,7 @@ class NoteServiceTest {
         when(tripService.getTripById(tripId)).thenReturn(trip);
 
         // When
-        NoteResponse noteResponse = noteService.getNoteById(tripId);
+        NoteResponse noteResponse = noteService.getNoteByTripId(tripId);
 
         // Then
         assertNotNull(noteResponse);
@@ -92,7 +92,7 @@ class NoteServiceTest {
         when(tripService.getTripById(tripId)).thenReturn(trip);
 
         // When
-        NoteResponse noteResponse = noteService.getNoteById(tripId);
+        NoteResponse noteResponse = noteService.getNoteByTripId(tripId);
 
         // Then
         assertNotNull(noteResponse);
@@ -104,15 +104,15 @@ class NoteServiceTest {
     void testCreateNewNoteForTrip_CreatesNewNote() {
         // Given
         Long tripId = 1L;
-        NoteForTripRequest request = NoteForTripRequest.builder()
-                .tripId(tripId)
+        NoteRequest request = NoteRequest.builder()
+                .entityId(tripId)
                 .note("New note")
                 .build();
         Trip trip = new Trip();
         when(tripService.getTripById(tripId)).thenReturn(trip);
 
         // When
-        noteService.createNewNoteForTrip(request);
+        noteService.saveNote(request);
 
         // Then
         verify(noteRepository, times(1)).save(any(Note.class));
@@ -126,14 +126,14 @@ class NoteServiceTest {
         Note existingNote = Note.builder().note("Old note").build();
         Trip trip = new Trip();
         trip.addNote(existingNote);
-        NoteForTripRequest request = NoteForTripRequest.builder()
-                .tripId(tripId)
+        NoteRequest request = NoteRequest.builder()
+                .entityId(tripId)
                 .note("Updated note")
                 .build();
         when(tripService.getTripById(tripId)).thenReturn(trip);
 
         // When
-        noteService.createNewNoteForTrip(request);
+        noteService.saveNote(request);
 
         // Then
         verify(noteRepository, times(1)).save(existingNote);

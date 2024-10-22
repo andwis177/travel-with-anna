@@ -3,6 +3,7 @@ package com.andwis.travel_with_anna.trip.expanse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 public class ExpanseController {
     private final ExpanseFacade facade;
 
-    @PostMapping("/save")
+    @PostMapping("entity/save")
     public ResponseEntity<ExpanseResponse> createOrUpdateExpanse(@RequestBody @Valid ExpanseRequest creator) {
         ExpanseResponse response = facade.createOrUpdateExpanse(creator);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -28,9 +29,9 @@ public class ExpanseController {
         return ResponseEntity.ok(expanse);
     }
 
-    @GetMapping("/{itemId}/item")
-    public ResponseEntity<ExpanseResponse> getExpanseByItemId(@PathVariable("itemId") Long itemId) {
-        ExpanseResponse expanse = facade.getExpanseByItemId(itemId);
+    @GetMapping("{entityId}/entity/{entityType}")
+    public ResponseEntity<ExpanseResponse> getExpanseByEntity(@NotNull Long entityId, @NotNull String entityType) {
+        ExpanseResponse expanse = facade.getExpanseByEntityId(entityId, entityType);
         return ResponseEntity.ok(expanse);
     }
 

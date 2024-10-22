@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.api.currency;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -10,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Slf4j
 public class CurrencyExchangeClient {
     @Value("${my_apis.currency.header.apikey}")
     private String apiKey;
@@ -21,7 +23,8 @@ public class CurrencyExchangeClient {
         this.restClient = restClient;
     }
 
-    public List<CurrencyExchangeResponse> getAllExchangeRates() {
+    public List<CurrencyExchangeResponse> fetchAllExchangeRates() {
+        try {
         CurrencyResponse response = restClient.get()
                 .uri(baseUrl + "/latest")
                 .header("apikey", apiKey)
@@ -41,5 +44,9 @@ public class CurrencyExchangeClient {
         currencyExchangeResponses.sort(Comparator.comparing(CurrencyExchangeResponse::getCode));
 
         return currencyExchangeResponses;
+        } catch (Exception e) {
+            log.error("Error during fetchAllExchangeRates API call: {}", e.getMessage());
+            return Collections.emptyList();
+        }
     }
 }

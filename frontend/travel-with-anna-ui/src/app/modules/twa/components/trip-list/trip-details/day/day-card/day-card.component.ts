@@ -1,34 +1,42 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DayResponse} from "../../../../../../../services/models/day-response";
 import {Router} from "@angular/router";
-import {DatePipe, NgClass} from "@angular/common";
+import {NgClass, NgForOf} from "@angular/common";
 import {MatTooltip} from "@angular/material/tooltip";
-import {DayDeleteComponent} from "./day-delete/day-delete.component";
 import {MatDialog} from "@angular/material/dialog";
-import {provideNativeDateAdapter} from "@angular/material/core";
+import {AddressDetail} from "../../../../../../../services/models/address-detail";
+import {ActivityService} from "../../../../../../../services/services/activity.service";
+import {SharedService} from "../../../../../../../services/shared/shared.service";
 
 @Component({
   selector: 'app-day',
   standalone: true,
   imports: [
     NgClass,
-    MatTooltip
+    MatTooltip,
+    NgForOf
   ],
-  providers: [provideNativeDateAdapter(), DatePipe],
   templateUrl: './day-card.component.html',
   styleUrl: './day-card.component.scss'
 })
-export class DayCardComponent {
+export class DayCardComponent implements OnInit {
   private _day: DayResponse = {};
+  private _amountOfDays: number = 0;
+  addressDetails: AddressDetail = {};
   @Output() afterDayDelete: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(private router: Router,
               public dialog: MatDialog,
-              private datePipe: DatePipe,) {
+              private activityService: ActivityService,
+              private sharedService: SharedService) {
   }
 
   get day(): DayResponse {
     return this._day;
+  }
+
+  get amountOfDays(): number {
+    return this._amountOfDays;
   }
 
   @Input()
@@ -36,9 +44,19 @@ export class DayCardComponent {
     this._day = value;
   }
 
+  @Input()
+  set amountOfDays(value: number) {
+    this._amountOfDays = value;
+  }
+
+  ngOnInit() {
+    this.getAddressDetails();
+  }
+
   openDay(event: Event) {
     event.preventDefault();
-    this.router.navigate(['/twa/day', this._day.dayId]).then();
+    this.sharedService.setDay(this._day);
+    this.router.navigate(['/twa/day']).then();
   }
 
   getTodayClass(isToday: boolean): string {
@@ -50,26 +68,16 @@ export class DayCardComponent {
     }
   }
 
-  onDelete(event: Event) {
-    event.preventDefault();
-    const dialogRef = this.dialog.open(DayDeleteComponent, {
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      width: 'auto',
-      height: 'auto',
-      id: 'delete-day-dialog',
-      data: {
-        dayId: this._day.dayId,
-        date: this.formatDateToJson()
+  getAddressDetails() {
+    this.activityService.fetchAddressDetailsByDayId({
+      dayId: this._day.dayId!
+    }).subscribe({
+      next: (response) => {
+        this.addressDetails = response;
+      },
+      error: (error) => {
+        console.error(error);
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
-      this.afterDayDelete.emit();
-    });
-  }
-
-  private formatDateToJson(): string {
-    const formattedDate = this.datePipe.transform(this._day.date, 'yyyy-MM-dd');
-    return formattedDate ? formattedDate : '';
   }
 }

@@ -38,7 +38,7 @@ public class TripController {
     }
 
     @PatchMapping("/update")
-    public ResponseEntity<Void> updateTrip(@RequestBody TripEditRequest request) {
+    public ResponseEntity<Void> updateTrip(@RequestBody @Valid TripEditRequest request) {
         facade.updateTrip(request);
         return ResponseEntity.ok().build();
     }

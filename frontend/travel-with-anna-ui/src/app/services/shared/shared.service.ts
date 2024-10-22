@@ -1,6 +1,9 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {LocalStorageService} from "../local-storage/local-storage.service";
+import {DayResponse} from "../models/day-response";
+import {TripResponse} from "../models/trip-response";
+import {ActivityResponse} from "../models/activity-response";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +16,17 @@ export class SharedService {
   private userAdminEditId = new BehaviorSubject<number | null>(null);
   private userAdminEditId$:Observable<number | null> = this.userAdminEditId.asObservable();
   private userAdminViewIdentifier= new BehaviorSubject<string>('');
-  public userAdminViewIdentifier$:Observable<string> = this.userAdminViewIdentifier.asObservable();
+  private userAdminViewIdentifier$:Observable<string> = this.userAdminViewIdentifier.asObservable();
+  private trip = new BehaviorSubject<TripResponse>({} as TripResponse);
+  private trip$ = this.trip.asObservable();
+  private tripDays = new BehaviorSubject<Array<DayResponse> | []>([]);
+  private tripDays$ = this.tripDays.asObservable();
+  private day = new BehaviorSubject<DayResponse>({} as DayResponse);
+  private day$ = this.day.asObservable();
+  private tripCurrency = new BehaviorSubject<string>('');
+  private tripCurrency$ = this.tripCurrency.asObservable();
+  private activity = new BehaviorSubject<ActivityResponse>({} as ActivityResponse);
+  private activity$ = this.activity.asObservable();
 
   private userNameKey: string = 'userName';
   private imageKey: string = 'image';
@@ -54,6 +67,10 @@ export class SharedService {
       this.userAdminViewIdentifier.next(identifier);
   }
 
+  getUserAdminViewIdentifier(): Observable<string> {
+    return this.userAdminViewIdentifier$;
+  }
+
   updateAvatarImg(newImg: string): void {
     this.avatarImg.next(newImg);
   }
@@ -65,6 +82,46 @@ export class SharedService {
   getImage(): Observable<string | null> {
     this.avatarImg.next(this.localStorageService.getItem(this.imageKey));
     return this.avatarImg$;
+  }
+
+  setTrip(trip: TripResponse): void {
+    this.trip.next(trip);
+  }
+
+  getTrip(): Observable<TripResponse | null> {
+    return this.trip$;
+  }
+
+  setTripDays(days: Array<DayResponse>): void {
+    this.tripDays.next(days);
+  }
+
+  getTripDays(): Observable<Array<DayResponse> | []> {
+    return this.tripDays$;
+  }
+
+  setDay(day: DayResponse): void {
+    this.day.next(day);
+  }
+
+  getDay(): Observable<DayResponse> {
+    return this.day$;
+  }
+
+  setTripCurrency(currency: string): void {
+    this.tripCurrency.next(currency);
+  }
+
+  getTripCurrency(): Observable<string> {
+    return this.tripCurrency$;
+  }
+
+  setActivity(activity: ActivityResponse): void {
+    this.activity.next(activity);
+  }
+
+  getActivity(): Observable<ActivityResponse> {
+    return this.activity$;
   }
 }
 

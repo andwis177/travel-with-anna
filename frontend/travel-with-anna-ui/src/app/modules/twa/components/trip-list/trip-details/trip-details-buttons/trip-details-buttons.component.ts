@@ -1,9 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatDialog} from "@angular/material/dialog";
 import {BackpackComponent} from "../backpack/backpack.component";
-import {BudgetService} from "../../../../../../services/services/budget.service";
-import {GetBudgetById$Params} from "../../../../../../services/fn/budget/get-budget-by-id";
 import {TripResponse} from "../../../../../../services/models/trip-response";
 import {Router} from "@angular/router";
 import {NoteComponent} from "../note/note.component";
@@ -11,6 +9,7 @@ import {DeleteTripComponent} from "../delete-trip/delete-trip.component";
 import {AddDay$Params} from "../../../../../../services/fn/day/add-day";
 import {DayService} from "../../../../../../services/services/day.service";
 import {EditTripComponent} from "../edit-trip/edit-trip.component";
+import {SharedService} from "../../../../../../services/shared/shared.service";
 
 @Component({
   selector: 'app-trip-details-buttons',
@@ -22,26 +21,24 @@ import {EditTripComponent} from "../edit-trip/edit-trip.component";
   styleUrl: './trip-details-buttons.component.scss'
 })
 export class TripDetailsButtonsComponent implements OnInit {
-  @Input()_trip: TripResponse = {};
-  tripCurrency: string = '';
+  trip: TripResponse = {};
   @Output() afterAddDay: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(public dialog: MatDialog,
               private router: Router,
-              private budgetService: BudgetService,
-              private dayService: DayService
+              private dayService: DayService,
+              private sharedService: SharedService
   ) {
   }
 
   ngOnInit(): void {
-    this.getTripCurrency()
+    this.getTrip();
   }
 
-  getTripCurrency() {
-    const params: GetBudgetById$Params = {budgetId: this._trip.budgetId!};
-    this.budgetService.getBudgetById(params).subscribe({
-      next: (budget) => {
-        this.tripCurrency = budget.currency!;
+  getTrip() {
+    this.sharedService.getTrip().subscribe({
+      next: (trip) => {
+        this.trip = trip!;
       },
       error: (err) => {
         console.error(err.error.errors);
@@ -58,19 +55,18 @@ export class TripDetailsButtonsComponent implements OnInit {
       height: 'auto',
       id: 'backpack-dialog',
       data: {
-        backpackId: this._trip.backpackId,
-        tripId: this._trip.tripId,
-        tripCurrency: this.tripCurrency
+        backpackId: this.trip.backpackId,
+        tripId: this.trip.tripId,
+        budgetId: this.trip.budgetId,
       }
     });
-
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
     });
   }
 
   openBudget(event: Event) {
     event.preventDefault();
-    this.router.navigate(['/twa/budget', this._trip.tripId, this._trip.budgetId]).then();
+    this.router.navigate(['/twa/budget']).then();
   }
 
   openNote(event: Event) {
@@ -82,10 +78,11 @@ export class TripDetailsButtonsComponent implements OnInit {
       height: 'auto',
       id: 'note-dialog',
       data: {
-        tripId: this._trip.tripId,
+        id: this.trip.tripId,
+        relatedTo: 'trip'
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
     });
   }
 
@@ -98,27 +95,20 @@ export class TripDetailsButtonsComponent implements OnInit {
       height: 'auto',
       id: 'delete-trip-dialog',
       data: {
-        tripId: this._trip.tripId,
+        tripId: this.trip.tripId,
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
     });
-  }
-
-  addFirst(event: Event) {
-    this.addDay(true, event);
-  }
-
-  addLast(event: Event) {
-    this.addDay(false, event);
   }
 
   addDay(isFirst: boolean, event: Event) {
     event.preventDefault();
-    const params: AddDay$Params = {body: {tripId: this._trip.tripId!, first: isFirst}};
+    const params: AddDay$Params = {body: {tripId: this.trip.tripId!, first: isFirst}};
     this.dayService.addDay(params).subscribe({
       next: () => {
-        this.afterAddDay.emit();},
+        this.afterAddDay.emit();
+      },
       error: (err) => {
         console.error(err.error.errors);
       }
@@ -134,14 +124,22 @@ export class TripDetailsButtonsComponent implements OnInit {
       height: 'auto',
       id: 'edit-trip-dialog',
       data: {
-        tripId: this._trip.tripId,
-        tripName: this._trip.tripName,
-        startDate: this._trip.startDate,
-        endDate: this._trip.endDate
+        tripId: this.trip.tripId,
+        tripName: this.trip.tripName,
+        startDate: this.trip.startDate,
+        endDate: this.trip.endDate
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
       this.afterAddDay.emit();
     });
+  }
+
+  addLastDay(event: Event) {
+    this.addDay(true, event);
+  }
+
+  addFirstDay(event: Event) {
+    this.addDay(false, event);
   }
 }

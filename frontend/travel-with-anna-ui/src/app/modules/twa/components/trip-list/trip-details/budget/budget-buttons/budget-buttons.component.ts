@@ -17,19 +17,18 @@ import {BudgetCurrenciesComponent} from "../budget-currencies/budget-currencies.
   styleUrl: './budget-buttons.component.scss'
 })
 export class BudgetButtonsComponent {
-@Input()_tripId: number = -1;
-@Input()_budget: BudgetResponse = {};
-@Input()_sumsByCurrency: Array<ExpanseByCurrency> = [];
-@Output() afterSave: EventEmitter<void> = new EventEmitter<void>();
+  @Input()_tripId: number = -1;
+  @Input()_budget: BudgetResponse = {};
+  @Input()_sumsByCurrency: Array<ExpanseByCurrency> = [];
+  @Output() afterSave: EventEmitter<void> = new EventEmitter<void>();
 
-constructor(private router: Router,
-            public dialog: MatDialog) {
-}
+  constructor(private router: Router,
+              public dialog: MatDialog) {
+  }
 
   backToTrip($event: Event)  {
     $event.preventDefault();
     this.router.navigate(['/twa/trip-details', this._tripId]).then();
-
   }
 
   editBudget($event: Event) {
@@ -44,7 +43,7 @@ constructor(private router: Router,
         budget: this._budget
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
       this.afterSave.emit();
     });
   }
@@ -62,7 +61,7 @@ constructor(private router: Router,
         currency: this._budget.currency
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
     });
   }
 }

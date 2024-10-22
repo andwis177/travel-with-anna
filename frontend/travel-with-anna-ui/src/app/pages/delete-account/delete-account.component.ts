@@ -15,6 +15,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {Router} from "@angular/router";
 import {ErrorService} from "../../services/error/error.service";
 import {UserResponse} from "../../services/models/user-response";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-delete-account',
@@ -48,6 +49,7 @@ export class DeleteAccountComponent {
               private logoutService: LogoutService,
               private _snackBar: MatSnackBar,
               private router: Router,
+              private dialog: MatDialog,
               private errorService: ErrorService)
   {
   }
@@ -87,6 +89,7 @@ export class DeleteAccountComponent {
   }
 
   cancel() {
-    this.router.navigate(['twa']).then(r => this._snackBar.open('Account deletion canceled', 'Close'));
+    this.dialog.getDialogById('delete-account-dialog')!.close();
+    // this.router.navigate(['twa']).then(r => this._snackBar.open('Account deletion canceled', 'Close'));
   }
 }

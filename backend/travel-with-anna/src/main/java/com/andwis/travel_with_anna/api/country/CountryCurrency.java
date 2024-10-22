@@ -1,16 +1,15 @@
 package com.andwis.travel_with_anna.api.country;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Builder
 public class CountryCurrency implements Comparable<CountryCurrency> {
+    private String country;
     private String currency;
 
     @Override

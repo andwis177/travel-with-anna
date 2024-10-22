@@ -1,0 +1,74 @@
+<a class="title trip-font">{{_activity.activityTitle}}</a>
+<div [ngClass]="_activity.badge">
+
+  <button class="button" (click)="openEditActivity()">
+    <div class="activities-container">
+
+      <div class="activity-content">
+        <img src="../../../../../assets/images/activity/{{_activity.type}}.png"
+             class="image-container"
+             alt=""
+             matTooltip="{{_activity.badge?.toUpperCase()}}">
+        <div style="margin-top:10px">
+          <a class="time">{{_activity.startTime}}</a> <a *ngIf="_activity.endTime"> - </a> <a class="time">{{_activity.endTime}}</a>
+        </div>
+      </div>
+
+      <div class="activity-content">
+        <a class="place">{{_activity.address?.place}}</a>
+        <a class="city-country">{{_activity.address?.city}}</a>
+        <a class="city-country">{{_activity.address?.country}}</a>
+        <a class="address">{{_activity.address?.address}}</a>
+      </div>
+
+      <div class="activity-content">
+
+        <button class="activity-button"
+                (click)="getContactInformation(); $event.stopPropagation()"
+                matTooltip="Contact Information">
+          <img src="../../../../../assets/images/activity/information.png" class="activity-button-image" alt="">
+        </button>
+
+        <button class="activity-button "
+                (click)="openNote(); $event.stopPropagation()"
+                matTooltip="Contact Information">
+          <img src="../../../../../assets/images/notes.png" class="activity-button-image" alt="">
+        </button>
+        <button class="activity-button"
+                (click)="openExpanse(); $event.stopPropagation()"
+                matTooltip="Open Expanse">
+          <img src="../../../../../assets/images/expanse.png" class="activity-button-image" alt="">
+        </button>
+
+        <button class="activity-button delete-button fas fa-trash-alt"
+                (click)="deleteActivity(); $event.stopPropagation()"
+                matTooltip="Delete Activity">
+        </button>
+      </div>
+
+      <div class="activity-content">
+        <img *ngIf="_activity.status"
+             src="../../../../../assets/images/activity/{{_activity.status}}.png"
+             class="image-container"
+             alt=""
+             matTooltip="{{_activity.status.toUpperCase()}}">
+      </div>
+
+    </div>
+
+    <div class="expanse-display">
+      <label class="label-currency">Price: <label *ngIf="_activity && _activity.expanse" class="amount">  {{formatAmount(_activity.expanse.price!)}}
+        <label class="label-currency">{{_activity.expanse.currency}}</label> </label>
+      </label>
+
+      <label *ngIf="_activity && _activity.expanse" class="amount" [ngClass]="getToPayClass(calculateLeftToPay())">{{formatAmount(calculateLeftToPay())}}
+        <label class="label-currency">{{_activity.expanse.currency}}</label>
+      </label>
+
+      <label class="label-currency">Paid:  <label *ngIf="_activity && _activity.expanse" class="amount"  >{{formatAmount(_activity.expanse.paid!)}}
+        <label class="label-currency">{{_activity.expanse.currency}}</label></label>
+      </label>
+    </div>
+
+  </button>
+</div>

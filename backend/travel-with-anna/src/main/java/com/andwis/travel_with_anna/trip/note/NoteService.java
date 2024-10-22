@@ -1,16 +1,16 @@
 package com.andwis.travel_with_anna.trip.note;
 
-import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.andwis.travel_with_anna.trip.trip.TripService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 public class NoteService {
     private final NoteRepository noteRepository;
-    private final TripService tripService;
 
     public void saveNote(Note note) {
         noteRepository.save(note);
@@ -20,25 +20,35 @@ public class NoteService {
         return noteRepository.existsById(noteId);
     }
 
-    public NoteResponse getNoteById(Long tripId) {
-        Trip trip = tripService.getTripById(tripId);
-        if (trip.getNote() == null){
-            return new NoteResponse("");
+    public <T> NoteResponse getNoteById(
+            Long entityId,
+            @NotNull Function<Long, T> getByIdFunction,
+            @NotNull Function<T, Note> getNoteFunction)
+    {
+        T entity = getByIdFunction.apply(entityId);
+
+        Note note = getNoteFunction.apply(entity);
+        if (note == null) {
+            return new NoteResponse(-1L, "");
         }
-        return new NoteResponse(trip.getNote().getNote());
+        return new NoteResponse(note.getNoteId(), note.getNote());
     }
 
-    public void createNewNoteForTrip(@NotNull NoteForTripRequest noteRequest) {
-        Trip trip = tripService.getTripById(noteRequest.getTripId());
-        Note note;
-        if (trip.getNote() != null) {
-            note = trip.getNote();
-            note.setNote(noteRequest.getNote());
-        } else {
+    public <T> void saveNote(
+            @NotNull NoteRequest noteRequest,
+            @NotNull Function<Long, T> getByIdFunction,
+            @NotNull Function<T, Note> getNoteFunction,
+            @NotNull BiConsumer<T, Note> addNoteFunction
+    ) {
+        T entity = getByIdFunction.apply(noteRequest.getEntityId());
+        Note note = getNoteFunction.apply(entity);
+        if (note == null) {
             note = Note.builder()
                     .note(noteRequest.getNote())
                     .build();
-            trip.addNote(note);
+            addNoteFunction.accept(entity, note);
+        } else {
+            note.setNote(noteRequest.getNote());
         }
         saveNote(note);
     }

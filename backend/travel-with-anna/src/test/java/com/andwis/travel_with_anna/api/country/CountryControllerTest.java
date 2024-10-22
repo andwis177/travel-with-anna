@@ -36,16 +36,16 @@ class CountryControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void findAllCountryNames_ShouldReturnCountryNames() throws Exception {
         // Given
-        CountryName countryName = new CountryName (
+        Country countryName = new Country(
                 "United States",
                 "US",
                 "USA");
-        CountryName countryName2 = new CountryName (
+        Country countryName2 = new Country(
                 "Canada",
                 "CA",
                 "CAN");
 
-        List<CountryName> countryNames = new ArrayList<>();
+        List<Country> countryNames = new ArrayList<>();
         countryNames.add(countryName);
         countryNames.add(countryName2);
 

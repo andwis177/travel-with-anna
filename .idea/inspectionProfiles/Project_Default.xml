@@ -9,13 +9,14 @@
       <option name="myIgnoreVendorSpecificProperties" value="false" />
       <option name="myCustomPropertiesList">
         <value>
-          <list size="6">
+          <list size="7">
             <item index="0" class="java.lang.String" itemvalue="align-text" />
             <item index="1" class="java.lang.String" itemvalue="transparency" />
             <item index="2" class="java.lang.String" itemvalue="fxlaout" />
             <item index="3" class="java.lang.String" itemvalue="fxlayoutalign" />
             <item index="4" class="java.lang.String" itemvalue="dislpay" />
             <item index="5" class="java.lang.String" itemvalue="flex-display" />
+            <item index="6" class="java.lang.String" itemvalue="margin-righ" />
           </list>
         </value>
       </option>

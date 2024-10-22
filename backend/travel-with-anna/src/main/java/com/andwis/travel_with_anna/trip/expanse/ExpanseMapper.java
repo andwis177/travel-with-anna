@@ -27,7 +27,7 @@ public class ExpanseMapper {
     }
 
 
-    public static @NotNull ExpanseResponse mapToExpanseResponse(@NotNull Expanse expanse) {
+    public static @NotNull ExpanseResponse toExpanseResponse(@NotNull Expanse expanse) {
         return new ExpanseResponse(
                 expanse.getExpanseId(),
                 expanse.getExpanseName(),
@@ -50,7 +50,7 @@ public class ExpanseMapper {
 
     public static List<ExpanseResponse> mapToExpanseResponseList(@NotNull List<Expanse> expanses) {
         return expanses.stream()
-                .map(ExpanseMapper::mapToExpanseResponse)
+                .map(ExpanseMapper::toExpanseResponse)
                 .collect(Collectors.toList());
     }
 }

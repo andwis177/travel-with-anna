@@ -25,8 +25,7 @@ export class TripListComponent implements OnInit  {
   errorMsg: string[] = [];
   tripResponse: PageResponseTripResponse = {};
   page: number = 0;
-  size: number = 20;
-
+  size: number = 10;
 
   constructor(private tripService: TripService,
               private errorService: ErrorService) {}

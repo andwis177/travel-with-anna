@@ -33,7 +33,14 @@ public enum ErrorCodes {
     BUDGET_NOT_FOUND(3300, "Budget not found", NOT_FOUND),
     CURRENCY_NOT_PROVIDED(3400, "Currency is required", BAD_REQUEST),
     EXPANSE_NOT_FOUND(3500, "Expanse not found", NOT_FOUND),
-    EXPANSE_NOT_SAVED(3501, "Expanse was not saved", BAD_REQUEST);
+    EXPANSE_NOT_SAVED(3501, "Expanse was not saved", BAD_REQUEST),
+
+    DAY_NOT_FOUND(4000, "Day not found", NOT_FOUND),
+    ACTIVITY_NOT_FOUND(4100, "Activity not found", NOT_FOUND),
+
+    DATA_NOT_VALID(5000, "Data is not valid", BAD_REQUEST),
+
+    MISSING_PARAMETER(6000, "Missing parameter", BAD_REQUEST);
 
 
     private final int code;

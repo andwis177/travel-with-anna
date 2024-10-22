@@ -17,7 +17,6 @@ import {MatTooltip} from "@angular/material/tooltip";
   styleUrl: './user-list-buttons.component.scss'
 })
 export class UserListButtonsComponent {
-
   identifier: string = '';
 
   constructor(
@@ -46,6 +45,5 @@ export class UserListButtonsComponent {
     this.identifier = '';
     this.sharedService.setUserAdminViewIdentifier('');
   }
-
 }
 

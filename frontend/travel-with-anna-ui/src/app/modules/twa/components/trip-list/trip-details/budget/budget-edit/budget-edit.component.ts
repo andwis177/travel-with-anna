@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {FormsModule} from "@angular/forms";
 import {MatCard, MatCardActions} from "@angular/material/card";
@@ -12,11 +12,12 @@ import {MatToolbarRow} from "@angular/material/toolbar";
 import {NgForOf, NgIf} from "@angular/common";
 import {BudgetResponse} from "../../../../../../../services/models/budget-response";
 import {CountryCurrency} from "../../../../../../../services/models/country-currency";
-import {MatOption, MatSelect} from "@angular/material/select";
+import {MatOption, MatSelect, MatSelectTrigger} from "@angular/material/select";
 import {CountryControllerService} from "../../../../../../../services/services/country-controller.service";
 import {BudgetService} from "../../../../../../../services/services/budget.service";
 import {BudgetRequest} from "../../../../../../../services/models/budget-request";
 import {ErrorService} from "../../../../../../../services/error/error.service";
+import {SharedService} from "../../../../../../../services/shared/shared.service";
 
 @Component({
   selector: 'app-budget-edit',
@@ -35,23 +36,25 @@ import {ErrorService} from "../../../../../../../services/error/error.service";
     MatSelect,
     MatToolbarRow,
     NgForOf,
-    NgIf
+    NgIf,
+    MatSelectTrigger
   ],
   templateUrl: './budget-edit.component.html',
   styleUrl: './budget-edit.component.scss'
 })
-export class BudgetEditComponent implements OnInit {
+export class BudgetEditComponent {
   errorMsg: Array<string> = [];
   currency: CountryCurrency[] = [];
   budget: BudgetRequest = {};
 
-
   constructor(public dialog: MatDialog,
               private budgetService: BudgetService,
               private countryControllerService: CountryControllerService,
+              private sharedService: SharedService,
               private errorService: ErrorService,
               @Inject(MAT_DIALOG_DATA) public data: {budget: BudgetResponse}) {
     this.budget = data.budget;
+    this.getCurrency();
   }
 
   onClose() {
@@ -67,14 +70,11 @@ export class BudgetEditComponent implements OnInit {
     this.errorMsg = [];
     this.budgetService.updateBudget({ body: this.budget }).subscribe({
       next: () => {
+        this.sharedService.setTripCurrency(this.budget.currency!);
         this.onClose();
       },
       error: (error) => this.errorMsg = this.errorService.errorHandler(error)
     });
-  }
-
-  ngOnInit(): void {
-    this.getCurrency();
   }
 
   getCurrency() {

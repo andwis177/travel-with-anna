@@ -10,14 +10,6 @@
     <img src="../../../../../assets/images/notes.png" class="user-button-image" alt="">
   </button>
 
-  <button class="user-button margin" (click)="addFirst($event)" matTooltip="Add Day at the beginning">
-    <img src="../../../../../assets/images/add-day-first.png" class="user-button-image button-first" alt="">
-  </button>
-
-  <button class="user-button margin" (click)="addLast($event)" matTooltip="Add Day at the end">
-    <img src="../../../../../assets/images/add-day-last.png" class="user-button-image button-last" alt="">
-  </button>
-
   <button class="user-button margin" (click)="editTrip($event)" matTooltip="Edit Trip">
     <img src="../../../../../assets/images/edit.png" class="user-button-image" alt="">
   </button>
@@ -25,5 +17,21 @@
   <button class="delete-button margin" (click)="deleteTrip($event)" matTooltip="Delete Trip">
     <img src="../../../../../assets/images/delete.png" class="delete-button-image" style="opacity: 0.7" alt="">
   </button>
+
+  <div class="item">
+    <button class="add-delete-button margin fas fa-plus-square plus-team" (click)="addLastDay($event)" matTooltip="Add First Day">
+    </button>
+
+    <button class="add-delete-button margin fas fa-minus-square minus-team" (click)="addFirstDay($event)" matTooltip="Delete First Day">
+    </button>
+  </div>
+
+  <div class="item">
+    <button class="add-delete-button margin fas fa-plus-square plus-team" (click)="addFirstDay($event)" matTooltip="Add Last Day">
+    </button>
+
+    <button class="add-delete-button margin fas fa-minus-square minus-team" (click)="addFirstDay($event)" matTooltip="Delete Last Day">
+    </button>
+  </div>
 </form>
 

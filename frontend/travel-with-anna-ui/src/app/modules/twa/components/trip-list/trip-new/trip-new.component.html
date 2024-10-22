@@ -10,22 +10,23 @@
 <div class="dialog-container">
   <form class="main-form">
     <div>
-      <div class = "full-width name-button-area" >
+      <div class="full-width name-button-area">
+
         <div>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Trip name: </mat-label>
-            <input  type="text"
-                    matInput
-                    [(ngModel)]=tripCreatorRequest.tripName
-                    [ngModelOptions]="{standalone: true}"
-                    placeholder="Name your trip"
-                    autocomplete="name"
-                    (keydown.enter)="$event.preventDefault()">
+            <input type="text"
+                   matInput
+                   [(ngModel)]="tripCreatorRequest.tripName"
+                   name="tripName"
+                   placeholder="Name your trip"
+                   autocomplete="name"
+                   (keydown.enter)="$event.preventDefault()">
           </mat-form-field>
         </div>
 
-        <div class ="margin-form">
-          <mat-form-field appearance="outline" >
+        <div class="margin-form">
+          <mat-form-field appearance="outline">
             <mat-label>Enter a date range</mat-label>
             <mat-date-range-input [rangePicker]="picker">
               <input matStartDate [(ngModel)]="startDate" name="startDate" placeholder="Start date">
@@ -36,41 +37,43 @@
           </mat-form-field>
         </div>
 
-        <div>
-          <form class="full-width currency-container">
-            <mat-form-field appearance="outline" class="insert-size" style="margin-right:5%">
-              <mat-label>Enter Amount</mat-label>
-              <input matInput placeholder="0.00" [(ngModel)]="tripCreatorRequest.toSpend" type="number" name="amount" min="0" step="0.01">
-              <span matPrefix>&nbsp;</span>
-            </mat-form-field>
+        <div class="full-width">
+          <mat-form-field appearance="outline" class="insert-size">
+            <mat-label>Enter Amount</mat-label>
+            <input matInput placeholder="0.00" [(ngModel)]="tripCreatorRequest.toSpend"
+                   type="number" name="amount" min="0" step="0.01">
+            <span matPrefix>&nbsp;</span>
+          </mat-form-field>
 
-            <mat-form-field appearance="outline" class="insert-size">
-              <mat-select [(value)] = "tripCreatorRequest.currency" >
-                <mat-option *ngFor="let currency of currency" [value]="currency.currency">
-                  {{ currency.currency?.toString()}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </form>
+          <mat-form-field appearance="outline" class="insert-size">
+            <mat-label>Currency</mat-label>
+            <mat-select [(ngModel)]="tripCreatorRequest.currency" name="currency">
+              <mat-select-trigger>
+                {{ tripCreatorRequest.currency }}
+              </mat-select-trigger>
+              <mat-option *ngFor="let currency of currency" [value]="currency.currency">
+                {{ currency.currency?.toString() }}
+                <p style="font-size:10px">{{ currency.country?.toUpperCase() }}</p>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
 
-        <form>
-          <mat-card-actions>
-            <div class="full-width" style="align-items: center">
-              <button class="custom-button-0 " (click)="createNewTrip()" type="submit">Create</button>
-              <button class="custom-button-1 " (click)="onClose()" type="submit">Cancel</button>
-            </div>
-          </mat-card-actions>
-        </form>
+        <mat-card-actions>
+          <div class="full-width" style="align-items: center">
+            <button class="custom-button-0" (click)="createNewTrip()" type="button">Create</button>
+            <button class="custom-button-1" (click)="onClose()" type="button">Cancel</button>
+          </div>
+        </mat-card-actions>
 
-        <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+        <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
           <mat-divider></mat-divider>
-          <p *ngFor="let msg of errorMsg">{{msg}}</p>
+          <p *ngFor="let msg of errorMsg">{{ msg }}</p>
         </div>
+
       </div>
     </div>
   </form>
 </div>
-
 
 

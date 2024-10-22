@@ -19,6 +19,7 @@ import {UserInformationService} from "../../../../../services/user-information/u
 import {ImageFileService} from "../../../../../services/image-file-service/image-file-service";
 import {UserCredentialsRequest} from "../../../../../services/models/user-credentials-request";
 import {ErrorService} from "../../../../../services/error/error.service";
+import {DeleteAccountComponent} from "../../../../../pages/delete-account/delete-account.component";
 
 @Component({
   selector: 'app-account',
@@ -111,7 +112,7 @@ export class AccountComponent implements OnInit {
       const file = input.files[0];
       if (file.type.startsWith('image/jpg') || file.type.startsWith('image/jpeg')) {
         this.selectedFile = file;
-        this.saveUserAvatar(file).then(r => console.log('Avatar saved'));
+        this.saveUserAvatar(file).then(() => console.log('Avatar saved'));
         this.sharedService.updateAvatarImg(URL.createObjectURL(file));
       } else {
         this.errorMsg.push('Invalid file type. Only images are allowed.');
@@ -182,6 +183,15 @@ export class AccountComponent implements OnInit {
   }
 
   deleteAccount() {
-    this.router.navigate(['delete-account']).then(r => this.dialogRef.close());
+    const dialogRef = this.dialog.open(DeleteAccountComponent, {
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      width: 'auto',
+      height: 'auto',
+      id: 'delete-account-dialog',
+    })
+    this.dialog.getDialogById("account-dialog")?.close();
+    dialogRef.afterClosed().subscribe(() => {
+    });
   }
 }

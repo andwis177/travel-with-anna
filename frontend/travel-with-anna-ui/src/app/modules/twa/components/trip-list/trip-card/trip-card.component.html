@@ -1,18 +1,19 @@
-<div class="item">
-  <button class="button" (click)="selectTrip()">
-    <div class="full-width">
-      <img src="https://flagsapi.com/US/flat/32.png" class="image"  alt="">
-      <img src="https://flagsapi.com/BE/flat/32.png" class="image"  alt="">
+<div class="item ">
+  <button class="button mat-elevation-z8" (click)="selectTrip()">
+
+    <div class="display-flag">
+      <img *ngFor="let country of addressDetail.countries"
+           src="https://flagsapi.com/{{country.iso2}}/shiny/32.png"  alt="">
     </div>
-    <div class="trip-name trip-font mat-elevation-z8 ">
+
+    <div class="trip-name trip-font">
       <div>{{trip.tripName}}</div>
     </div>
     <div class="days trip-font">
-      <div class="label-text">Number of days:</div>
-      <div class="days-text">{{trip.amountOfDays}}</div>
+      <div class="days-text main-font">{{trip.amountOfDays}} {{dayOrDays}} </div>
     </div>
 
-    <div class="date main-font mat-elevation-z8">
+    <div class="date main-font ">
       <div class="label-text trip-font"> from </div>
       <div class="main-font margin-form main-font-size">{{trip.startDate}}</div>
       <div class="label-text trip-font"> to </div>
@@ -20,4 +21,5 @@
     </div>
   </button>
 </div>
+
 

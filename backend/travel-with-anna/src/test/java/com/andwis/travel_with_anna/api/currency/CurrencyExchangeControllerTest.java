@@ -51,7 +51,7 @@ class CurrencyExchangeControllerTest {
         exchangeRates.add(usdExchange);
         exchangeRates.add(eurExchange);
 
-        when(currencyExchangeClient.getAllExchangeRates()).thenReturn(exchangeRates);
+        when(currencyExchangeClient.fetchAllExchangeRates()).thenReturn(exchangeRates);
         String jsonContent = objectMapper.writeValueAsString(exchangeRates);
 
         // When & Then

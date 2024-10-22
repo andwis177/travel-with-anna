@@ -1,0 +1,20 @@
+<mat-toolbar-row class="dialog-header">
+  <div class="dialog-title">Contact Information</div>
+  <button mat-icon-button class="close-button"
+          (click)="onClose()"
+          (keydown.enter)="$event.preventDefault()">
+    <mat-icon class="close-icon">close</mat-icon>
+  </button>
+</mat-toolbar-row>
+
+<mat-card-content class="dialog-container">
+  <form>
+    <div class="title">PHONE: </div> <label class="information">{{phone}}</label>
+    <div class="title">EMAIL: </div> <label class="information">{{email}}</label>
+    <div class="title">WEBSITE: </div> <a class="information" href="https://{{website}}" target="_blank">{{ website }}</a>
+    <div class="full-width" style="align-items: center; margin-top: 30px">
+      <button class="custom-button-1" (click)="onClose()" type="button">Close</button>
+    </div>
+  </form>
+</mat-card-content>
+

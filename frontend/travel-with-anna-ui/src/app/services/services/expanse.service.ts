@@ -15,10 +15,10 @@ import { ExpanseInTripCurrency } from '../models/expanse-in-trip-currency';
 import { ExpanseResponse } from '../models/expanse-response';
 import { getExchangeRate } from '../fn/expanse/get-exchange-rate';
 import { GetExchangeRate$Params } from '../fn/expanse/get-exchange-rate';
+import { getExpanseByEntity } from '../fn/expanse/get-expanse-by-entity';
+import { GetExpanseByEntity$Params } from '../fn/expanse/get-expanse-by-entity';
 import { getExpanseById } from '../fn/expanse/get-expanse-by-id';
 import { GetExpanseById$Params } from '../fn/expanse/get-expanse-by-id';
-import { getExpanseByItemId } from '../fn/expanse/get-expanse-by-item-id';
-import { GetExpanseByItemId$Params } from '../fn/expanse/get-expanse-by-item-id';
 import { getTripCurrencyValues } from '../fn/expanse/get-trip-currency-values';
 import { GetTripCurrencyValues$Params } from '../fn/expanse/get-trip-currency-values';
 
@@ -29,7 +29,7 @@ export class ExpanseService extends BaseService {
   }
 
   /** Path part for operation `createOrUpdateExpanse()` */
-  static readonly CreateOrUpdateExpansePath = '/expanse/save';
+  static readonly CreateOrUpdateExpansePath = '/expanse/entity/save';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -49,31 +49,6 @@ export class ExpanseService extends BaseService {
    */
   createOrUpdateExpanse(params: CreateOrUpdateExpanse$Params, context?: HttpContext): Observable<ExpanseResponse> {
     return this.createOrUpdateExpanse$Response(params, context).pipe(
-      map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
-    );
-  }
-
-  /** Path part for operation `getExpanseByItemId()` */
-  static readonly GetExpanseByItemIdPath = '/expanse/{itemId}/item';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getExpanseByItemId()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getExpanseByItemId$Response(params: GetExpanseByItemId$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
-    return getExpanseByItemId(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getExpanseByItemId$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getExpanseByItemId(params: GetExpanseByItemId$Params, context?: HttpContext): Observable<ExpanseResponse> {
-    return this.getExpanseByItemId$Response(params, context).pipe(
       map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
     );
   }
@@ -99,6 +74,31 @@ export class ExpanseService extends BaseService {
    */
   getExpanseById(params: GetExpanseById$Params, context?: HttpContext): Observable<ExpanseResponse> {
     return this.getExpanseById$Response(params, context).pipe(
+      map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
+    );
+  }
+
+  /** Path part for operation `getExpanseByEntity()` */
+  static readonly GetExpanseByEntityPath = '/expanse/{entityId}/entity/{entityType}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getExpanseByEntity()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExpanseByEntity$Response(params: GetExpanseByEntity$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
+    return getExpanseByEntity(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getExpanseByEntity$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExpanseByEntity(params: GetExpanseByEntity$Params, context?: HttpContext): Observable<ExpanseResponse> {
+    return this.getExpanseByEntity$Response(params, context).pipe(
       map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
     );
   }

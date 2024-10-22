@@ -4,8 +4,6 @@ import com.andwis.travel_with_anna.api.currency.*;
 import com.andwis.travel_with_anna.handler.exception.CurrencyNotProvidedException;
 import com.andwis.travel_with_anna.handler.exception.ExpanseNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.ExpanseNotSaveException;
-import com.andwis.travel_with_anna.trip.backpack.item.Item;
-import com.andwis.travel_with_anna.trip.backpack.item.ItemService;
 import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
@@ -19,6 +17,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,6 @@ public class ExpanseService {
     private final CurrencyRepository currencyRepository;
     private final CurrencyExchangeClient currencyExchangeService;
     private final TripService tripService;
-    private final ItemService itemService;
 
     public Expanse save(Expanse expanse) {
         return expanseRepository.save(expanse);
@@ -45,52 +45,51 @@ public class ExpanseService {
         return currencyRepository.findByCode(code).orElseThrow(() -> new CurrencyNotProvidedException(code));
     }
 
-    public ExpanseResponse createOrUpdateExpanse(ExpanseRequest expanseRequest) {
-        validateExpanseRequest(expanseRequest);
-
+    public <T> ExpanseResponse createOrUpdateExpanse(
+            @NotNull ExpanseRequest expanseRequest,
+            @NotNull Function<Long, T> getByIdFunction,
+            @NotNull Supplier<Expanse> getExpanseFunction,
+            @NotNull BiConsumer<T, Expanse> addExpanseFunction
+    ){
         if (isValidId(expanseRequest.getExpanseId())) {
-            return ExpanseMapper.mapToExpanseResponse(updateExpanse(expanseRequest));
+            return ExpanseMapper.toExpanseResponse(updateExpanse(expanseRequest));
         }
-
-        if (isValidId(expanseRequest.getItemId()) && isValidId(expanseRequest.getTripId())) {
-            return ExpanseMapper.mapToExpanseResponse(saveExpanseWithItem(expanseRequest));
+        if (isValidId(expanseRequest.getEntityId()) && isValidId(expanseRequest.getTripId())) {
+            return ExpanseMapper.toExpanseResponse(saveExpanse(
+                    expanseRequest, getByIdFunction, getExpanseFunction, addExpanseFunction));
         }
         throw new ExpanseNotSaveException("Expanse not saved");
     }
 
     private boolean isValidId(Long id) {
-        return id != null && id != 0;
+        return id != null && id > 0;
     }
 
-    private void validateExpanseRequest(ExpanseRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("Request cannot be null");
-        }
-    }
-
-    private Expanse saveExpanseWithItem(
-            @NotNull ExpanseRequest request) {
-
+    private <T> Expanse saveExpanse(
+            @NotNull ExpanseRequest request,
+            @NotNull Function<Long, T> getByIdFunction,
+            @NotNull Supplier<Expanse> expanseSupplier,
+            @NotNull BiConsumer<T, Expanse> addExpanseFunction
+    ) {
         Expanse expanse;
 
-        Item item = itemService.findById(request.getItemId());
-        if (item.getExpanse() != null) {
-            expanse = item.getExpanse();
-        } else {
-            expanse = new Expanse();
-        }
-        ExpanseMapper.mapToExpanse(expanse, request);
+        T entity = getByIdFunction.apply(request.getEntityId());
+        expanse = expanseSupplier.get();
 
-        item.addExpanse(expanse);
+        if (expanse == null) {
+            expanse = Expanse.builder().build();
+        }
+
+        ExpanseMapper.mapToExpanse(expanse, request);
+        addExpanseFunction.accept(entity, expanse);
 
         Trip trip = tripService.getTripById(request.getTripId());
         trip.addExpanse(expanse);
-
         save(expanse);
         return expanse;
     }
 
-    private Expanse updateExpanse(@NotNull ExpanseRequest request) {
+    public Expanse updateExpanse(@NotNull ExpanseRequest request) {
         Expanse expanse = findById(request.getExpanseId());
         ExpanseMapper.mapToExpanse(expanse, request);
         save(expanse);
@@ -99,7 +98,7 @@ public class ExpanseService {
 
     public ExpanseResponse getExpanseById(Long expanseId) {
         Expanse expanse = expanseRepository.findById(expanseId).orElseThrow();
-        return ExpanseMapper.mapToExpanseResponse(expanse);
+        return ExpanseMapper.toExpanseResponse(expanse);
     }
 
     public List<ExpanseResponse> getExpansesForTrip(Long tripId) {
@@ -107,17 +106,18 @@ public class ExpanseService {
         return ExpanseMapper.mapToExpanseResponseList(expanses);
     }
 
-    public ExpanseResponse getExpanseByItemId(Long itemId) {
-        Item item = itemService.findById(itemId);
-        if (item == null) {
-            return null;
-        }
-        Expanse expanse = item.getExpanse();
+    public <T> ExpanseResponse getExpanseByEntityId(
+            @NotNull Long entityId,
+            @NotNull Function<Long, T> getByIdFunction,
+            @NotNull Function<T, Expanse> getExpanseFunction
+    ) {
+        T entity = getByIdFunction.apply(entityId);
+        Expanse expanse = getExpanseFunction.apply(entity);
+
         if (expanse == null) {
             return null;
         }
-        Long expanseId = expanse.getExpanseId();
-        return getExpanseById(expanseId);
+        return ExpanseMapper.toExpanseResponse(expanse);
     }
 
     public BigDecimal getExchangeRate(String currencyFrom, String currencyTo) {
@@ -143,7 +143,6 @@ public class ExpanseService {
         return getUSD.multiply(currencyToExchange.getExchangeValue().setScale(12, RoundingMode.HALF_UP));
     }
 
-
     private void verifyCurrencyExchange() {
         if (currencyRepository.count() == 0) {
             saveAllCurrencyExchange();
@@ -163,7 +162,7 @@ public class ExpanseService {
 
     private void saveAllCurrencyExchange() {
         currencyRepository.deleteAll();
-        List<CurrencyExchangeResponse> currencyApiFetch = currencyExchangeService.getAllExchangeRates();
+        List<CurrencyExchangeResponse> currencyApiFetch = currencyExchangeService.fetchAllExchangeRates();
         List<CurrencyExchange> currencyExchangeList = currencyApiFetch.stream()
                 .map(CurrencyExchangeMapper::mapToCurrencyExchange)
                 .toList();

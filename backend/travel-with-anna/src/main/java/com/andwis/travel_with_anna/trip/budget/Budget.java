@@ -23,6 +23,7 @@ public class Budget {
     @Column(name = "budget_id")
     private Long budgetId;
 
+    @NotNull
     @Size(max = 10)
     @Column(name = "currency", length = 10)
     private String currency;

@@ -11,6 +11,7 @@ public record DayResponse(
         LocalDate date,
         String dayOfWeek,
         boolean isToday,
+        int dayNumber,
         Note note,
         Long tripId,
         List<ActivityResponse> activity

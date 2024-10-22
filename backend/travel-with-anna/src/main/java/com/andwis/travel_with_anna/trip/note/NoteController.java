@@ -13,14 +13,25 @@ import org.springframework.web.bind.annotation.*;
 public class NoteController {
     private final NoteFacade facade;
 
-    @PostMapping("/save")
-    public ResponseEntity<Void> createNewNoteForTrip(@RequestBody @Valid NoteForTripRequest request) {
-        facade.createNewNoteForTrip(request);
+    @PostMapping("/trip/save")
+    public ResponseEntity<Void> saveNoteForTrip(@RequestBody @Valid NoteRequest request) {
+        facade.saveNoteForTrip(request);
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/{tripId}")
-    public ResponseEntity<NoteResponse> getNoteById(@PathVariable("tripId") Long tripId) {
-        return ResponseEntity.ok(facade.getNoteById(tripId));
+    @PostMapping("/activity/save")
+    public ResponseEntity<Void> saveNoteForActivity(@RequestBody @Valid NoteRequest request) {
+        facade.saveNoteForActivity(request);
+        return ResponseEntity.accepted().build();
+    }
+
+    @GetMapping("trip/{tripId}")
+    public ResponseEntity<NoteResponse> getNoteByTripId(@PathVariable("tripId") Long tripId) {
+        return ResponseEntity.ok(facade.getNoteByTripId(tripId));
+    }
+
+    @GetMapping("activity/{activityId}")
+    public ResponseEntity<NoteResponse> getNoteByActivityId(@PathVariable("activityId") Long activityId) {
+        return ResponseEntity.ok(facade.getNoteByActivityId(activityId));
     }
 }

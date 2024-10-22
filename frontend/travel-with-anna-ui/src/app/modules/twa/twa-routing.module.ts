@@ -39,18 +39,13 @@ const routes: Routes = [
         component: BackpackComponent,
         canActivate: [AuthGuard]
       },
-      // {
-      //   path: 'backpack/:id',
-      //   component: BackpackComponent,
-      //   canActivate: [AuthGuard]
-      // },
       {
-        path: 'budget/:trip_id/:budget_id',
+        path: 'budget',
         component: BudgetComponent,
         canActivate: [AuthGuard]
       },
       {
-        path: 'day/:day_id',
+        path: 'day',
         component: DayDetailsComponent,
         canActivate: [AuthGuard]
       }

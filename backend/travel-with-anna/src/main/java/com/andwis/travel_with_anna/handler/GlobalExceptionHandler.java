@@ -14,12 +14,14 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.management.relation.RoleNotFoundException;
+import java.time.DateTimeException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +33,19 @@ import static org.springframework.http.HttpStatus.*;
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(ActivityNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull ActivityNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(ACTIVITY_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(ACTIVITY_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
 
     @ExceptionHandler(AvatarNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull AvatarNotFoundException exp) {
@@ -112,6 +127,32 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(DateTimeException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull DateTimeException exp) {
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(DATA_NOT_VALID.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(DATA_NOT_VALID.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(DayNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull DayNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(DAY_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(DAY_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull DisabledException exp) {
         return ResponseEntity
@@ -177,7 +218,7 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(FileNotSaved.class)
+       @ExceptionHandler(FileNotSaved.class)
     public ResponseEntity<ExceptionResponse> handleSaveAvatarException(@NotNull FileNotSaved exp) {
         return ResponseEntity
                 .status(BAD_REQUEST)
@@ -218,7 +259,6 @@ public class GlobalExceptionHandler {
                 );
     }
 
-
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull InvalidTokenException exp) {
         return ResponseEntity
@@ -248,7 +288,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(JwtParsingException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull JwtParsingException exp) {
-        return ResponseEntity
+         return ResponseEntity
                 .status(UNAUTHORIZED)
                 .body(
                         ExceptionResponse.builder()
@@ -313,6 +353,20 @@ public class GlobalExceptionHandler {
                         ExceptionResponse.builder()
                                 .errorCode(VALIDATION_ERROR.getCode())
                                 .errors(errorsSorted)
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull MissingServletRequestParameterException exp) {
+        exp.getMessage();
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(MISSING_PARAMETER.getCode())
+                                .errors(exp.getMessage().isEmpty()
+                                        ? List.of(MISSING_PARAMETER.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }

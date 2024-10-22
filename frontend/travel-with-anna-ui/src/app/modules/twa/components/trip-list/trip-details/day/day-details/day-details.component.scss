@@ -1,15 +1,11 @@
 .trip-name {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   color: #2E3944;
   font-weight: 500;
   background-color: transparent;
-  font-size: 24px;
+  font-size: 22px;
   margin-top: 0 !important;
-}
-
-.trip-name-padding {
-  padding: 0 3% 0 3%;
 }
 
 .main-form {
@@ -22,4 +18,55 @@
 
 .activity-container > * {
   margin: 1%;
+}
+
+.center-align {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 0 0 0 ;
+}
+
+.flag {
+  margin: 0 5px 0 5px;
+}
+
+.day-details {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  color: whitesmoke;
+  font-weight: 300;
+  background-color: transparent;
+  font-size: 16px;
+  width: 30vw;
+}
+
+.pagination-button {
+  border-radius: 10px !important;
+  border: none;
+  color: #1C252D !important;
+  font-size: 20px !important;
+  font-weight: bold;
+  font-family: Purple Purse, sans-serif;
+  margin: 0 0 0 0;
+}
+
+.pagination-button:hover {
+  opacity: 0.7;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.negative{
+  color: indianred !important;
+}
+
+.default-color {
+  color: whitesmoke !important;
 }

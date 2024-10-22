@@ -2,6 +2,6 @@
 /* eslint-disable */
 export interface Budget {
   budgetId?: number;
-  currency?: string;
+  currency: string;
   toSpend: number;
 }

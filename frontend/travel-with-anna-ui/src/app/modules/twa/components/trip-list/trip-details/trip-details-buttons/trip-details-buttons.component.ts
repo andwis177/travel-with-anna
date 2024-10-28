@@ -1,27 +1,33 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatDialog} from "@angular/material/dialog";
 import {BackpackComponent} from "../backpack/backpack.component";
 import {TripResponse} from "../../../../../../services/models/trip-response";
 import {Router} from "@angular/router";
-import {NoteComponent} from "../note/note.component";
 import {DeleteTripComponent} from "../delete-trip/delete-trip.component";
 import {AddDay$Params} from "../../../../../../services/fn/day/add-day";
 import {DayService} from "../../../../../../services/services/day.service";
 import {EditTripComponent} from "../edit-trip/edit-trip.component";
 import {SharedService} from "../../../../../../services/shared/shared.service";
+import {NgClass} from "@angular/common";
+import {MatBadge} from "@angular/material/badge";
+import {MatIcon} from "@angular/material/icon";
+import {DayDeleteComponent} from "../day/day-card/day-delete/day-delete.component";
 
 @Component({
   selector: 'app-trip-details-buttons',
   standalone: true,
   imports: [
-    MatTooltip
+    MatTooltip,
+    NgClass,
+    MatBadge,
+    MatIcon
   ],
   templateUrl: './trip-details-buttons.component.html',
   styleUrl: './trip-details-buttons.component.scss'
 })
 export class TripDetailsButtonsComponent implements OnInit {
-  trip: TripResponse = {};
+  private _trip: TripResponse = {};
   @Output() afterAddDay: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(public dialog: MatDialog,
@@ -31,6 +37,15 @@ export class TripDetailsButtonsComponent implements OnInit {
   ) {
   }
 
+  get trip(): TripResponse {
+    return this._trip;
+  }
+
+  @Input()
+  set trip(value: TripResponse) {
+    this._trip = value;
+  }
+
   ngOnInit(): void {
     this.getTrip();
   }
@@ -38,7 +53,7 @@ export class TripDetailsButtonsComponent implements OnInit {
   getTrip() {
     this.sharedService.getTrip().subscribe({
       next: (trip) => {
-        this.trip = trip!;
+        this._trip = trip!;
       },
       error: (err) => {
         console.error(err.error.errors);
@@ -55,9 +70,9 @@ export class TripDetailsButtonsComponent implements OnInit {
       height: 'auto',
       id: 'backpack-dialog',
       data: {
-        backpackId: this.trip.backpackId,
-        tripId: this.trip.tripId,
-        budgetId: this.trip.budgetId,
+        backpackId: this._trip.backpackId,
+        tripId: this._trip.tripId,
+        budgetId: this._trip.budgetId,
       }
     });
     dialogRef.afterClosed().subscribe(() => {
@@ -69,23 +84,6 @@ export class TripDetailsButtonsComponent implements OnInit {
     this.router.navigate(['/twa/budget']).then();
   }
 
-  openNote(event: Event) {
-    event.preventDefault();
-    const dialogRef = this.dialog.open(NoteComponent, {
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      width: 'auto',
-      height: 'auto',
-      id: 'note-dialog',
-      data: {
-        id: this.trip.tripId,
-        relatedTo: 'trip'
-      }
-    });
-    dialogRef.afterClosed().subscribe(() => {
-    });
-  }
-
   deleteTrip(event: Event) {
     event.preventDefault();
     const dialogRef = this.dialog.open(DeleteTripComponent, {
@@ -95,7 +93,7 @@ export class TripDetailsButtonsComponent implements OnInit {
       height: 'auto',
       id: 'delete-trip-dialog',
       data: {
-        tripId: this.trip.tripId,
+        tripId: this._trip.tripId,
       }
     });
     dialogRef.afterClosed().subscribe(() => {
@@ -104,7 +102,7 @@ export class TripDetailsButtonsComponent implements OnInit {
 
   addDay(isFirst: boolean, event: Event) {
     event.preventDefault();
-    const params: AddDay$Params = {body: {tripId: this.trip.tripId!, first: isFirst}};
+    const params: AddDay$Params = {body: {tripId: this._trip.tripId!, first: isFirst}};
     this.dayService.addDay(params).subscribe({
       next: () => {
         this.afterAddDay.emit();
@@ -112,6 +110,25 @@ export class TripDetailsButtonsComponent implements OnInit {
       error: (err) => {
         console.error(err.error.errors);
       }
+    });
+  }
+
+  deleteDay(isFirst: boolean, event: Event) {
+    event.preventDefault();
+    const dialogRef = this.dialog.open(DayDeleteComponent, {
+      panelClass: 'custom-dialog-container',
+      maxWidth: '50vw',
+      maxHeight: '50vw',
+      width: '50vw',
+      height: 'auto',
+      id: 'delete-day-dialog',
+      data: {
+        tripId: this._trip.tripId,
+        isFirst: isFirst
+      }
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.afterAddDay.emit();
     });
   }
 
@@ -124,22 +141,14 @@ export class TripDetailsButtonsComponent implements OnInit {
       height: 'auto',
       id: 'edit-trip-dialog',
       data: {
-        tripId: this.trip.tripId,
-        tripName: this.trip.tripName,
-        startDate: this.trip.startDate,
-        endDate: this.trip.endDate
+        tripId: this._trip.tripId,
+        tripName: this._trip.tripName,
+        startDate: this._trip.startDate,
+        endDate: this._trip.endDate
       }
     });
     dialogRef.afterClosed().subscribe(() => {
       this.afterAddDay.emit();
     });
-  }
-
-  addLastDay(event: Event) {
-    this.addDay(true, event);
-  }
-
-  addFirstDay(event: Event) {
-    this.addDay(false, event);
   }
 }

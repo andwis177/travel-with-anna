@@ -102,7 +102,7 @@ p, a, span {
   width: 100% !important;
   height: 100% !important;
   box-sizing: border-box;
-  padding: 5% !important;
+  padding: 3% !important;
   border: none !important;
 
   .toolbar-row {
@@ -259,10 +259,10 @@ p, a, span {
 .dialog-title{
   display: flex;
   align-items: center;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 400;
   color: #1C252D;
-  margin-left: 40px;
+  margin-left: 20px !important;
   font-family: 'Montserrat', sans-serif
 }
 
@@ -272,6 +272,9 @@ p, a, span {
 }
 
 .close-button {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   width: 22px;
   height: 22px;
   min-width: 22px;
@@ -280,6 +283,9 @@ p, a, span {
 }
 
 .close-icon {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   cursor: pointer;
   font-size: 20px;
   font-weight: bold;
@@ -378,12 +384,11 @@ p, a, span {
   background-color: #C0D0D8;
   padding:5px;
   cursor: pointer;
-  border: 1px solid snow  ;
+  border: 1px solid snow;
 }
 
 .user-button-image:hover,
-.user-button:hover,
-{
+.user-button:hover {
   opacity: 0.5;
 }
 
@@ -392,5 +397,14 @@ p, a, span {
 }
 
 .selected-button {
-  box-shadow: 0 0 10px 10px #7B9D9C !important;
+  box-shadow: 0 0 3px 12px goldenrod !important;
+  border-radius: 3px !important;
+  background-color: goldenrod !important;
+}
+
+::ng-deep .mat-badge-content,
+::ng-deep .mat-badge-active {
+  background-color: gold !important;
+  border: 1px solid black;
+  color: black;
 }

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-export interface DayAddRequest {
+export interface DayAddDeleteRequest {
   first?: boolean;
   tripId?: number;
 }

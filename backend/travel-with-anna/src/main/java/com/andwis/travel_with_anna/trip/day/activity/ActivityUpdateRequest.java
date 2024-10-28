@@ -27,4 +27,5 @@ public class ActivityUpdateRequest {
     @Size(max = 20, message = "Type should be 20 characters or less")
     private String type;
     private AddressRequest addressRequest;
+    private boolean isDayTag;
 }

@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS activities (
                                         day_id BIGINT,
                                         associated_id BIGINT,
                                         address_id BIGINT,
+                                        day_tag BOOLEAN DEFAULT FALSE,
                                         CONSTRAINT fk_day FOREIGN KEY (day_id) REFERENCES days(day_id),
                                         CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES addresses(address_id)
 
@@ -114,12 +115,6 @@ ALTER TABLE trips
     ADD CONSTRAINT fk_budget FOREIGN KEY (budget_id) REFERENCES budget(budget_id);
 
 --
-ALTER TABLE trips
-    ADD COLUMN note_id BIGINT;
-
-ALTER TABLE trips
-    ADD CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id);
-
 ALTER TABLE activities
     ADD COLUMN note_id BIGINT;
 

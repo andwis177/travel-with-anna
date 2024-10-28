@@ -5,7 +5,8 @@
     </div>
     <div class="menu-buttons">
       <app-trip-details-buttons
-        (afterAddDay)="getDays(trip.tripId!); receiveTrip()">
+        [trip]="trip"
+        (afterAddDay)="getDays(trip.tripId!); getTrip()">
       </app-trip-details-buttons>
     </div>
     <div class="user">
@@ -13,6 +14,7 @@
     </div>
   </div>
 </div>
+
 
 <div class="main-form">
   <div *ngIf="trip.tripName">
@@ -24,7 +26,7 @@
       [day]="day"
       [amountOfDays]="days.length"
       *ngFor="let day of days"
-      (afterDayDelete)="getDays(trip.tripId!); receiveTrip()"
+      (afterDayChange)="getDays(trip.tripId!); getTrip()"
     >{{day}}</app-day>
   </div>
 </div>

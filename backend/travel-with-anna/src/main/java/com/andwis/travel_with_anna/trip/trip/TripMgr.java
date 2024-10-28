@@ -86,8 +86,8 @@ public class TripMgr {
 
         trip.setTripName(request.getTripName());
 
-        if (!trip.getDays().getFirst().getDate().equals(startDate)
-                || !trip.getDays().getLast().getDate().equals(endDate)) {
+        if (!trip.getDaysInOrder().getFirst().getDate().equals(startDate)
+                || !trip.getDaysInOrder().getLast().getDate().equals(endDate)) {
             dayService.changeTripDates(
                     trip, startDate, endDate);
         }

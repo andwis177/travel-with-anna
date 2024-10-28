@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.day;
 
 import com.andwis.travel_with_anna.handler.exception.DayNotFoundException;
+import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
 import com.andwis.travel_with_anna.utility.NumberDistributor;
@@ -12,6 +13,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +30,7 @@ public class DayService {
     }
 
     public void createDay(@NotNull DayRequest request) {
-        Trip trip = tripService.getTripById(request.getTripId());
+        Trip trip = tripService.getTripById(request.getEntityId());
         Day day = Day.builder()
                 .date(request.getDate())
                 .build();
@@ -35,27 +38,31 @@ public class DayService {
         saveDay(day);
     }
 
-    public Day findById(Long dayId) {
+    public Day getById(Long dayId) {
         return dayRepository.findById(dayId)
                 .orElseThrow(() -> new DayNotFoundException("Day not found"));
     }
 
-    public Day findByTripIdAndDate(Long tripId, LocalDate date) {
+    public Set<Day> getDaysByTripId(Long tripId) {
+        return dayRepository.findByTripTripId(tripId);
+    }
+
+    public Day getByTripIdAndDate(Long tripId, LocalDate date) {
         return dayRepository.findByTripTripIdAndDate(tripId, date)
                 .orElseThrow(() -> new DayNotFoundException("Day not found"));
     }
 
     public DayResponse getDayById(Long dayId) {
-        Day day = findById(dayId);
+        Day day = getById(dayId);
         return DayMapper.toDayResponse(day);
     }
 
-    public void addDay (@NotNull DayAddRequest request) {
+    public void addDay (@NotNull DayAddDeleteRequest request) {
         List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(request.getTripId());
         LocalDate dayToAdd = getDayToAdd(days, request.isFirst());
         DayRequest dayRequest = DayRequest.builder()
                 .date(dayToAdd)
-                .tripId(request.getTripId())
+                .entityId(request.getTripId())
                 .build();
         createDay(dayRequest);
     }
@@ -109,6 +116,18 @@ public class DayService {
         }
     }
 
+    public void changeDayDate(@NotNull DayRequest request) {
+        if (request.getEntityId() == null) {
+            throw new IllegalArgumentException("Day Id must be provided");
+        }
+        if (request.getDate() == null) {
+            throw new IllegalArgumentException("Date must be provided");
+        }
+        Day day = getById(request.getEntityId());
+        day.setDate(request.getDate());
+        saveDay(day);
+    }
+
     public void changeTripDates(@NotNull Trip trip, LocalDate startDate, LocalDate endDate) {
         validateDates(startDate, endDate);
 
@@ -129,7 +148,19 @@ public class DayService {
         }
     }
 
-    public void deleteDay(Long dayId) {
-        dayRepository.deleteById(dayId);
+    public void deleteDay(@NotNull Day day, Consumer<Activity> deleteFunction) {
+        Set<Activity> activities = day.getActivity();
+        activities.forEach(deleteFunction);
+        day.getTrip().getDays().remove(day);
+        dayRepository.delete(day);
+    }
+
+    public void deleteFirstOrLastDay (@NotNull DayAddDeleteRequest request, Consumer<Activity> deleteFunction) {
+        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(request.getTripId());
+        if (request.isFirst()) {
+            deleteDay(days.getFirst(), deleteFunction);
+        } else {
+            deleteDay(days.getLast(), deleteFunction);
+        }
     }
 }

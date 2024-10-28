@@ -44,7 +44,11 @@
 
     <div class="center-align" *ngIf="isEdit">
       <mat-divider></mat-divider>
-      <button class="custom-button-2" (click)="deleteAccount()" type="submit">DELETE ACCOUNT</button>
+      <button class="custom-button-2"
+              (click)="deleteAccount()"
+              type="submit"
+              matTooltip="Delete Account"
+      >DELETE ACCOUNT</button>
     </div>
   </form>
 </div>

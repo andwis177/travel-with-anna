@@ -1,5 +1,7 @@
 package com.andwis.travel_with_anna.email;
 
+import com.andwis.travel_with_anna.handler.exception.NoteTypeException;
+import com.andwis.travel_with_anna.trip.note.NoteType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +18,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

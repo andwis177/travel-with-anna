@@ -1,0 +1,53 @@
+<mat-toolbar-row class="dialog-header">
+  <div class="full-width activity-edit-toolbar">
+    <div class="dialog-title">Edit Day
+      <div class="dialog-title">{{ originalDate }}</div>
+    </div>
+      <button mat-icon-button class="close-button"
+              (click)="onClose()"
+              (keydown.enter)="$event.preventDefault()">
+        <mat-icon class="close-icon">close</mat-icon>
+      </button>
+
+  </div>
+</mat-toolbar-row>
+
+<div class="dialog-container">
+  <form class="main-form">
+    <div>
+      <div class = "full-width name-button-area" >
+
+
+        <div class ="margin-form">
+          <mat-form-field appearance="outline" >
+            <mat-label>Select date</mat-label>
+            <input
+              matInput [matDatepicker]="picker"
+              [(ngModel)]="date"
+              name="date">
+            <mat-datepicker-toggle matSuffix  [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <form>
+          <mat-card-actions>
+            <div class="full-width" style="align-items: center">
+              <button class="custom-button-0 " (click)="updateDay()" type="submit">Change</button>
+              <button class="custom-button-1 " (click)="onClose()" type="submit">Cancel</button>
+            </div>
+          </mat-card-actions>
+        </form>
+
+        <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+          <mat-divider></mat-divider>
+          <p *ngFor="let msg of errorMsg">{{msg}}</p>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+
+

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {EatComponent} from "../buttons/eat/eat.component";
 import {EventComponent} from "../buttons/event/event.component";
 import {FormsModule} from "@angular/forms";
@@ -31,6 +31,8 @@ import {ActivityUpdateRequest} from "../../../../../../../../../services/models/
 import {UpdateActivity$Params} from "../../../../../../../../../services/fn/activity/update-activity";
 import {DayDetailsButtonsComponent} from "../../day-details-buttons/day-details-buttons.component";
 import {ShopComponent} from "../buttons/shop/shop.component";
+import {MatCheckbox} from "@angular/material/checkbox";
+
 
 @Component({
   selector: 'app-activity-edit',
@@ -56,13 +58,14 @@ import {ShopComponent} from "../buttons/shop/shop.component";
     TravelComponent,
     TrekComponent,
     DayDetailsButtonsComponent,
-    ShopComponent
+    ShopComponent,
+    MatCheckbox
   ],
   providers: [provideNativeDateAdapter(), DatePipe],
   templateUrl: './activity-edit.component.html',
   styleUrl: './activity-edit.component.scss'
 })
-export class ActivityEditComponent {
+export class ActivityEditComponent implements OnInit {
   errorMsg: Array<string> = [];
   activity : ActivityResponse = {};
   day: DayResponse = {};
@@ -71,7 +74,8 @@ export class ActivityEditComponent {
     dayId: -1,
     newDate: "",
     oldDate: "",
-    startTime: ""
+    startTime: "",
+    dayTag: false
   };
   address: AddressResponse = {};
   trip: TripResponse = {};
@@ -112,10 +116,13 @@ export class ActivityEditComponent {
     this.date = this.day.date!
     this.startTime = this.activity.startTime!;
     this.endTime = this.activity.endTime!;
-    this.country = {name: this.address.country,currency: this.address.currency, iso2: this.address.countryCode};
+    this.country = {name: this.address.country, currency: this.address.currency, iso2: this.address.countryCode};
     this.getCountries()
     this.city = {city: this.address.city};
-    this.getCities(this.address.country!);
+    if (this.country.name !== null && this.country.name?.length! > 0)
+    {
+      this.getCities(this.country.name!);
+    }
     this.provideTypeToButtons(this.activity.type!);
     this.activityUpdateRequest.activityId = this.activity.activityId!;
     this.activityUpdateRequest.activityTitle = this.activity.activityTitle!;
@@ -123,6 +130,10 @@ export class ActivityEditComponent {
     this.activityUpdateRequest.newDate = this.day.date!;
     this.activityUpdateRequest.oldDate = this.day.date!;
     this.activityUpdateRequest.startTime = this.activity.startTime!;
+    this.activityUpdateRequest.dayTag = this.activity.dayTag!;
+  }
+
+  ngOnInit() {
   }
 
   provideTypeToButtons(type:string) {
@@ -297,7 +308,7 @@ export class ActivityEditComponent {
 
     const params: UpdateActivity$Params = {body: this.activityUpdateRequest};
     this.activityService.updateActivity(params).subscribe({
-      next: (response) => {
+      next: () => {
         this.dialog.getDialogById('activity-edit-dialog')?.close();
       },
       error: (error) => {

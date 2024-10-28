@@ -34,7 +34,7 @@ public class ExpanseFacade {
         }
     }
 
-    public ExpanseResponse getExpanseByEntityId(@NotNull Long entityId, @NotNull @NotEmpty @NotBlank String entityType) {
+    public ExpanseResponse getExpanseByEntityId(Long entityId, @NotNull @NotEmpty @NotBlank String entityType) {
         ExpanseType expanseType = ExpanseType.fromString(entityType);
 
         if (expanseType == null) {

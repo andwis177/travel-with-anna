@@ -31,7 +31,9 @@
 
         <button class="activity-button "
                 (click)="openNote(); $event.stopPropagation()"
-                matTooltip="Contact Information">
+                matTooltip="Contact Information"
+                matBadge="!"
+                [matBadgeHidden]="!isBadgeVisible">
           <img src="../../../../../assets/images/notes.png" class="activity-button-image" alt="">
         </button>
         <button class="activity-button"

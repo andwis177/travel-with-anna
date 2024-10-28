@@ -2,7 +2,6 @@ package com.andwis.travel_with_anna.trip.note;
 
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
-import com.andwis.travel_with_anna.trip.trip.Trip;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -30,9 +29,6 @@ public class Note {
     private Day day;
 
     @OneToOne(mappedBy = "note")
-    private Trip trip;
-
-    @OneToOne(mappedBy = "note")
     private Activity activity;
 
     @Override
@@ -43,7 +39,6 @@ public class Note {
         return Objects.equals(noteId, objectNote.noteId)
                 && Objects.equals(note, objectNote.note)
                 && Objects.equals(day, objectNote.day)
-                && Objects.equals(trip, objectNote.trip)
                 && Objects.equals(activity, objectNote.activity);
     }
 

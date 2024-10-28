@@ -40,8 +40,9 @@ public enum ErrorCodes {
 
     DATA_NOT_VALID(5000, "Data is not valid", BAD_REQUEST),
 
-    MISSING_PARAMETER(6000, "Missing parameter", BAD_REQUEST);
-
+    MISSING_PARAMETER(6000, "Missing parameter", BAD_REQUEST),
+    NOTE_TYPE_NOT_FOUND(6100, "Note type not found", NOT_IMPLEMENTED),
+    ENTITY_NOT_FOUND(6200, "Entity not found", NOT_FOUND);
 
     private final int code;
     private final String message;

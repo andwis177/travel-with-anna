@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.trip.day;
 
+import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,12 +10,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DayFacade {
     private final DayService dayService;
+    private final ActivityService activityService;
 
-    public void createDay(DayRequest request) {
-        dayService.createDay(request);
-    }
-
-    public void addDay(DayAddRequest request) {
+    public void addDay(DayAddDeleteRequest request) {
         dayService.addDay(request);
     }
 
@@ -30,7 +28,11 @@ public class DayFacade {
         dayService.generateDays(request);
     }
 
-    public void deleteDay(Long dayId) {
-        dayService.deleteDay(dayId);
+    public void changeDayDate(DayRequest request) {
+        dayService.changeDayDate(request);
+    }
+
+    public void deleteDay(DayAddDeleteRequest request) {
+        dayService.deleteFirstOrLastDay(request, activityService::deleteActivity);
     }
 }

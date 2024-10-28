@@ -18,7 +18,6 @@ import { ItemService } from './services/item.service';
 import { BackpackService } from './services/backpack.service';
 import { AdminService } from './services/admin.service';
 import { RoleService } from './services/role.service';
-import { BadgeService } from './services/badge.service';
 import { CurrencyExchangeControllerService } from './services/currency-exchange-controller.service';
 
 /**
@@ -43,7 +42,6 @@ import { CurrencyExchangeControllerService } from './services/currency-exchange-
     BackpackService,
     AdminService,
     RoleService,
-    BadgeService,
     CurrencyExchangeControllerService,
     ApiConfiguration
   ],

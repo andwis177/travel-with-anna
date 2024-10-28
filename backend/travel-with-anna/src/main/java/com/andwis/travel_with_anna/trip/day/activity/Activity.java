@@ -7,6 +7,7 @@ import com.andwis.travel_with_anna.trip.note.Note;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -66,6 +67,9 @@ public class Activity {
     @JoinColumn(name = "address_id")
     private Address address;
 
+    @Column(name = "day_tag")
+    private boolean isDayTag;
+
     public String getBeginTime() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         return beginTime != null ? this.beginTime.format(formatter) : "";
@@ -76,12 +80,12 @@ public class Activity {
         return  associatedId == null && endTime != null ? this.endTime.format(formatter) : "";
     }
 
-    public void addNote(Note note) {
+    public void addNote(@NotNull Note note) {
         this.note = note;
         note.setActivity(this);
     }
 
-    public void addExpanse(Expanse expanse) {
+    public void addExpanse(@NotNull Expanse expanse) {
         this.expanse = expanse;
         expanse.setActivity(this);
     }

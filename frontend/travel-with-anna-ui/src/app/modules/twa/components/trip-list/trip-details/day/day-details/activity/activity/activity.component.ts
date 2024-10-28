@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatCardContent} from "@angular/material/card";
 import {MatDivider} from "@angular/material/divider";
@@ -6,8 +6,8 @@ import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
-import {MatOption, provideNativeDateAdapter} from "@angular/material/core";
-import {MatSelect} from "@angular/material/select";
+import {provideNativeDateAdapter} from "@angular/material/core";
+import {MatOption, MatSelect} from "@angular/material/select";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {MatTooltip} from "@angular/material/tooltip";
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
@@ -33,6 +33,7 @@ import {City} from "../../../../../../../../../services/models/city";
 import {SharedService} from "../../../../../../../../../services/shared/shared.service";
 import {TripResponse} from "../../../../../../../../../services/models/trip-response";
 import {ShopComponent} from "../buttons/shop/shop.component";
+import {MatCheckbox} from "@angular/material/checkbox";
 
 @Component({
   selector: 'app-activity',
@@ -62,13 +63,14 @@ import {ShopComponent} from "../buttons/shop/shop.component";
     EatComponent,
     EventComponent,
     ShopComponent,
+    MatCheckbox,
   ],
   providers: [provideNativeDateAdapter(), DatePipe],
   templateUrl: './activity.component.html',
   styleUrl: './activity.component.scss'
 
 })
-export class ActivityComponent {
+export class ActivityComponent implements OnInit{
   errorMsg: Array<string> = [];
   trip: TripResponse = {};
   startTime: string = '12:00';
@@ -88,14 +90,14 @@ export class ActivityComponent {
     phone: '',
     currency: ''
   };
-  country: Country = {};
+  country: Country = {currency: '', iso2: '', iso3:'', name: ''};
   countries: Array<Country> = [];
   cities: Array<City> = [];
   city: City = {};
   badge: string = '';
   associated: boolean = false;
-  start: ActivityRequest = {tripId: -1, activityTitle: '', dateTime:''};
-  end: ActivityRequest = {tripId:-1 , activityTitle: '', dateTime:''};
+  firstActivity: ActivityRequest = {tripId: -1, activityTitle: '', dateTime:''};
+  secondActivity: ActivityRequest = {tripId:-1 , activityTitle: '', dateTime:''};
 
   constructor(public dialog: MatDialog,
               private datePipe: DatePipe,
@@ -110,7 +112,8 @@ export class ActivityComponent {
                 lastCountry: string,
                 lastCountryCode: string,
                 lastCity: string,
-                lastCountryCurrency: string
+                lastCountryCurrency: string,
+                dayTag: boolean
               }
   ) {
     this.sharedService.getTrip().subscribe({
@@ -125,15 +128,22 @@ export class ActivityComponent {
     this.lastTripDay = this.trip.endDate!;
     this.badge = data.badge;
     this.associated = data.associated;
+    this.firstActivity.dayTag = data.dayTag;
     this.country = {name: data.lastCountry,currency: data.lastCountryCurrency, iso2: data.lastCountryCode};
     this.city = {city: data.lastCity};
     this.addressRequest.country = this.country.name;
     this.addressRequest.countryCode = this.country.iso2;
     this.addressRequest.currency = this.country.currency;
     this.addressRequest.city = this.city.city;
+  }
+
+  ngOnInit(): void {
     this.generateDatesBetween();
     this.getCountries();
-    this.getCities(this.addressRequest.country!);
+    if (this.addressRequest.country!)
+    {
+      this.getCities(this.addressRequest.country!);
+    }
   }
 
   onClose() {
@@ -141,51 +151,49 @@ export class ActivityComponent {
   }
 
   receiveBadge(badge: string) {
-    this.start.badge = badge;
-    this.end.badge = badge;
+    this.firstActivity.badge = badge;
+    this.secondActivity.badge = badge;
   }
 
   receiveType(type: string) {
-    this.start.type = type;
-    this.end.type = type;
+    this.firstActivity.type = type;
+    this.secondActivity.type = type;
   }
 
   receiveFirstStatus(status: string) {
-    this.start.status = status;
+    this.firstActivity.status = status;
   }
 
   receiveSecondStatus(status: string) {
-    this.end.status = status;
+    this.secondActivity.status = status;
   }
 
   buildSingleActivity() {
     this.errorMsg = [];
-    this.start.dateTime = this.startDate + 'T' + this.startTime;
-    this.start.endTime = this.endTime;
-    this.start.tripId = this.trip.tripId!;
-    this.start.addressRequest = this.addressRequest;
-    this.createSingleActivity(this.start);
+    this.firstActivity.dateTime = this.startDate + 'T' + this.startTime;
+    this.firstActivity.endTime = this.endTime;
+    this.firstActivity.tripId = this.trip.tripId!;
+    this.firstActivity.addressRequest = this.addressRequest;
+    this.createSingleActivity(this.firstActivity);
     this.onClose();
   }
 
   buildAssociatedActivity() {
     this.errorMsg = [];
     if (this.endDate != '') {
-      this.start.dateTime = this.startDate + 'T' + this.startTime;
-      this.end.dateTime = this.endDate + 'T' + this.endTime;
+      this.secondActivity.activityTitle = this.firstActivity.activityTitle;
+      this.secondActivity.dayTag = this.firstActivity.dayTag;
 
-      console.log(this.start.dateTime);
-      console.log(this.end.dateTime);
+      this.firstActivity.dateTime = this.startDate + 'T' + this.startTime;
+      this.secondActivity.dateTime = this.endDate + 'T' + this.endTime;
 
-      this.start.tripId = this.trip.tripId!;
-      this.end.tripId = this.trip.tripId!;
+      this.firstActivity.tripId = this.trip.tripId!;
+      this.secondActivity.tripId = this.trip.tripId!;
 
-      this.end.activityTitle = this.start.activityTitle;
+      this.firstActivity.addressRequest = this.addressRequest;
+      this.secondActivity.addressRequest = this.addressRequest;
 
-      this.start.addressRequest = this.addressRequest;
-      this.end.addressRequest = this.addressRequest;
-
-      this.createAssociatedActivities(this.start, this.end);
+      this.createAssociatedActivities(this.firstActivity, this.secondActivity);
     } else {
       this.errorMsg.push('Please select a check-out date');
     }
@@ -260,10 +268,11 @@ export class ActivityComponent {
     this.addressRequest.city = '';
     if (this.cities.length == 0) {
       this.errorMsg = [];
+      console.log("Country: ", country);
       this.countryService.findAllCountryCities({country: country}).subscribe({
         next: (response) => {
           this.cities = response;
-          if (response.length === 1) {
+          if (response.length > 0) {
             this.addressRequest.city = response[0].city!;
           } else {
             this.addressRequest.city = '';

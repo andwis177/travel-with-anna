@@ -179,6 +179,19 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull EntityNotFoundException exp) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(ENTITY_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(ENTITY_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
     @ExceptionHandler(ExpanseNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull ExpanseNotFoundException exp) {
         return ResponseEntity
@@ -367,6 +380,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(MISSING_PARAMETER.getCode())
                                 .errors(exp.getMessage().isEmpty()
                                         ? List.of(MISSING_PARAMETER.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(NoteTypeException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull NoteTypeException exp) {
+        return ResponseEntity
+                .status(UNSUPPORTED_MEDIA_TYPE)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(NOTE_TYPE_NOT_FOUND.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(NOTE_TYPE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }

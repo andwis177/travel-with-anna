@@ -37,7 +37,7 @@ export class DayDetailsButtonsComponent  {
     this.router.navigate(['/twa/trip-details', this._trip.tripId]).then();
   }
 
-  addActivity(badge: string, associated: boolean, event: Event) {
+  addActivity(badge: string, associated: boolean, dayTag:boolean, event: Event) {
     event.preventDefault();
     const dialogRef = this.dialog.open(ActivityComponent, {
       panelClass: 'custom-dialog-container',
@@ -52,13 +52,14 @@ export class DayDetailsButtonsComponent  {
         lastTripDay: this._trip.endDate,
         badge: badge,
         associated: associated,
+        dayTag: dayTag,
         lastCountry: this._addressDetail.lastCountry?.name,
         lastCountryCode: this._addressDetail.lastCountry?.iso2,
         lastCity: this._addressDetail.lastCity?.city,
         lastCountryCurrency: this._addressDetail.lastCountry?.currency,
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
       this._afterActivityClosed.emit();
     });
   }

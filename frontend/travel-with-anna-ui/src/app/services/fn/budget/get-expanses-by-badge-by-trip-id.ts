@@ -6,14 +6,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { NoteResponse } from '../../models/note-response';
+import { ExpanseTotalByBadge } from '../../models/expanse-total-by-badge';
 
-export interface GetNoteByTripId$Params {
+export interface GetExpansesByBadgeByTripId$Params {
   tripId: number;
 }
 
-export function getNoteByTripId(http: HttpClient, rootUrl: string, params: GetNoteByTripId$Params, context?: HttpContext): Observable<StrictHttpResponse<NoteResponse>> {
-  const rb = new RequestBuilder(rootUrl, getNoteByTripId.PATH, 'get');
+export function getExpansesByBadgeByTripId(http: HttpClient, rootUrl: string, params: GetExpansesByBadgeByTripId$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ExpanseTotalByBadge>>> {
+  const rb = new RequestBuilder(rootUrl, getExpansesByBadgeByTripId.PATH, 'get');
   if (params) {
     rb.path('tripId', params.tripId, {});
   }
@@ -23,9 +23,9 @@ export function getNoteByTripId(http: HttpClient, rootUrl: string, params: GetNo
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<NoteResponse>;
+      return r as StrictHttpResponse<Array<ExpanseTotalByBadge>>;
     })
   );
 }
 
-getNoteByTripId.PATH = '/note/trip/{tripId}';
+getExpansesByBadgeByTripId.PATH = '/budget/calculate/{tripId}';

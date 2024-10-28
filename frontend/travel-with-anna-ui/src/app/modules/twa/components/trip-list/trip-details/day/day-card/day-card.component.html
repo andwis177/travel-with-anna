@@ -1,4 +1,4 @@
-<div class="item mat-elevation-z8" >
+<div class="item" >
   <button class="button" (click)="openDay($event)">
     <div class="day-number trip-font">- {{day.dayNumber}} -</div>
 
@@ -14,6 +14,50 @@
 
   </button>
   <div class="bottom-menu">
+    <ng-container  class="bottom-menu-element" *ngIf="taggedActivities.length > 4; else defaultDisplay">
+      <div class="scrollable-icon-wrapper">
+        <a class="icon-area" *ngFor="let activity of taggedActivities">
+          <img src="../../../../../assets/images/activity/{{iconProvider(activity)}}.png"
+               class="image-container icon"
+               alt=""
+               matTooltip="{{getTooltipContent(activity)}}">
+        </a>
+      </div>
+    </ng-container>
+
+    <ng-template #defaultDisplay>
+      <div  class="bottom-menu-element">
+        <a class="icon-area" *ngFor="let activity of taggedActivities">
+          <img src="../../../../../assets/images/activity/{{iconProvider(activity)}}.png"
+               class="image-container icon"
+               alt=""
+               matTooltip="{{getTooltipContent(activity)}}">
+        </a>
+      </div>
+    </ng-template>
+
+    <div class="notes-button">
+      <button class="menu-button"
+              (click)="changeDate($event)"
+              matTooltip="Change Date">
+        <img src="../../../../../assets/images/date.png"
+             class="image-container"
+             alt="">
+      </button>
+
+      <div
+        matBadge="!"
+        [matBadgeHidden]="!isBadgeVisible">
+        <button class="menu-button"
+                (click)="openNote($event)"
+                matTooltip="Notes">
+          <img src="../../../../../assets/images/notes.png"
+               class="image-container"
+               alt="">
+        </button>
+        <div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-

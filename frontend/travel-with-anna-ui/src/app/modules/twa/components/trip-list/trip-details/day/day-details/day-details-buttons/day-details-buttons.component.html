@@ -1,35 +1,38 @@
 <form class="buttons-container">
+
   <button class="user-button margin" (click)="backToDays($event)" matTooltip="Back to Days">
     <img src="../../../../../assets/images/left-arrow.png" class="user-button-image" alt="">
   </button>
 
-  <button class="user-button margin" (click)="addActivity('stay', true ,$event)" matTooltip="Stay">
-    <img src="../../../../../assets/images/activity/stay.png" class="user-button-image" alt="">
-  </button>
-
-  <button class="user-button margin" (click)="addActivity('travel', false, $event)" matTooltip="Travel">
-    <img src="../../../../../assets/images/activity/travel.png" class="user-button-image" alt="">
-  </button>
-
-  <button class="user-button margin" (click)="addActivity('eat', false, $event)" matTooltip="Eat">
+  <button class="user-button margin" (click)="addActivity('eat', false, false, $event)" matTooltip="Eat">
     <img src="../../../../../assets/images/activity/eat.png" class="user-button-image" alt="">
   </button>
 
-  <button class="user-button margin" (click)="addActivity('trek', false, $event)" matTooltip="Trek">
-    <img src="../../../../../assets/images/activity/trek.png" class="user-button-image" alt="">
-  </button>
-
-  <button class="user-button margin" (click)="addActivity('rent', true, $event)" matTooltip="Rent">
-    <img src="../../../../../assets/images/activity/rent.png" class="user-button-image" alt="">
-  </button>
-
-  <button class="user-button margin" (click)="addActivity('event', false, $event)" matTooltip="Event">
+  <button class="user-button margin" (click)="addActivity('event', false, false, $event)" matTooltip="Event">
     <img src="../../../../../assets/images/activity/event.png" class="user-button-image" alt="">
   </button>
 
-  <button class="user-button margin" (click)="addActivity('shop', false, $event)" matTooltip="Event">
+  <button class="user-button margin" (click)="addActivity('rent', true, true, $event)" matTooltip="Rent">
+    <img src="../../../../../assets/images/activity/rent.png" class="user-button-image" alt="">
+  </button>
+
+  <button class="user-button margin" (click)="addActivity('shop', false, false, $event)" matTooltip="Shop">
     <img src="../../../../../assets/images/activity/shop.png" class="user-button-image" alt="">
   </button>
+
+  <button class="user-button margin" (click)="addActivity('stay', true, true, $event)" matTooltip="Stay">
+    <img src="../../../../../assets/images/activity/stay.png" class="user-button-image" alt="">
+  </button>
+
+
+  <button class="user-button margin" (click)="addActivity('travel', false, false, $event)" matTooltip="Travel">
+    <img src="../../../../../assets/images/activity/travel.png" class="user-button-image" alt="">
+  </button>
+
+  <button class="user-button margin" (click)="addActivity('trek', false, false, $event)" matTooltip="Trek">
+    <img src="../../../../../assets/images/activity/trek.png" class="user-button-image" alt="">
+  </button>
+
 </form>
 
 

@@ -126,6 +126,14 @@ export class BudgetCurrenciesComponent implements OnInit, AfterViewInit {
     }
   }
 
+  formatAmount(amount: number): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount)
+  }
+
   onClose() {
     this.dialog.closeAll();
   }

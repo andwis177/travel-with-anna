@@ -1,18 +1,18 @@
 package com.andwis.travel_with_anna.trip.budget;
 
 import com.andwis.travel_with_anna.handler.exception.BudgetNotFoundException;
-import com.andwis.travel_with_anna.trip.expanse.ExpanseByCurrency;
-import com.andwis.travel_with_anna.trip.expanse.ExpanseCalculator;
-import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
-import com.andwis.travel_with_anna.trip.expanse.ExpanseService;
+import com.andwis.travel_with_anna.trip.day.Day;
+import com.andwis.travel_with_anna.trip.day.DayService;
+import com.andwis.travel_with_anna.trip.day.activity.Activity;
+import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
+import com.andwis.travel_with_anna.trip.expanse.*;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +21,8 @@ public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final ExpanseService expanseService;
     private final DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
+    private final ActivityService activityService;
+    private final DayService dayService;
 
     public void saveBudget(Budget budget) {
         budgetRepository.save(budget);
@@ -79,6 +81,49 @@ public class BudgetService {
                                                 && expanse.price().doubleValue() > expanse.paid().doubleValue()
                                                 ? expanse.price().subtract(expanse.paid()) : BigDecimal.ZERO),
                                 ExpanseCalculator::add
+                        )
+                ));
+    }
+
+    public List<ExpanseTotalByBadge> calculateExpansesByBadgeByTripId(@NotNull Long tripId) {
+        Set<Day> days = dayService.getDaysByTripId(tripId);
+        Set<Activity> activities = new HashSet<>();
+        for (Day day : days) {
+            activities.addAll(activityService.getActivitiesByDayId(day.getDayId()));
+        }
+        Map<String, ExpanseBadgeCalculator> expansesByBadge = calculateExpansesByBadge(activities);
+        List<ExpanseTotalByBadge> expanseTotalByBadge = convertToExpanseTotalBadge(expansesByBadge);
+
+        return sortByType(expanseTotalByBadge);
+    }
+
+    private List<ExpanseTotalByBadge> convertToExpanseTotalBadge (Map<String, ExpanseBadgeCalculator> expansesByBadge) {
+        return expansesByBadge.entrySet().stream()
+                .map(entry -> new ExpanseTotalByBadge(
+                        entry.getKey(),
+                        entry.getValue().getTotalPriceInTripCurrency(),
+                        entry.getValue().getTotalPaidInTripCurrency())
+                ).toList();
+    }
+
+    private List<ExpanseTotalByBadge> sortByType(List<ExpanseTotalByBadge> expanseTotalByBadge) {
+        return expanseTotalByBadge.stream()
+                .sorted(Comparator.comparing(ExpanseTotalByBadge::getType))
+                .toList();
+    }
+
+    private Map<String, ExpanseBadgeCalculator> calculateExpansesByBadge(@NotNull Set<Activity> activities) {
+        return activities.stream()
+                .filter(activity -> activity.getExpanse() != null)
+                .collect(Collectors.groupingBy(
+                        Activity::getBadge,
+                        Collectors.reducing(
+                                new ExpanseBadgeCalculator(BigDecimal.ZERO, BigDecimal.ZERO),
+                                activity -> new ExpanseBadgeCalculator(
+                                        activity.getExpanse().getPriceInTripCurrency() != null ? activity.getExpanse().getPriceInTripCurrency() : BigDecimal.ZERO,
+                                        activity.getExpanse().getPaidInTripCurrency() != null ? activity.getExpanse().getPaidInTripCurrency() : BigDecimal.ZERO
+                                ),
+                                ExpanseBadgeCalculator::add
                         )
                 ));
     }

@@ -6,6 +6,7 @@ export interface ActivityUpdateRequest {
   activityTitle?: string;
   addressRequest?: AddressRequest;
   dayId: number;
+  dayTag?: boolean;
   endTime?: string;
   newDate: string;
   oldDate: string;

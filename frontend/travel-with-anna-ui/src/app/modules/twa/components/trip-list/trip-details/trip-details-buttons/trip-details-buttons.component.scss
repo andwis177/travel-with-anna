@@ -11,8 +11,8 @@
 }
 
 .delete-button {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   padding: 0;
   border: none;
   display: flex;
@@ -40,26 +40,62 @@
 .add-delete-button {
   width: 25px;
   height: 25px;
-  padding: 0;
-  border: none;
   display: flex;
   justify-content: center !important;
   cursor: pointer;
+  background-color: transparent;
   border-radius: 5px;
-  color: black;
-  background-color: whitesmoke;
 }
 
-.plus-team {
+.add-delete-description {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  background-color: transparent;
+  color: lightslategrey;
+  font-size: 2.5vw;
+  font-weight: 300;
+  justify-content: center !important;
+}
+
+.add-day-buttons {
   border: 1px solid limegreen;
-  background-color: limegreen;
-  font-size: 1.6vw;
+  border-radius: 5px;
+  align-items: center !important;
 }
 
-.minus-team {
-  border:1px solid indianred;
-  background-color: indianred;
-  font-size: 1.6vw;
+.delete-day-buttons {
+  border: 1px solid indianred;
+  border-radius: 5px;
+  align-items: center !important;
+}
+
+.add-delete-buttons {
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.add-color {
+  color: limegreen;
+}
+
+.delete-color {
+  color: indianred;
+}
+
+.add-delete-button:hover {
+  opacity: 0.5;
+}
+
+.add-delete-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 10px 10px 10px 50px !important;
+  border-radius: 20px;
+  background-color: transparent;
 }
 
 

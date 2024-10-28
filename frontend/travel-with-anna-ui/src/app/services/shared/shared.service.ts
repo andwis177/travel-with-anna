@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {LocalStorageService} from "../local-storage/local-storage.service";
 import {DayResponse} from "../models/day-response";
 import {TripResponse} from "../models/trip-response";
 import {ActivityResponse} from "../models/activity-response";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +27,12 @@ export class SharedService {
   private tripCurrency$ = this.tripCurrency.asObservable();
   private activity = new BehaviorSubject<ActivityResponse>({} as ActivityResponse);
   private activity$ = this.activity.asObservable();
+  private getDayTrigger = new Subject<void>();
+  public getDayTriggerEvent$ = this.getDayTrigger.asObservable();
+  private getActivityTrigger = new Subject<void>();
+  public getActivityTriggerEvent$ = this.getActivityTrigger.asObservable();
+
+
 
   private userNameKey: string = 'userName';
   private imageKey: string = 'image';
@@ -37,7 +43,7 @@ export class SharedService {
 
   clean(): void {
     this.localStorageService.clear();
-    this.userName.next('User Name');
+    this.userName.next(null);
     this.avatarImg.next(null);
   }
 
@@ -51,12 +57,8 @@ export class SharedService {
     return this.userName$;
   }
 
-  setUserAdminEditId(userAdminEditId: number | undefined): void {
-    if (userAdminEditId !== undefined) {
+  setUserAdminEditId(userAdminEditId: number | null): void {
       this.userAdminEditId.next(userAdminEditId);
-    } else {
-      this.userAdminEditId.next(null);
-    }
   }
 
   getUserAdminEditId(): Observable<number | null> {
@@ -122,6 +124,14 @@ export class SharedService {
 
   getActivity(): Observable<ActivityResponse> {
     return this.activity$;
+  }
+
+  triggerGetDays() {
+    this.getDayTrigger.next();
+  }
+
+  triggerGetActivity() {
+    this.getActivityTrigger.next();
   }
 }
 

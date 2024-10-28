@@ -1,0 +1,82 @@
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}
+
+.image-frame {
+  width: 4vw;
+  height: 3vw;
+  background-color: whitesmoke;
+  border: 1px solid goldenrod;
+  border-radius: 15px;
+  padding: 5px;
+  text-align: center !important;
+}
+
+.badge-name {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #1C252D;
+}
+
+.image-container {
+  width: 1.4vw;
+  height: 1.4vw;
+  object-fit: cover;
+  background-color: transparent;
+  cursor: default;
+  border: none  ;
+}
+
+.badge-expanses-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 40px 10px 30px;
+  background-color: #1C252D;
+}
+
+.amount-container {
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 2vw;
+}
+
+.amount-group {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  box-sizing: border-box;
+  color: whitesmoke;
+}
+
+.label-currency {
+  font-size: 10px;
+  padding: 5px;
+}
+
+.amount {
+  font-size: 12px;
+  font-weight: 450;
+  padding: 1px;
+  color: goldenrod;
+}
+
+.paid-to-much {
+  color: red;
+}
+
+.budget-badge-content{
+  flex-direction: column !important;
+  flex:4 !important;
+}
+
+.budget-badge-content:first-child{
+  flex:1 !important;
+}
+
+.budget-badge-content:nth-child(2){
+  padding-left: 2vw !important;
+  flex:3 !important;
+}
+

@@ -5,14 +5,18 @@
 
   <div class="label-padding">
     <i class="fas fa-circle-exclamation fa-fade fa-1x warning-icon"></i>
-    <p class="error-msg full-width text-size">You will delete day: </p>
-    <p class="error-msg full-width text-size bold-font">{{date}}</p>
+    <div *ngIf="isFirst">
+      <p class="error-msg full-width text-size">You will delete FIRST day! </p>
+    </div>
+    <div *ngIf="!isFirst">
+      <p class="error-msg full-width text-size">You will delete LAST day! </p>
+    </div>
   </div>
 
   <mat-card-content class="content">
     <form>
       <div>
-        <button class="custom-button-4 button-font" (click)="dayDelete()" type="submit">DELETE</button>
+        <button class="custom-button-4 button-font" (click)="deleteDay()" type="submit">DELETE</button>
       </div>
       <div>
         <button class="custom-button-0 button-font" (click)="onClose()" type="submit">Cancel</button>

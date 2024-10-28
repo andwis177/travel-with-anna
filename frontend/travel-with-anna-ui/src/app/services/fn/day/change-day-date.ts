@@ -6,14 +6,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { NoteRequest } from '../../models/note-request';
+import { DayRequest } from '../../models/day-request';
 
-export interface SaveNoteForTrip$Params {
-      body: NoteRequest
+export interface ChangeDayDate$Params {
+      body: DayRequest
 }
 
-export function saveNoteForTrip(http: HttpClient, rootUrl: string, params: SaveNoteForTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, saveNoteForTrip.PATH, 'post');
+export function changeDayDate(http: HttpClient, rootUrl: string, params: ChangeDayDate$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, changeDayDate.PATH, 'patch');
   if (params) {
     rb.body(params.body, 'application/json');
   }
@@ -28,4 +28,4 @@ export function saveNoteForTrip(http: HttpClient, rootUrl: string, params: SaveN
   );
 }
 
-saveNoteForTrip.PATH = '/note/trip/save';
+changeDayDate.PATH = '/day/change/date';

@@ -15,8 +15,7 @@ import {MatFormField} from "@angular/material/form-field";
 import {FormsModule} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {NoteRequest} from "../../../../../../services/models/note-request";
-import {SaveNoteForTrip$Params} from "../../../../../../services/fn/note/save-note-for-trip";
-import {SaveNoteForActivity$Params} from "../../../../../../services/fn/note/save-note-for-activity";
+import {SaveNote$Params} from "../../../../../../services/fn/note/save-note";
 
 @Component({
   selector: 'app-note',
@@ -44,116 +43,70 @@ import {SaveNoteForActivity$Params} from "../../../../../../services/fn/note/sav
 })
 export class NoteComponent implements OnInit {
   errorMsg: Array<string> = [];
-  id: number;
-  noteRequest: NoteRequest = {};
+  noteRequest: NoteRequest = {entityType: ""};
   noteResponse: NoteResponse = {};
-  relatedEntity: string = '';
 
   constructor(private noteService: NoteService,
               public dialog: MatDialog,
               private errorService: ErrorService,
-              @Inject(MAT_DIALOG_DATA) public data: {id: number, relatedTo: string}) {
-    this.id = data.id;
-    this.relatedEntity = data.relatedTo;
+              @Inject(MAT_DIALOG_DATA) public data: {
+                entityId: number,
+                entityType: string
+              }) {
+    this.noteRequest.entityId = data.entityId;
+    this.noteRequest.entityType = data.entityType;
   }
 
   ngOnInit() {
-    this.executeGetNote();
+    if (this.noteRequest.entityId && this.noteRequest.entityType) {
+      this.getNote();
+    }
   }
 
-  getNoteForTrip() {
-    this.noteService.getNoteByTripId({tripId: this.id}).subscribe({
-      next: (note) => {
-        this.setNote(note);
-      },
-      error: (err) => {
-        this.errorMsg = this.errorService.errorHandler(err);
-      }
-    });
+  getNote() {
+    console.log(this.noteRequest);
+    this.noteService.getNote({
+      entityId: this.noteRequest.entityId!,
+      entityType: this.noteRequest.entityType})
+      .subscribe({
+        next: (note) => {
+          this.noteResponse = note;
+        },
+        error: (err) => {
+          this.errorMsg = this.errorService.errorHandler(err);
+        }
+      });
   }
 
-  private getNoteForActivity() {
-    this.noteService.getNoteByActivityId({activityId: this.id}).subscribe({
-      next: (note) => {
-        this.setNote(note);
-      },
-      error: (err) => {
-        this.errorMsg = this.errorService.errorHandler(err);
-      }
-    });
-  }
-
-  private getNoteForDay() {
-
-  }
-
-  setNote(note: NoteResponse) {
-    this.noteResponse = note;
+  setNote() {
+    this.noteRequest.noteId = this.noteResponse.noteId;
     this.noteRequest.note = this.noteResponse.note;
-    this.noteRequest.entityId = this.id;
   }
 
   onClose() {
     this.dialog.getDialogById('note-dialog')?.close();
   }
 
-  saveNoteForTrip() {
+  closeAfterSave() {
+    this.dialog.getDialogById('note-dialog')?.close();
+  }
+
+  saveNote() {
     this.errorMsg = [];
-    const params: SaveNoteForTrip$Params = {body: this.noteRequest};
-    this.noteService.saveNoteForTrip(params).subscribe({ next: () => {
-        this.onClose();
-      },
-      error: (err) => {
-        this.errorMsg = this.errorService.errorHandler(err);
-      }
-    });
-  }
-
-  saveNoteForActivity() {
-    this.errorMsg = [];
-    const params: SaveNoteForActivity$Params = {body: this.noteRequest};
-    this.noteService.saveNoteForActivity(params).subscribe({ next: () => {
-        this.onClose();
-      },
-      error: (err) => {
-        this.errorMsg = this.errorService.errorHandler(err);
-      }
-    });
-  }
-
-  private saveNoteForDay() {
-
-  }
-
-  executeGetNote() {
-    switch (this.relatedEntity) {
-      case 'trip':
-        this.getNoteForTrip();
-        break;
-      case 'activity':
-        this.getNoteForActivity();
-        break;
-      case 'day':
-        this.getNoteForDay();
-        break;
-      default:
-        this.errorMsg = ['Invalid related entity'];
-    }
-  }
-
-  executeNoteSave() {
-    switch (this.relatedEntity) {
-      case 'trip':
-        this.saveNoteForTrip();
-        break;
-      case 'activity':
-        this.saveNoteForActivity();
-        break;
-      case 'day':
-        this.saveNoteForDay();
-        break;
-      default:
-        this.errorMsg = ['Invalid related entity'];
+    this.setNote();
+    console.log(this.data.entityId);
+    console.log(this.data.entityType);
+    if (this.noteRequest.entityId && this.noteRequest.entityType) {
+      console.log(this.noteRequest);
+      const params: SaveNote$Params = {body: this.noteRequest};
+      this.noteService.saveNote(params).subscribe({
+        next: () => {
+          this.closeAfterSave()
+        },
+        error: (err) => {
+          this.errorMsg = this.errorService.errorHandler(err);
+        }
+      });
     }
   }
 }

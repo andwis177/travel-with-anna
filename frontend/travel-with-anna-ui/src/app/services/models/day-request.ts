@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export interface DayRequest {
-  date: string;
-  tripId?: number;
+  date?: string;
+  entityId?: number;
 }

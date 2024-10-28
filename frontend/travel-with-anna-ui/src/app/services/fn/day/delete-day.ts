@@ -6,15 +6,16 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { DayAddDeleteRequest } from '../../models/day-add-delete-request';
 
 export interface DeleteDay$Params {
-  dayId: number;
+      body: DayAddDeleteRequest
 }
 
 export function deleteDay(http: HttpClient, rootUrl: string, params: DeleteDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, deleteDay.PATH, 'delete');
   if (params) {
-    rb.path('dayId', params.dayId, {});
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(
@@ -27,4 +28,4 @@ export function deleteDay(http: HttpClient, rootUrl: string, params: DeleteDay$P
   );
 }
 
-deleteDay.PATH = '/day/{dayId}';
+deleteDay.PATH = '/day';

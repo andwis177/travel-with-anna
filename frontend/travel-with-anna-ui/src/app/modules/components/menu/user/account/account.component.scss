@@ -1,15 +1,17 @@
 .dialog-container {
-  padding: 3% !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .image-button-container {
   display: flex;
   justify-content: center;
-  margin-top: 3% !important;
-  margin-bottom: 3% !important;
+  margin-top: 1% !important;
+  margin-bottom: 1% !important;
   width: 100% !important;
   align-items: center;
-  padding: 3% !important;
+  padding: 2% !important;
 }
 
 .profile-button{
@@ -85,7 +87,7 @@
 .button-area {
   justify-content: center !important;
   max-width: 100% !important;
-  margin: 3% !important;
+  margin: 1% !important;
 }
 
 .center-align{
@@ -98,5 +100,10 @@
   display: none;
 }
 
+.custom-button-2 {
+  background-color: lightgray !important;
+  border: #1C252D 1px solid;
+  border-radius: 10px;
+}
 
 

@@ -1,10 +1,13 @@
 package com.andwis.travel_with_anna.trip.budget;
 
+import com.andwis.travel_with_anna.trip.expanse.ExpanseTotalByBadge;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +32,12 @@ public class BudgetController {
     public ResponseEntity<BudgetExpensesRespond> getBudgetExpanses(@PathVariable("tripId") Long tripId, @PathVariable("budgetId") Long budgetId) {
         BudgetExpensesRespond budgetExpensesRespond = facade.getBudgetExpanses(tripId, budgetId);
         return ResponseEntity.ok(budgetExpensesRespond);
+    }
+
+    @GetMapping("/calculate/{tripId}")
+    public ResponseEntity<List<ExpanseTotalByBadge>> getExpansesByBadgeByTripId(@PathVariable("tripId") Long tripId) {
+        List<ExpanseTotalByBadge> expanseTotalByType = facade.getExpansesByBadgeByTripId(tripId);
+        return ResponseEntity.ok(expanseTotalByType);
     }
 
     @PatchMapping("/update")

@@ -1,7 +1,6 @@
 package com.andwis.travel_with_anna.trip.day;
 
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
-import com.andwis.travel_with_anna.trip.day.log.ActivityLog;
 import com.andwis.travel_with_anna.trip.note.Note;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import jakarta.persistence.*;
@@ -9,9 +8,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -38,13 +37,8 @@ public class Day {
     @JoinColumn(name = "trip_id")
     private Trip trip;
 
-    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ActivityLog> logId;
-
-
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Activity> activity;
+    private Set<Activity> activity;
 
     @Override
     public boolean equals(Object o) {
@@ -65,7 +59,7 @@ public class Day {
 
     public void addActivity(Activity activity) {
         if (this.activity == null) {
-            this.activity = new ArrayList<>();
+            this.activity = new HashSet<>();
         }
         this.activity.add(activity);
         activity.setDay(this);
@@ -74,5 +68,10 @@ public class Day {
     public void removeActivity(Activity activity) {
         this.activity.remove(activity);
         activity.setDay(null);
+    }
+
+    public void addNote (Note note) {
+        this.note = note;
+        note.setDay(this);
     }
 }

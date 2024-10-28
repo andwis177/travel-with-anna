@@ -11,10 +11,13 @@ import { StrictHttpResponse } from '../strict-http-response';
 
 import { BudgetExpensesRespond } from '../models/budget-expenses-respond';
 import { BudgetResponse } from '../models/budget-response';
+import { ExpanseTotalByBadge } from '../models/expanse-total-by-badge';
 import { getBudgetById } from '../fn/budget/get-budget-by-id';
 import { GetBudgetById$Params } from '../fn/budget/get-budget-by-id';
 import { getBudgetExpanses } from '../fn/budget/get-budget-expanses';
 import { GetBudgetExpanses$Params } from '../fn/budget/get-budget-expanses';
+import { getExpansesByBadgeByTripId } from '../fn/budget/get-expanses-by-badge-by-trip-id';
+import { GetExpansesByBadgeByTripId$Params } from '../fn/budget/get-expanses-by-badge-by-trip-id';
 import { saveBudget } from '../fn/budget/save-budget';
 import { SaveBudget$Params } from '../fn/budget/save-budget';
 import { updateBudget } from '../fn/budget/update-budget';
@@ -123,6 +126,31 @@ export class BudgetService extends BaseService {
   getBudgetExpanses(params: GetBudgetExpanses$Params, context?: HttpContext): Observable<BudgetExpensesRespond> {
     return this.getBudgetExpanses$Response(params, context).pipe(
       map((r: StrictHttpResponse<BudgetExpensesRespond>): BudgetExpensesRespond => r.body)
+    );
+  }
+
+  /** Path part for operation `getExpansesByBadgeByTripId()` */
+  static readonly GetExpansesByBadgeByTripIdPath = '/budget/calculate/{tripId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getExpansesByBadgeByTripId()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExpansesByBadgeByTripId$Response(params: GetExpansesByBadgeByTripId$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ExpanseTotalByBadge>>> {
+    return getExpansesByBadgeByTripId(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getExpansesByBadgeByTripId$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getExpansesByBadgeByTripId(params: GetExpansesByBadgeByTripId$Params, context?: HttpContext): Observable<Array<ExpanseTotalByBadge>> {
+    return this.getExpansesByBadgeByTripId$Response(params, context).pipe(
+      map((r: StrictHttpResponse<Array<ExpanseTotalByBadge>>): Array<ExpanseTotalByBadge> => r.body)
     );
   }
 

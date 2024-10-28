@@ -45,6 +45,9 @@ public class CountryClient {
     }
 
     public List<City> fetchAllCountryCities(String country) {
+        if (country == null || country.isBlank() || country.isEmpty()) {
+            return Collections.emptyList();
+        }
         try {
             CountryCitiesResponse response = restClient.get()
                     .uri(baseUrl + "/api/v0.1/countries/cities/q?country=" + country.toLowerCase())

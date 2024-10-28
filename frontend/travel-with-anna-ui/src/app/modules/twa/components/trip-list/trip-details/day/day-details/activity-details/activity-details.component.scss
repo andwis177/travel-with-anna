@@ -3,7 +3,7 @@
 }
 
 .travel {
-  background-color: #C8D5C8 !important;
+  background-color: #B7D5B0  !important;
 }
 
 .eat {
@@ -111,8 +111,8 @@
 }
 
 .image-container {
-  width: 2.0vw;
-  height: 2.0vw;
+  width: 2.5vw;
+  height: 2.5vw;
   object-fit: cover;
   background-color: transparent;
   cursor: default;
@@ -171,7 +171,6 @@
   justify-content: center;
   background: transparent;
   cursor: pointer;
-  color: #D46A6A !important;
 }
 
 .activities-container > div {
@@ -227,4 +226,10 @@
   color: black !important;
 }
 
+::ng-deep .mat-badge-content,
+::ng-deep .mat-badge-active {
+  background-color: goldenrod !important;
+  color: #1C252D !important;
+  border: 1px solid #1C252D;
+}
 

@@ -10,6 +10,7 @@ import {ExpanseComponent} from "../../../expanse/expanse.component";
 import {SharedService} from "../../../../../../../../services/shared/shared.service";
 import {ActivityEditComponent} from "../activity/activity-edit/activity-edit.component";
 import {ActivityDeleteComponent} from "./activity-delete/activity-delete.component";
+import {MatBadge} from "@angular/material/badge";
 
 @Component({
   selector: 'app-activity-details',
@@ -18,7 +19,8 @@ import {ActivityDeleteComponent} from "./activity-delete/activity-delete.compone
     NgClass,
     FormsModule,
     MatTooltip,
-    NgIf
+    NgIf,
+    MatBadge
   ],
   templateUrl: './activity-details.component.html',
   styleUrl: './activity-details.component.scss',
@@ -27,6 +29,7 @@ import {ActivityDeleteComponent} from "./activity-delete/activity-delete.compone
 export class ActivityDetailsComponent implements OnInit {
   @Input()_activity: ActivityResponse = {};
   tripId: number = -1;
+  isBadgeVisible: boolean = false;
   @Output() _afterActivityEditClosed: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(public dialog: MatDialog,
@@ -35,6 +38,9 @@ export class ActivityDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTrip();
+    if (this._activity) {
+      this.checkIfNoteExists();
+    }
   }
 
   getTrip(){
@@ -84,11 +90,12 @@ export class ActivityDetailsComponent implements OnInit {
       height: 'auto',
       id: 'note-dialog',
       data: {
-        id: this._activity.activityId!,
-        relatedTo: 'activity'
+        entityId: this._activity.activityId!,
+        entityType: 'activity'
       }
     });
     dialogRef.afterClosed().subscribe(() => {
+      this.sharedService.triggerGetActivity();
     });
   }
 
@@ -137,7 +144,7 @@ export class ActivityDetailsComponent implements OnInit {
       panelClass: 'custom-dialog-container',
       maxWidth: '50vw',
       maxHeight: '50vw',
-      width: '20vw',
+      width: '50vw',
       height: 'auto',
       id: 'activity-delete-dialog',
       data: {
@@ -159,6 +166,14 @@ export class ActivityDetailsComponent implements OnInit {
         return 'negative';
       default:
         return 'default-activity';
+    }
+  }
+
+  checkIfNoteExists() {
+    if (this._activity.note !== null) {
+      const noSpacesStr = this._activity.note?.note!.replace(/\s+/g, "");
+      if (noSpacesStr !== '' && noSpacesStr!.length > 0)
+        this.isBadgeVisible = true;
     }
   }
 }

@@ -6,6 +6,7 @@ export interface ActivityRequest {
   addressRequest?: AddressRequest;
   badge?: string;
   dateTime: string;
+  dayTag?: boolean;
   endTime?: string;
   status?: string;
   tripId: number;

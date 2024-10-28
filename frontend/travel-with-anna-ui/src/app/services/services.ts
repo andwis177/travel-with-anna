@@ -12,5 +12,4 @@ export { ItemService } from './services/item.service';
 export { BackpackService } from './services/backpack.service';
 export { AdminService } from './services/admin.service';
 export { RoleService } from './services/role.service';
-export { BadgeService } from './services/badge.service';
 export { CurrencyExchangeControllerService } from './services/currency-exchange-controller.service';

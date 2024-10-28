@@ -37,6 +37,9 @@ public class ExpanseService {
     }
 
     public Expanse findById(Long expanseId) {
+        if (expanseId == null) {
+            throw new ExpanseNotFoundException("Expanse not found");
+        }
         return expanseRepository.findById(expanseId).orElseThrow(() -> new ExpanseNotFoundException(
                 "Expanse not found"));
     }
@@ -90,6 +93,9 @@ public class ExpanseService {
     }
 
     public Expanse updateExpanse(@NotNull ExpanseRequest request) {
+        if (request.getExpanseId() == null) {
+            throw new ExpanseNotFoundException("Expanse not found");
+        }
         Expanse expanse = findById(request.getExpanseId());
         ExpanseMapper.mapToExpanse(expanse, request);
         save(expanse);
@@ -121,6 +127,10 @@ public class ExpanseService {
     }
 
     public BigDecimal getExchangeRate(String currencyFrom, String currencyTo) {
+        if (currencyFrom == null || currencyFrom.isEmpty() || currencyFrom.isBlank()
+                || currencyTo == null || currencyTo.isEmpty() || currencyTo.isBlank()) {
+            return BigDecimal.ONE;
+        }
         verifyCurrencyExchange();
         updateCurrencyExchange();
         BigDecimal exchangeRate = calculateExchangeRate(currencyFrom, currencyTo);

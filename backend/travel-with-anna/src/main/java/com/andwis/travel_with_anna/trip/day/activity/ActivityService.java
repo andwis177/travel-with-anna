@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDate;
@@ -84,7 +81,7 @@ public class ActivityService {
             throw new DateTimeException("Date and Time is required");
         }
 
-        Day day = dayService.findByTripIdAndDate(request.getTripId(),
+        Day day = dayService.getByTripIdAndDate(request.getTripId(),
                 toLocalDateTime(request.getDateTime()).toLocalDate());
 
         Activity activity = ActivityMapper.toActivity(request);
@@ -109,9 +106,9 @@ public class ActivityService {
         }
     }
 
-    private void updateActivityDate(Activity activity, String newDate) {
+    private void updateActivityDate(@NotNull Activity activity, String newDate) {
         Day oldDay = activity.getDay();
-        Day newDay = dayService.findByTripIdAndDate(
+        Day newDay = dayService.getByTripIdAndDate(
                 activity.getDay().getTrip().getTripId(),
                 toLocalDate(newDate));
         oldDay.removeActivity(activity);
@@ -119,7 +116,7 @@ public class ActivityService {
         dayService.saveAllDays(List.of(oldDay, newDay));
     }
 
-    private void updateAssociatedActivity(Activity activity, String newType) {
+    private void updateAssociatedActivity(@NotNull Activity activity, String newType) {
         try {
             Activity associatedActivity = findById(activity.getAssociatedId());
             associatedActivity.setType(newType);
@@ -130,12 +127,12 @@ public class ActivityService {
         }
     }
 
-    public List<Activity> getActivitiesByDayId(Long dayId) {
+    public Set<Activity> getActivitiesByDayId(Long dayId) {
         return activityRepository.findByDayDayIdOrderByBeginTimeAsc(dayId);
     }
 
     public ActivityDetailedResponse fetchActivitiesByDayId(Long dayId) {
-        List<Activity> activities = getActivitiesByDayId(dayId);
+        Set<Activity> activities = getActivitiesByDayId(dayId);
         List<ActivityResponse> activityResponses = ActivityMapper.toActivityResponseList(activities);
         AddressDetail addressDetail = buildAddressDetail(
                 getActivitiesCountriesFromDay(activityResponses),
@@ -209,7 +206,7 @@ public class ActivityService {
     }
 
     public AddressDetail fetchAddressDetailByDayId(Long dayId) {
-        List<Activity> activities = getActivitiesByDayId(dayId);
+        Set<Activity> activities = getActivitiesByDayId(dayId);
         List<ActivityResponse> activityResponses = ActivityMapper.toActivityResponseList(activities);
         return  buildAddressDetail(
                 getActivitiesCountriesFromDay(activityResponses),
@@ -221,7 +218,7 @@ public class ActivityService {
         List<DayResponse> days = dayService.getDays(tripId);
         List<ActivityResponse> activityResponses = new ArrayList<>();
         for (DayResponse day : days) {
-            List<Activity> activities = getActivitiesByDayId(day.dayId());
+            Set<Activity> activities = getActivitiesByDayId(day.dayId());
             activityResponses.addAll(ActivityMapper.toActivityResponseList(activities));
         }
         return  buildAddressDetail(
@@ -230,8 +227,12 @@ public class ActivityService {
         );
     }
 
-    public void deleteActivity(@NotNull Long activityId) {
+    public void deleteActivityById(@NotNull Long activityId) {
         Activity activity = findById(activityId);
+        deleteActivity(activity);
+    }
+
+    public void deleteActivity(@NotNull Activity activity) {
         Day day = activity.getDay();
 
         Optional<Activity> associatedActivity = findAssociatedActivity(activity.getAssociatedId());
@@ -254,18 +255,31 @@ public class ActivityService {
                 });
     }
 
-    private void deleteBothActivities(Activity activity, Day day, Activity associatedActivity) {
+    private void deleteBothActivities(Activity activity, @NotNull Day day, @NotNull Activity associatedActivity) {
+        Address address = activity.getAddress();
         Day associatedDay = associatedActivity.getDay();
         day.removeActivity(activity);
         associatedDay.removeActivity(associatedActivity);
 
         activityRepository.deleteAll(List.of(activity, associatedActivity));
+        deleteActivityAddress(address);
         dayService.saveAllDays(List.of(day, associatedDay));
     }
 
-    private void deleteSingleActivity(Activity activity, Day day) {
+    private void deleteSingleActivity(Activity activity, @NotNull Day day) {
+        Address address = activity.getAddress();
         day.removeActivity(activity);
         activityRepository.delete(activity);
+        deleteActivityAddress(address);
         dayService.saveDay(day);
+    }
+
+    private void deleteActivityAddress(Address address) {
+        int addressAssociationCount =
+                activityRepository.countActivitiesByAddress_AddressId(
+                        address.getAddressId());
+        if (addressAssociationCount < 2) {
+            addressService.delete(address);
+        }
     }
 }

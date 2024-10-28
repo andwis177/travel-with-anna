@@ -4,15 +4,12 @@ import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
-import com.andwis.travel_with_anna.trip.note.Note;
 import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Getter
 @Setter
@@ -36,7 +33,7 @@ public class Trip {
     private User owner;
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Day> days = new ArrayList<>();
+    private Set<Day> days = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "backpack_id")
@@ -47,11 +44,7 @@ public class Trip {
     private Budget budget;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Expanse> expanses;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "note_id")
-    private Note note;
+    private Set<Expanse> expanses = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -79,11 +72,6 @@ public class Trip {
     public void addBudget(Budget budget) {
         this.budget = budget;
         budget.setTrip(this);
-    }
-
-    public void addNote(Note note) {
-        this.note = note;
-        note.setTrip(this);
     }
 
     public void addDay(Day day) {
@@ -121,11 +109,15 @@ public class Trip {
         if (this.budget != null) {
             this.budget.setTrip(null);
         }
-        if (this.note != null) {
-            this.note.setTrip(null);
-        }
         if (this.owner != null) {
             this.owner.removeTrip(this);
         }
+    }
+
+    public List<Day> getDaysInOrder() {
+        List<Day> daysList = new ArrayList<>(days);
+        daysList.sort(Comparator.comparing(Day::getDate));
+        System.out.println(daysList);
+        return daysList;
     }
 }

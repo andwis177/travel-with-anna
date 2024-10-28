@@ -8,12 +8,12 @@ import { RequestBuilder } from '../../request-builder';
 
 import { NoteRequest } from '../../models/note-request';
 
-export interface SaveNoteForActivity$Params {
+export interface SaveNote$Params {
       body: NoteRequest
 }
 
-export function saveNoteForActivity(http: HttpClient, rootUrl: string, params: SaveNoteForActivity$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, saveNoteForActivity.PATH, 'post');
+export function saveNote(http: HttpClient, rootUrl: string, params: SaveNote$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  const rb = new RequestBuilder(rootUrl, saveNote.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/json');
   }
@@ -28,4 +28,4 @@ export function saveNoteForActivity(http: HttpClient, rootUrl: string, params: S
   );
 }
 
-saveNoteForActivity.PATH = '/note/activity/save';
+saveNote.PATH = '/note/save';

@@ -8,14 +8,16 @@ import { RequestBuilder } from '../../request-builder';
 
 import { NoteResponse } from '../../models/note-response';
 
-export interface GetNoteByActivityId$Params {
-  activityId: number;
+export interface GetNote$Params {
+  entityId: number;
+  entityType: string;
 }
 
-export function getNoteByActivityId(http: HttpClient, rootUrl: string, params: GetNoteByActivityId$Params, context?: HttpContext): Observable<StrictHttpResponse<NoteResponse>> {
-  const rb = new RequestBuilder(rootUrl, getNoteByActivityId.PATH, 'get');
+export function getNote(http: HttpClient, rootUrl: string, params: GetNote$Params, context?: HttpContext): Observable<StrictHttpResponse<NoteResponse>> {
+  const rb = new RequestBuilder(rootUrl, getNote.PATH, 'get');
   if (params) {
-    rb.path('activityId', params.activityId, {});
+    rb.query('entityId', params.entityId, {});
+    rb.query('entityType', params.entityType, {});
   }
 
   return http.request(
@@ -28,4 +30,4 @@ export function getNoteByActivityId(http: HttpClient, rootUrl: string, params: G
   );
 }
 
-getNoteByActivityId.PATH = '/note/activity/{activityId}';
+getNote.PATH = '/note';

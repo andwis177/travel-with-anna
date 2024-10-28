@@ -9,10 +9,10 @@
 
 <div class="dialog-container">
   <div>
-    <textarea class="text-area mat-elevation-z5" [(ngModel)]="noteRequest.note" rows="15" cols="70"></textarea>
+    <textarea class="text-area mat-elevation-z5" [(ngModel)]="noteResponse.note" rows="15" cols="70"></textarea>
 
     <div class="note-button-area ">
-      <button class="custom-button-0 " (click)="executeNoteSave()" type="submit">Save</button>
+      <button class="custom-button-0 " (click)="saveNote()" type="submit">Save</button>
       <button class="custom-button-1 " (click)="onClose()" type="submit">Cancel</button>
     </div>
 

@@ -1,0 +1,41 @@
+<mat-toolbar-row class="dialog-header">
+  <div class="dialog-title">Expanses by Badge</div>
+  <button mat-icon-button class="close-button"
+          (click)="onClose()"
+          (keydown.enter)="$event.preventDefault()">
+    <mat-icon class="close-icon">close</mat-icon>
+  </button>
+</mat-toolbar-row>
+
+<div class="badge-expanses-container" *ngFor="let badge of totalExpanses">
+
+  <div class="budget-badge-content">
+    <div class="image-frame">
+      <img src="../../../../../assets/images/activity/{{badge.type}}.png"
+           class="image-container"
+           alt="">
+      <div>
+        <a class="badge-name">{{badge.type?.toUpperCase()}}</a>
+      </div>
+    </div>
+  </div >
+
+  <div class="budget-badge-content">
+    <div class="amount-group">
+      <div style="flex-direction: row">
+        <label class="label-currency">PRICE:</label> <a class="amount"> {{formatAmount(badge.totalPriceInTripCurrency!)}}</a> <a class="label-currency"> {{currency}}</a>
+      </div>
+      <div style="flex-direction: row">
+        <label class="label-currency">PAID:</label> <a class="amount" [ngClass]="getPaidToMuchClass(badge)"> {{formatAmount(badge.totalPaidInTripCurrency!)}}</a> <a class="label-currency"> {{currency}}</a>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+      <mat-divider></mat-divider>
+      <p *ngFor="let msg of errorMsg">{{msg}}</p>
+    </div>
+  </div>
+
+</div>

@@ -22,6 +22,7 @@ import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {TripService} from "../../../../../../services/services/trip.service";
 import {UpdateTrip$Params} from "../../../../../../services/fn/trip/update-trip";
 import {ErrorService} from "../../../../../../services/error/error.service";
+import {SharedService} from "../../../../../../services/shared/shared.service";
 
 @Component({
   selector: 'app-edit-trip',
@@ -66,8 +67,13 @@ export class EditTripComponent {
   constructor(public dialog: MatDialog,
               private tripService: TripService,
               private errorService: ErrorService,
+              private sharedService: SharedService,
               private datePipe: DatePipe,
-              @Inject(MAT_DIALOG_DATA) public data: {tripId: number, tripName: string, startDate: Date, endDate: Date}) {
+              @Inject(MAT_DIALOG_DATA) public data: {
+                tripId: number,
+                tripName: string,
+                startDate: Date,
+                endDate: Date}) {
     this.tripId = data.tripId;
     this.tripName = data.tripName;
     this.startDate = data.startDate;
@@ -81,6 +87,7 @@ export class EditTripComponent {
     const params: UpdateTrip$Params = { body:{dayGeneratorRequest: {
           tripId: this.tripId, startDate: formattedStartDate, endDate: formattedEndDate}, tripName: this.tripName }};
     this.tripService.updateTrip(params).subscribe({next: () => {
+        this.sharedService.triggerGetDays();
         this.onClose();
       },
       error: (err) => {

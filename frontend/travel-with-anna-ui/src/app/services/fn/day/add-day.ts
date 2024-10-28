@@ -6,10 +6,10 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { DayAddRequest } from '../../models/day-add-request';
+import { DayAddDeleteRequest } from '../../models/day-add-delete-request';
 
 export interface AddDay$Params {
-      body: DayAddRequest
+      body: DayAddDeleteRequest
 }
 
 export function addDay(http: HttpClient, rootUrl: string, params: AddDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {

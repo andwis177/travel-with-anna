@@ -23,6 +23,7 @@ public class ActivityResponse implements Comparable<ActivityResponse> {
     private ExpanseResponse expanse;
     private Long associatedId;
     private AddressResponse address;
+    private boolean isDayTag;
 
     @Override
     public int compareTo(@NotNull ActivityResponse obj) {

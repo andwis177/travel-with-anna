@@ -9,6 +9,7 @@ export interface ActivityResponse {
   address?: AddressResponse;
   associatedId?: number;
   badge?: string;
+  dayTag?: boolean;
   endTime?: string;
   expanse?: ExpanseResponse;
   note?: NoteResponse;

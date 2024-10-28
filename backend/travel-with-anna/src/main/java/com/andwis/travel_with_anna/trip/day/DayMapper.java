@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 
+import static com.andwis.travel_with_anna.trip.note.NoteMapper.toNoteResponse;
+
 public class DayMapper {
     private static boolean isToday(@NotNull Day day) {
         return day.getDate().equals(LocalDate.now());
@@ -19,7 +21,7 @@ public class DayMapper {
                 day.getDate().getDayOfWeek().toString(),
                 isToday(day),
                 dayNumber,
-                day.getNote(),
+                day.getNote() != null ? toNoteResponse(day.getNote()) : null,
                 day.getTrip().getTripId(),
                 day.getActivity().stream().map(
                         ActivityMapper::toActivityResponse).toList()

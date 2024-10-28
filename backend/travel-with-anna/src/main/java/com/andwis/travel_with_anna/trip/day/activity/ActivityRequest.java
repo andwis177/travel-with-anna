@@ -25,4 +25,5 @@ public class ActivityRequest {
     @Size(max = 20, message = "Status should be 20 characters or less")
     private String status;
     private AddressRequest addressRequest;
+    private boolean isDayTag;
 }

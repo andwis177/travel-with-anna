@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.trip.day.activity;
 
 import com.andwis.travel_with_anna.address.AddressDetail;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,7 +11,7 @@ public class ActivityFacade {
 
     private final ActivityService service;
 
-    public void createAssociatedActivities(ActivityAssociatedRequest request) {
+    public void createAssociatedActivities(@NotNull ActivityAssociatedRequest request) {
         service.createAssociatedActivities(request.getFirstRequest(), request.getSecondRequest());
     }
 
@@ -35,6 +36,6 @@ public class ActivityFacade {
     }
 
     public void deleteActivityById(Long activityId) {
-        service.deleteActivity(activityId);
+        service.deleteActivityById(activityId);
     }
 }

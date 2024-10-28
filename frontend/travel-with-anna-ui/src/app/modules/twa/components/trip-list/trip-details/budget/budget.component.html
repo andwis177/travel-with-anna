@@ -87,8 +87,8 @@
           Price
         </th>
         <td mat-cell *matCellDef="let element" class="amount-currency-column">
-          {{element.price}}
-          <label style="font-size: 10px">{{element.currency}} </label>
+          {{formatAmount(element.price!)}}
+          <label style="font-size: 10px">{{element.currency!}} </label>
         </td>
       </ng-container>
 
@@ -97,7 +97,7 @@
           Paid
         </th>
         <td mat-cell *matCellDef="let element" class="amount-currency-column">
-          {{element.paid}}
+          {{formatAmount(element.paid!)}}
           <label style="font-size: 10px">{{element.currency}} </label>
         </td>
       </ng-container>
@@ -116,7 +116,7 @@
           Price
         </th>
         <td mat-cell *matCellDef="let element" class="trip-currency-column">
-          {{element.priceInTripCurrency}}
+          {{formatAmount(element.priceInTripCurrency!)}}
           <label style="font-size: 10px">{{budgetExpanse.budgetResponse!.currency}} </label>
         </td>
       </ng-container>
@@ -126,7 +126,7 @@
           Paid
         </th>
         <td mat-cell *matCellDef="let element" class="trip-currency-column">
-          {{element.paidInTripCurrency}}
+          {{formatAmount(element.paidInTripCurrency!)}}
           <label style="font-size: 10px">{{budgetExpanse.budgetResponse!.currency}} </label>
         </td>
       </ng-container>

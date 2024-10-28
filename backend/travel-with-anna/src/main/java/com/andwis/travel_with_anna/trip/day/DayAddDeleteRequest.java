@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class DayAddRequest {
+public class DayAddDeleteRequest {
     private Long tripId;
     private boolean isFirst;
 }

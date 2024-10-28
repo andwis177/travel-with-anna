@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import { ActivityResponse } from '../models/activity-response';
-import { Note } from '../models/note';
+import { NoteResponse } from '../models/note-response';
 export interface DayResponse {
   activity?: Array<ActivityResponse>;
   date?: string;
@@ -9,6 +9,6 @@ export interface DayResponse {
   dayNumber?: number;
   dayOfWeek?: string;
   isToday?: boolean;
-  note?: Note;
+  note?: NoteResponse;
   tripId?: number;
 }

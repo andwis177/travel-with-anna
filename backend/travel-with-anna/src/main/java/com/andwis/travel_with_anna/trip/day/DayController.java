@@ -15,14 +15,8 @@ import java.util.List;
 public class DayController {
     private final DayFacade facade;
 
-    @PostMapping("/create")
-    public ResponseEntity<Void> createDay(@RequestBody @Valid DayRequest request) {
-        facade.createDay(request);
-        return ResponseEntity.accepted().build();
-    }
-
     @PostMapping("/add")
-    public ResponseEntity<Void> addDay(@RequestBody DayAddRequest request) {
+    public ResponseEntity<Void> addDay(@RequestBody DayAddDeleteRequest request) {
         facade.addDay(request);
         return ResponseEntity.accepted().build();
     }
@@ -45,9 +39,15 @@ public class DayController {
         return ResponseEntity.accepted().build();
     }
 
-    @DeleteMapping("/{dayId}")
-    public ResponseEntity<Void> deleteDay(@PathVariable("dayId") Long dayId) {
-        facade.deleteDay(dayId);
+    @PatchMapping("/change/date")
+    public ResponseEntity<Void> changeDayDate(@RequestBody @Valid DayRequest request) {
+        facade.changeDayDate(request);
+        return ResponseEntity.accepted().build();
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<Void> deleteDay(@RequestBody @Valid DayAddDeleteRequest request) {
+        facade.deleteDay(request);
         return ResponseEntity.noContent().build();
     }
 }

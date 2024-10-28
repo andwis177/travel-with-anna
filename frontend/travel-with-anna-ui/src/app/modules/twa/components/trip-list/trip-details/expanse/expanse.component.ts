@@ -154,20 +154,25 @@ export class ExpanseComponent implements OnInit {
   }
 
   getExchangeRate() {
-    const params : GetExchangeRate$Params = {
-      currencyFrom: this.expanseRequest.currency!,
-      currencyTo: this.tripCurrency!
-    };
-    this.expanseService.getExchangeRate(params)
-      .subscribe({
-        next: (rate) => {
-          this.expanseRequest.exchangeRate = rate;
-          this.calculateTripValue();
-        },
-        error: (err) => {
-          this.errorMsg = this.errorService.errorHandler(err);
-        }
-      });
+    if (this.expanseRequest.currency === null || this.expanseRequest.currency.length === 0) {
+      this.expanseRequest.currency = this.tripCurrency;
+    }
+    if (this.expanseRequest.currency !== null && this.expanseRequest.currency.length > 0) {
+      const params: GetExchangeRate$Params = {
+        currencyFrom: this.expanseRequest.currency!,
+        currencyTo: this.tripCurrency!
+      };
+      this.expanseService.getExchangeRate(params)
+        .subscribe({
+          next: (rate) => {
+            this.expanseRequest.exchangeRate = rate;
+            this.calculateTripValue();
+          },
+          error: (err) => {
+            this.errorMsg = this.errorService.errorHandler(err);
+          }
+        });
+    }
   }
 
   setAsPaid() {

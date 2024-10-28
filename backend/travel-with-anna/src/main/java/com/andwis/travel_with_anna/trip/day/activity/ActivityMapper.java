@@ -6,6 +6,7 @@ import com.andwis.travel_with_anna.trip.note.NoteMapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDateTime;
 import static com.andwis.travel_with_anna.utility.DateTimeMapper.toTime;
@@ -22,6 +23,7 @@ public class ActivityMapper {
                 .type(activity.getType())
                 .status(activity.getStatus())
                 .associatedId(activity.getAssociatedId())
+                .isDayTag(activity.isDayTag())
                 .build();
         if (activity.getNote() != null) {
             response.setNote(NoteMapper.toNoteResponse(activity.getNote()));
@@ -42,6 +44,7 @@ public class ActivityMapper {
                 .type(request.getType())
                 .status(request.getStatus())
                 .activityTitle(request.getActivityTitle())
+                .isDayTag(request.isDayTag())
                 .build();
 
         if (request.getEndTime() != null && !request.getEndTime().isEmpty()) {
@@ -50,7 +53,7 @@ public class ActivityMapper {
         return activity;
     }
 
-    public static List<ActivityResponse> toActivityResponseList(List<Activity> activities) {
+    public static List<ActivityResponse> toActivityResponseList(Set<Activity> activities) {
         return activities.stream().map(ActivityMapper::toActivityResponse).toList();
     }
 
@@ -58,6 +61,7 @@ public class ActivityMapper {
         activity.setActivityTitle(request.getActivityTitle());
         activity.setBeginTime(toTime(request.getStartTime()));
         activity.setType(request.getType());
+        activity.setDayTag(request.isDayTag());
 
         if (request.getEndTime() != null) {
             activity.setEndTime(toTime(request.getEndTime()));

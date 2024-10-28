@@ -1,11 +1,18 @@
 <mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">{{badge}}</div>
-  <div class="dialog-title" style="margin-right: 80px">{{startDate}}</div>
-  <button mat-icon-button class="close-button"
-          (click)="onClose()"
-          (keydown.enter)="$event.preventDefault()">
-    <mat-icon class="close-icon">close</mat-icon>
-  </button>
+  <div class="full-width" style="display: flex; flex-direction: row; justify-content: space-between !important; align-items: center;">
+
+    <div class="dialog-title">Edit
+      <mat-label class="dialog-title"> | Tag:
+        <mat-checkbox [(ngModel)]="firstActivity.dayTag"
+                      name="dayTag"
+        ></mat-checkbox> </mat-label>
+    </div>
+    <button mat-icon-button class="close-button"
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="close-icon">close</mat-icon>
+    </button>
+  </div>
 </mat-toolbar-row>
 
 <mat-card-content class="dialog-container">
@@ -16,7 +23,7 @@
         <input type="text"
                matInput
                class="insert insert-width"
-               [(ngModel)]="start.activityTitle"
+               [(ngModel)]="firstActivity.activityTitle"
                [ngModelOptions]="{standalone: true}"
                placeholder=""
                autocomplete="description"

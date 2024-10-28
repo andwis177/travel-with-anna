@@ -51,7 +51,10 @@ export class TripDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.receiveTrip();
+    this.getTrip();
+    this.sharedService.getDayTriggerEvent$.subscribe(() => {
+      this.getDays(this.tripId);
+    });
   }
 
   grabTripId(): number {
@@ -65,7 +68,7 @@ export class TripDetailsComponent implements OnInit {
     return -1;
   }
 
-  receiveTrip(): void {
+  getTrip(): void {
     const param: GetTripById$Params = {tripId: this.tripId};
     this.tripService.getTripById(param).subscribe({
       next: (trip) => {

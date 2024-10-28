@@ -1,11 +1,19 @@
 <mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">Edit {{ activity.badge?.toUpperCase() }}</div>
-  <div class="dialog-title" style="margin-right: 80px">{{ day.date }}</div>
-  <button mat-icon-button class="close-button"
-          (click)="onClose()"
-          (keydown.enter)="$event.preventDefault()">
-    <mat-icon class="close-icon">close</mat-icon>
-  </button>
+  <div class="full-width activity-edit-toolbar">
+
+    <div class="dialog-title">Edit {{ activity.badge?.toUpperCase() }}
+      <div class="dialog-title"> | {{ day.date }}</div>
+      <mat-label class="dialog-title"> | Tag:
+        <mat-checkbox [(ngModel)]="activityUpdateRequest.dayTag"
+                      name="dayTag"
+        ></mat-checkbox> </mat-label>
+    </div>
+    <button mat-icon-button class="close-button"
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="close-icon">close</mat-icon>
+    </button>
+  </div>
 </mat-toolbar-row>
 
 <mat-card-content class="dialog-container">

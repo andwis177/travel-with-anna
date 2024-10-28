@@ -6,9 +6,6 @@
   <button class="user-button margin" (click)="openBudget($event)" matTooltip="Budget">
     <img src="../../../../../assets/images/budget.png" class="user-button-image" alt="">
   </button>
-  <button class="user-button margin" (click)="openNote($event)" matTooltip="Note">
-    <img src="../../../../../assets/images/notes.png" class="user-button-image" alt="">
-  </button>
 
   <button class="user-button margin" (click)="editTrip($event)" matTooltip="Edit Trip">
     <img src="../../../../../assets/images/edit.png" class="user-button-image" alt="">
@@ -17,21 +14,36 @@
   <button class="delete-button margin" (click)="deleteTrip($event)" matTooltip="Delete Trip">
     <img src="../../../../../assets/images/delete.png" class="delete-button-image" style="opacity: 0.7" alt="">
   </button>
+  <div class="add-delete-container">
+    <div class="item">
+      <button class="add-delete-button margin add-day-buttons" (click)="addDay(true, $event)" matTooltip="Add FIRST Day">
+        <mat-icon class="add-delete-buttons add-color">keyboard_double_arrow_left</mat-icon>
+      </button>
 
-  <div class="item">
-    <button class="add-delete-button margin fas fa-plus-square plus-team" (click)="addLastDay($event)" matTooltip="Add First Day">
-    </button>
+      <button class="add-delete-button margin delete-day-buttons" (click)="deleteDay(true, $event)" matTooltip="Delete FIRST Day">
+        <mat-icon class="add-delete-buttons delete-color">keyboard_double_arrow_left</mat-icon>
+      </button>
+    </div>
 
-    <button class="add-delete-button margin fas fa-minus-square minus-team" (click)="addFirstDay($event)" matTooltip="Delete First Day">
-    </button>
-  </div>
+    <div class="item">
+      <a class="add-delete-description margin">
+        +
+      </a>
 
-  <div class="item">
-    <button class="add-delete-button margin fas fa-plus-square plus-team" (click)="addFirstDay($event)" matTooltip="Add Last Day">
-    </button>
+      <a class="add-delete-description margin ">
+        -
+      </a>
+    </div>
 
-    <button class="add-delete-button margin fas fa-minus-square minus-team" (click)="addFirstDay($event)" matTooltip="Delete Last Day">
-    </button>
+    <div class="item">
+      <button class="add-delete-button margin add-day-buttons" (click)="addDay(false, $event)" matTooltip="Add LAST Day">
+        <mat-icon class="add-delete-buttons add-color">keyboard_double_arrow_right</mat-icon>
+      </button>
+
+      <button class="add-delete-button margin delete-day-buttons " (click)="deleteDay(false, $event)" matTooltip="Delete LAST Day">
+        <mat-icon class="add-delete-buttons delete-color">keyboard_double_arrow_right</mat-icon>
+      </button>
+    </div>
   </div>
 </form>
 

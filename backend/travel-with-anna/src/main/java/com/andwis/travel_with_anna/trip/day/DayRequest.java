@@ -12,8 +12,6 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class DayRequest {
-    private Long tripId;
-    @NotNull(message = "Date is required")
-    @NotEmpty(message = "Date is required")
+    private Long entityId;
     private LocalDate date;
 }

@@ -11,8 +11,8 @@ import { StrictHttpResponse } from '../strict-http-response';
 
 import { addDay } from '../fn/day/add-day';
 import { AddDay$Params } from '../fn/day/add-day';
-import { createDay } from '../fn/day/create-day';
-import { CreateDay$Params } from '../fn/day/create-day';
+import { changeDayDate } from '../fn/day/change-day-date';
+import { ChangeDayDate$Params } from '../fn/day/change-day-date';
 import { DayResponse } from '../models/day-response';
 import { deleteDay } from '../fn/day/delete-day';
 import { DeleteDay$Params } from '../fn/day/delete-day';
@@ -54,31 +54,6 @@ export class DayService extends BaseService {
     );
   }
 
-  /** Path part for operation `createDay()` */
-  static readonly CreateDayPath = '/day/create';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `createDay()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  createDay$Response(params: CreateDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return createDay(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `createDay$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  createDay(params: CreateDay$Params, context?: HttpContext): Observable<void> {
-    return this.createDay$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
-  }
-
   /** Path part for operation `addDay()` */
   static readonly AddDayPath = '/day/add';
 
@@ -100,6 +75,31 @@ export class DayService extends BaseService {
    */
   addDay(params: AddDay$Params, context?: HttpContext): Observable<void> {
     return this.addDay$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `changeDayDate()` */
+  static readonly ChangeDayDatePath = '/day/change/date';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `changeDayDate()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  changeDayDate$Response(params: ChangeDayDate$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return changeDayDate(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `changeDayDate$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  changeDayDate(params: ChangeDayDate$Params, context?: HttpContext): Observable<void> {
+    return this.changeDayDate$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
@@ -155,13 +155,13 @@ export class DayService extends BaseService {
   }
 
   /** Path part for operation `deleteDay()` */
-  static readonly DeleteDayPath = '/day/{dayId}';
+  static readonly DeleteDayPath = '/day';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `deleteDay()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
   deleteDay$Response(params: DeleteDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     return deleteDay(this.http, this.rootUrl, params, context);
@@ -171,7 +171,7 @@ export class DayService extends BaseService {
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `deleteDay$Response()` instead.
    *
-   * This method doesn't expect any request body.
+   * This method sends `application/json` and handles request body of type `application/json`.
    */
   deleteDay(params: DeleteDay$Params, context?: HttpContext): Observable<void> {
     return this.deleteDay$Response(params, context).pipe(

@@ -74,12 +74,15 @@ export class DayDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getActivities();
-    this.getTripCurrency()
+    this.getTripCurrency();
+    this.sharedService.getActivityTriggerEvent$.subscribe(()=> {
+      this.getActivities()
+    })
   }
 
   formatAmount(amount: number): string {
     return new Intl.NumberFormat('en-IN', {
-      style: 'decimal',  // No currency styling
+      style: 'decimal',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount)
@@ -128,7 +131,7 @@ export class DayDetailsComponent implements OnInit {
   }
 
   getToPayClass(firstAmount: number, secondAmount: number): string {
-    switch (firstAmount > secondAmount) {
+    switch (firstAmount >= secondAmount) {
       case false:
         return 'negative';
       default:

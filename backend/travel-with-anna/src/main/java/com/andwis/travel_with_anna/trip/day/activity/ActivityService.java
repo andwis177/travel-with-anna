@@ -16,11 +16,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDate;
 import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDateTime;
@@ -33,11 +38,12 @@ public class ActivityService {
     private final DayService dayService;
     private final AddressService addressService;
 
-    public Activity findById(Long activityId) {
+    public Activity getById(Long activityId) {
         return activityRepository.findById(activityId)
                 .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
     }
 
+    @Transactional
     public void createSingleActivity(ActivityRequest request) {
         Address address;
         Activity activity = createActivity(request);
@@ -49,17 +55,17 @@ public class ActivityService {
         }
         activityRepository.save(activity);
     }
+    @Transactional
+    public void createAssociatedActivities(@NotNull ActivityAssociatedRequest request) {
+        Activity firstActivity = createActivity(request.getFirstRequest());
+        Activity secondActivity = createActivity(request.getSecondRequest());
 
-    public void createAssociatedActivities(ActivityRequest firstRequest, ActivityRequest secondRequest) {
-        Address address;
-        Activity firstActivity = createActivity(firstRequest);
-        Activity secondActivity = createActivity(secondRequest);
-
-        if (firstRequest.getAddressRequest() != null) {
-            address = AddressMapper.toAddress(firstRequest.getAddressRequest());
-            addressService.save(address);
-            address.addActivity(firstActivity);
-            address.addActivity(secondActivity);
+        if (request.isAddressSeparated()) {
+            setActivityAddress(request.getFirstRequest(), firstActivity);
+            setActivityAddress(request.getSecondRequest(), secondActivity);
+        } else {
+            setActivityAddress(request.getFirstRequest(), firstActivity);
+            secondActivity.addAddress(firstActivity.getAddress());
         }
 
         List<Activity> activities = List.of(
@@ -70,9 +76,18 @@ public class ActivityService {
         secondActivity.setAssociatedId(firstActivity.getActivityId());
 
         activityRepository.saveAll(activities);
-
     }
 
+    private void setActivityAddress(@NotNull ActivityRequest request, Activity activity) {
+        Address address;
+        if (request.getAddressRequest() != null) {
+            address = AddressMapper.toAddress(request.getAddressRequest());
+            addressService.save(address);
+            activity.setAddress(address);
+        }
+    }
+
+    @Transactional
     public Activity createActivity(@NotNull ActivityRequest request) {
         if (request.getTripId() == null) {
             throw new TripNotFoundException("Trip ID is required");
@@ -90,36 +105,41 @@ public class ActivityService {
 
         return activity;
     }
-
-    public void updateActivity(@NotNull ActivityUpdateRequest request) {
-        Activity activity = findById(request.getActivityId());
+    @Transactional
+    public String updateActivity(@NotNull ActivityUpdateRequest request) {
+        Activity activity = getById(request.getActivityId());
         ActivityMapper.updateActivity(activity, request);
 
         if (!toLocalDate(request.getOldDate()).equals(toLocalDate(request.getNewDate()))) {
             updateActivityDate(activity, request.getNewDate());
+            return "Activity date updated";
         }
 
         if (activity.getAssociatedId() != null) {
-            updateAssociatedActivity(activity, request.getType());
+            updateAssociatedActivity(activity);
+            return "Associated activity updated";
         } else {
             activityRepository.save(activity);
+            return "Activity updated";
         }
     }
 
-    private void updateActivityDate(@NotNull Activity activity, String newDate) {
+    @Transactional
+    protected void updateActivityDate(@NotNull Activity activity, String newDate) {
         Day oldDay = activity.getDay();
         Day newDay = dayService.getByTripIdAndDate(
                 activity.getDay().getTrip().getTripId(),
                 toLocalDate(newDate));
-        oldDay.removeActivity(activity);
+        oldDay.removeActivities(Set.of(activity));
         newDay.addActivity(activity);
-        dayService.saveAllDays(List.of(oldDay, newDay));
+        dayService.saveAllDays(Set.of(oldDay, newDay));
     }
 
-    private void updateAssociatedActivity(@NotNull Activity activity, String newType) {
+    @Transactional
+    protected void updateAssociatedActivity(@NotNull Activity activity) {
         try {
-            Activity associatedActivity = findById(activity.getAssociatedId());
-            associatedActivity.setType(newType);
+            Activity associatedActivity = getById(activity.getAssociatedId());
+            associatedActivity.setType(activity.getType());
             activityRepository.saveAll(List.of(activity, associatedActivity));
         } catch (ActivityNotFoundException _) {
             activityRepository.save(activity);
@@ -208,7 +228,7 @@ public class ActivityService {
     public AddressDetail fetchAddressDetailByDayId(Long dayId) {
         Set<Activity> activities = getActivitiesByDayId(dayId);
         List<ActivityResponse> activityResponses = ActivityMapper.toActivityResponseList(activities);
-        return  buildAddressDetail(
+        return buildAddressDetail(
                 getActivitiesCountriesFromDay(activityResponses),
                 getActivitiesCitiesFromDay(activityResponses)
         );
@@ -221,65 +241,42 @@ public class ActivityService {
             Set<Activity> activities = getActivitiesByDayId(day.dayId());
             activityResponses.addAll(ActivityMapper.toActivityResponseList(activities));
         }
-        return  buildAddressDetail(
+        return buildAddressDetail(
                 getActivitiesCountriesFromDay(activityResponses),
                 getActivitiesCitiesFromDay(activityResponses)
         );
     }
 
+    @Transactional
     public void deleteActivityById(@NotNull Long activityId) {
-        Activity activity = findById(activityId);
-        deleteActivity(activity);
+        Activity activity = getById(activityId);
+        deleteActivities(Set.of(activity));
     }
 
-    public void deleteActivity(@NotNull Activity activity) {
-        Day day = activity.getDay();
+    @Transactional
+    protected void deleteActivities(@NotNull Set<Activity> activities) {
+        Set<Long> activityIds = activities.stream()
+                .map(Activity::getActivityId)
+                .collect(Collectors.toSet());
 
-        Optional<Activity> associatedActivity = findAssociatedActivity(activity.getAssociatedId());
+        Set<Long> associatedIds = activities.stream()
+                .map(Activity::getAssociatedId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
-        associatedActivity.ifPresentOrElse(
-                assocActivity -> deleteBothActivities(activity, day, assocActivity),
-                () -> deleteSingleActivity(activity, day)
-        );
+        activityIds.addAll(associatedIds);
+
+        Set<Activity> allActivities = activityRepository.findAllByActivityIdIn(activityIds);
+        Set<Long> allAddressIds = allActivities.stream()
+                .map(activity -> activity.getAddress().getAddressId())
+                .collect(Collectors.toSet());
+        activityRepository.deleteAll(allActivities);
+        addressService.deleteAllByAddressIdIn(allAddressIds);
     }
 
-    private Optional<Activity> findAssociatedActivity(Long associatedId) {
-        return Optional.ofNullable(associatedId)
-                .map(id -> {
-                    try {
-                        return findById(id);
-                    } catch (ActivityNotFoundException e) {
-                        log.error("Associated activity not found");
-                        return null;
-                    }
-                });
-    }
-
-    private void deleteBothActivities(Activity activity, @NotNull Day day, @NotNull Activity associatedActivity) {
-        Address address = activity.getAddress();
-        Day associatedDay = associatedActivity.getDay();
-        day.removeActivity(activity);
-        associatedDay.removeActivity(associatedActivity);
-
-        activityRepository.deleteAll(List.of(activity, associatedActivity));
-        deleteActivityAddress(address);
-        dayService.saveAllDays(List.of(day, associatedDay));
-    }
-
-    private void deleteSingleActivity(Activity activity, @NotNull Day day) {
-        Address address = activity.getAddress();
-        day.removeActivity(activity);
-        activityRepository.delete(activity);
-        deleteActivityAddress(address);
-        dayService.saveDay(day);
-    }
-
-    private void deleteActivityAddress(Address address) {
-        int addressAssociationCount =
-                activityRepository.countActivitiesByAddress_AddressId(
-                        address.getAddressId());
-        if (addressAssociationCount < 2) {
-            addressService.delete(address);
-        }
+    @Transactional
+    public void deleteDayActivities(@NotNull Day day) {
+        Set<Activity> activities = day.getActivities();
+        deleteActivities(activities);
     }
 }

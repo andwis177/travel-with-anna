@@ -1,8 +1,12 @@
 package com.andwis.travel_with_anna.trip.trip;
 
+import com.andwis.travel_with_anna.address.Address;
+import com.andwis.travel_with_anna.address.AddressService;
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.budget.Budget;
+import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayService;
+import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserService;
 import com.andwis.travel_with_anna.utility.PageResponse;
@@ -19,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +33,9 @@ public class TripMgr {
     private final TripService tripService;
     private final UserService userService;
     private final DayService dayService;
+    private final AddressService addressService;
 
+    @Transactional
     public Long createTrip(@NotNull @Valid TripCreatorRequest request, Authentication connectedUser) {
         User user = userService.getConnectedUser(connectedUser);
 
@@ -45,8 +53,8 @@ public class TripMgr {
 
         trip.addBackpack(backpack);
         trip.addBudget(budget);
-
         user.addTrip(trip);
+
         return tripService.saveTrip(trip);
     }
 
@@ -71,14 +79,23 @@ public class TripMgr {
         return TripMapper.toTripResponse(tripService.getTripById(tripId));
     }
 
+    @Transactional
     public void deleteTrip(@NotNull TripRequest request, Authentication connectedUser) {
         User adminUser = userService.getConnectedUser(connectedUser);
         userService.verifyPassword(adminUser, request.password());
         Trip trip = tripService.getTripById(request.tripId());
         trip.removeTripAssociations();
-        tripService.deleteById(request.tripId());
+        tripService.delete(trip);
+        addressService.deleteAllByAddressIdIn(getAllTripAddresses(trip));
     }
 
+    private Set<Long> getAllTripAddresses(@NotNull Trip trip) {
+        Set<Day> days = trip.getDays();
+        Set<Activity> activities = days.stream().map(Day::getActivities).flatMap(Set::stream).collect(Collectors.toSet());
+        return activities.stream().map(Activity::getAddress).map(Address::getAddressId).collect(Collectors.toSet());
+    }
+
+    @Transactional
     public void updateTrip(@NotNull TripEditRequest request) {
         Trip trip = tripService.getTripById(request.getDayGeneratorRequest().getTripId());
         LocalDate startDate = request.getDayGeneratorRequest().getStartDate();

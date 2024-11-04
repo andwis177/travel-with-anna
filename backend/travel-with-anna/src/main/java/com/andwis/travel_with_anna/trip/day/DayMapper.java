@@ -23,7 +23,7 @@ public class DayMapper {
                 dayNumber,
                 day.getNote() != null ? toNoteResponse(day.getNote()) : null,
                 day.getTrip().getTripId(),
-                day.getActivity().stream().map(
+                day.getActivities().stream().map(
                         ActivityMapper::toActivityResponse).toList()
         );
     }

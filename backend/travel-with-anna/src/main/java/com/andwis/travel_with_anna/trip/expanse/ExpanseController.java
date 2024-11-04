@@ -36,9 +36,9 @@ public class ExpanseController {
     }
 
     @GetMapping("/exchange")
-    public ResponseEntity<BigDecimal> getExchangeRate(@RequestParam String currencyFrom, @RequestParam String currencyTo) {
-        BigDecimal exchangeRate = facade.getExchangeRate(currencyFrom, currencyTo);
-        return ResponseEntity.ok(exchangeRate);
+    public ResponseEntity<ExchangeResponse> getExchangeRate(@RequestParam String currencyFrom, @RequestParam String currencyTo) {
+        ExchangeResponse exchangeResponse = facade.getExchangeRate(currencyFrom, currencyTo);
+        return ResponseEntity.ok(exchangeResponse);
     }
 
     @GetMapping("/trip-currency-values")

@@ -5,6 +5,7 @@ import com.andwis.travel_with_anna.user.User;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class AvatarService {
         return avatar;
     }
 
+    @Transactional
     public void deleteAvatar(@NotNull User user) {
         if (user.getAvatarId() != null) {
             avatarRepository.deleteById(user.getAvatarId());

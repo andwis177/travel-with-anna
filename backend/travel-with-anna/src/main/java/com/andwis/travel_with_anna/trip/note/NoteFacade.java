@@ -5,7 +5,6 @@ import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
-import com.andwis.travel_with_anna.trip.trip.TripService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class NoteFacade {
     public final NoteService noteService;
-    private final TripService tripService;
     private final DayService dayService;
     private final ActivityService activityService;
 
@@ -53,11 +51,11 @@ public class NoteFacade {
     }
 
     private void saveNoteForDay(NoteRequest noteRequest) {
-        noteService.saveNote(noteRequest, dayService::getById, Day::getNote, Day::addNote);
+        noteService.saveNote(noteRequest, dayService::getById, Day::getNote, Day::addNote, Day::removeNote);
     }
 
     private void saveNoteForActivity(NoteRequest noteRequest) {
-        noteService.saveNote(noteRequest, activityService::findById, Activity::getNote, Activity::addNote);
+        noteService.saveNote(noteRequest, activityService::getById, Activity::getNote, Activity::addNote, Activity::removeNote);
     }
 
     private NoteResponse getNoteByDayId(Long dayId) {
@@ -65,6 +63,6 @@ public class NoteFacade {
     }
 
     private NoteResponse getNoteByActivityId(Long activityId) {
-        return noteService.getNoteById(activityId, activityService::findById, Activity::getNote);
+        return noteService.getNoteById(activityId, activityService::getById, Activity::getNote);
     }
 }

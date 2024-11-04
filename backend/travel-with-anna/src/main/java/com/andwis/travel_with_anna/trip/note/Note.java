@@ -5,6 +5,7 @@ import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -45,5 +46,15 @@ public class Note {
     @Override
     public int hashCode() {
         return Objects.hash(noteId, note);
+    }
+
+    public void removeActivity() {
+        this.activity = null;
+    }
+
+    public void removeDay(@NotNull Day day) {
+        if (day.getNote() == this) {
+            day.setNote(null);
+        }
     }
 }

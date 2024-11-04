@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.user;
 
+import com.andwis.travel_with_anna.address.AddressService;
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
 import com.andwis.travel_with_anna.handler.exception.EmailNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.UserExistsException;
@@ -8,6 +9,9 @@ import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.security.JwtService;
+import com.andwis.travel_with_anna.trip.day.Day;
+import com.andwis.travel_with_anna.trip.day.DayService;
+import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +26,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +43,8 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final AvatarService avatarService;
+    private final AddressService addressService;
+    private final DayService dayService;
 
     public Long saveUser(User user) {
         return userRepository.save(user).getUserId();
@@ -93,6 +103,7 @@ public class UserService {
         );
     }
 
+    @Transactional
     public AuthenticationResponse updateUserExecution(@NotNull UserCredentialsRequest userCredentials, Authentication connectedUser) {
         var user = getSecurityUser(connectedUser).getUser();
         verifyPassword(user, userCredentials.getPassword());
@@ -106,7 +117,6 @@ public class UserService {
                 .email(userCredentials.getEmail())
                 .build();
     }
-
 
     private void updateUser(@NotNull UserCredentialsRequest userCredentials, User user) {
         boolean isChanged = false;
@@ -148,7 +158,7 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-
+    @Transactional
     public UserResponse changePassword(@NotNull ChangePasswordRequest request, Authentication connectedUser) {
         var user = getSecurityUser(connectedUser);
         var currentUser = user.getUser();
@@ -164,21 +174,33 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
     public UserResponse deleteConnectedUser(@NotNull PasswordRequest request, Authentication connectedUser)
             throws UsernameNotFoundException, WrongPasswordException {
         var securityUser = getSecurityUser(connectedUser);
         var currentUser = securityUser.getUser();
         String userName = currentUser.getUserName();
         verifyPassword(currentUser, request.password());
-        userRepository.delete(securityUser.getUser());
-        avatarService.deleteAvatar(currentUser);
+        deleteUser(currentUser);
         return UserResponse.builder()
                 .message("User " + userName + " has been deleted!")
                 .build();
     }
 
-    public void deleteUserById(Long userId) {
-        userRepository.deleteById(userId);
+    @Transactional
+    public void deleteUser(User user) {
+        Set<Day> days = getAllUserTripDays(user);
+        Set<Long> addressIds = addressService.getAddressFromDays(days);
+
+        avatarService.deleteAvatar(user);
+        userRepository.delete(user);
+        addressService.deleteAllByAddressIdIn(addressIds);
+    }
+
+    private Set<Day> getAllUserTripDays(@NotNull User user) {
+        Set<Trip> trips = user.getOwnedTrips();
+        Set<Long> tripIds = trips.stream().map(Trip::getTripId).collect(Collectors.toSet());
+        return dayService.getDaysByTripIds(tripIds);
     }
 
     public void verifyPassword(@NotNull User user, String password) throws WrongPasswordException {

@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.trip.budget;
 
+import com.andwis.travel_with_anna.trip.expanse.ExpanseByCurrency;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseTotalByBadge;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,9 @@ public class BudgetFacade {
     }
 
     public BudgetExpensesRespond getBudgetExpanses(Long tripId, Long budgetId) {
-        return budgetService.getBudgetExpanses(tripId, budgetId);
+        BudgetExpensesRespond respond = budgetService.getBudgetExpanses(tripId, budgetId);
+        respond.sumsByCurrency().stream().map(ExpanseByCurrency::totalDebt).forEach(System.out::println);
+        return respond;
     }
 
     public List<ExpanseTotalByBadge> getExpansesByBadgeByTripId(Long tripId) {

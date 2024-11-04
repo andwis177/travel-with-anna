@@ -14,4 +14,6 @@ public interface DayRepository extends JpaRepository<Day, Long> {
     Set<Day> findByTripTripId(Long tripId);
 
     List<Day> findByTripTripIdOrderByDateAsc(Long tripId);
+
+    Set<Day> findByTripTripIdIn(Set<Long> tripIds);
 }

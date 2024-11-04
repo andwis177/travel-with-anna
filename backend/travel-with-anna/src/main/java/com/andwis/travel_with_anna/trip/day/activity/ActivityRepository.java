@@ -6,5 +6,5 @@ import java.util.Set;
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
     Set<Activity> findByDayDayIdOrderByBeginTimeAsc(Long dayId);
-    int countActivitiesByAddress_AddressId(Long addressId);
+    Set<Activity> findAllByActivityIdIn(Set<Long> activityIds);
 }

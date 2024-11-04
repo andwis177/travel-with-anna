@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
+
 import com.andwis.travel_with_anna.address.Address;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
@@ -56,7 +57,7 @@ public class Activity {
     @JoinColumn(name = "day_id")
     private Day day;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "expanse_id")
     private Expanse expanse;
 
@@ -85,8 +86,20 @@ public class Activity {
         note.setActivity(this);
     }
 
+    public void removeNote() {
+        if (this.note != null) {
+            this.note.removeActivity();
+            this.note = null;
+        }
+    }
+
     public void addExpanse(@NotNull Expanse expanse) {
         this.expanse = expanse;
         expanse.setActivity(this);
+    }
+
+    public void addAddress(@NotNull Address address) {
+        this.address = address;
+        address.addActivity(this);
     }
 }

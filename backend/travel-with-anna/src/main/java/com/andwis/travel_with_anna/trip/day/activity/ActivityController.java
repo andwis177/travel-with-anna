@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
 import com.andwis.travel_with_anna.address.AddressDetail;
+import com.andwis.travel_with_anna.utility.MessageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,10 @@ public class ActivityController {
     }
 
     @PatchMapping("/update")
-    public ResponseEntity<Void> updateActivity(
+    public ResponseEntity<MessageResponse> updateActivity(
             @RequestBody @Valid ActivityUpdateRequest request) {
-        facade.updateActivity(request);
-        return ResponseEntity.accepted().build();
+       MessageResponse message = facade.updateActivity(request);
+        return ResponseEntity.accepted().body(message);
     }
 
     @GetMapping("/get/{dayId}")

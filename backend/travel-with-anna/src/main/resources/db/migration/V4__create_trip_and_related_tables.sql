@@ -19,18 +19,20 @@ CREATE TABLE IF NOT EXISTS trips  (
                                       CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES users(user_id)
 );
 
+CREATE TABLE IF NOT EXISTS notes (
+                                     note_id BIGSERIAL PRIMARY KEY,
+                                     note VARCHAR(500)
+);
+
 CREATE TABLE IF NOT EXISTS days (
                                     day_id BIGSERIAL PRIMARY KEY,
-                                    date DATE NOT NULL
+                                    date DATE NOT NULL,
+                                    note_id BIGINT,
+                                    CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id)
 );
 
 CREATE TABLE IF NOT EXISTS backpack (
                                         backpack_id BIGSERIAL PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS badges (
-                                      badge_id SERIAL PRIMARY KEY,
-                                      badge_name VARCHAR(40) NOT NULL
 );
 
 
@@ -59,20 +61,14 @@ CREATE TABLE IF NOT EXISTS activities (
                                         day_id BIGINT,
                                         associated_id BIGINT,
                                         address_id BIGINT,
+                                        note_id BIGINT,
                                         day_tag BOOLEAN DEFAULT FALSE,
                                         CONSTRAINT fk_day FOREIGN KEY (day_id) REFERENCES days(day_id),
-                                        CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES addresses(address_id)
-
+                                        CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES addresses(address_id),
+                                        CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id)
 );
 
-CREATE TABLE IF NOT EXISTS notes (
-                                     note_id BIGSERIAL PRIMARY KEY,
-                                     note VARCHAR(500),
-                                     day_id BIGINT,
-                                     activity_id BIGINT,
-                                     CONSTRAINT fk_day FOREIGN KEY (day_id) REFERENCES days(day_id),
-                                     CONSTRAINT fk_activity FOREIGN KEY (activity_id) REFERENCES activities(activity_id)
-);
+
 
 CREATE TABLE IF NOT EXISTS budget (
                                       budget_id BIGSERIAL PRIMARY KEY,
@@ -114,25 +110,11 @@ ALTER TABLE trips
 ALTER TABLE trips
     ADD CONSTRAINT fk_budget FOREIGN KEY (budget_id) REFERENCES budget(budget_id);
 
---
-ALTER TABLE activities
-    ADD COLUMN note_id BIGINT;
-
-ALTER TABLE activities
-    ADD CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id);
-
 ALTER TABLE activities
     ADD COLUMN expanse_id BIGINT;
 
 ALTER TABLE activities
     ADD CONSTRAINT fk_expanse FOREIGN KEY (expanse_id) REFERENCES expanses(expanse_id);
-
---
-ALTER TABLE days
-    ADD COLUMN note_id BIGINT;
-
-ALTER TABLE days
-    ADD CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id);
 
 ALTER TABLE days
     ADD COLUMN trip_id BIGINT;

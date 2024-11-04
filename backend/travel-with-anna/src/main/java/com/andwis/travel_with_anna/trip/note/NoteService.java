@@ -3,8 +3,10 @@ package com.andwis.travel_with_anna.trip.note;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Service
@@ -34,11 +36,13 @@ public class NoteService {
         return new NoteResponse(note.getNoteId(), note.getNote());
     }
 
+    @Transactional
     public <T> void saveNote(
             @NotNull NoteRequest noteRequest,
             @NotNull Function<Long, T> getByIdFunction,
             @NotNull Function<T, Note> getNoteFunction,
-            @NotNull BiConsumer<T, Note> addNoteFunction
+            @NotNull BiConsumer<T, Note> addNoteFunction,
+            @NotNull Consumer<T> removeNoteFunction
     ) {
         T entity = getByIdFunction.apply(noteRequest.getEntityId());
         Note note = getNoteFunction.apply(entity);
@@ -47,9 +51,28 @@ public class NoteService {
                     .note(noteRequest.getNote())
                     .build();
             addNoteFunction.accept(entity, note);
+            saveNote(note);
         } else {
-            note.setNote(noteRequest.getNote());
+            if (noteRequest.getNote() != null) {
+
+                if (!noteRequest.getNote().isEmpty()) {
+
+                    if (!noteRequest.getNote().isBlank()) {
+                        note.setNote(noteRequest.getNote());
+                        saveNote(note);
+                    } else {
+                        deleteNote(note);
+                    }
+                } else
+                {
+                    removeNoteFunction.accept(entity);
+                    deleteNote(note);
+                }
+            }
         }
-        saveNote(note);
+    }
+
+    private void deleteNote(Note note) {
+        noteRepository.delete(note);
     }
 }

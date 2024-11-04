@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @Builder
@@ -18,4 +20,20 @@ public class NoteRequest {
         @NotEmpty(message = "Entity type is required")
         @NotBlank(message = "Entity type is required")
         private String entityType;
+
+        @Override
+        public boolean equals(Object object) {
+                if (this == object) return true;
+                if (object == null || getClass() != object.getClass()) return false;
+                NoteRequest that = (NoteRequest) object;
+                return Objects.equals(note, that.note) &&
+                        Objects.equals(noteId, that.noteId) &&
+                        Objects.equals(entityId, that.entityId) &&
+                        Objects.equals(entityType, that.entityType);
+        }
+
+        @Override
+        public int hashCode() {
+                return Objects.hash(note, noteId, entityId, entityType);
+        }
 }

@@ -8,12 +8,11 @@ import com.andwis.travel_with_anna.utility.NumberDistributor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Service
@@ -25,10 +24,11 @@ public class DayService {
     public void saveDay(Day day) {
         dayRepository.save(day);
     }
-    public void saveAllDays(List<Day> days) {
+    public void saveAllDays(Set<Day> days) {
         dayRepository.saveAll(days);
     }
 
+    @Transactional
     public void createDay(@NotNull DayRequest request) {
         Trip trip = tripService.getTripById(request.getEntityId());
         Day day = Day.builder()
@@ -57,6 +57,7 @@ public class DayService {
         return DayMapper.toDayResponse(day);
     }
 
+    @Transactional
     public void addDay (@NotNull DayAddDeleteRequest request) {
         List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(request.getTripId());
         LocalDate dayToAdd = getDayToAdd(days, request.isFirst());
@@ -80,6 +81,10 @@ public class DayService {
         return LocalDate.now();
     }
 
+    public Set<Day> getDaysByTripIds(Set<Long> tripIds) {
+        return dayRepository.findByTripTripIdIn(tripIds);
+    }
+
     public List<DayResponse> getDays(Long tripId) {
         List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(tripId);
         List<DayResponse> response = days.stream()
@@ -89,6 +94,7 @@ public class DayService {
         return response;
     }
 
+    @Transactional
     public List<Day> createDays(LocalDate startDate, LocalDate endDate) {
         long numberOfDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
         List<Day> days = new ArrayList<>((int) numberOfDays);
@@ -101,6 +107,7 @@ public class DayService {
         return days;
     }
 
+    @Transactional
     public void generateDays(@NotNull DayGeneratorRequest request) {
         validateDates(request.getStartDate(), request.getEndDate());
         Trip trip = tripService.getTripById(request.getTripId());
@@ -116,6 +123,7 @@ public class DayService {
         }
     }
 
+    @Transactional
     public void changeDayDate(@NotNull DayRequest request) {
         if (request.getEntityId() == null) {
             throw new IllegalArgumentException("Day Id must be provided");
@@ -128,6 +136,7 @@ public class DayService {
         saveDay(day);
     }
 
+    @Transactional
     public void changeTripDates(@NotNull Trip trip, LocalDate startDate, LocalDate endDate) {
         validateDates(startDate, endDate);
 
@@ -148,14 +157,15 @@ public class DayService {
         }
     }
 
-    public void deleteDay(@NotNull Day day, Consumer<Activity> deleteFunction) {
-        Set<Activity> activities = day.getActivity();
-        activities.forEach(deleteFunction);
+    @Transactional
+    public void deleteDay(@NotNull Day day, @NotNull Consumer<Day> deleteFunction) {
+        deleteFunction.accept(day);
         day.getTrip().getDays().remove(day);
         dayRepository.delete(day);
     }
 
-    public void deleteFirstOrLastDay (@NotNull DayAddDeleteRequest request, Consumer<Activity> deleteFunction) {
+    @Transactional
+    public void deleteFirstOrLastDay (@NotNull DayAddDeleteRequest request, Consumer<Day> deleteFunction) {
         List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(request.getTripId());
         if (request.isFirst()) {
             deleteDay(days.getFirst(), deleteFunction);

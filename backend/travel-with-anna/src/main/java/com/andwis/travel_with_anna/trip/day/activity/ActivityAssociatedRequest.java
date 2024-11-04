@@ -11,4 +11,5 @@ public class ActivityAssociatedRequest {
     private ActivityRequest firstRequest;
     @Valid
     private ActivityRequest secondRequest;
+    boolean isAddressSeparated;
 }

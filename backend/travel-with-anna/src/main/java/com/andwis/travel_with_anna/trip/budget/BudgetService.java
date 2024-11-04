@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -28,6 +29,7 @@ public class BudgetService {
         budgetRepository.save(budget);
     }
 
+    @Transactional
     public void updateBudget(@NotNull BudgetRequest request) {
         Budget budget = findById(request.getBudgetId());
         budget.setToSpend(request.getToSpend());
@@ -78,7 +80,6 @@ public class BudgetService {
                                         expanse.priceInTripCurrency() != null ? expanse.priceInTripCurrency() : BigDecimal.ZERO,
                                         expanse.paidInTripCurrency() != null ? expanse.paidInTripCurrency() : BigDecimal.ZERO,
                                         expanse.price() != null && expanse.paid() != null
-                                                && expanse.price().doubleValue() > expanse.paid().doubleValue()
                                                 ? expanse.price().subtract(expanse.paid()) : BigDecimal.ZERO),
                                 ExpanseCalculator::add
                         )
@@ -97,7 +98,7 @@ public class BudgetService {
         return sortByType(expanseTotalByBadge);
     }
 
-    private List<ExpanseTotalByBadge> convertToExpanseTotalBadge (Map<String, ExpanseBadgeCalculator> expansesByBadge) {
+    private List<ExpanseTotalByBadge> convertToExpanseTotalBadge (@NotNull Map<String, ExpanseBadgeCalculator> expansesByBadge) {
         return expansesByBadge.entrySet().stream()
                 .map(entry -> new ExpanseTotalByBadge(
                         entry.getKey(),
@@ -106,7 +107,7 @@ public class BudgetService {
                 ).toList();
     }
 
-    private List<ExpanseTotalByBadge> sortByType(List<ExpanseTotalByBadge> expanseTotalByBadge) {
+    private List<ExpanseTotalByBadge> sortByType(@NotNull List<ExpanseTotalByBadge> expanseTotalByBadge) {
         return expanseTotalByBadge.stream()
                 .sorted(Comparator.comparing(ExpanseTotalByBadge::getType))
                 .toList();
@@ -128,22 +129,21 @@ public class BudgetService {
                 ));
     }
 
-    public BigDecimal overallPriceInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
+    private BigDecimal overallPriceInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
                 .map(ExpanseResponse::priceInTripCurrency)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal overallPaidInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
+    private BigDecimal overallPaidInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
                 .map(ExpanseResponse::paidInTripCurrency)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal calculateTotalDepth(@NotNull List<ExpanseResponse> expanses) {
+    private BigDecimal calculateTotalDepth(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
-                .map(expanse -> expanse.priceInTripCurrency().doubleValue() > expanse.paidInTripCurrency().doubleValue()
-                        ? expanse.priceInTripCurrency().subtract(expanse.paidInTripCurrency())
-                        : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(expanse -> expanse.priceInTripCurrency().subtract(expanse.paidInTripCurrency()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

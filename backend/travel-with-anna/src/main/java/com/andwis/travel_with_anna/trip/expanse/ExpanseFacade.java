@@ -67,7 +67,7 @@ public class ExpanseFacade {
 
     private ExpanseResponse createOrUpdateExpanseForActivity(
             @NotNull ExpanseRequest expanseRequest) {
-        Activity activity = activityService.findById(expanseRequest.getEntityId());
+        Activity activity = activityService.getById(expanseRequest.getEntityId());
         return expanseService.createOrUpdateExpanse(
                 expanseRequest,
                 id -> activity,
@@ -93,7 +93,7 @@ public class ExpanseFacade {
     }
 
     private ExpanseResponse getExpanseByActivityId(Long activityId) {
-        Activity activity = activityService.findById(activityId);
+        Activity activity = activityService.getById(activityId);
         return expanseService.getExpanseByEntityId(
                 activityId,
                 id -> activity,
@@ -101,7 +101,7 @@ public class ExpanseFacade {
         );
     }
 
-    public BigDecimal getExchangeRate(String currencyFrom, String currencyTo) {
+    public ExchangeResponse getExchangeRate(String currencyFrom, String currencyTo) {
         return expanseService.getExchangeRate(currencyFrom, currencyTo);
     }
     public ExpanseInTripCurrency getExpanseInTripCurrency(BigDecimal price, BigDecimal paid, BigDecimal exchangeRate) {

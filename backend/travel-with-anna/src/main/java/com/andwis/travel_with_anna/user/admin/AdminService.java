@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.List;
@@ -56,7 +57,6 @@ public class AdminService {
     public AvatarImg getAvatar(Long userId) {
         User user = userService.getUserById(userId);
         return avatarService.getAvatar(user);
-
     }
 
     public UserAdminResponse getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
@@ -83,6 +83,7 @@ public class AdminService {
         throw new UserNotFoundException("User not found");
     }
 
+    @Transactional
     public Long updateUser(@NotNull UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.getPassword());
@@ -95,10 +96,12 @@ public class AdminService {
         return user.getUserId();
     }
 
+    @Transactional
     public UserResponse deleteUser(@NotNull UserAdminDeleteRequest request, Authentication authentication) {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.password());
-        userService.deleteUserById(request.userId());
+        User userToBeDeleted = userService.getUserById(request.userId());
+        userService.deleteUser(userToBeDeleted);
         return UserResponse.builder().message("User has been deleted").build();
     }
 

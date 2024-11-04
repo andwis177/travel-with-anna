@@ -25,6 +25,7 @@ public class AvatarController {
         facade.setAvatar(file, connectedUser);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/get-avatar")
     public ResponseEntity<byte[]> getCurrentUserAvatar(Authentication connectedUser) throws FileNotSaved {
         byte[] avatarBytes = facade.getAvatar(connectedUser);

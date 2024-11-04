@@ -33,6 +33,6 @@ public class DayFacade {
     }
 
     public void deleteDay(DayAddDeleteRequest request) {
-        dayService.deleteFirstOrLastDay(request, activityService::deleteActivity);
+        dayService.deleteFirstOrLastDay(request, activityService::deleteDayActivities);
     }
 }

@@ -10,8 +10,8 @@ import com.andwis.travel_with_anna.trip.trip.TripService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -48,6 +48,7 @@ public class ExpanseService {
         return currencyRepository.findByCode(code).orElseThrow(() -> new CurrencyNotProvidedException(code));
     }
 
+    @Transactional
     public <T> ExpanseResponse createOrUpdateExpanse(
             @NotNull ExpanseRequest expanseRequest,
             @NotNull Function<Long, T> getByIdFunction,
@@ -68,7 +69,8 @@ public class ExpanseService {
         return id != null && id > 0;
     }
 
-    private <T> Expanse saveExpanse(
+    @Transactional
+    public <T> Expanse saveExpanse(
             @NotNull ExpanseRequest request,
             @NotNull Function<Long, T> getByIdFunction,
             @NotNull Supplier<Expanse> expanseSupplier,
@@ -92,6 +94,7 @@ public class ExpanseService {
         return expanse;
     }
 
+    @Transactional
     public Expanse updateExpanse(@NotNull ExpanseRequest request) {
         if (request.getExpanseId() == null) {
             throw new ExpanseNotFoundException("Expanse not found");
@@ -126,31 +129,31 @@ public class ExpanseService {
         return ExpanseMapper.toExpanseResponse(expanse);
     }
 
-    public BigDecimal getExchangeRate(String currencyFrom, String currencyTo) {
+    public ExchangeResponse getExchangeRate(String currencyFrom, String currencyTo) {
         if (currencyFrom == null || currencyFrom.isEmpty() || currencyFrom.isBlank()
                 || currencyTo == null || currencyTo.isEmpty() || currencyTo.isBlank()) {
-            return BigDecimal.ONE;
+            return new ExchangeResponse("Currency not provided", BigDecimal.ZERO);
+        }
+        if (currencyFrom.equals(currencyTo)) {
+            return new ExchangeResponse(null, BigDecimal.ONE);
         }
         verifyCurrencyExchange();
         updateCurrencyExchange();
-        BigDecimal exchangeRate = calculateExchangeRate(currencyFrom, currencyTo);
-        if (exchangeRate == null) {
-            return BigDecimal.ONE;
-        }
-        return exchangeRate.setScale(5, RoundingMode.HALF_UP);
+        return calculateExchangeRate(currencyFrom, currencyTo);
     }
 
-    private @Nullable BigDecimal calculateExchangeRate(String currencyFrom, String currencyTo) {
+    private @NotNull ExchangeResponse calculateExchangeRate(String currencyFrom, String currencyTo) {
         CurrencyExchange currencyFromExchange;
         CurrencyExchange currencyToExchange;
         try {
             currencyFromExchange = getCurrencyExchangeByCode(currencyFrom);
             currencyToExchange = getCurrencyExchangeByCode(currencyTo);
         } catch (CurrencyNotProvidedException e) {
-            return null;
+            return new ExchangeResponse(("Currency not supported"), BigDecimal.ZERO);
         }
         BigDecimal getUSD = BigDecimal.ONE.divide(currencyFromExchange.getExchangeValue(), 12, RoundingMode.HALF_UP);
-        return getUSD.multiply(currencyToExchange.getExchangeValue().setScale(12, RoundingMode.HALF_UP));
+        return new ExchangeResponse(null ,
+                getUSD.multiply(currencyToExchange.getExchangeValue().setScale(5, RoundingMode.HALF_UP)));
     }
 
     private void verifyCurrencyExchange() {
@@ -169,6 +172,7 @@ public class ExpanseService {
             }
         }
     }
+
 
     private void saveAllCurrencyExchange() {
         currencyRepository.deleteAll();
@@ -195,11 +199,12 @@ public class ExpanseService {
         return value.multiply(exchangeRate);
     }
 
+    @Transactional
     public void changeTripCurrency(@NotNull Budget budget) {
         List<Expanse> expanses = expanseRepository.findByTripId(budget.getTrip().getTripId());
         expanses.forEach(expanse -> {
-            BigDecimal exchangeRate = getExchangeRate(expanse.getCurrency(), budget.getCurrency());
-            expanse.setExchangeRate(exchangeRate);
+            ExchangeResponse exchangeResponse = getExchangeRate(expanse.getCurrency(), budget.getCurrency());
+            expanse.setExchangeRate(exchangeResponse.exchangeRate());
         });
         expanseRepository.saveAll(expanses);
     }

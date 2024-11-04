@@ -2,11 +2,12 @@ package com.andwis.travel_with_anna.trip.backpack;
 
 import com.andwis.travel_with_anna.handler.exception.BackpackNotFoundException;
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
-import com.andwis.travel_with_anna.trip.backpack.item.ItemWithExpanseRequest;
 import com.andwis.travel_with_anna.trip.backpack.item.ItemService;
+import com.andwis.travel_with_anna.trip.backpack.item.ItemWithExpanseRequest;
 import com.andwis.travel_with_anna.trip.note.NoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class BackpackService {
         return backpackRepository.findById(backpackId).orElseThrow(BackpackNotFoundException::new);
     }
 
+    @Transactional
     public void addItemToBackpack(Long backpackId, ItemWithExpanseRequest itemWithExpanseRequest) {
         Backpack backpack = findById(backpackId);
         Item item = itemService.createItem(itemWithExpanseRequest);
@@ -32,6 +34,7 @@ public class BackpackService {
         return BackpackMapper.toBackpackResponse(backpack, isNote);
     }
 
+    @Transactional
     public void deleteItem(Long itemId) {
         Item item = itemService.findById(itemId);
 

@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.utility;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -10,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class DateTimeMapper {
-    public static LocalDateTime toLocalDateTime(@NotNull String dateTimeString) {
+    public static @NotNull LocalDateTime toLocalDateTime(@NotNull String dateTimeString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         try {
             return LocalDateTime.parse(dateTimeString, formatter);
@@ -19,7 +20,7 @@ public class DateTimeMapper {
         }
     }
 
-    public static LocalDate toLocalDate(@NotNull String dateString) {
+    public static @NotNull LocalDate toLocalDate(@NotNull String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
             return LocalDate.parse(dateString, formatter);
@@ -28,7 +29,7 @@ public class DateTimeMapper {
         }
     }
 
-    public static LocalTime toTime(@NotNull String timeString) {
+    public static @Nullable LocalTime toTime(@NotNull String timeString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         try {
             return LocalTime.parse(timeString, formatter);

@@ -143,6 +143,7 @@ public class AuthenticationService {
         return response;
     }
 
+    @Transactional
     public void activateAccount(String token) throws MessagingException {
         var tokenEntity = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
@@ -165,6 +166,7 @@ public class AuthenticationService {
         return generatedPassword;
     }
 
+    @Transactional
     protected void resetPassword(@NotNull ResetPasswordRequest request) throws MessagingException {
         User user;
         if (request.getCredential().contains("@")) {

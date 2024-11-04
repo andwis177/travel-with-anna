@@ -32,8 +32,8 @@ public class Trip {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Day> days = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Day> days;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "backpack_id")
@@ -44,7 +44,8 @@ public class Trip {
     private Budget budget;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Expanse> expanses = new HashSet<>();
+    private Set<Expanse> expanses;
+
 
     @Override
     public boolean equals(Object o) {
@@ -117,7 +118,6 @@ public class Trip {
     public List<Day> getDaysInOrder() {
         List<Day> daysList = new ArrayList<>(days);
         daysList.sort(Comparator.comparing(Day::getDate));
-        System.out.println(daysList);
         return daysList;
     }
 }

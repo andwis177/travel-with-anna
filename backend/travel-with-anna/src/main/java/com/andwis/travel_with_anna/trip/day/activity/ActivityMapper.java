@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
 import com.andwis.travel_with_anna.address.AddressMapper;
+import com.andwis.travel_with_anna.address.AddressResponse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseMapper;
 import com.andwis.travel_with_anna.trip.note.NoteMapper;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +34,19 @@ public class ActivityMapper {
         }
         if (activity.getAddress() != null) {
             response.setAddress(AddressMapper.toAddressResponse(activity.getAddress()));
+        } else {
+            response.setAddress(new AddressResponse(
+                    -1L,
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+            ));
         }
         return response;
     }
@@ -53,7 +67,7 @@ public class ActivityMapper {
         return activity;
     }
 
-    public static List<ActivityResponse> toActivityResponseList(Set<Activity> activities) {
+    public static List<ActivityResponse> toActivityResponseList(@NotNull Set<Activity> activities) {
         return activities.stream().map(ActivityMapper::toActivityResponse).toList();
     }
 

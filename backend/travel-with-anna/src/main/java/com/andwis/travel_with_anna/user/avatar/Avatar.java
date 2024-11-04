@@ -22,6 +22,4 @@ public class Avatar {
     @Lob
     @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar;
-
-
 }

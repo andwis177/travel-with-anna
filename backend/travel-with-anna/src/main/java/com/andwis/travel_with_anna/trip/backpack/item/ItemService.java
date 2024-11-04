@@ -4,6 +4,7 @@ import com.andwis.travel_with_anna.handler.exception.ItemNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class ItemService {
                 .toList();
     }
 
+    @Transactional
     public void saveAllItems(@NotNull List<ItemRequest> items) {
         List<Long> idList = items.stream()
                 .map(ItemRequest::getItemId)

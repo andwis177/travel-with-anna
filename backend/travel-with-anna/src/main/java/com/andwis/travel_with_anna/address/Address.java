@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -52,8 +52,8 @@ public class Address {
     @Column(name = "email", length = 150)
     private String email;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "address")
-    private List<Activity> activities;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "address", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Activity> activities;
 
     @Size(max = 10)
     @Column(name ="currency", length = 10)
@@ -61,9 +61,13 @@ public class Address {
 
     public void addActivity(Activity activity) {
         if (this.activities == null) {
-            this.activities = new ArrayList<>();
+            this.activities = new HashSet<>();
         }
         activities.add(activity);
         activity.setAddress(this);
+    }
+
+    public void removeActivity(Activity activity) {
+        this.activities.remove(activity);
     }
 }

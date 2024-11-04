@@ -38,7 +38,7 @@ public class Day {
     private Trip trip;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Activity> activity;
+    private Set<Activity> activities;
 
     @Override
     public boolean equals(Object o) {
@@ -49,7 +49,7 @@ public class Day {
                 && Objects.equals(date, day.date)
                 && Objects.equals(note, day.note)
                 && Objects.equals(trip, day.trip)
-                && Objects.equals(activity, day.activity);
+                && Objects.equals(activities, day.activities);
     }
 
     @Override
@@ -58,20 +58,28 @@ public class Day {
     }
 
     public void addActivity(Activity activity) {
-        if (this.activity == null) {
-            this.activity = new HashSet<>();
+        if (this.activities == null) {
+            this.activities = new HashSet<>();
         }
-        this.activity.add(activity);
+        this.activities.add(activity);
         activity.setDay(this);
     }
 
-    public void removeActivity(Activity activity) {
-        this.activity.remove(activity);
-        activity.setDay(null);
+    public void removeActivities(Set<Activity> activities) {
+        activities.forEach(activity -> activity.setDay(null));
+        this.activities.removeAll(activities);
+
     }
 
     public void addNote (Note note) {
         this.note = note;
         note.setDay(this);
+    }
+
+    public void removeNote() {
+        if (this.note != null) {
+            this.note.removeDay(this);
+            this.note = null;
+        }
     }
 }

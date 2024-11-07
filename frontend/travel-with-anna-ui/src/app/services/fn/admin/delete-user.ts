@@ -29,4 +29,4 @@ export function deleteUser(http: HttpClient, rootUrl: string, params: DeleteUser
   );
 }
 
-deleteUser.PATH = '/admin/delete/{userId}';
+deleteUser.PATH = '/admin/{userId}';

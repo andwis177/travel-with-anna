@@ -115,6 +115,7 @@ export class TripDetailsButtonsComponent implements OnInit {
 
   deleteDay(isFirst: boolean, event: Event) {
     event.preventDefault();
+    console.log(this._trip.tripId)
     const dialogRef = this.dialog.open(DayDeleteComponent, {
       panelClass: 'custom-dialog-container',
       maxWidth: '50vw',

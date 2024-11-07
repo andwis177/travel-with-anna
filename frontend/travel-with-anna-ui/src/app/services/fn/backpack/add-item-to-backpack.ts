@@ -30,4 +30,4 @@ export function addItemToBackpack(http: HttpClient, rootUrl: string, params: Add
   );
 }
 
-addItemToBackpack.PATH = '/backpack/{backpackId}/item-add';
+addItemToBackpack.PATH = '/backpack/{backpackId}/item';

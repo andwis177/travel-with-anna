@@ -251,7 +251,7 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   }
 
 
-  async openExpanse(item: ItemRequest, index: number) {
+  async openExpanse(item: ItemResponse, index: number) {
     try {
       await this.getTripCurrency()
       this.selectRowByIndex(index)

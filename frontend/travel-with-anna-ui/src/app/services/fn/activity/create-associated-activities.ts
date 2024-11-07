@@ -28,4 +28,4 @@ export function createAssociatedActivities(http: HttpClient, rootUrl: string, pa
   );
 }
 
-createAssociatedActivities.PATH = '/activity/create/associated';
+createAssociatedActivities.PATH = '/activity/associated';

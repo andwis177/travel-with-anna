@@ -28,4 +28,4 @@ export function getExpanseById(http: HttpClient, rootUrl: string, params: GetExp
   );
 }
 
-getExpanseById.PATH = '/expanse/{expanseId}/expanse';
+getExpanseById.PATH = '/expanse/{expanseId}';

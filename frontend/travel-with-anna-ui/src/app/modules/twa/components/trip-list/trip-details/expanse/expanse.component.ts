@@ -154,6 +154,7 @@ export class ExpanseComponent implements OnInit {
   }
 
   getExchangeRate() {
+    this.errorMsg = [];
     if (this.expanseRequest.currency === null || this.expanseRequest.currency.length === 0) {
       this.expanseRequest.currency = this.tripCurrency;
     }
@@ -165,7 +166,10 @@ export class ExpanseComponent implements OnInit {
       this.expanseService.getExchangeRate(params)
         .subscribe({
           next: (rate) => {
-            this.expanseRequest.exchangeRate = rate;
+            this.expanseRequest.exchangeRate = rate.exchangeRate!;
+            if (rate.errorMsg?.length! > 0) {
+              this.errorMsg.push(rate.errorMsg!);
+            }
             this.calculateTripValue();
           },
           error: (err) => {

@@ -6,13 +6,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { ExchangeResponse } from '../../models/exchange-response';
 
 export interface GetExchangeRate$Params {
   currencyFrom: string;
   currencyTo: string;
 }
 
-export function getExchangeRate(http: HttpClient, rootUrl: string, params: GetExchangeRate$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
+export function getExchangeRate(http: HttpClient, rootUrl: string, params: GetExchangeRate$Params, context?: HttpContext): Observable<StrictHttpResponse<ExchangeResponse>> {
   const rb = new RequestBuilder(rootUrl, getExchangeRate.PATH, 'get');
   if (params) {
     rb.query('currencyFrom', params.currencyFrom, {});
@@ -24,7 +25,7 @@ export function getExchangeRate(http: HttpClient, rootUrl: string, params: GetEx
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: parseFloat(String((r as HttpResponse<any>).body)) }) as StrictHttpResponse<number>;
+      return r as StrictHttpResponse<ExchangeResponse>;
     })
   );
 }

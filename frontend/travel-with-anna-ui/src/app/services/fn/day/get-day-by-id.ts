@@ -28,4 +28,4 @@ export function getDayById(http: HttpClient, rootUrl: string, params: GetDayById
   );
 }
 
-getDayById.PATH = '/day/{dayId}/day';
+getDayById.PATH = '/day/{dayId}';

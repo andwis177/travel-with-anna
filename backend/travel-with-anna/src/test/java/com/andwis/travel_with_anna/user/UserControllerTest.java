@@ -38,7 +38,7 @@ class UserControllerTest {
         // Given
         UserCredentialsResponse userCredentials = new UserCredentialsResponse(
                 "email@example.com",
-               "username",
+                "username",
                 "USER"
         );
 
@@ -78,7 +78,7 @@ class UserControllerTest {
         when(connectedUser.getName()).thenReturn("email@example.com");
 
         // When & Then
-        mockMvc.perform(patch("/user/update")
+        mockMvc.perform(patch("/user")
                         .principal(connectedUser)
                         .contentType("application/json")
                         .content(jsonContent))
@@ -123,7 +123,7 @@ class UserControllerTest {
                 .thenReturn(expectedResponse);
 
         // When & Then
-        mockMvc.perform(delete("/user/delete")
+        mockMvc.perform(delete("/user")
                         .contentType("application/json")
                         .content(jsonContent))
                 .andExpect(status().isNoContent())

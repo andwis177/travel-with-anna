@@ -25,4 +25,4 @@ export function getCurrentUserAvatar(http: HttpClient, rootUrl: string, params?:
   );
 }
 
-getCurrentUserAvatar.PATH = '/avatar/get-avatar';
+getCurrentUserAvatar.PATH = '/avatar';

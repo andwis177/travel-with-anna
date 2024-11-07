@@ -28,4 +28,4 @@ export function fetchActivitiesByDayId(http: HttpClient, rootUrl: string, params
   );
 }
 
-fetchActivitiesByDayId.PATH = '/activity/get/{dayId}';
+fetchActivitiesByDayId.PATH = '/activity/day/{dayId}';

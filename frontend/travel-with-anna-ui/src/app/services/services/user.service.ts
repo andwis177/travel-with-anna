@@ -27,8 +27,33 @@ export class UserService extends BaseService {
     super(config, http);
   }
 
+  /** Path part for operation `delete()` */
+  static readonly DeletePath = '/user';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `delete()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  delete$Response(params: Delete$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
+    return delete$(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `delete$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  delete(params: Delete$Params, context?: HttpContext): Observable<UserResponse> {
+    return this.delete$Response(params, context).pipe(
+      map((r: StrictHttpResponse<UserResponse>): UserResponse => r.body)
+    );
+  }
+
   /** Path part for operation `update()` */
-  static readonly UpdatePath = '/user/update';
+  static readonly UpdatePath = '/user';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -99,31 +124,6 @@ export class UserService extends BaseService {
   getCredentials(params?: GetCredentials$Params, context?: HttpContext): Observable<UserCredentialsResponse> {
     return this.getCredentials$Response(params, context).pipe(
       map((r: StrictHttpResponse<UserCredentialsResponse>): UserCredentialsResponse => r.body)
-    );
-  }
-
-  /** Path part for operation `delete()` */
-  static readonly DeletePath = '/user/delete';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `delete()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  delete$Response(params: Delete$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
-    return delete$(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `delete$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  delete(params: Delete$Params, context?: HttpContext): Observable<UserResponse> {
-    return this.delete$Response(params, context).pipe(
-      map((r: StrictHttpResponse<UserResponse>): UserResponse => r.body)
     );
   }
 

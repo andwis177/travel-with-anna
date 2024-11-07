@@ -28,4 +28,4 @@ export function createActivity(http: HttpClient, rootUrl: string, params: Create
   );
 }
 
-createActivity.PATH = '/activity/create';
+createActivity.PATH = '/activity';

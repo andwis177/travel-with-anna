@@ -28,4 +28,4 @@ export function saveNote(http: HttpClient, rootUrl: string, params: SaveNote$Par
   );
 }
 
-saveNote.PATH = '/note/save';
+saveNote.PATH = '/note';

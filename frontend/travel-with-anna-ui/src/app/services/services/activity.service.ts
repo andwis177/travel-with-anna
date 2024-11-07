@@ -23,6 +23,7 @@ import { fetchAddressDetailsByDayId } from '../fn/activity/fetch-address-details
 import { FetchAddressDetailsByDayId$Params } from '../fn/activity/fetch-address-details-by-day-id';
 import { fetchAddressDetailsByTripId } from '../fn/activity/fetch-address-details-by-trip-id';
 import { FetchAddressDetailsByTripId$Params } from '../fn/activity/fetch-address-details-by-trip-id';
+import { MessageResponse } from '../models/message-response';
 import { updateActivity } from '../fn/activity/update-activity';
 import { UpdateActivity$Params } from '../fn/activity/update-activity';
 
@@ -33,7 +34,7 @@ export class ActivityService extends BaseService {
   }
 
   /** Path part for operation `createActivity()` */
-  static readonly CreateActivityPath = '/activity/create';
+  static readonly CreateActivityPath = '/activity';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -58,7 +59,7 @@ export class ActivityService extends BaseService {
   }
 
   /** Path part for operation `createAssociatedActivities()` */
-  static readonly CreateAssociatedActivitiesPath = '/activity/create/associated';
+  static readonly CreateAssociatedActivitiesPath = '/activity/associated';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -91,7 +92,7 @@ export class ActivityService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  updateActivity$Response(params: UpdateActivity$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  updateActivity$Response(params: UpdateActivity$Params, context?: HttpContext): Observable<StrictHttpResponse<MessageResponse>> {
     return updateActivity(this.http, this.rootUrl, params, context);
   }
 
@@ -101,14 +102,14 @@ export class ActivityService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  updateActivity(params: UpdateActivity$Params, context?: HttpContext): Observable<void> {
+  updateActivity(params: UpdateActivity$Params, context?: HttpContext): Observable<MessageResponse> {
     return this.updateActivity$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
+      map((r: StrictHttpResponse<MessageResponse>): MessageResponse => r.body)
     );
   }
 
   /** Path part for operation `fetchAddressDetailsByTripId()` */
-  static readonly FetchAddressDetailsByTripIdPath = '/activity/get/{tripId}/trip/details';
+  static readonly FetchAddressDetailsByTripIdPath = '/activity/trip/{tripId}/details';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -133,7 +134,7 @@ export class ActivityService extends BaseService {
   }
 
   /** Path part for operation `fetchActivitiesByDayId()` */
-  static readonly FetchActivitiesByDayIdPath = '/activity/get/{dayId}';
+  static readonly FetchActivitiesByDayIdPath = '/activity/day/{dayId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -158,7 +159,7 @@ export class ActivityService extends BaseService {
   }
 
   /** Path part for operation `fetchAddressDetailsByDayId()` */
-  static readonly FetchAddressDetailsByDayIdPath = '/activity/get/{dayId}/day/details';
+  static readonly FetchAddressDetailsByDayIdPath = '/activity/day/{dayId}/details';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.

@@ -9,6 +9,7 @@ import com.andwis.travel_with_anna.api.country.Country;
 import com.andwis.travel_with_anna.handler.exception.ActivityNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.TripNotFoundException;
 import com.andwis.travel_with_anna.trip.day.Day;
+import com.andwis.travel_with_anna.trip.day.DayRepository;
 import com.andwis.travel_with_anna.trip.day.DayResponse;
 import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
@@ -37,6 +38,7 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
     private final DayService dayService;
     private final AddressService addressService;
+    private final DayRepository dayRepository;
 
     public Activity getById(Long activityId) {
         return activityRepository.findById(activityId)
@@ -44,7 +46,7 @@ public class ActivityService {
     }
 
     @Transactional
-    public void createSingleActivity(ActivityRequest request) {
+    public Long createSingleActivity(ActivityRequest request) {
         Address address;
         Activity activity = createActivity(request);
 
@@ -53,8 +55,9 @@ public class ActivityService {
             addressService.save(address);
             address.addActivity(activity);
         }
-        activityRepository.save(activity);
+        return activityRepository.save(activity).getActivityId();
     }
+
     @Transactional
     public void createAssociatedActivities(@NotNull ActivityAssociatedRequest request) {
         Activity firstActivity = createActivity(request.getFirstRequest());
@@ -105,6 +108,7 @@ public class ActivityService {
 
         return activity;
     }
+
     @Transactional
     public String updateActivity(@NotNull ActivityUpdateRequest request) {
         Activity activity = getById(request.getActivityId());
@@ -268,6 +272,7 @@ public class ActivityService {
 
         Set<Activity> allActivities = activityRepository.findAllByActivityIdIn(activityIds);
         Set<Long> allAddressIds = allActivities.stream()
+                .filter(activity -> activity.getAddress() != null)
                 .map(activity -> activity.getAddress().getAddressId())
                 .collect(Collectors.toSet());
         activityRepository.deleteAll(allActivities);
@@ -277,6 +282,8 @@ public class ActivityService {
     @Transactional
     public void deleteDayActivities(@NotNull Day day) {
         Set<Activity> activities = day.getActivities();
-        deleteActivities(activities);
+        if (activities != null) {
+            deleteActivities(activities);
+        }
     }
 }

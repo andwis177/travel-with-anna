@@ -17,11 +17,11 @@ export class ImageFileService extends BaseService {
   uploadAvatar(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    return this.http.post(this.rootUrl + '/avatar/upload-avatar', formData);
+    return this.http.post(this.rootUrl + '/avatar', formData);
   }
 
   getAvatar(): Observable<Blob> {
-    return this.http.get<Blob>(this.rootUrl + '/avatar/get-avatar', {responseType: 'blob' as 'json'});
+    return this.http.get<Blob>(this.rootUrl + '/avatar', {responseType: 'blob' as 'json'});
   }
 
   convertFileToBase64(file: File): Promise<string | ArrayBuffer | null> {

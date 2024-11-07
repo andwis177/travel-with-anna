@@ -20,13 +20,13 @@ import java.io.IOException;
 public class AvatarController {
     private final AvatarFacade facade;
 
-    @PostMapping("/upload-avatar")
+    @PostMapping
     public ResponseEntity<?> uploadAvatar(@RequestParam("file")  MultipartFile file, Authentication connectedUser) throws IOException {
         facade.setAvatar(file, connectedUser);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/get-avatar")
+    @GetMapping
     public ResponseEntity<byte[]> getCurrentUserAvatar(Authentication connectedUser) throws FileNotSaved {
         byte[] avatarBytes = facade.getAvatar(connectedUser);
 

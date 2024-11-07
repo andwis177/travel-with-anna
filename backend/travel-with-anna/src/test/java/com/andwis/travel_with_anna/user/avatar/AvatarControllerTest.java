@@ -43,7 +43,7 @@ class AvatarControllerTest {
                 "test image".getBytes());
 
         // When & Then
-        mockMvc.perform(multipart("/avatar/upload-avatar")
+        mockMvc.perform(multipart("/avatar")
                         .file(imageFile)
                         .principal(authentication))
                 .andExpect(status().isOk());
@@ -57,7 +57,7 @@ class AvatarControllerTest {
         when(userAvatarMgr.getAvatar(any(Authentication.class))).thenReturn(imageBytes);
 
         // When & Then
-        mockMvc.perform(get("/avatar/get-avatar"))
+        mockMvc.perform(get("/avatar"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.IMAGE_JPEG))
                 .andExpect(content().bytes(imageBytes));

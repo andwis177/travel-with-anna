@@ -23,7 +23,7 @@ public class UserController {
         return ResponseEntity.ok(userCredentials);
     }
 
-    @PatchMapping("/update")
+    @PatchMapping
     public ResponseEntity<AuthenticationResponse> update(@RequestBody @Valid UserCredentialsRequest userCredentials, Authentication connectedUser) {
         AuthenticationResponse response = facade.updateUserExecution(userCredentials, connectedUser);
         return ResponseEntity.ok(response);
@@ -35,7 +35,7 @@ public class UserController {
         return ResponseEntity.accepted().body(respond);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<UserResponse> delete(@RequestBody @Valid PasswordRequest request, Authentication connectedUser) {
         UserResponse respond = facade.deleteConnectedUser(request, connectedUser);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respond);

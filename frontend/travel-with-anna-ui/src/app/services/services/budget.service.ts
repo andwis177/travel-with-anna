@@ -30,7 +30,7 @@ export class BudgetService extends BaseService {
   }
 
   /** Path part for operation `saveBudget()` */
-  static readonly SaveBudgetPath = '/budget/create';
+  static readonly SaveBudgetPath = '/budget';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.

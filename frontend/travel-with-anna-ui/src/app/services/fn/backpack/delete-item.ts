@@ -27,4 +27,4 @@ export function deleteItem(http: HttpClient, rootUrl: string, params: DeleteItem
   );
 }
 
-deleteItem.PATH = '/backpack/delete/{itemId}/item';
+deleteItem.PATH = '/backpack/{itemId}/item';

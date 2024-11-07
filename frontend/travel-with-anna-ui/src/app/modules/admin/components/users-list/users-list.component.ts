@@ -77,7 +77,7 @@ export class UsersListComponent implements OnInit, AfterViewInit {
     totalPages: 0
   };
   page = 0;
-  size = 1;
+  size = 10;
   pages: any = [];
   message = '';
   private _liveAnnouncer = inject(LiveAnnouncer);

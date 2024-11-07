@@ -17,13 +17,13 @@ public class TripController {
 
     private final TripFacade facade;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<Long> createTrip(@RequestBody @Valid TripCreatorRequest trip, Authentication connectedUser) {
         Long tripId = facade.createTrip(trip, connectedUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(tripId);
     }
 
-    @GetMapping("")
+    @GetMapping
     public PageResponse<TripResponse> getAllOwnersTrips(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size,
@@ -37,13 +37,13 @@ public class TripController {
         return ResponseEntity.status(HttpStatus.OK).body(tripDto);
     }
 
-    @PatchMapping("/update")
+    @PatchMapping
     public ResponseEntity<Void> updateTrip(@RequestBody @Valid TripEditRequest request) {
         facade.updateTrip(request);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<Void> deleteTrip(@RequestBody TripRequest request, Authentication connectedUser) {
         facade.deleteTrip(request, connectedUser);
         return ResponseEntity.noContent().build();

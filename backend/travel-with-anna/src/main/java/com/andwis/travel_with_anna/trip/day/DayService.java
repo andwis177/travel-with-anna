@@ -1,7 +1,6 @@
 package com.andwis.travel_with_anna.trip.day;
 
 import com.andwis.travel_with_anna.handler.exception.DayNotFoundException;
-import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
 import com.andwis.travel_with_anna.utility.NumberDistributor;
@@ -12,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 @Service
@@ -24,6 +25,7 @@ public class DayService {
     public void saveDay(Day day) {
         dayRepository.save(day);
     }
+
     public void saveAllDays(Set<Day> days) {
         dayRepository.saveAll(days);
     }

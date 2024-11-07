@@ -7,23 +7,24 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { ActivityUpdateRequest } from '../../models/activity-update-request';
+import { MessageResponse } from '../../models/message-response';
 
 export interface UpdateActivity$Params {
       body: ActivityUpdateRequest
 }
 
-export function updateActivity(http: HttpClient, rootUrl: string, params: UpdateActivity$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+export function updateActivity(http: HttpClient, rootUrl: string, params: UpdateActivity$Params, context?: HttpContext): Observable<StrictHttpResponse<MessageResponse>> {
   const rb = new RequestBuilder(rootUrl, updateActivity.PATH, 'patch');
   if (params) {
     rb.body(params.body, 'application/json');
   }
 
   return http.request(
-    rb.build({ responseType: 'text', accept: '*/*', context })
+    rb.build({ responseType: 'json', accept: 'application/json', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      return r as StrictHttpResponse<MessageResponse>;
     })
   );
 }

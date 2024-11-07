@@ -1,4 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 @import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap');
@@ -6,7 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet"');
 
 .ngx-material-timepicker {
-  z-index: 2001;  // Ensure it's higher than the default Material Dialog z-index
+  z-index: 2001;
 }
 
 html, body { height: 100%; }
@@ -407,4 +407,36 @@ p, a, span {
   background-color: gold !important;
   border: 1px solid black;
   color: black;
+}
+
+.stay{
+  background-color: #A0C4D9 !important;
+}
+
+.travel {
+  background-color: #B7D5B0  !important;
+}
+
+.eat {
+  background-color: #F9DBB0 !important;
+}
+
+.trek {
+  background-color: #D4CFC4 !important;
+}
+
+.rent {
+  background-color: lightgoldenrodyellow !important;
+}
+
+.event {
+  background-color: #D7BDE8 !important;
+}
+
+.shop {
+  background-color: #FBC1B6  !important;
+}
+
+.default-activity-details {
+  background-color: whitesmoke !important;
 }

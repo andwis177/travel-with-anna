@@ -29,4 +29,4 @@ export function createOrUpdateExpanse(http: HttpClient, rootUrl: string, params:
   );
 }
 
-createOrUpdateExpanse.PATH = '/expanse/entity/save';
+createOrUpdateExpanse.PATH = '/expanse';

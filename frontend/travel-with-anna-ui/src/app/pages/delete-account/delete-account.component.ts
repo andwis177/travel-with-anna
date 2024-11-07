@@ -62,7 +62,7 @@ export class DeleteAccountComponent {
 
   @HostListener('document:keydown.escape', ['$event'])
   onEscapeKeydownHandler(event: KeyboardEvent): void {
-    this.cancel();
+    this.onClose();
   }
 
   @HostListener('document:keydown.enter', ['$event'])
@@ -78,6 +78,7 @@ export class DeleteAccountComponent {
       next: (respond ) => {
         this.userRespond = respond;
         this.logoutService.logout();
+        this.onClose();
         if (this.userRespond.message != null) {
           this.router.navigate(['login']).then(r => this._snackBar.open(<string>this.userRespond.message, 'Close'));
         }
@@ -88,8 +89,7 @@ export class DeleteAccountComponent {
     })
   }
 
-  cancel() {
+  onClose() {
     this.dialog.getDialogById('delete-account-dialog')!.close();
-    // this.router.navigate(['twa']).then(r => this._snackBar.open('Account deletion canceled', 'Close'));
   }
 }

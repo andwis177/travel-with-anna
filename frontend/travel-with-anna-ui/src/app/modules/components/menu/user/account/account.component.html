@@ -42,13 +42,14 @@
       <p *ngFor="let msg of errorMsg">{{msg}}</p>
     </div>
 
-    <div class="center-align" *ngIf="isEdit">
+    <div class="end-align" *ngIf="isEdit">
       <mat-divider></mat-divider>
-      <button class="custom-button-2"
+      <button class="delete-button"
               (click)="deleteAccount()"
               type="submit"
-              matTooltip="Delete Account"
-      >DELETE ACCOUNT</button>
+              matTooltip="Delete Account">
+        <img src="../../../../../assets/images/delete.png" class="delete-button-image" style="opacity: 0.8" alt="">
+      </button>
     </div>
   </form>
 </div>

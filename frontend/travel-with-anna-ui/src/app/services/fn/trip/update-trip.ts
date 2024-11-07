@@ -28,4 +28,4 @@ export function updateTrip(http: HttpClient, rootUrl: string, params: UpdateTrip
   );
 }
 
-updateTrip.PATH = '/trip/update';
+updateTrip.PATH = '/trip';

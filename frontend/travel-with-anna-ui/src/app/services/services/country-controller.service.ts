@@ -26,7 +26,7 @@ export class CountryControllerService extends BaseService {
   }
 
   /** Path part for operation `findAllCountryCities()` */
-  static readonly FindAllCountryCitiesPath = '/api/country/cities-all';
+  static readonly FindAllCountryCitiesPath = '/api/country/cities';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -51,7 +51,7 @@ export class CountryControllerService extends BaseService {
   }
 
   /** Path part for operation `findAllCountryNames()` */
-  static readonly FindAllCountryNamesPath = '/api/country/names-all';
+  static readonly FindAllCountryNamesPath = '/api/country/names';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -76,7 +76,7 @@ export class CountryControllerService extends BaseService {
   }
 
   /** Path part for operation `findAllCountryCurrencies()` */
-  static readonly FindAllCountryCurrenciesPath = '/api/country/currencies-all';
+  static readonly FindAllCountryCurrenciesPath = '/api/country/currencies';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.

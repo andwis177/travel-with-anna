@@ -33,7 +33,7 @@ export class AdminService extends BaseService {
   }
 
   /** Path part for operation `updateUser()` */
-  static readonly UpdateUserPath = '/admin/update';
+  static readonly UpdateUserPath = '/admin';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -158,7 +158,7 @@ export class AdminService extends BaseService {
   }
 
   /** Path part for operation `deleteUser()` */
-  static readonly DeleteUserPath = '/admin/delete/{userId}';
+  static readonly DeleteUserPath = '/admin/{userId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.

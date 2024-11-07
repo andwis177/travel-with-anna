@@ -1,182 +1,209 @@
-//package com.andwis.travel_with_anna.trip.budget;
-//
-//
-//import com.andwis.travel_with_anna.api.currency.CurrencyExchange;
-//import com.andwis.travel_with_anna.api.currency.CurrencyRepository;
-//import com.andwis.travel_with_anna.handler.exception.BudgetNotFoundException;
-//import com.andwis.travel_with_anna.trip.expanse.Expanse;
-//import com.andwis.travel_with_anna.trip.expanse.ExpanseRepository;
-//import com.andwis.travel_with_anna.trip.trip.Trip;
-//import com.andwis.travel_with_anna.trip.trip.TripRepository;
-//import jakarta.persistence.EntityManager;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.math.BigDecimal;
-//import java.time.LocalDateTime;
-//import java.util.ArrayList;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//@SpringBootTest
-//@DisplayName("Budget Service tests")
-//class BudgetServiceTest {
-//
-//    @Autowired
-//    private BudgetService budgetService;
-//
-//    @Autowired
-//    private BudgetRepository budgetRepository;
-//
-//    @Autowired
-//    private ExpanseRepository expanseRepository;
-//
-//    @Autowired
-//    private TripRepository tripRepository;
-//
-//    @Autowired
-//    private EntityManager entityManager;
-//
-//    @Autowired
-//    private CurrencyRepository currencyRepository;
-//
-//    private Trip trip;
-//    private Budget budget;
-//
-//    @BeforeEach
-//    void setUp() {
-//        trip = Trip.builder()
-//                .tripName("Vacation")
-//                .expanses(new ArrayList<>())
-//                .days(new ArrayList<>())
-//                .build();
-//        tripRepository.save(trip);
-//
-//        budget = Budget.builder()
-//                .toSpend(BigDecimal.valueOf(1000))
-//                .currency("USD")
-//                .trip(trip)
-//                .build();
-//        budgetRepository.save(budget);
-//
-//        currencyRepository.deleteAll();
-//
-//        CurrencyExchange usdToEur = CurrencyExchange.builder()
-//                .code("USD")
-//                .exchangeValue(BigDecimal.valueOf(0.9))
-//                .timeStamp(LocalDateTime.now())
-//                .build();
-//        currencyRepository.save(usdToEur);
-//    }
-//
-//    @AfterEach
-//    void tearDown() {
-//        expanseRepository.deleteAll();
-//        budgetRepository.deleteAll();
-//        tripRepository.deleteAll();
-//        currencyRepository.deleteAll();
-//    }
-//
-//    @Test
-//    @Transactional
-//    void testSaveBudget() {
-//        // Given
-//        Budget newBudget = Budget.builder()
-//                .toSpend(BigDecimal.valueOf(500))
-//                .currency("EUR")
-//                .trip(trip)
-//                .build();
-//
-//        // When
-//        budgetService.saveBudget(newBudget);
-//        entityManager.flush();
-//
-//        // Then
-//        assertNotNull(newBudget.getBudgetId());
-//        assertEquals("EUR", newBudget.getCurrency());
-//        assertEquals(BigDecimal.valueOf(500), newBudget.getToSpend());
-//    }
-//
-//    @Test
-//    @Transactional
-//    void testUpdateBudget() {
-//        // Given
-//        BudgetRequest request = new BudgetRequest(
-//                budget.getBudgetId(),
-//                "EUR",
-//                BigDecimal.valueOf(1200),
-//                trip.getTripId()
-//        );
-//        request.setBudgetId(budget.getBudgetId());
-//        request.setToSpend(BigDecimal.valueOf(1200));
-//        request.setCurrency("EUR");
-//
-//        // When
-//        budgetService.updateBudget(request);
-//        entityManager.flush();
-//        Budget updatedBudget = budgetRepository.findById(budget.getBudgetId()).orElseThrow();
-//
-//        // Then
-//        assertEquals(BigDecimal.valueOf(1200), updatedBudget.getToSpend());
-//        assertEquals("EUR", updatedBudget.getCurrency());
-//    }
-//
-//    @Test
-//    void testFindById() {
-//        // When
-//        Budget foundBudget = budgetService.findById(budget.getBudgetId());
-//
-//        // Then
-//        assertNotNull(foundBudget);
-//        assertEquals(budget.getBudgetId(), foundBudget.getBudgetId());
-//    }
-//
-//    @Test
-//    void testFindByIdThrowsExceptionForInvalidId() {
-//        // Given
-//        Long invalidBudgetId = 999L;
-//
-//        // When / Then
-//        assertThrows(BudgetNotFoundException.class, () -> budgetService.findById(invalidBudgetId));
-//    }
-//
-//    @Test
-//    @Transactional
-//    void testGetBudgetById() {
-//        // When
-//        BudgetResponse response = budgetService.getBudgetById(budget.getBudgetId());
-//
-//        // Then
-//        assertNotNull(response);
-//        assertEquals(budget.getBudgetId(), response.budgetId());
-//        assertEquals(BigDecimal.valueOf(1000), response.toSpend());
-//    }
-//
-//    @Test
-//    @Transactional
-//    void testGetBudgetExpanses() {
-//        // Given
-//        Expanse expanse = Expanse.builder()
-//                .expanseName("Dinner")
-//                .currency("USD")
-//                .price(BigDecimal.valueOf(100))
-//                .paid(BigDecimal.valueOf(80))
-//                .exchangeRate(BigDecimal.valueOf(1.0))
-//                .trip(trip)
-//                .build();
-//        expanseRepository.save(expanse);
-//
-//        // When
-//        BudgetExpensesRespond budgetExpenses = budgetService.getBudgetExpanses(trip.getTripId(), budget.getBudgetId());
-//
-//        // Then
-//        assertNotNull(budgetExpenses);
-//        assertEquals(1, budgetExpenses.expanses().size());
-//        assertEquals("Dinner", budgetExpenses.expanses().getFirst().expanseName());
-//    }
-//}
+package com.andwis.travel_with_anna.trip.budget;
+
+
+import com.andwis.travel_with_anna.handler.exception.BudgetNotFoundException;
+import com.andwis.travel_with_anna.trip.day.Day;
+import com.andwis.travel_with_anna.trip.day.DayService;
+import com.andwis.travel_with_anna.trip.day.activity.Activity;
+import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
+import com.andwis.travel_with_anna.trip.expanse.*;
+import com.andwis.travel_with_anna.trip.trip.Trip;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@DisplayName("Budget Service tests")
+class BudgetServiceTest {
+    @Mock
+    private BudgetRepository budgetRepository;
+    @Mock
+    private ExpanseService expanseService;
+    @Mock
+    private ActivityService activityService;
+    @Mock
+    private DayService dayService;
+    @InjectMocks
+    private BudgetService budgetService;
+    private Budget budget;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        budget = Budget.builder()
+                .budgetId(1L)
+                .toSpend(new BigDecimal("1000.00"))
+                .currency("USD")
+                .trip(new Trip())
+                .build();
+        Trip trip = new Trip();
+        trip.setTripId(1L);
+        budget.setTrip(trip);
+    }
+
+    @Test
+    void testSaveBudget() {
+        // Given
+        // When
+        budgetService.saveBudget(budget);
+
+        // Then
+        verify(budgetRepository).save(budget);
+    }
+
+    @Test
+    void testUpdateBudget_UpdatesCurrencyAndCallsChangeTripCurrency() {
+        // Given
+        BudgetRequest request = BudgetRequest.builder()
+                .budgetId(1L)
+                .toSpend(new BigDecimal("1200.00"))
+                .currency("EUR")
+                .build();
+        when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
+        when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
+
+        // When
+        budgetService.updateBudget(request);
+
+        // Then
+        assertEquals(new BigDecimal("1200.00"), budget.getToSpend());
+        assertEquals("EUR", budget.getCurrency());
+        verify(expanseService).changeTripCurrency(budget);
+        verify(budgetRepository).save(budget);
+    }
+
+    @Test
+    void testUpdateBudget_BudgetNotFound() {
+        // Given
+        BudgetRequest request = BudgetRequest.builder()
+                .budgetId(1L)
+                .build();
+        when(budgetRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(BudgetNotFoundException.class, () -> budgetService.updateBudget(request));
+    }
+
+    @Test
+    void testFindById() {
+        // Given
+        when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
+
+        // When
+        Budget foundBudget = budgetService.findById(1L);
+
+        // Then
+        assertEquals(budget, foundBudget);
+    }
+
+    @Test
+    void testFindById_BudgetNotFound() {
+        // Given
+        when(budgetRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(BudgetNotFoundException.class, () -> budgetService.findById(1L));
+    }
+
+    @Test
+    void testUpdateBudget() {
+        // Given
+        BudgetRequest request = new BudgetRequest(
+                1L,"USD",  new BigDecimal("1500.00"), 1L);
+        when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
+        doNothing().when(expanseService).changeTripCurrency(any());
+
+        // When
+        budgetService.updateBudget(request);
+
+        // Then
+        assertEquals(new BigDecimal("1500.00"), budget.getToSpend());
+        assertEquals("USD", budget.getCurrency());
+        verify(budgetRepository).save(budget);
+    }
+
+    @Test
+    void testGetBudgetExpanses() {
+        // Given
+        Long tripId = 1L;
+        Long budgetId = 1L;
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget));
+        List<ExpanseResponse> expanses = new ArrayList<>();
+        ExpanseResponse expanse1 =  new ExpanseResponse(1L,"First Expanse", "USD",
+                new BigDecimal("100.00"), new BigDecimal("50.00"), new BigDecimal("2.00"),
+                new BigDecimal("200.00"), new BigDecimal("100.00"));
+        expanses.add(expanse1);
+        when(expanseService.getExpansesForTrip(tripId)).thenReturn(expanses);
+
+        // When
+        BudgetExpensesRespond budgetExpenses = budgetService.getBudgetExpanses(tripId, budgetId);
+
+        // Then
+        assertNotNull(budgetExpenses);
+        assertEquals(budget.getBudgetId(), budgetExpenses.budgetResponse().budgetId());
+        assertEquals(expanses, budgetExpenses.expanses());
+        assertEquals(new BigDecimal("200.00"), budgetExpenses.overallPriceInTripCurrency());
+    }
+
+    @Test
+    void testCalculateSumsByCurrency() {
+        // Given
+        List<ExpanseResponse> expanses = new ArrayList<>();
+        ExpanseResponse expanse1 =  new ExpanseResponse(1L,"First Expanse", "USD",
+                new BigDecimal("100.00"), new BigDecimal("50.00"), new BigDecimal("2.00"),
+                new BigDecimal("200.00"), new BigDecimal("100.00"));
+        expanses.add(expanse1);
+
+        // When
+        Map<String, ExpanseCalculator> sums = budgetService.calculateSumsByCurrency(expanses);
+
+        // Then
+        assertNotNull(sums);
+        assertTrue(sums.containsKey("USD"));
+        assertEquals(new BigDecimal("100.00"), sums.get("USD").getTotalPrice());
+        assertEquals(new BigDecimal("50.00"), sums.get("USD").getTotalPaid());
+    }
+
+    @Test
+    void testCalculateExpansesByBadgeByTripId() {
+        // Given
+        Long tripId = 1L;
+        Set<Day> days = new HashSet<>();
+        Day day = new Day();
+        day.setDayId(1L);
+        days.add(day);
+
+        Activity activity1 = new Activity();
+        activity1.setBadge("badge1");
+        activity1.setExpanse(Expanse.builder()
+                .price(new BigDecimal("100.00"))
+                .paid(new BigDecimal("50.00"))
+                .build());
+        Activity activity2 = new Activity();
+        activity2.setBadge("badge2");
+        activity2.setExpanse(Expanse.builder()
+                .price(new BigDecimal("100.00"))
+                .paid(new BigDecimal("70.00"))
+                .build());
+        day.setActivities(Set.of(activity1, activity2));
+        when(dayService.getDaysByTripId(tripId)).thenReturn(days);
+        when(activityService.getActivitiesByDayId(any())).thenReturn(Set.of(activity1, activity2));
+
+        // When
+        List<ExpanseTotalByBadge> result = budgetService.calculateExpansesByBadgeByTripId(tripId);
+
+        // Then
+        assertEquals(2, result.size());
+        assertEquals("badge1", result.get(0).getType());
+        assertEquals("badge2", result.get(1).getType());
+    }
+}

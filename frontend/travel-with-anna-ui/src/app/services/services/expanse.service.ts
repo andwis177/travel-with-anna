@@ -11,6 +11,7 @@ import { StrictHttpResponse } from '../strict-http-response';
 
 import { createOrUpdateExpanse } from '../fn/expanse/create-or-update-expanse';
 import { CreateOrUpdateExpanse$Params } from '../fn/expanse/create-or-update-expanse';
+import { ExchangeResponse } from '../models/exchange-response';
 import { ExpanseInTripCurrency } from '../models/expanse-in-trip-currency';
 import { ExpanseResponse } from '../models/expanse-response';
 import { getExchangeRate } from '../fn/expanse/get-exchange-rate';
@@ -29,7 +30,7 @@ export class ExpanseService extends BaseService {
   }
 
   /** Path part for operation `createOrUpdateExpanse()` */
-  static readonly CreateOrUpdateExpansePath = '/expanse/entity/save';
+  static readonly CreateOrUpdateExpansePath = '/expanse';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -54,7 +55,7 @@ export class ExpanseService extends BaseService {
   }
 
   /** Path part for operation `getExpanseById()` */
-  static readonly GetExpanseByIdPath = '/expanse/{expanseId}/expanse';
+  static readonly GetExpanseByIdPath = '/expanse/{expanseId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -79,7 +80,7 @@ export class ExpanseService extends BaseService {
   }
 
   /** Path part for operation `getExpanseByEntity()` */
-  static readonly GetExpanseByEntityPath = '/expanse/{entityId}/entity/{entityType}';
+  static readonly GetExpanseByEntityPath = '/expanse/{entityId}/type/{entityType}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -137,7 +138,7 @@ export class ExpanseService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getExchangeRate$Response(params: GetExchangeRate$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
+  getExchangeRate$Response(params: GetExchangeRate$Params, context?: HttpContext): Observable<StrictHttpResponse<ExchangeResponse>> {
     return getExchangeRate(this.http, this.rootUrl, params, context);
   }
 
@@ -147,9 +148,9 @@ export class ExpanseService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getExchangeRate(params: GetExchangeRate$Params, context?: HttpContext): Observable<number> {
+  getExchangeRate(params: GetExchangeRate$Params, context?: HttpContext): Observable<ExchangeResponse> {
     return this.getExchangeRate$Response(params, context).pipe(
-      map((r: StrictHttpResponse<number>): number => r.body)
+      map((r: StrictHttpResponse<ExchangeResponse>): ExchangeResponse => r.body)
     );
   }
 

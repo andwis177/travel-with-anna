@@ -28,4 +28,4 @@ export function getDays(http: HttpClient, rootUrl: string, params: GetDays$Param
   );
 }
 
-getDays.PATH = '/day/{tripId}';
+getDays.PATH = '/day/trip/{tripId}';

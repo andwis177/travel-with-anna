@@ -26,4 +26,4 @@ export function findAllCountryCurrencies(http: HttpClient, rootUrl: string, para
   );
 }
 
-findAllCountryCurrencies.PATH = '/api/country/currencies-all';
+findAllCountryCurrencies.PATH = '/api/country/currencies';

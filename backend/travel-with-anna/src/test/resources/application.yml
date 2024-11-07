@@ -14,7 +14,8 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
   flyway:
     cleanDisabled: false
-    locations: classpath:db/migration
+    locations: classpath:db/migration/test
+    cleanOnValidationError: true
   mail:
     host: sandbox.smtp.mailtrap.io
     port: 2525

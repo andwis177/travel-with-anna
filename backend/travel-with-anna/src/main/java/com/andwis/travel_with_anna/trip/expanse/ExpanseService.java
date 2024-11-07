@@ -26,7 +26,6 @@ import java.util.function.Supplier;
 public class ExpanseService {
 
     private static final String defaultCurrency = "USD";
-
     private final ExpanseRepository expanseRepository;
     private final CurrencyRepository currencyRepository;
     private final CurrencyExchangeClient currencyExchangeService;
@@ -106,7 +105,8 @@ public class ExpanseService {
     }
 
     public ExpanseResponse getExpanseById(Long expanseId) {
-        Expanse expanse = expanseRepository.findById(expanseId).orElseThrow();
+        Expanse expanse = expanseRepository.findById(expanseId).orElseThrow(() -> new ExpanseNotFoundException(
+                "Expanse not found"));
         return ExpanseMapper.toExpanseResponse(expanse);
     }
 
@@ -156,7 +156,7 @@ public class ExpanseService {
                 getUSD.multiply(currencyToExchange.getExchangeValue().setScale(5, RoundingMode.HALF_UP)));
     }
 
-    private void verifyCurrencyExchange() {
+    void verifyCurrencyExchange() {
         if (currencyRepository.count() == 0) {
             saveAllCurrencyExchange();
         }
@@ -172,7 +172,6 @@ public class ExpanseService {
             }
         }
     }
-
 
     private void saveAllCurrencyExchange() {
         currencyRepository.deleteAll();

@@ -28,4 +28,4 @@ export function fetchAddressDetailsByTripId(http: HttpClient, rootUrl: string, p
   );
 }
 
-fetchAddressDetailsByTripId.PATH = '/activity/get/{tripId}/trip/details';
+fetchAddressDetailsByTripId.PATH = '/activity/trip/{tripId}/details';

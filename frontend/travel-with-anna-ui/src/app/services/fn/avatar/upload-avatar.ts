@@ -31,4 +31,4 @@ export function uploadAvatar(http: HttpClient, rootUrl: string, params?: UploadA
   );
 }
 
-uploadAvatar.PATH = '/avatar/upload-avatar';
+uploadAvatar.PATH = '/avatar';

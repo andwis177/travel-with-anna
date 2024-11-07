@@ -28,4 +28,4 @@ export function findAllCountryCities(http: HttpClient, rootUrl: string, params: 
   );
 }
 
-findAllCountryCities.PATH = '/api/country/cities-all';
+findAllCountryCities.PATH = '/api/country/cities';

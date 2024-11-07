@@ -3,11 +3,13 @@ package com.andwis.travel_with_anna.user.admin;
 import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import com.andwis.travel_with_anna.user.UserService;
 import com.andwis.travel_with_anna.user.avatar.*;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +23,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +48,6 @@ class AdminServiceTest {
     private RoleRepository roleRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     private Avatar avatar;
     private User user;
     private Long userId;
@@ -78,6 +80,10 @@ class AdminServiceTest {
                 .build();
         Long avatar2Id = avatarService.saveAvatar(avatar2).getAvatarId();
 
+        Trip trip = Trip.builder()
+                .tripName("tripName")
+                .build();
+
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
@@ -95,7 +101,9 @@ class AdminServiceTest {
                 .password(passwordEncoder.encode("password"))
                 .role(retrivedUserRole)
                 .avatarId(avatar2Id)
+                .ownedTrips(new HashSet<>())
                 .build();
+        secondaryUser.addTrip(trip);
         secondaryUser.setAccountLocked(false);
         secondaryUser.setEnabled(true);
         secondaryUserId = userRepository.save(secondaryUser).getUserId();
@@ -124,7 +132,6 @@ class AdminServiceTest {
     @Test
     void testGetUserAdminViewByIdentifier_UserId() {
         // Getter
-
         // When
         UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUserId.toString(), createAuthentication(user));
 
@@ -136,7 +143,6 @@ class AdminServiceTest {
     @Test
     void testGetUserAdminViewByIdentifier_UserName() {
         // Getter
-
         // When
         UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUser.getUserName(), createAuthentication(user));
 
@@ -169,7 +175,6 @@ class AdminServiceTest {
     @Test
     void getUserAdminViewByIdentifier_Email() {
         // Getter
-
         // When
         UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(user.getEmail(), createAuthentication(secondaryUser));
 
@@ -191,6 +196,7 @@ class AdminServiceTest {
     void testDeleteUser() {
         // Getter
         UserAdminDeleteRequest request = new UserAdminDeleteRequest(secondaryUserId, "password");
+
         // When
         adminService.deleteUser(request, createAuthentication(user));
 
@@ -209,7 +215,7 @@ class AdminServiceTest {
         assertTrue(roles.contains(getAdminRole()));
     }
 
-    private Authentication createAuthentication(User user) {
+    private @NotNull Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
         return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }

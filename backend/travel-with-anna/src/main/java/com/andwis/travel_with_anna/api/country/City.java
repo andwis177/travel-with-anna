@@ -1,6 +1,9 @@
 package com.andwis.travel_with_anna.api.country;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.jackson.Jacksonized;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -8,6 +11,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Builder
+@Jacksonized
 public class City implements Comparable<City> {
     private String city;
 

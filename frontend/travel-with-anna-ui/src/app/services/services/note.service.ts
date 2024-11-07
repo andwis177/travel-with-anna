@@ -21,31 +21,6 @@ export class NoteService extends BaseService {
     super(config, http);
   }
 
-  /** Path part for operation `saveNote()` */
-  static readonly SaveNotePath = '/note/save';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `saveNote()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  saveNote$Response(params: SaveNote$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return saveNote(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `saveNote$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  saveNote(params: SaveNote$Params, context?: HttpContext): Observable<void> {
-    return this.saveNote$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
-  }
-
   /** Path part for operation `getNote()` */
   static readonly GetNotePath = '/note';
 
@@ -68,6 +43,31 @@ export class NoteService extends BaseService {
   getNote(params: GetNote$Params, context?: HttpContext): Observable<NoteResponse> {
     return this.getNote$Response(params, context).pipe(
       map((r: StrictHttpResponse<NoteResponse>): NoteResponse => r.body)
+    );
+  }
+
+  /** Path part for operation `saveNote()` */
+  static readonly SaveNotePath = '/note';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `saveNote()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  saveNote$Response(params: SaveNote$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return saveNote(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `saveNote$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  saveNote(params: SaveNote$Params, context?: HttpContext): Observable<void> {
+    return this.saveNote$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 

@@ -168,39 +168,49 @@ export class ActivityComponent implements OnInit{
     this.secondActivity.status = status;
   }
 
-  buildSingleActivity() {
+  executeSingleActivity() {
     this.errorMsg = [];
+    if (this.startTime != '' && this.endTime != '') {
+      this.buildSingleActivity();
+      this.createSingleActivity(this.firstActivity);
+      this.onClose();
+    } else {
+      this.errorMsg.push('Please select date and time');
+    }
+  }
+
+  executeAssociatedActivity(addressSeparated: boolean) {
+    this.errorMsg = [];
+    if (this.endDate != '' && this.startDate != '' && this.startTime != '' && this.endTime != '') {
+      this.buildAssociatedActivity();
+      this.createAssociatedActivities(this.firstActivity, this.secondActivity, addressSeparated);
+    } else {
+      this.errorMsg.push('Please select date and time');
+    }
+  }
+
+  buildSingleActivity() {
     this.firstActivity.dateTime = this.startDate + 'T' + this.startTime;
     this.firstActivity.endTime = this.endTime;
     this.firstActivity.tripId = this.trip.tripId!;
     this.firstActivity.addressRequest = this.addressRequest;
-    this.createSingleActivity(this.firstActivity);
-    this.onClose();
   }
 
   buildAssociatedActivity() {
-    this.errorMsg = [];
-    if (this.endDate != '') {
-      this.secondActivity.activityTitle = this.firstActivity.activityTitle;
-      this.secondActivity.dayTag = this.firstActivity.dayTag;
+    this.secondActivity.activityTitle = this.firstActivity.activityTitle;
+    this.secondActivity.dayTag = this.firstActivity.dayTag;
 
-      this.firstActivity.dateTime = this.startDate + 'T' + this.startTime;
-      this.secondActivity.dateTime = this.endDate + 'T' + this.endTime;
+    this.firstActivity.dateTime = this.startDate + 'T' + this.startTime;
+    this.secondActivity.dateTime = this.endDate + 'T' + this.endTime;
 
-      this.firstActivity.tripId = this.trip.tripId!;
-      this.secondActivity.tripId = this.trip.tripId!;
+    this.firstActivity.tripId = this.trip.tripId!;
+    this.secondActivity.tripId = this.trip.tripId!;
 
-      this.firstActivity.addressRequest = this.addressRequest;
-      this.secondActivity.addressRequest = this.addressRequest;
-
-      this.createAssociatedActivities(this.firstActivity, this.secondActivity);
-    } else {
-      this.errorMsg.push('Please select a check-out date');
-    }
+    this.firstActivity.addressRequest = this.addressRequest;
+    this.secondActivity.addressRequest = this.addressRequest;
   }
 
   createSingleActivity(activityRequest: ActivityRequest){
-    this.errorMsg = [];
     const params: CreateActivity$Params = {body: activityRequest}
     this.activityService.createActivity(params)
       .subscribe({
@@ -212,10 +222,9 @@ export class ActivityComponent implements OnInit{
       })
   }
 
-  createAssociatedActivities(firstActivityRequest: ActivityRequest, secondActivityRequest: ActivityRequest) {
-    this.errorMsg = [];
+  createAssociatedActivities(firstActivityRequest: ActivityRequest, secondActivityRequest: ActivityRequest, addressSeparated: boolean) {
     const params: CreateAssociatedActivities$Params = {
-      body:{firstRequest:firstActivityRequest, secondRequest: secondActivityRequest}
+      body:{firstRequest:firstActivityRequest, secondRequest: secondActivityRequest, addressSeparated: addressSeparated}
     }
     this.activityService.createAssociatedActivities(params)
       .subscribe({

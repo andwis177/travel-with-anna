@@ -33,7 +33,6 @@ import {DayDetailsButtonsComponent} from "../../day-details-buttons/day-details-
 import {ShopComponent} from "../buttons/shop/shop.component";
 import {MatCheckbox} from "@angular/material/checkbox";
 
-
 @Component({
   selector: 'app-activity-edit',
   standalone: true,
@@ -90,7 +89,6 @@ export class ActivityEditComponent implements OnInit {
   cities: Array<City> = [];
   city: City = {};
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
-
 
   constructor(public dialog: MatDialog,
               private datePipe: DatePipe,
@@ -194,6 +192,7 @@ export class ActivityEditComponent implements OnInit {
       currentDate.setDate(currentDate.getDate() + 1);
     }
   }
+
 
   getCountries() {
     this.errorMsg = [];
@@ -308,8 +307,10 @@ export class ActivityEditComponent implements OnInit {
 
     const params: UpdateActivity$Params = {body: this.activityUpdateRequest};
     this.activityService.updateActivity(params).subscribe({
-      next: () => {
+      next: (respond) => {
+        this.sharedService.setActivity(this.activityUpdateRequest);
         this.dialog.getDialogById('activity-edit-dialog')?.close();
+        console.log(respond.message);
       },
       error: (error) => {
         this.errorMsg = this.errorService.errorHandlerWithJson(error);

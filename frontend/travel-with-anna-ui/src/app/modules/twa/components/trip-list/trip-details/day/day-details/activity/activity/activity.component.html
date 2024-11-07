@@ -207,7 +207,7 @@
         (provideType)="receiveType($event)"
         (provideFirstStatus)="receiveFirstStatus($event)"
         (provideSecondStatus)="receiveSecondStatus($event)"
-        (afterStay)="buildAssociatedActivity()"
+        (afterStay)="executeAssociatedActivity(false)"
       ></app-stay>
     </div>
 
@@ -215,7 +215,7 @@
       <app-travel
         (provideBadge)="receiveBadge($event)"
         (provideType)="receiveType($event)"
-        (afterTravel)="buildSingleActivity()"
+        (afterTravel)="executeSingleActivity()"
       ></app-travel>
     </div>
 
@@ -225,7 +225,7 @@
         (provideType)="receiveType($event)"
         (provideFirstStatus)="receiveFirstStatus($event)"
         (provideSecondStatus)="receiveSecondStatus($event)"
-        (afterRent)="buildAssociatedActivity()"
+        (afterRent)="executeAssociatedActivity(true)"
       ></app-rent>
     </div>
 
@@ -233,7 +233,7 @@
       <app-eat
         (provideBadge)="receiveBadge($event)"
         (provideType)="receiveType($event)"
-        (afterEat)="buildSingleActivity()"
+        (afterEat)="executeSingleActivity()"
       ></app-eat>
     </div>
 
@@ -241,7 +241,7 @@
       <app-trek
         (provideBadge)="receiveBadge($event)"
         (provideType)="receiveType($event)"
-        (afterTrek)="buildSingleActivity()"
+        (afterTrek)="executeSingleActivity()"
       ></app-trek>
     </div>
 
@@ -249,7 +249,7 @@
       <app-event
         (provideBadge)="receiveBadge($event)"
         (provideType)="receiveType($event)"
-        (afterEvent)="buildSingleActivity()"
+        (afterEvent)="executeSingleActivity()"
       ></app-event>
     </div>
 
@@ -257,7 +257,7 @@
       <app-shop
         (provideBadge)="receiveBadge($event)"
         (provideType)="receiveType($event)"
-        (afterShop)="buildSingleActivity()"
+        (afterShop)="executeSingleActivity()"
       ></app-shop>
     </div>
 

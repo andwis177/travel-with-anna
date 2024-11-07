@@ -28,4 +28,4 @@ export function createTrip(http: HttpClient, rootUrl: string, params: CreateTrip
   );
 }
 
-createTrip.PATH = '/trip/create';
+createTrip.PATH = '/trip';

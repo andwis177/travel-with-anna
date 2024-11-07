@@ -28,4 +28,4 @@ export function updateUser(http: HttpClient, rootUrl: string, params: UpdateUser
   );
 }
 
-updateUser.PATH = '/admin/update';
+updateUser.PATH = '/admin';

@@ -66,8 +66,4 @@ public class Address {
         activities.add(activity);
         activity.setAddress(this);
     }
-
-    public void removeActivity(Activity activity) {
-        this.activities.remove(activity);
-    }
 }

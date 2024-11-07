@@ -16,8 +16,8 @@ export interface GetExpanseByEntity$Params {
 export function getExpanseByEntity(http: HttpClient, rootUrl: string, params: GetExpanseByEntity$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseResponse>> {
   const rb = new RequestBuilder(rootUrl, getExpanseByEntity.PATH, 'get');
   if (params) {
-    rb.query('entityId', params.entityId, {});
-    rb.query('entityType', params.entityType, {});
+    rb.path('entityId', params.entityId, {});
+    rb.path('entityType', params.entityType, {});
   }
 
   return http.request(
@@ -30,4 +30,4 @@ export function getExpanseByEntity(http: HttpClient, rootUrl: string, params: Ge
   );
 }
 
-getExpanseByEntity.PATH = '/expanse/{entityId}/entity/{entityType}';
+getExpanseByEntity.PATH = '/expanse/{entityId}/type/{entityType}';

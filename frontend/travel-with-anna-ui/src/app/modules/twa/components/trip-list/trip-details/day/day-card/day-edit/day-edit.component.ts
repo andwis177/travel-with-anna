@@ -73,7 +73,7 @@ export class DayEditComponent {
   }
 
   private formatDateToJson(date: Date): string {
-    return this.datePipe.transform(date, 'MM-dd-yyyy')!;
+    return this.datePipe.transform(date, 'yyyy-MM-dd')!;
   }
 
   updateDay() {

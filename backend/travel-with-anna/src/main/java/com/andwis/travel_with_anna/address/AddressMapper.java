@@ -1,8 +1,11 @@
 package com.andwis.travel_with_anna.address;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 public class AddressMapper {
 
-    public static Address toAddress(AddressRequest addressRequest) {
+    public static Address toAddress(@NotNull AddressRequest addressRequest) {
         return Address.builder()
                 .place(addressRequest.getPlace())
                 .country(addressRequest.getCountry())
@@ -16,7 +19,7 @@ public class AddressMapper {
                 .build();
     }
 
-    public static AddressResponse toAddressResponse(Address address) {
+    public static @NotNull AddressResponse toAddressResponse(@NotNull Address address) {
         return new AddressResponse(
                 address.getAddressId(),
                 address.getPlace(),
@@ -31,7 +34,7 @@ public class AddressMapper {
         );
     }
 
-    public static void updateAddress(Address address, AddressRequest addressRequest) {
+    public static void updateAddress(@NotNull Address address, @NotNull AddressRequest addressRequest) {
         address.setPlace(addressRequest.getPlace());
         address.setCountry(addressRequest.getCountry());
         address.setCountryCode(addressRequest.getCountryCode());

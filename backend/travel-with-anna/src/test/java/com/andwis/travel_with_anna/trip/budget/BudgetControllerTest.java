@@ -2,7 +2,9 @@ package com.andwis.travel_with_anna.trip.budget;
 
 import com.andwis.travel_with_anna.trip.expanse.ExpanseByCurrency;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
+import com.andwis.travel_with_anna.trip.expanse.ExpanseTotalByBadge;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Budget Controller Tests")
 class BudgetControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private BudgetFacade budgetFacade;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -43,14 +42,12 @@ class BudgetControllerTest {
         Budget budget = new Budget();
         budget.setCurrency("USD");
         budget.setToSpend(BigDecimal.valueOf(1000));
-
         String requestBody = objectMapper.writeValueAsString(budget);
-
         doNothing().when(budgetFacade).saveBudget(budget);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
-                        .post("/budget/create")
+                        .post("/budget")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted());
@@ -61,8 +58,8 @@ class BudgetControllerTest {
     void getBudgetById_ShouldReturnBudget() throws Exception {
         // Given
         Long budgetId = 1L;
-        BudgetResponse budgetResponse = new BudgetResponse(budgetId, "USD", BigDecimal.valueOf(500), 1L);
-
+        BudgetResponse budgetResponse = new BudgetResponse(
+                budgetId, "USD", BigDecimal.valueOf(500), 1L);
         when(budgetFacade.getBudgetById(budgetId)).thenReturn(budgetResponse);
 
         // When & Then
@@ -79,9 +76,8 @@ class BudgetControllerTest {
         // Given
         Long tripId = 2L;
         Long budgetId = 1L;
-        
-        BudgetResponse budgetResponse = new BudgetResponse(budgetId, "USD", BigDecimal.valueOf(1000), 1L); 
-        
+        BudgetResponse budgetResponse = new BudgetResponse(
+                budgetId, "USD", BigDecimal.valueOf(1000), 1L);
         List<ExpanseResponse> expanses = List.of(
                 new ExpanseResponse(
                         1L, "Food", "USD", BigDecimal.valueOf(100), BigDecimal.valueOf(50),
@@ -94,7 +90,6 @@ class BudgetControllerTest {
         );
 
         BudgetExpensesRespond budgetExpensesRespond = getBudgetExpensesRespond(budgetResponse, expanses);
-
         when(budgetFacade.getBudgetExpanses(tripId, budgetId)).thenReturn(budgetExpensesRespond);
 
         // When & Then
@@ -109,9 +104,9 @@ class BudgetControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void updateBudget_ShouldReturnOk() throws Exception {
         // Given
-        BudgetRequest budgetRequest = new BudgetRequest(1L, "USD", BigDecimal.valueOf(1000), 1L);
+        BudgetRequest budgetRequest = new BudgetRequest(
+                1L, "USD", BigDecimal.valueOf(1000), 1L);
         String requestBody = objectMapper.writeValueAsString(budgetRequest);
-
         doNothing().when(budgetFacade).updateBudget(budgetRequest);
 
         // When & Then
@@ -122,7 +117,26 @@ class BudgetControllerTest {
                 .andExpect(status().isOk());
     }
 
-    private static BudgetExpensesRespond getBudgetExpensesRespond(BudgetResponse budgetResponse, List<ExpanseResponse> expanses) {
+    @Test
+    @WithMockUser(username = "email@example.com", authorities = "User")
+    void getExpansesByBadgeByTripId_ShouldReturnExpanses() throws Exception {
+        // Given
+        Long tripId = 1L;
+        List<ExpanseTotalByBadge> expanseTotals = List.of(
+                new ExpanseTotalByBadge("Food", BigDecimal.valueOf(150), BigDecimal.valueOf(75)),
+                new ExpanseTotalByBadge("Transport", BigDecimal.valueOf(200), BigDecimal.valueOf(100))
+        );
+        when(budgetFacade.getExpansesByBadgeByTripId(tripId)).thenReturn(expanseTotals);
+
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/budget/calculate/{tripId}", tripId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expanseTotals)));
+    }
+
+    private static @NotNull BudgetExpensesRespond getBudgetExpensesRespond(BudgetResponse budgetResponse, List<ExpanseResponse> expanses) {
         List<ExpanseByCurrency> sumsByCurrency = List.of(
                 new ExpanseByCurrency(
                         "USD", BigDecimal.valueOf(300), BigDecimal.valueOf(150),

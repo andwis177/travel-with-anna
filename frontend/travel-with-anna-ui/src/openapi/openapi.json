@@ -17,7 +17,47 @@
     }
   ],
   "paths": {
-    "/trip/create": {
+    "/trip": {
+      "get": {
+        "tags": [
+          "Trip"
+        ],
+        "operationId": "getAllOwnersTrips",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseTripResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "Trip"
@@ -46,9 +86,88 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Trip"
+        ],
+        "operationId": "deleteTrip",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Trip"
+        ],
+        "operationId": "updateTrip",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripEditRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
-    "/note/save": {
+    "/note": {
+      "get": {
+        "tags": [
+          "Note"
+        ],
+        "operationId": "getNote",
+        "parameters": [
+          {
+            "name": "entityId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "entityType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "Note"
@@ -71,7 +190,7 @@
         }
       }
     },
-    "/expanse/entity/save": {
+    "/expanse": {
       "post": {
         "tags": [
           "Expanse"
@@ -147,7 +266,7 @@
         }
       }
     },
-    "/budget/create": {
+    "/budget": {
       "post": {
         "tags": [
           "Budget"
@@ -170,7 +289,26 @@
         }
       }
     },
-    "/avatar/upload-avatar": {
+    "/avatar": {
+      "get": {
+        "tags": [
+          "Avatar"
+        ],
+        "operationId": "getCurrentUserAvatar",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "Avatar"
@@ -268,7 +406,7 @@
         }
       }
     },
-    "/api/country/cities-all": {
+    "/api/country/cities": {
       "post": {
         "tags": [
           "country-controller"
@@ -301,7 +439,7 @@
         }
       }
     },
-    "/activity/create": {
+    "/activity": {
       "post": {
         "tags": [
           "Activity"
@@ -324,7 +462,7 @@
         }
       }
     },
-    "/activity/create/associated": {
+    "/activity/associated": {
       "post": {
         "tags": [
           "Activity"
@@ -347,7 +485,35 @@
         }
       }
     },
-    "/user/update": {
+    "/user": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "tags": [
           "User"
@@ -403,29 +569,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/trip/update": {
-      "patch": {
-        "tags": [
-          "Trip"
-        ],
-        "operationId": "updateTrip",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TripEditRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
           }
         }
       }
@@ -502,7 +645,7 @@
         }
       }
     },
-    "/backpack/{backpackId}/item-add": {
+    "/backpack/{backpackId}/item": {
       "patch": {
         "tags": [
           "Backpack"
@@ -566,7 +709,7 @@
         }
       }
     },
-    "/admin/update": {
+    "/admin": {
       "patch": {
         "tags": [
           "Admin"
@@ -607,7 +750,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -625,48 +775,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserCredentialsResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/trip": {
-      "get": {
-        "tags": [
-          "Trip"
-        ],
-        "operationId": "getAllOwnersTrips",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PageResponseTripResponse"
                 }
               }
             }
@@ -728,45 +836,6 @@
         }
       }
     },
-    "/note": {
-      "get": {
-        "tags": [
-          "Note"
-        ],
-        "operationId": "getNote",
-        "parameters": [
-          {
-            "name": "entityId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "entityType",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NoteResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/item/{backpackId}": {
       "get": {
         "tags": [
@@ -801,7 +870,7 @@
         }
       }
     },
-    "/expanse/{expanseId}/expanse": {
+    "/expanse/{expanseId}": {
       "get": {
         "tags": [
           "Expanse"
@@ -832,7 +901,7 @@
         }
       }
     },
-    "/expanse/{entityId}/entity/{entityType}": {
+    "/expanse/{entityId}/type/{entityType}": {
       "get": {
         "tags": [
           "Expanse"
@@ -841,7 +910,7 @@
         "parameters": [
           {
             "name": "entityId",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "integer",
@@ -850,7 +919,7 @@
           },
           {
             "name": "entityType",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"
@@ -947,7 +1016,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "number"
+                  "$ref": "#/components/schemas/ExchangeResponse"
                 }
               }
             }
@@ -955,7 +1024,38 @@
         }
       }
     },
-    "/day/{tripId}": {
+    "/day/{dayId}": {
+      "get": {
+        "tags": [
+          "Day"
+        ],
+        "operationId": "getDayById",
+        "parameters": [
+          {
+            "name": "dayId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DayResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/day/trip/{tripId}": {
       "get": {
         "tags": [
           "Day"
@@ -982,37 +1082,6 @@
                   "items": {
                     "$ref": "#/components/schemas/DayResponse"
                   }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/day/{dayId}/day": {
-      "get": {
-        "tags": [
-          "Day"
-        ],
-        "operationId": "getDayById",
-        "parameters": [
-          {
-            "name": "dayId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DayResponse"
                 }
               }
             }
@@ -1156,27 +1225,6 @@
         }
       }
     },
-    "/avatar/get-avatar": {
-      "get": {
-        "tags": [
-          "Avatar"
-        ],
-        "operationId": "getCurrentUserAvatar",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "format": "byte"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/auth/activate-account": {
       "get": {
         "tags": [
@@ -1223,7 +1271,7 @@
         }
       }
     },
-    "/api/country/names-all": {
+    "/api/country/names": {
       "get": {
         "tags": [
           "country-controller"
@@ -1246,7 +1294,7 @@
         }
       }
     },
-    "/api/country/currencies-all": {
+    "/api/country/currencies": {
       "get": {
         "tags": [
           "country-controller"
@@ -1395,7 +1443,7 @@
         }
       }
     },
-    "/activity/get/{tripId}/trip/details": {
+    "/activity/trip/{tripId}/details": {
       "get": {
         "tags": [
           "Activity"
@@ -1426,7 +1474,7 @@
         }
       }
     },
-    "/activity/get/{dayId}": {
+    "/activity/day/{dayId}": {
       "get": {
         "tags": [
           "Activity"
@@ -1457,7 +1505,7 @@
         }
       }
     },
-    "/activity/get/{dayId}/day/details": {
+    "/activity/day/{dayId}/details": {
       "get": {
         "tags": [
           "Activity"
@@ -1488,59 +1536,6 @@
         }
       }
     },
-    "/user/delete": {
-      "delete": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "delete",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/trip/delete": {
-      "delete": {
-        "tags": [
-          "Trip"
-        ],
-        "operationId": "deleteTrip",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TripRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/day": {
       "delete": {
         "tags": [
@@ -1564,7 +1559,7 @@
         }
       }
     },
-    "/backpack/delete/{itemId}/item": {
+    "/backpack/{itemId}/item": {
       "delete": {
         "tags": [
           "Backpack"
@@ -1588,7 +1583,7 @@
         }
       }
     },
-    "/admin/delete/{userId}": {
+    "/admin/{userId}": {
       "delete": {
         "tags": [
           "Admin"
@@ -1995,6 +1990,9 @@
           },
           "secondRequest": {
             "$ref": "#/components/schemas/ActivityRequest"
+          },
+          "addressSeparated": {
+            "type": "boolean"
           }
         }
       },
@@ -2080,9 +2078,6 @@
             "maxLength": 40,
             "minLength": 0,
             "type": "string"
-          },
-          "expanse": {
-            "$ref": "#/components/schemas/ExpanseResponse"
           },
           "packed": {
             "type": "boolean"
@@ -2232,6 +2227,14 @@
           }
         }
       },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
       "UserCredentialsResponse": {
         "type": "object",
         "properties": {
@@ -2351,6 +2354,17 @@
             "type": "number"
           },
           "paid": {
+            "type": "number"
+          }
+        }
+      },
+      "ExchangeResponse": {
+        "type": "object",
+        "properties": {
+          "errorMsg": {
+            "type": "string"
+          },
+          "exchangeRate": {
             "type": "number"
           }
         }

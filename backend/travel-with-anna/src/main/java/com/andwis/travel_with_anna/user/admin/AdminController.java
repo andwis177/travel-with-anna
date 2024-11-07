@@ -41,7 +41,7 @@ public class AdminController {
         return ResponseEntity.ok(userAvatar);
     }
 
-    @PatchMapping("/update")
+    @PatchMapping
     public ResponseEntity<Void> updateUser(
             @RequestBody @Valid UserAdminUpdateRequest request,
             Authentication authentication)
@@ -50,7 +50,7 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<UserResponse> deleteUser(
             @RequestBody @Valid UserAdminDeleteRequest request,
             Authentication authentication) {

@@ -24,7 +24,7 @@ export class BackpackService extends BaseService {
   }
 
   /** Path part for operation `addItemToBackpack()` */
-  static readonly AddItemToBackpackPath = '/backpack/{backpackId}/item-add';
+  static readonly AddItemToBackpackPath = '/backpack/{backpackId}/item';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -74,7 +74,7 @@ export class BackpackService extends BaseService {
   }
 
   /** Path part for operation `deleteItem()` */
-  static readonly DeleteItemPath = '/backpack/delete/{itemId}/item';
+  static readonly DeleteItemPath = '/backpack/{itemId}/item';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.

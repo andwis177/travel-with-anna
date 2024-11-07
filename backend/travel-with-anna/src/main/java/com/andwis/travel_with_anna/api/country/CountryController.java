@@ -13,19 +13,19 @@ public class CountryController {
 
     private final CountryClient countryClient;
 
-    @GetMapping("/names-all")
+    @GetMapping("/names")
     public ResponseEntity<List<Country>> findAllCountryNames() {
         List<Country> countryNames = countryClient.fetchAllCountries();
         return ResponseEntity.ok(countryNames);
     }
 
-    @GetMapping("/currencies-all")
+    @GetMapping("/currencies")
     public ResponseEntity<List<CountryCurrency>> findAllCountryCurrencies() {
         List<CountryCurrency> currencies = countryClient.fetchAllCountriesCurrencies();
         return  ResponseEntity.ok(currencies);
     }
 
-    @PostMapping("/cities-all")
+    @PostMapping("/cities")
     public ResponseEntity<List<City>> findAllCountryCities(@RequestParam String country) {
         List<City> countryCities = countryClient.fetchAllCountryCities(country);
         return ResponseEntity.ok(countryCities);

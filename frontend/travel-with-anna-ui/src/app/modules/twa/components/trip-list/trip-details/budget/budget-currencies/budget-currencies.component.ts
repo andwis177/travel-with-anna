@@ -20,7 +20,7 @@ import {MatInput} from "@angular/material/input";
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {MatTooltip} from "@angular/material/tooltip";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {LiveAnnouncer} from "@angular/cdk/a11y";
 import {SelectionModel} from "@angular/cdk/collections";
@@ -53,7 +53,8 @@ import {ExpanseByCurrency} from "../../../../../../../services/models/expanse-by
     NgIf,
     ReactiveFormsModule,
     MatHeaderCellDef,
-    FormsModule
+    FormsModule,
+    NgClass
   ],
   templateUrl: './budget-currencies.component.html',
   styleUrl: './budget-currencies.component.scss'
@@ -132,6 +133,14 @@ export class BudgetCurrenciesComponent implements OnInit, AfterViewInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount)
+  }
+
+  getColorAmount(amount: number): string {
+    if (amount < 0) {
+      return 'negative';
+    } else {
+      return 'positive';
+    }
   }
 
   onClose() {

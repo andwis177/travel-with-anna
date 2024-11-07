@@ -29,4 +29,4 @@ export function delete$(http: HttpClient, rootUrl: string, params: Delete$Params
   );
 }
 
-delete$.PATH = '/user/delete';
+delete$.PATH = '/user';

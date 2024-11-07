@@ -7,6 +7,9 @@ import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.trip.trip.TripRepository;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.relation.RoleNotFoundException;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
@@ -31,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @DisplayName("User Service tests")
 class UserServiceTest {
-
     @Autowired
     private UserService userService;
     @Autowired
@@ -40,6 +42,8 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private TripRepository tripRepository;
     private User user;
     private Role retrivedRole;
     private Long userId;
@@ -52,14 +56,20 @@ class UserServiceTest {
         Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
+        Trip trip = Trip.builder()
+                .tripName("tripName")
+                .build();
+
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
                 .role(retrivedRole)
                 .avatarId(1L)
+                .ownedTrips(new HashSet<>())
                 .build();
         user.setEnabled(true);
+        user.addTrip(trip);
         userId = userRepository.save(user).getUserId();
 
         User secondaryUser = User.builder()
@@ -77,6 +87,7 @@ class UserServiceTest {
     void cleanUp() {
         userRepository.deleteAll();
         roleRepository.deleteAll();
+        tripRepository.deleteAll();
     }
 
     @Test
@@ -327,7 +338,7 @@ class UserServiceTest {
         assertEquals(usersQty - 1, userQtyAfterDelete);
     }
 
-    private Authentication createAuthentication(User user) {
+    private @NotNull Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
         return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }

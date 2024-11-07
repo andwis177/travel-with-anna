@@ -28,4 +28,4 @@ export function deleteTrip(http: HttpClient, rootUrl: string, params: DeleteTrip
   );
 }
 
-deleteTrip.PATH = '/trip/delete';
+deleteTrip.PATH = '/trip';

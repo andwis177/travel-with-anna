@@ -1,7 +1,6 @@
 <div class="item" >
   <button class="button" (click)="openDay($event)">
     <div class="day-number trip-font">- {{day.dayNumber}} -</div>
-
     <div class="day-date trip-font" [ngClass]="getTodayClass(day.isToday!)">
       <div>{{day.date}}</div>
       <div>{{day.dayOfWeek}}</div>

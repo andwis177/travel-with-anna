@@ -72,6 +72,7 @@ export class BudgetButtonsComponent {
     const dialogRef = this.dialog.open(BudgetBadgesComponent, {
       maxWidth: '90vw',
       maxHeight: '90vh',
+      minHeight: '15vh',
       width: '25vw',
       height: 'auto',
       id: 'budget-badges',

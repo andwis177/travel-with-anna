@@ -26,4 +26,4 @@ export function findAllCountryNames(http: HttpClient, rootUrl: string, params?: 
   );
 }
 
-findAllCountryNames.PATH = '/api/country/names-all';
+findAllCountryNames.PATH = '/api/country/names';

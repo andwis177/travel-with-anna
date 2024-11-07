@@ -104,33 +104,8 @@ export class DayService extends BaseService {
     );
   }
 
-  /** Path part for operation `getDays()` */
-  static readonly GetDaysPath = '/day/{tripId}';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getDays()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getDays$Response(params: GetDays$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<DayResponse>>> {
-    return getDays(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getDays$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getDays(params: GetDays$Params, context?: HttpContext): Observable<Array<DayResponse>> {
-    return this.getDays$Response(params, context).pipe(
-      map((r: StrictHttpResponse<Array<DayResponse>>): Array<DayResponse> => r.body)
-    );
-  }
-
   /** Path part for operation `getDayById()` */
-  static readonly GetDayByIdPath = '/day/{dayId}/day';
+  static readonly GetDayByIdPath = '/day/{dayId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
@@ -151,6 +126,31 @@ export class DayService extends BaseService {
   getDayById(params: GetDayById$Params, context?: HttpContext): Observable<DayResponse> {
     return this.getDayById$Response(params, context).pipe(
       map((r: StrictHttpResponse<DayResponse>): DayResponse => r.body)
+    );
+  }
+
+  /** Path part for operation `getDays()` */
+  static readonly GetDaysPath = '/day/trip/{tripId}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getDays()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getDays$Response(params: GetDays$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<DayResponse>>> {
+    return getDays(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getDays$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getDays(params: GetDays$Params, context?: HttpContext): Observable<Array<DayResponse>> {
+    return this.getDays$Response(params, context).pipe(
+      map((r: StrictHttpResponse<Array<DayResponse>>): Array<DayResponse> => r.body)
     );
   }
 

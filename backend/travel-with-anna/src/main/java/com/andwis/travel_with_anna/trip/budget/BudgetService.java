@@ -8,7 +8,6 @@ import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
 import com.andwis.travel_with_anna.trip.expanse.*;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final ExpanseService expanseService;
-    private final DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
     private final ActivityService activityService;
     private final DayService dayService;
 

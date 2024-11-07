@@ -28,4 +28,4 @@ export function saveBudget(http: HttpClient, rootUrl: string, params: SaveBudget
   );
 }
 
-saveBudget.PATH = '/budget/create';
+saveBudget.PATH = '/budget';

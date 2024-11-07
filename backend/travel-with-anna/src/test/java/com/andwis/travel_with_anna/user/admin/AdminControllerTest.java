@@ -8,6 +8,7 @@ import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -249,7 +250,7 @@ class AdminControllerTest {
                 .thenReturn(updatedUser.getUserId());
 
         // When & Then
-        mockMvc.perform(patch("/admin/update")
+        mockMvc.perform(patch("/admin")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isOk());
@@ -269,7 +270,7 @@ class AdminControllerTest {
         when(adminService.deleteUser(eq(request), any())).thenReturn(userRespond);
 
         // When & Then
-        mockMvc.perform(delete("/admin/delete/{userId}", userId)
+        mockMvc.perform(delete("/admin/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isNoContent())
@@ -295,7 +296,7 @@ class AdminControllerTest {
                 .andExpect(content().json(jsonContent));
     }
 
-    private Authentication createAuthentication(User user) {
+    private @NotNull Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
         return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }

@@ -17,7 +17,7 @@ public class BackpackService {
     private final NoteService noteService;
 
     public Backpack findById(Long backpackId) {
-        return backpackRepository.findById(backpackId).orElseThrow(BackpackNotFoundException::new);
+        return backpackRepository.findById(backpackId).orElseThrow(() -> new BackpackNotFoundException("Backpack not found"));
     }
 
     @Transactional

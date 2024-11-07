@@ -8,6 +8,7 @@ import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -44,7 +45,7 @@ public class Trip {
     private Budget budget;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Expanse> expanses;
+    private Set<Expanse> expanses = new HashSet<>();
 
 
     @Override
@@ -65,12 +66,12 @@ public class Trip {
         return Objects.hash(tripId, tripName);
     }
 
-    public void addBackpack(Backpack backpack) {
+    public void addBackpack(@NotNull Backpack backpack) {
         this.backpack = backpack;
         backpack.setTrip(this);
     }
 
-    public void addBudget(Budget budget) {
+    public void addBudget(@NotNull Budget budget) {
         this.budget = budget;
         budget.setTrip(this);
     }
@@ -89,6 +90,9 @@ public class Trip {
     }
 
     public void addExpanse(Expanse expanse) {
+        if (this.expanses == null) {
+            this.expanses = new HashSet<>();
+        }
         this.expanses.add(expanse);
         expanse.setTrip(this);
     }

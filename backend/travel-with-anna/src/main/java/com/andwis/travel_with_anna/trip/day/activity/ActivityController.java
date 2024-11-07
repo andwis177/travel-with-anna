@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 public class ActivityController {
     private final ActivityFacade facade;
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<Void> createActivity(
             @RequestBody @Valid ActivityRequest request) {
         facade.createSingleActivity(request);
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping("/create/associated")
+    @PostMapping("/associated")
     public ResponseEntity<Void> createAssociatedActivities(
             @RequestBody @Valid ActivityAssociatedRequest request) {
         facade.createAssociatedActivities(request);
@@ -33,27 +33,29 @@ public class ActivityController {
     @PatchMapping("/update")
     public ResponseEntity<MessageResponse> updateActivity(
             @RequestBody @Valid ActivityUpdateRequest request) {
-       MessageResponse message = facade.updateActivity(request);
+        MessageResponse message = facade.updateActivity(request);
         return ResponseEntity.accepted().body(message);
     }
 
-    @GetMapping("/get/{dayId}")
+    @GetMapping("/day/{dayId}")
     public ResponseEntity<ActivityDetailedResponse> fetchActivitiesByDayId(
             @PathVariable("dayId") Long dayId) {
         ActivityDetailedResponse response = facade.fetchActivitiesByDayId(dayId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get/{dayId}/day/details")
+    @GetMapping("/day/{dayId}/details")
     public ResponseEntity<AddressDetail> fetchAddressDetailsByDayId(
             @PathVariable("dayId") Long dayId) {
-        return ResponseEntity.ok(facade.fetchAddressDetailsByDayId(dayId));
+        AddressDetail addressDetail = facade.fetchAddressDetailsByDayId(dayId);
+        return ResponseEntity.ok(addressDetail);
     }
 
-    @GetMapping("/get/{tripId}/trip/details")
+    @GetMapping("/trip/{tripId}/details")
     public ResponseEntity<AddressDetail> fetchAddressDetailsByTripId(
             @PathVariable("tripId") Long tripId) {
-        return ResponseEntity.ok(facade.fetchAddressDetailsByTripId(tripId));
+        AddressDetail addressDetail = facade.fetchAddressDetailsByTripId(tripId);
+        return ResponseEntity.ok(addressDetail);
     }
 
     @DeleteMapping("/{activityId}")

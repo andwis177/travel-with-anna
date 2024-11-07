@@ -28,56 +28,6 @@ export class TripService extends BaseService {
     super(config, http);
   }
 
-  /** Path part for operation `createTrip()` */
-  static readonly CreateTripPath = '/trip/create';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `createTrip()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  createTrip$Response(params: CreateTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
-    return createTrip(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `createTrip$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  createTrip(params: CreateTrip$Params, context?: HttpContext): Observable<number> {
-    return this.createTrip$Response(params, context).pipe(
-      map((r: StrictHttpResponse<number>): number => r.body)
-    );
-  }
-
-  /** Path part for operation `updateTrip()` */
-  static readonly UpdateTripPath = '/trip/update';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `updateTrip()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  updateTrip$Response(params: UpdateTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return updateTrip(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `updateTrip$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  updateTrip(params: UpdateTrip$Params, context?: HttpContext): Observable<void> {
-    return this.updateTrip$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
-    );
-  }
-
   /** Path part for operation `getAllOwnersTrips()` */
   static readonly GetAllOwnersTripsPath = '/trip';
 
@@ -103,6 +53,81 @@ export class TripService extends BaseService {
     );
   }
 
+  /** Path part for operation `createTrip()` */
+  static readonly CreateTripPath = '/trip';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `createTrip()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  createTrip$Response(params: CreateTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
+    return createTrip(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `createTrip$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  createTrip(params: CreateTrip$Params, context?: HttpContext): Observable<number> {
+    return this.createTrip$Response(params, context).pipe(
+      map((r: StrictHttpResponse<number>): number => r.body)
+    );
+  }
+
+  /** Path part for operation `deleteTrip()` */
+  static readonly DeleteTripPath = '/trip';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `deleteTrip()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  deleteTrip$Response(params: DeleteTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return deleteTrip(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `deleteTrip$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  deleteTrip(params: DeleteTrip$Params, context?: HttpContext): Observable<void> {
+    return this.deleteTrip$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `updateTrip()` */
+  static readonly UpdateTripPath = '/trip';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `updateTrip()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  updateTrip$Response(params: UpdateTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return updateTrip(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `updateTrip$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  updateTrip(params: UpdateTrip$Params, context?: HttpContext): Observable<void> {
+    return this.updateTrip$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
   /** Path part for operation `getTripById()` */
   static readonly GetTripByIdPath = '/trip/{tripId}';
 
@@ -125,31 +150,6 @@ export class TripService extends BaseService {
   getTripById(params: GetTripById$Params, context?: HttpContext): Observable<TripResponse> {
     return this.getTripById$Response(params, context).pipe(
       map((r: StrictHttpResponse<TripResponse>): TripResponse => r.body)
-    );
-  }
-
-  /** Path part for operation `deleteTrip()` */
-  static readonly DeleteTripPath = '/trip/delete';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `deleteTrip()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  deleteTrip$Response(params: DeleteTrip$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    return deleteTrip(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `deleteTrip$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  deleteTrip(params: DeleteTrip$Params, context?: HttpContext): Observable<void> {
-    return this.deleteTrip$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 

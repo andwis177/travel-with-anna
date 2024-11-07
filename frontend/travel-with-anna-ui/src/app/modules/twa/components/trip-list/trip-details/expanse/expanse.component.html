@@ -97,6 +97,7 @@
             <input
               matInput placeholder="0.00"
               [(ngModel)]="expanseRequest.exchangeRate"
+              (blur)="calculateTripValue()"
               type="number"
               name="exchangeRate"
               min="0"
@@ -116,7 +117,7 @@
       </div>
 
       <div class="expanse-container center-align mat-elevation-z8">
-        <div class="padding-label mat-elevation-z8">{{ expanseRequest.currency }}</div>
+        <div class="padding-label mat-elevation-z8">{{ tripCurrency }}</div>
         <div class="value-container">
           <label class="title-label">PRICE:</label>
           <label class="value-label">{{expanseRequest.priceInTripCurrency}}</label>

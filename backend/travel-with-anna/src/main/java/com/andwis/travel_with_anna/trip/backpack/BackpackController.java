@@ -1,7 +1,6 @@
 package com.andwis.travel_with_anna.trip.backpack;
 
 import com.andwis.travel_with_anna.trip.backpack.item.ItemWithExpanseRequest;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ public class BackpackController {
 
     private final BackpackFacade facade;
 
-    @PatchMapping("/{backpackId}/item-add")
+    @PatchMapping("/{backpackId}/item")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> addItemToBackpack(
             @RequestBody @Valid ItemWithExpanseRequest itemWithExpanseRequest,
@@ -33,7 +32,7 @@ public class BackpackController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete/{itemId}/item")
+    @DeleteMapping("/{itemId}/item")
     public ResponseEntity<Void> deleteItem(@PathVariable("itemId") Long itemId) {
         facade.deleteItem(itemId);
         return ResponseEntity.noContent().build();

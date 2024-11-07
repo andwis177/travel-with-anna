@@ -21,14 +21,13 @@ public class DayController {
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/{dayId}/day")
+    @GetMapping("/{dayId}")
     public ResponseEntity<DayResponse> getDayById(@PathVariable("dayId") Long dayId) {
         DayResponse dayResponse = facade.getDayById(dayId);
-        dayResponse.activity().forEach(activity -> System.out.println("!!! End Time:  " + activity.getEndTime()));
         return ResponseEntity.ok(dayResponse);
     }
 
-    @GetMapping("/{tripId}")
+    @GetMapping("/trip/{tripId}")
     public ResponseEntity<List<DayResponse>> getDays(@PathVariable("tripId") Long tripId) {
         return ResponseEntity.ok(facade.getDays(tripId));
     }
@@ -45,7 +44,7 @@ public class DayController {
         return ResponseEntity.accepted().build();
     }
 
-    @DeleteMapping("")
+    @DeleteMapping
     public ResponseEntity<Void> deleteDay(@RequestBody @Valid DayAddDeleteRequest request) {
         facade.deleteDay(request);
         return ResponseEntity.noContent().build();

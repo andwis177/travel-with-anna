@@ -38,7 +38,7 @@ public class Day {
     private Trip trip;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Activity> activities;
+    private Set<Activity> activities = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

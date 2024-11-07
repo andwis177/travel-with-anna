@@ -13,15 +13,16 @@ import org.springframework.web.bind.annotation.*;
 public class NoteController {
     private final NoteFacade facade;
 
-    @PostMapping("/save")
+    @PostMapping
     public ResponseEntity<Void> saveNote(@RequestBody @Valid NoteRequest request) {
         facade.saveNote(request);
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<NoteResponse> getNote(
-            @RequestParam("entityId") Long entityId, @RequestParam("entityType") String entityType) {
+            @RequestParam("entityId") Long entityId,
+            @RequestParam("entityType") String entityType) {
         NoteResponse response = facade.getNote(entityId, entityType);
         return ResponseEntity.ok(response);
     }

@@ -28,4 +28,4 @@ export function fetchAddressDetailsByDayId(http: HttpClient, rootUrl: string, pa
   );
 }
 
-fetchAddressDetailsByDayId.PATH = '/activity/get/{dayId}/day/details';
+fetchAddressDetailsByDayId.PATH = '/activity/day/{dayId}/details';

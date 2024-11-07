@@ -22,13 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Backpack Controller Tests")
 class BackpackControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private BackpackFacade backpackFacade;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -42,14 +39,12 @@ class BackpackControllerTest {
                 .qty("1")
                 .isPacked(false)
                 .build();
-
         String requestBody = objectMapper.writeValueAsString(itemWithExpanseRequest);
-
         doNothing().when(backpackFacade).addItemToBackpack(backpackId, itemWithExpanseRequest);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
-                        .patch("/backpack/{backpackId}/item-add", backpackId)
+                        .patch("/backpack/{backpackId}/item", backpackId)
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -62,7 +57,6 @@ class BackpackControllerTest {
         // Given
         Long backpackId = 1L;
         BackpackResponse backpackResponse = new BackpackResponse(backpackId, 1L, true);
-
         when(backpackFacade.getBackpackById(backpackId)).thenReturn(backpackResponse);
 
         // When & Then
@@ -78,12 +72,11 @@ class BackpackControllerTest {
     void deleteItem_ShouldReturnNoContent() throws Exception {
         // Given
         Long itemId = 2L;
-
         doNothing().when(backpackFacade).deleteItem(itemId);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/backpack/delete/{itemId}/item", itemId)
+                        .delete("/backpack/{itemId}/item", itemId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }

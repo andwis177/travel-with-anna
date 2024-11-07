@@ -39,13 +39,13 @@
 
         <div>
           <button class="custom-button-0" (click)="signIn()" type="submit">Sign In</button>
+          <div>
+            <button class="custom-button-1" style="margin-top: 5px" (click)="register()">Register</button>
+          </div>
           <div class="alert alert-danger full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
             <mat-divider class="padding-bottom"></mat-divider>
             <p *ngFor="let msg of errorMsg">{{msg}}</p>
             <mat-divider class="padding-bottom"></mat-divider>
-          </div>
-          <div>
-            <button class="custom-button-1" style="margin-top: 5px" (click)="register()">Register</button>
           </div>
         </div>
         <div style="padding-top: 20px">

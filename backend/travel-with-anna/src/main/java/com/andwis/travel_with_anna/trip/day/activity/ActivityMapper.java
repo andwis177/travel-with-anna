@@ -51,7 +51,7 @@ public class ActivityMapper {
         return response;
     }
 
-    public static@NotNull Activity toActivity(@NotNull ActivityRequest request) {
+    public static Activity toActivity(@NotNull ActivityRequest request) {
         Activity activity = Activity.builder()
                 .beginTime(toLocalDateTime(request.getDateTime()).toLocalTime())
                 .badge(request.getBadge())

@@ -16,7 +16,7 @@ import java.util.List;
 public class BudgetController {
     private final BudgetFacade facade;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<Void> saveBudget(Budget budget) {
         facade.saveBudget(budget);
         return ResponseEntity.accepted().build();

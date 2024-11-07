@@ -1,3 +1,10 @@
+.custom-dialog-container {
+  align-items: center !important;
+  text-align: center;
+  background-color: #1C252D !important;
+  min-height: 10vw !important;
+}
+
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
   display: none;
 }
@@ -28,6 +35,7 @@
 }
 
 .badge-expanses-container {
+  //height: 15vw  !important;
   display: flex;
   flex-direction: row;
   align-items: center;

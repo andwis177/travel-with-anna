@@ -53,6 +53,7 @@ export class DayDeleteComponent {
   }
 
   deleteDay() {
+    console.log(this.tripId!);
     const params: DeleteDay$Params = {body: {tripId: this.tripId!, first: this.isFirst!}};
     this.dayService.deleteDay$Response(params).subscribe({
       next: () => {

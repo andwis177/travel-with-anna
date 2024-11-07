@@ -2,10 +2,12 @@ package com.andwis.travel_with_anna.trip.trip;
 
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.trip.day.DayGeneratorRequest;
 import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,28 +36,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Trip Controller tests")
 class TripControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private TripRepository tripRepository;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @MockBean
     private TripMgr tripFacade;
-
     private User user;
 
     @BeforeEach
@@ -111,7 +106,7 @@ class TripControllerTest {
         // When & Then
         mockMvc
                 .perform(MockMvcRequestBuilders
-                        .post("/trip/create")
+                        .post("/trip")
                         .principal(createAuthentication(user))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
@@ -149,17 +144,24 @@ class TripControllerTest {
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")
-    void changeTripName_ShouldReturnOk() throws Exception {
+    void updateTrip_ShouldReturnOk() throws Exception {
         // Given
-        Long tripId = 1L;
-        String newTripName = "New Trip Name";
+        DayGeneratorRequest dayGeneratorRequest = DayGeneratorRequest.builder()
+                .tripId(1L)
+                .startDate(null)
+                .endDate(null)
+                .build();
+        TripEditRequest request = new TripEditRequest(dayGeneratorRequest, "Updated Trip Name");
+        String requestBody = objectMapper.writeValueAsString(request);
+        doNothing().when(tripFacade).updateTrip(request);
 
         // When & Then
         mockMvc
                 .perform(MockMvcRequestBuilders
-                        .patch("/trip/{tripId}/name/change", tripId)
-                        .param("tripName", newTripName)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .patch("/trip")
+                        .principal(createAuthentication(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isOk());
     }
 
@@ -170,20 +172,19 @@ class TripControllerTest {
         Long tripId = 1L;
         String password = "password";
         TripRequest request = new TripRequest(tripId, password);
-
         String requestBody = objectMapper.writeValueAsString(request);
 
         // When & Then
         mockMvc
                 .perform(MockMvcRequestBuilders
-                        .delete("/trip/delete")
+                        .delete("/trip")
                         .principal(createAuthentication(user))
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
-    private Authentication createAuthentication(User user) {
+    private @NotNull Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
         return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }

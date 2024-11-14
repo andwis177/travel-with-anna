@@ -6,12 +6,11 @@ import com.andwis.travel_with_anna.trip.note.NoteResponse;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
 @Builder
-public class ActivityResponse implements Comparable<ActivityResponse> {
+public class ActivityResponse {
     private Long activityId;
     private String activityTitle;
     private String startTime;
@@ -25,8 +24,4 @@ public class ActivityResponse implements Comparable<ActivityResponse> {
     private AddressResponse address;
     private boolean isDayTag;
 
-    @Override
-    public int compareTo(@NotNull ActivityResponse obj) {
-        return this.startTime.compareTo(obj.startTime);
-    }
 }

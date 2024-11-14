@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.trip.trip;
 
 import com.andwis.travel_with_anna.address.AddressService;
 import com.andwis.travel_with_anna.handler.exception.TripNotFoundException;
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
@@ -166,7 +167,7 @@ class TripMgrTest {
 
     @Test
     @Transactional
-    void testDeleteTrip() {
+    void testDeleteTrip() throws WrongPasswordException {
         // Given
         TripRequest request = new TripRequest(testTrip.getTripId(), "password");
         doNothing().when(addressService).deleteAllByAddressIdIn(anySet());
@@ -188,7 +189,7 @@ class TripMgrTest {
                 .thenThrow(new BadCredentialsException("Wrong password"));
 
         // When & Then
-        assertThrows(BadCredentialsException.class, () -> tripMgr.deleteTrip(request, createAuthentication(testUser)));
+        assertThrows(WrongPasswordException.class, () -> tripMgr.deleteTrip(request, createAuthentication(testUser)));
     }
 
     @Test

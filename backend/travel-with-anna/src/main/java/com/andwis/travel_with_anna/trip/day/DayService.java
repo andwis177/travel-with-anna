@@ -126,19 +126,6 @@ public class DayService {
     }
 
     @Transactional
-    public void changeDayDate(@NotNull DayRequest request) {
-        if (request.getEntityId() == null) {
-            throw new IllegalArgumentException("Day Id must be provided");
-        }
-        if (request.getDate() == null) {
-            throw new IllegalArgumentException("Date must be provided");
-        }
-        Day day = getById(request.getEntityId());
-        day.setDate(request.getDate());
-        saveDay(day);
-    }
-
-    @Transactional
     public void changeTripDates(@NotNull Trip trip, LocalDate startDate, LocalDate endDate) {
         validateDates(startDate, endDate);
 

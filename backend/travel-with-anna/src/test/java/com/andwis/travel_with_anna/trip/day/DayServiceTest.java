@@ -303,21 +303,6 @@ class DayServiceTest {
         assertEquals(LocalDate.of(2024, 1, 1), days.getFirst().getDate());
     }
 
-    @Test
-    @Transactional
-    void testChangeDayDate() {
-        // Given
-        DayRequest dayRequest = DayRequest.builder()
-                .entityId(day.getDayId())
-                .date(LocalDate.of(2024, 11, 10))
-                .build();
-
-        // When
-        dayService.changeDayDate(dayRequest);
-
-        // Then
-        assertEquals(LocalDate.of(2024, 11, 10), day.getDate());
-    }
 
     @Test
     @Transactional

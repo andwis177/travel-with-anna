@@ -9,7 +9,6 @@ import com.andwis.travel_with_anna.api.country.Country;
 import com.andwis.travel_with_anna.handler.exception.ActivityNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.TripNotFoundException;
 import com.andwis.travel_with_anna.trip.day.Day;
-import com.andwis.travel_with_anna.trip.day.DayRepository;
 import com.andwis.travel_with_anna.trip.day.DayResponse;
 import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
@@ -21,10 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,7 +34,6 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
     private final DayService dayService;
     private final AddressService addressService;
-    private final DayRepository dayRepository;
 
     public Activity getById(Long activityId) {
         return activityRepository.findById(activityId)
@@ -151,12 +146,12 @@ public class ActivityService {
         }
     }
 
-    public Set<Activity> getActivitiesByDayId(Long dayId) {
+    public List<Activity> getActivitiesByDayId(Long dayId) {
         return activityRepository.findByDayDayIdOrderByBeginTimeAsc(dayId);
     }
 
     public ActivityDetailedResponse fetchActivitiesByDayId(Long dayId) {
-        Set<Activity> activities = getActivitiesByDayId(dayId);
+        List<Activity> activities = getActivitiesByDayId(dayId);
         List<ActivityResponse> activityResponses = ActivityMapper.toActivityResponseList(activities);
         AddressDetail addressDetail = buildAddressDetail(
                 getActivitiesCountriesFromDay(activityResponses),
@@ -185,52 +180,61 @@ public class ActivityService {
     private @NotNull List<Country> getActivitiesCountriesFromDay(
             @NotNull List<ActivityResponse> activityResponses) {
         List<Country> countries = new ArrayList<>();
-        activityResponses.forEach(activity -> {
-            if (activity.getAddress().country() != null && !activity.getAddress().country().isEmpty()) {
-                Country country = Country.builder()
-                        .name(activity.getAddress().country())
-                        .iso2(activity.getAddress().countryCode())
-                        .currency(activity.getAddress().currency())
-                        .build();
-                addToCountryIfNotExists(countries, country);
-            }
-        });
+        activityResponses.stream()
+                .map(ActivityResponse::getAddress)
+                .filter(Objects::nonNull)
+                .map(country -> Country.builder()
+                        .name(country.country())
+                        .currency(country.currency())
+                        .iso2(country.countryCode())
+                        .iso3(country.countryCode())
+                        .build())
+                .filter(country -> country.getName() != null && !country.getName().isEmpty())
+                .forEach(countries::add);
         return countries;
-    }
-
-    private void addToCountryIfNotExists(@NotNull List<Country> countries, Country country) {
-        if (!countries.contains(country)) {
-            countries.add(country);
-        }
     }
 
     private @NotNull List<City> getActivitiesCitiesFromDay(@NotNull List<ActivityResponse> activityResponses) {
         List<City> cities = new ArrayList<>();
         activityResponses.stream()
                 .map(activity -> activity.getAddress().city())
-                .filter(city -> city != null && !city.isEmpty())
+                .filter(Objects::nonNull)
                 .map(city -> City.builder().city(city).build())
-                .forEach(city -> addToCityIfNotExists(cities, city));
+                .forEach(cities::add);
         return cities;
     }
 
-    private void addToCityIfNotExists(@NotNull List<City> cities, City city) {
-        if (!cities.contains(city)) {
-            cities.add(city);
-        }
-    }
 
-    public AddressDetail buildAddressDetail(List<Country> countries, List<City> cities) {
+    public AddressDetail buildAddressDetail(@NotNull List<Country> countries, @NotNull List<City> cities) {
+        List<Country> filteredCountries = countries.stream()
+                .collect(Collectors.toMap (
+                        Country::getName,
+                        country -> country,
+                        (existing, _) -> existing,
+                        LinkedHashMap::new
+                ))
+                .values().stream()
+                .toList();
+
+        List<City> filteredCities = cities.stream()
+                .collect(Collectors.toMap(
+                        City::getCity,
+                        city -> city,
+                        (existing, _) -> existing,
+                        LinkedHashMap::new
+                ))
+                .values().stream()
+                .toList();
         return new AddressDetail(
-                countries,
-                countries.stream().reduce((first, second) -> second).orElse(null),
-                cities,
-                cities.stream().reduce((first, second) -> second).orElse(null)
+                filteredCountries,
+                countries.stream().reduce((_, second) -> second).orElse(null),
+                filteredCities,
+                cities.stream().reduce((_, second) -> second).orElse(null)
         );
     }
 
     public AddressDetail fetchAddressDetailByDayId(Long dayId) {
-        Set<Activity> activities = getActivitiesByDayId(dayId);
+        List<Activity> activities = getActivitiesByDayId(dayId);
         List<ActivityResponse> activityResponses = ActivityMapper.toActivityResponseList(activities);
         return buildAddressDetail(
                 getActivitiesCountriesFromDay(activityResponses),
@@ -242,7 +246,7 @@ public class ActivityService {
         List<DayResponse> days = dayService.getDays(tripId);
         List<ActivityResponse> activityResponses = new ArrayList<>();
         for (DayResponse day : days) {
-            Set<Activity> activities = getActivitiesByDayId(day.dayId());
+            List<Activity> activities = getActivitiesByDayId(day.dayId());
             activityResponses.addAll(ActivityMapper.toActivityResponseList(activities));
         }
         return buildAddressDetail(

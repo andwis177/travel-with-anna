@@ -7,7 +7,6 @@ import com.andwis.travel_with_anna.trip.note.NoteMapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDateTime;
 import static com.andwis.travel_with_anna.utility.DateTimeMapper.toTime;
@@ -67,7 +66,7 @@ public class ActivityMapper {
         return activity;
     }
 
-    public static List<ActivityResponse> toActivityResponseList(@NotNull Set<Activity> activities) {
+    public static List<ActivityResponse> toActivityResponseList(@NotNull List<Activity> activities) {
         return activities.stream().map(ActivityMapper::toActivityResponse).toList();
     }
 

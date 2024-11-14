@@ -16,11 +16,15 @@ public class UserFacade {
         return userService.getCredentials(email);
     }
 
-    public AuthenticationResponse updateUserExecution(UserCredentialsRequest userCredentials, Authentication connectedUser) {
+    public AuthenticationResponse updateUserExecution(
+            UserCredentialsRequest userCredentials, Authentication connectedUser)
+            throws WrongPasswordException {
         return userService.updateUserExecution(userCredentials, connectedUser);
     }
 
-    public UserResponse changePassword(ChangePasswordRequest request, Authentication connectedUser) {
+    public UserResponse changePassword(
+            ChangePasswordRequest request, Authentication connectedUser)
+            throws WrongPasswordException {
         return userService.changePassword(request, connectedUser);
     }
 

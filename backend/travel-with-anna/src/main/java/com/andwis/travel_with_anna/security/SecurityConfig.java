@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -44,7 +45,10 @@ public class SecurityConfig  {
                                         "/swagger-ui/**",
                                         "/webjars/**",
                                         "/swagger-ui.html",
-                                        "/role/all-names"
+                                        "/role/all-names",
+                                        "/static/**",
+                                        "/public/**",
+                                        "/resources/**"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/user/**",
@@ -52,7 +56,6 @@ public class SecurityConfig  {
                                 ).hasAnyAuthority(getUserAuthority(), getAdminAuthority())
                                 .requestMatchers(
                                         "/expanse/**",
-                                        "/pdf_doc/**",
                                         "/note/**",
                                         "/day/**",
                                         "/budget/**",
@@ -69,12 +72,16 @@ public class SecurityConfig  {
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout((logout) -> {
-                    logout.logoutUrl("/execute_logout");
-                    logout.invalidateHttpSession(true);
-                    logout.logoutSuccessHandler(customLogoutSuccessHandler);
-                    logout.deleteCookies("JSESSIONID");
-                });
+                .logout(logout -> logout
+                        .logoutUrl("/execute_logout")
+                    .invalidateHttpSession(true)
+                    .logoutSuccessHandler(customLogoutSuccessHandler)
+                    .deleteCookies("JSESSIONID")
+                )
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+                );
 
         return http.build();
     }

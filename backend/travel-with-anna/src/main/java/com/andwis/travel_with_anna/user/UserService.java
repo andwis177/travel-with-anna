@@ -21,6 +21,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -104,7 +105,9 @@ public class UserService {
     }
 
     @Transactional
-    public AuthenticationResponse updateUserExecution(@NotNull UserCredentialsRequest userCredentials, Authentication connectedUser) {
+    public AuthenticationResponse updateUserExecution(
+            @NotNull UserCredentialsRequest userCredentials, Authentication connectedUser)
+            throws WrongPasswordException {
         var user = getSecurityUser(connectedUser).getUser();
         verifyPassword(user, userCredentials.getPassword());
         updateUser(userCredentials, user);
@@ -159,7 +162,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse changePassword(@NotNull ChangePasswordRequest request, Authentication connectedUser) {
+    public UserResponse changePassword(@NotNull ChangePasswordRequest request, Authentication connectedUser) throws WrongPasswordException {
         var user = getSecurityUser(connectedUser);
         var currentUser = user.getUser();
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
@@ -207,7 +210,7 @@ public class UserService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getEmail(), password));
-        } catch (WrongPasswordException exp) {
+        } catch (AuthenticationException exp) {
             throw new WrongPasswordException("Wrong password");
         }
     }

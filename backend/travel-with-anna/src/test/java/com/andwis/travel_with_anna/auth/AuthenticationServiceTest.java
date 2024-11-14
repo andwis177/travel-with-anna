@@ -6,10 +6,8 @@ import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleService;
 import com.andwis.travel_with_anna.security.JwtService;
 import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserCredentialsRequest;
 import com.andwis.travel_with_anna.user.UserCredentialsResponse;
 import com.andwis.travel_with_anna.user.UserService;
-import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.user.token.Token;
 import com.andwis.travel_with_anna.user.token.TokenRepository;
@@ -113,7 +111,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testRegister_Success() throws MessagingException, RoleNotFoundException {
+    void testRegister_Success() throws MessagingException, RoleNotFoundException, WrongPasswordException {
         //Given
         when(roleService.getRoleByName(getUserRole())).thenReturn(role);
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
@@ -187,7 +185,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testAuthenticationWithCredentials_Success() {
+    void testAuthenticationWithCredentials_Success() throws WrongPasswordException {
         //Given
         AuthenticationRequest request =
                 AuthenticationRequest.builder()
@@ -286,7 +284,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testActivateAccount_UsernameNotFound() throws MessagingException {
+    void testActivateAccount_UsernameNotFound() {
         //Given
         token.setExpiresAt(now.plusMinutes(15));
         when(tokenRepository.findByToken("jwtToken")).thenReturn(Optional.of(token));

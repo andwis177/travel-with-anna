@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.user.admin;
 
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.user.UserResponse;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
@@ -45,7 +46,7 @@ public class AdminController {
     public ResponseEntity<Void> updateUser(
             @RequestBody @Valid UserAdminUpdateRequest request,
             Authentication authentication)
-            throws RoleNotFoundException {
+            throws RoleNotFoundException, WrongPasswordException {
         facade.updateUser(request, authentication);
         return ResponseEntity.ok().build();
     }
@@ -53,7 +54,7 @@ public class AdminController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<UserResponse> deleteUser(
             @RequestBody @Valid UserAdminDeleteRequest request,
-            Authentication authentication) {
+            Authentication authentication) throws WrongPasswordException {
         UserResponse respond = facade.deleteUser(request, authentication);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respond);
     }

@@ -28,10 +28,6 @@ public class DayFacade {
         dayService.generateDays(request);
     }
 
-    public void changeDayDate(DayRequest request) {
-        dayService.changeDayDate(request);
-    }
-
     public void deleteDay(DayAddDeleteRequest request) {
         dayService.deleteFirstOrLastDay(request, activityService::deleteDayActivities);
     }

@@ -130,8 +130,8 @@ public class ExpanseService {
     }
 
     public ExchangeResponse getExchangeRate(String currencyFrom, String currencyTo) {
-        if (currencyFrom == null || currencyFrom.isEmpty() || currencyFrom.isBlank()
-                || currencyTo == null || currencyTo.isEmpty() || currencyTo.isBlank()) {
+        if (currencyFrom == null || currencyFrom.isBlank()
+                || currencyTo == null || currencyTo.isBlank()) {
             return new ExchangeResponse("Currency not provided", BigDecimal.ZERO);
         }
         if (currencyFrom.equals(currencyTo)) {
@@ -151,7 +151,7 @@ public class ExpanseService {
         } catch (CurrencyNotProvidedException e) {
             return new ExchangeResponse(("Currency not supported"), BigDecimal.ZERO);
         }
-        BigDecimal getUSD = BigDecimal.ONE.divide(currencyFromExchange.getExchangeValue(), 12, RoundingMode.HALF_UP);
+        BigDecimal getUSD = BigDecimal.ONE.divide(currencyFromExchange.getExchangeValue(), 5, RoundingMode.HALF_UP);
         return new ExchangeResponse(null ,
                 getUSD.multiply(currencyToExchange.getExchangeValue().setScale(5, RoundingMode.HALF_UP)));
     }

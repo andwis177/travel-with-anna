@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.trip.trip;
 
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -44,7 +45,8 @@ public class TripController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteTrip(@RequestBody TripRequest request, Authentication connectedUser) {
+    public ResponseEntity<Void> deleteTrip(@RequestBody TripRequest request, Authentication connectedUser)
+            throws WrongPasswordException {
         facade.deleteTrip(request, connectedUser);
         return ResponseEntity.noContent().build();
     }

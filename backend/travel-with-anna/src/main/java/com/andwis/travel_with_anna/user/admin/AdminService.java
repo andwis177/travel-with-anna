@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.user.admin;
 
 import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.RoleService;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserMapper;
@@ -84,7 +85,9 @@ public class AdminService {
     }
 
     @Transactional
-    public Long updateUser(@NotNull UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
+    public Long updateUser(
+            @NotNull UserAdminUpdateRequest request, Authentication authentication)
+            throws RoleNotFoundException, WrongPasswordException {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.getPassword());
         UserAdminEditRequest userAdminEditRequest = request.getUserAdminEditRequest();
@@ -97,7 +100,9 @@ public class AdminService {
     }
 
     @Transactional
-    public UserResponse deleteUser(@NotNull UserAdminDeleteRequest request, Authentication authentication) {
+    public UserResponse deleteUser(
+            @NotNull UserAdminDeleteRequest request, Authentication authentication)
+            throws WrongPasswordException {
         User adminUser = userService.getConnectedUser(authentication);
         userService.verifyPassword(adminUser, request.password());
         User userToBeDeleted = userService.getUserById(request.userId());

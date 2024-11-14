@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +25,25 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<AuthenticationResponse> update(@RequestBody @Valid UserCredentialsRequest userCredentials, Authentication connectedUser) {
+    public ResponseEntity<AuthenticationResponse> update(
+            @RequestBody @Valid UserCredentialsRequest userCredentials, Authentication connectedUser)
+            throws WrongPasswordException {
         AuthenticationResponse response = facade.updateUserExecution(userCredentials, connectedUser);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/change-password")
-    public ResponseEntity<UserResponse> changePassword(@RequestBody @Valid ChangePasswordRequest request, Authentication connectedUser) {
+    public ResponseEntity<UserResponse> changePassword(
+            @RequestBody @Valid ChangePasswordRequest request, Authentication connectedUser)
+            throws WrongPasswordException {
         UserResponse respond = facade.changePassword(request, connectedUser);
         return ResponseEntity.accepted().body(respond);
     }
 
     @DeleteMapping
-    public ResponseEntity<UserResponse> delete(@RequestBody @Valid PasswordRequest request, Authentication connectedUser) {
+    public ResponseEntity<UserResponse> delete(
+            @RequestBody @Valid PasswordRequest request, Authentication connectedUser)
+            throws WrongPasswordException {
         UserResponse respond = facade.deleteConnectedUser(request, connectedUser);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respond);
     }

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -213,7 +212,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testUpdateUserExecution_Success() {
+    void testUpdateUserExecution_Success() throws WrongPasswordException {
         // Given
         UserCredentialsRequest userCredentials = UserCredentialsRequest.builder()
                 .email("newEmail@example.com")
@@ -272,7 +271,7 @@ class UserServiceTest {
                 .build();
 
         // When & Then
-        assertThrows(BadCredentialsException.class, () ->
+        assertThrows(WrongPasswordException.class, () ->
                 userService.updateUserExecution(userCredentials, createAuthentication(user)));
     }
 
@@ -294,12 +293,12 @@ class UserServiceTest {
                 .build();
 
         // When & Then
-        assertThrows(BadCredentialsException.class, () ->
+        assertThrows(WrongPasswordException.class, () ->
                 userService.updateUserExecution(userCredentials, createAuthentication(testUser)));
     }
 
     @Test
-    void testChangePassword_Success () {
+    void testChangePassword_Success () throws WrongPasswordException {
         // Given
         ChangePasswordRequest request = new ChangePasswordRequest("password", "newPassword", "newPassword");
 
@@ -322,7 +321,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testDeleteConnectedUser_Success () {
+    void testDeleteConnectedUser_Success () throws WrongPasswordException {
         // Given
         long usersQty = userRepository.count();
         PasswordRequest request = new PasswordRequest("password");

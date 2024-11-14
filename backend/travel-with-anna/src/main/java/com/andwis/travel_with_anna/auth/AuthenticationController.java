@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.auth;
 
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -20,7 +21,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestBody @Valid RegistrationRequest request
-    ) throws RoleNotFoundException, MessagingException {
+    ) throws RoleNotFoundException, MessagingException, WrongPasswordException {
         service.register(request);
         return ResponseEntity.accepted().build();
     }
@@ -28,7 +29,7 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
-    )  {
+    ) throws WrongPasswordException {
         AuthenticationResponse response = service.authenticationWithCredentials(request);
         return ResponseEntity.ok(response);
     }

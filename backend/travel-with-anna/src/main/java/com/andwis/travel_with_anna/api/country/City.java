@@ -1,9 +1,8 @@
 package com.andwis.travel_with_anna.api.country;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.jackson.Jacksonized;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -11,8 +10,11 @@ import java.util.Objects;
 @Getter
 @Setter
 @Builder
-@Jacksonized
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class City implements Comparable<City> {
+    @JsonProperty("city")
     private String city;
 
     @Override

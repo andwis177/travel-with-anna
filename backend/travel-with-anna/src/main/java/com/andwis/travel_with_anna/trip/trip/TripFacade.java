@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.trip.trip;
 
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -22,7 +23,7 @@ public class TripFacade {
         return tripMgr.getTripById(tripId);
     }
 
-    public void deleteTrip(TripRequest request, Authentication connectedUser) {
+    public void deleteTrip(TripRequest request, Authentication connectedUser) throws WrongPasswordException {
         tripMgr.deleteTrip(request, connectedUser);
     }
 

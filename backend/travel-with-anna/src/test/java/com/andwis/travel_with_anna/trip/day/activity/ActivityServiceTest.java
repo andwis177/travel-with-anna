@@ -372,7 +372,7 @@ class ActivityServiceTest {
     void testGetActivitiesByDayId() {
         // Given
         // When
-        Set<Activity> activities = activityService.getActivitiesByDayId(day.getDayId());
+        List<Activity> activities = activityService.getActivitiesByDayId(day.getDayId());
 
         // Then
         assertEquals(2, activities.size());

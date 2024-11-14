@@ -196,7 +196,7 @@ class BudgetServiceTest {
                 .build());
         day.setActivities(Set.of(activity1, activity2));
         when(dayService.getDaysByTripId(tripId)).thenReturn(days);
-        when(activityService.getActivitiesByDayId(any())).thenReturn(Set.of(activity1, activity2));
+        when(activityService.getActivitiesByDayId(any())).thenReturn(List.of(activity1, activity2));
 
         // When
         List<ExpanseTotalByBadge> result = budgetService.calculateExpansesByBadgeByTripId(tripId);

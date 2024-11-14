@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.user.admin;
 
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.user.UserResponse;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
@@ -27,11 +28,13 @@ public class AdminFacade {
         return adminService.getAvatar(userId);
     }
 
-    public void updateUser(UserAdminUpdateRequest request, Authentication authentication) throws RoleNotFoundException {
+    public void updateUser(UserAdminUpdateRequest request, Authentication authentication)
+            throws RoleNotFoundException, WrongPasswordException {
         adminService.updateUser(request, authentication);
     }
 
-    public UserResponse deleteUser(UserAdminDeleteRequest request, Authentication authentication) {
+    public UserResponse deleteUser(UserAdminDeleteRequest request, Authentication authentication)
+            throws WrongPasswordException {
         return adminService.deleteUser(request, authentication);
     }
 

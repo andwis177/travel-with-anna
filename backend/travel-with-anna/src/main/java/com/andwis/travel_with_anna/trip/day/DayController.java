@@ -38,11 +38,6 @@ public class DayController {
         return ResponseEntity.accepted().build();
     }
 
-    @PatchMapping("/change/date")
-    public ResponseEntity<Void> changeDayDate(@RequestBody @Valid DayRequest request) {
-        facade.changeDayDate(request);
-        return ResponseEntity.accepted().build();
-    }
 
     @DeleteMapping
     public ResponseEntity<Void> deleteDay(@RequestBody @Valid DayAddDeleteRequest request) {

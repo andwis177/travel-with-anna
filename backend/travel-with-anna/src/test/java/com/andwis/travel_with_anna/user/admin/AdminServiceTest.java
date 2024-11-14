@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.user.admin;
 
 import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.trip.Trip;
@@ -153,7 +154,7 @@ class AdminServiceTest {
     }
 
     @Test
-    void testUpdateUser() throws RoleNotFoundException {
+    void testUpdateUser() throws RoleNotFoundException, WrongPasswordException {
         // Getter
         UserAdminEditRequest userAdminEdit = new UserAdminEditRequest(
                 secondaryUserId, true, false, getAdminRole());
@@ -193,7 +194,7 @@ class AdminServiceTest {
     }
 
     @Test
-    void testDeleteUser() {
+    void testDeleteUser() throws WrongPasswordException {
         // Getter
         UserAdminDeleteRequest request = new UserAdminDeleteRequest(secondaryUserId, "password");
 

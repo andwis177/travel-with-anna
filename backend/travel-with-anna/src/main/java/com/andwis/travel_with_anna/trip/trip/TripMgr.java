@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.trip.trip;
 
 import com.andwis.travel_with_anna.address.Address;
 import com.andwis.travel_with_anna.address.AddressService;
+import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.day.Day;
@@ -80,7 +81,9 @@ public class TripMgr {
     }
 
     @Transactional
-    public void deleteTrip(@NotNull TripRequest request, Authentication connectedUser) {
+    public void deleteTrip(
+            @NotNull TripRequest request, Authentication connectedUser)
+            throws WrongPasswordException {
         User adminUser = userService.getConnectedUser(connectedUser);
         userService.verifyPassword(adminUser, request.password());
         Trip trip = tripService.getTripById(request.tripId());

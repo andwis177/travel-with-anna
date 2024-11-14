@@ -49,7 +49,7 @@ public class AuthenticationService {
     private String loginUrl;
 
     @Transactional
-    public void register(@NotNull RegistrationRequest request) throws RoleNotFoundException, MessagingException {
+    public void register(@NotNull RegistrationRequest request) throws RoleNotFoundException, MessagingException, WrongPasswordException {
         Role role = roleService.getRoleByName(request.getRoleName());
 
         if (role.getRoleName().equals(getAdminRole())) {
@@ -78,7 +78,7 @@ public class AuthenticationService {
         }
         avatarService.createAvatar(user);
         userService.saveUser(user);
-        //
+
            sendValidationEmail(user);
         System.out.println(generateAndSaveActivationToken(user));
     }

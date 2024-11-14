@@ -95,21 +95,6 @@ class DayControllerTest {
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")
-    void changeDayDate_ShouldReturnAccepted() throws Exception {
-        // Given
-        DayRequest request = new DayRequest(1L, LocalDate.now());
-        doNothing().when(facade).changeDayDate(request);
-        String jsonContent = objectMapper.writeValueAsString(request);
-
-        // When & Then
-        mockMvc.perform(patch("/day/change/date")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonContent))
-                .andExpect(status().isAccepted());
-    }
-
-    @Test
-    @WithMockUser(username = "email@example.com", authorities = "User")
     void deleteDay_ShouldReturnNoContent() throws Exception {
         // Given
         DayAddDeleteRequest request = new DayAddDeleteRequest(1L, true);

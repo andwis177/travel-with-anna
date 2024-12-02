@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.user.avatar;
 
-import com.andwis.travel_with_anna.user.UserAvatarMgr;
+import com.andwis.travel_with_anna.user.UserAvatarService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +24,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Avatar Controller tests")
 class AvatarControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
     @MockBean
     private Authentication authentication;
     @MockBean
-    private UserAvatarMgr userAvatarMgr;
+    private UserAvatarService userAvatarService;
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")
@@ -54,7 +53,7 @@ class AvatarControllerTest {
     void getAvatar_ShouldReturnOkWithImageHeaders() throws Exception {
         // Given
         byte[] imageBytes = "test image".getBytes();
-        when(userAvatarMgr.getAvatar(any(Authentication.class))).thenReturn(imageBytes);
+        when(userAvatarService.getAvatar(any())).thenReturn(imageBytes);
 
         // When & Then
         mockMvc.perform(get("/avatar"))

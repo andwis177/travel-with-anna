@@ -26,27 +26,19 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @DisplayName("JWT Filter tests")
 class JwtFilterTest {
-
     @Mock
     private JwtService jwtService;
-
     @Mock
     private UserDetailsService userDetailsService;
-
     @Mock
     private FilterChain filterChain;
-
     @Mock
     private HttpServletRequest request;
-
     @Mock
     private HttpServletResponse response;
-
     @InjectMocks
     private JwtFilter jwtFilter;
-
     private final UserDetails userDetails = mock(UserDetails.class);
-
 
     @BeforeEach
     void setUp() {
@@ -59,7 +51,7 @@ class JwtFilterTest {
     }
 
     @Test
-    void testDoFilterInternal_WithAuthPath_ShouldProceedFilterChain() throws ServletException, IOException, IOException {
+    void testDoFilterInternal_WithAuthPath_ShouldProceedFilterChain() throws ServletException, IOException {
         // Given
         when(request.getServletPath()).thenReturn("/twa/v1/auth");
 

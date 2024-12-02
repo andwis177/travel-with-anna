@@ -8,7 +8,6 @@ import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.andwis.travel_with_anna.trip.trip.TripRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("User Service tests")
 class UserServiceTest {
     @Autowired
+    private UserAuthenticationService userAuthenticationService;
+    @Autowired
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
@@ -41,8 +43,6 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RoleRepository roleRepository;
-    @Autowired
-    private TripRepository tripRepository;
     private User user;
     private Role retrivedRole;
     private Long userId;
@@ -86,7 +86,6 @@ class UserServiceTest {
     void cleanUp() {
         userRepository.deleteAll();
         roleRepository.deleteAll();
-        tripRepository.deleteAll();
     }
 
     @Test
@@ -135,7 +134,7 @@ class UserServiceTest {
     void testGetConnectedUser() {
         // Given
         // When
-        User connectedUser = userService.getConnectedUser(createAuthentication(user));
+        User connectedUser = userAuthenticationService.getConnectedUser(createUserDetails(user));
 
         // Then
         assertNotNull(connectedUser);
@@ -221,7 +220,7 @@ class UserServiceTest {
                 .build();
 
         // When
-        AuthenticationResponse response = userService.updateUserExecution(userCredentials, createAuthentication(user));
+        AuthenticationResponse response = userService.updateUserExecution(userCredentials, createUserDetails(user));
         User retrivedUser = userService.getUserById(userId);
 
         // Then
@@ -244,7 +243,7 @@ class UserServiceTest {
 
         // When & Then
         assertThrows(UserExistsException.class, () ->
-                userService.updateUserExecution(userCredentials, createAuthentication(user)));
+                userService.updateUserExecution(userCredentials, createUserDetails(user)));
     }
 
     @Test
@@ -258,7 +257,7 @@ class UserServiceTest {
 
         // When & Then
         assertThrows(UserExistsException.class, () ->
-                userService.updateUserExecution(userCredentials, createAuthentication(user)));
+                userService.updateUserExecution(userCredentials, createUserDetails(user)));
     }
 
     @Test
@@ -272,7 +271,7 @@ class UserServiceTest {
 
         // When & Then
         assertThrows(WrongPasswordException.class, () ->
-                userService.updateUserExecution(userCredentials, createAuthentication(user)));
+                userService.updateUserExecution(userCredentials, createUserDetails(user)));
     }
 
     @Test
@@ -294,16 +293,17 @@ class UserServiceTest {
 
         // When & Then
         assertThrows(WrongPasswordException.class, () ->
-                userService.updateUserExecution(userCredentials, createAuthentication(testUser)));
+                userService.updateUserExecution(userCredentials, createUserDetails(testUser)));
     }
 
     @Test
     void testChangePassword_Success () throws WrongPasswordException {
         // Given
-        ChangePasswordRequest request = new ChangePasswordRequest("password", "newPassword", "newPassword");
+        ChangePasswordRequest request = new ChangePasswordRequest(
+                "password", "newPassword", "newPassword");
 
         // When
-        UserResponse response = userService.changePassword(request, createAuthentication(user));
+        UserResponse response = userService.changePassword(request, createUserDetails(user));
 
         // Then
         assertNotNull(response);
@@ -314,10 +314,11 @@ class UserServiceTest {
     @Test
     void testChangePassword_WrongPasswordException () {
         // Given
-        ChangePasswordRequest request = new ChangePasswordRequest("password", "newPassword", "differentPassword");
+        ChangePasswordRequest request = new ChangePasswordRequest(
+                "password", "newPassword", "differentPassword");
 
         // When & Then
-        assertThrows(WrongPasswordException.class, () -> userService.changePassword(request, createAuthentication(user)));
+        assertThrows(WrongPasswordException.class, () -> userService.changePassword(request, createUserDetails(user)));
     }
 
     @Test
@@ -327,7 +328,7 @@ class UserServiceTest {
         PasswordRequest request = new PasswordRequest("password");
 
         // When
-        UserResponse response = userService.deleteConnectedUser(request, createAuthentication(user));
+        UserResponse response = userService.deleteConnectedUser(request, createUserDetails(user));
         long userQtyAfterDelete = userRepository.count();
 
         // Then
@@ -337,8 +338,15 @@ class UserServiceTest {
         assertEquals(usersQty - 1, userQtyAfterDelete);
     }
 
-    private @NotNull Authentication createAuthentication(User user) {
+    private @NotNull UserDetails createUserDetails(User user) {
         SecurityUser securityUser = new SecurityUser(user);
-        return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

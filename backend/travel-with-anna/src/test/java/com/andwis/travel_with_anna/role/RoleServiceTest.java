@@ -20,16 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @DisplayName("Role Service tests")
 class RoleServiceTest {
-
     @Autowired
     private RoleService roleService;
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
     private UserRepository userRepository;
-
     private User user;
-
 
     @BeforeEach
     void setUp() {
@@ -51,7 +48,6 @@ class RoleServiceTest {
                 .avatarId(1L)
                 .build();
         user.setEnabled(true);
-
     }
 
     @AfterEach()
@@ -100,7 +96,7 @@ class RoleServiceTest {
     }
 
     @Test
-    void getRoleByName_RoleNameNotExists() throws RoleNotFoundException {
+    void getRoleByName_RoleNameNotExists() {
         // Given
         String roleName = "Role Name Not Exists";
         // When & Then

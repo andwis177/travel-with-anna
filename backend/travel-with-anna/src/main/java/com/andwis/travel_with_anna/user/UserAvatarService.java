@@ -6,7 +6,7 @@ import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,12 +17,13 @@ import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 
 @Service
 @RequiredArgsConstructor
-public class UserAvatarMgr {
+public class UserAvatarService {
     private final UserService userService;
+    private final UserAuthenticationService userAuthenticationService;
     private final AvatarService avatarService;
 
 
-    public void setAvatar(@NotNull MultipartFile file, Authentication connectedUser)
+    public void setAvatar(@NotNull MultipartFile file, UserDetails connectedUser)
             throws IOException {
         String contentType = file.getContentType();
 
@@ -31,7 +32,7 @@ public class UserAvatarMgr {
         }
 
         byte[] fileBytes = file.getBytes();
-        User user = userService.getConnectedUser(connectedUser);
+        User user = userAuthenticationService.getConnectedUser(connectedUser);
 
         if (fileBytes.length > 1024 * 1024) {
             throw new FileNotSaved("File is too big");
@@ -48,8 +49,8 @@ public class UserAvatarMgr {
         avatarService.saveAvatar(userAvatar);
     }
 
-    public byte[] getAvatar(Authentication connectedUser) {
-        User user = userService.getConnectedUser(connectedUser);
+    public byte[] getAvatar(UserDetails connectedUser) {
+        User user = userAuthenticationService.getConnectedUser(connectedUser);
 
         if (user.getAvatarId() != null) {
             if (avatarService.existsById(user.getAvatarId())) {

@@ -7,15 +7,11 @@ import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.budget.Budget;
-import com.andwis.travel_with_anna.trip.budget.BudgetRepository;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayGeneratorRequest;
 import com.andwis.travel_with_anna.trip.day.DayRepository;
 import com.andwis.travel_with_anna.trip.day.DayService;
-import com.andwis.travel_with_anna.user.SecurityUser;
-import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserRepository;
-import com.andwis.travel_with_anna.user.UserService;
+import com.andwis.travel_with_anna.user.*;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -29,7 +25,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,23 +53,21 @@ class TripMgrTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private TripRepository tripRepository;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
-    private BudgetRepository budgetRepository;
-    @Autowired
     private DayRepository dayRepository;
+    @Autowired
+    private TripMgr tripMgr;
+    @Autowired
+    private UserAuthenticationService userAuthenticationService;
     @Mock
     private AddressService addressService;
     @Mock
     private DayService dayService;
     @MockBean
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private TripMgr tripMgr;
+    private UserDetails userDetails;
     private Trip testTrip;
-    private User testUser;
 
     @BeforeEach
     @Transactional
@@ -83,7 +78,7 @@ class TripMgrTest {
         Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
         Role retrievedRole = existingRole.orElseGet(() -> roleRepository.save(role));
 
-        testUser = User.builder()
+        User testUser = User.builder()
                 .userName("testUser")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
@@ -114,15 +109,14 @@ class TripMgrTest {
         tripService.saveTrip(testTrip);
         testUser.addTrip(testTrip);
         userService.saveUser(testUser);
+
+        userDetails = createUserDetails(testUser);
     }
 
     @AfterEach
     void tearDown() {
-        tripRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
-        budgetRepository.deleteAll();
-        dayRepository.deleteAll();
     }
 
     @Test
@@ -132,7 +126,7 @@ class TripMgrTest {
                 "New Trip", "USD", BigDecimal.valueOf(1000));
 
         // When
-        Long tripId = tripMgr.createTrip(request, createAuthentication(testUser));
+        Long tripId = tripMgr.createTrip(request, userDetails);
         Trip createdTrip = tripService.getTripById(tripId);
 
         // Then
@@ -146,7 +140,7 @@ class TripMgrTest {
     void testGetAllOwnersTrips() {
         // Given
         // When
-        PageResponse<TripResponse> pageResponse = tripMgr.getAllOwnersTrips(0, 10, createAuthentication(testUser));
+        PageResponse<TripResponse> pageResponse = tripMgr.getAllOwnersTrips(0, 10, userDetails);
 
         // Then
         assertNotNull(pageResponse);
@@ -158,7 +152,7 @@ class TripMgrTest {
     void testGetTripById() {
         // Given
         // When
-        TripResponse tripRequest = tripMgr.getTripById(testTrip.getTripId());
+        TripResponse tripRequest = tripMgr.getTripById(testTrip.getTripId(), userDetails);
 
         // Then
         assertNotNull(tripRequest);
@@ -173,11 +167,11 @@ class TripMgrTest {
         doNothing().when(addressService).deleteAllByAddressIdIn(anySet());
 
         // When
-        tripMgr.deleteTrip(request, createAuthentication(testUser));
+        tripMgr.deleteTrip(request, userDetails);
 
         // Then
         assertThrows(TripNotFoundException.class, () -> tripService.getTripById(request.tripId()));
-        User updatedUser = userService.getConnectedUser(createAuthentication(testUser));
+        User updatedUser = userAuthenticationService.getConnectedUser(userDetails);
         assertFalse(updatedUser.getOwnedTrips().stream().anyMatch(trip -> trip.getTripId().equals(request.tripId())));
     }
 
@@ -189,7 +183,7 @@ class TripMgrTest {
                 .thenThrow(new BadCredentialsException("Wrong password"));
 
         // When & Then
-        assertThrows(WrongPasswordException.class, () -> tripMgr.deleteTrip(request, createAuthentication(testUser)));
+        assertThrows(WrongPasswordException.class, () -> tripMgr.deleteTrip(request, userDetails));
     }
 
     @Test
@@ -197,8 +191,8 @@ class TripMgrTest {
     void testUpdateTrip() {
         // Given
         String newTripName = "Updated Trip Name";
-        LocalDate newStartDate = LocalDate.now().plusDays(1); // New start date
-        LocalDate newEndDate = LocalDate.now().plusDays(5);   // New end date
+        LocalDate newStartDate = LocalDate.now().plusDays(1);
+        LocalDate newEndDate = LocalDate.now().plusDays(5);
         DayGeneratorRequest dayGeneratorRequest = DayGeneratorRequest.builder()
                 .tripId(testTrip.getTripId())
                 .startDate(newStartDate)
@@ -212,7 +206,7 @@ class TripMgrTest {
                 testTrip, newStartDate, newEndDate);
 
         // When
-        tripMgr.updateTrip(tripEditRequest);
+        tripMgr.updateTrip(tripEditRequest, userDetails);
 
         // Then
         Trip updatedTrip = tripService.getTripById(testTrip.getTripId());
@@ -222,8 +216,15 @@ class TripMgrTest {
         assertEquals(newEndDate, updatedTrip.getDaysInOrder().getLast().getDate());
     }
 
-    private @NotNull Authentication createAuthentication(User user) {
+    private @NotNull UserDetails createUserDetails(User user) {
         SecurityUser securityUser = new SecurityUser(user);
-        return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

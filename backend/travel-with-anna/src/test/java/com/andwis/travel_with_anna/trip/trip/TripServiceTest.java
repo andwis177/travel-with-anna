@@ -25,22 +25,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @DisplayName("Trip Service tests")
 class TripServiceTest {
-
     @Autowired
     private TripService tripService;
-
     @Autowired
     private TripRepository tripRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     private User user;
 
     @BeforeEach
@@ -64,7 +58,6 @@ class TripServiceTest {
 
     @AfterEach
     void tearDown() {
-        tripRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
     }
@@ -135,7 +128,6 @@ class TripServiceTest {
         assertEquals("Trip", savedTrip.getTripName());
         assertEquals(user.getUserName(), savedTrip.getOwner().getUserName());
         assertEquals(user.getEmail(), savedTrip.getOwner().getEmail());
-
     }
 
     @Transactional

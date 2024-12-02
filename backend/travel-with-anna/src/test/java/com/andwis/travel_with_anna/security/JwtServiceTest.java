@@ -7,6 +7,8 @@ import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import io.jsonwebtoken.Claims;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,11 +39,9 @@ class JwtServiceTest {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
     private User user;
-
 
     @BeforeEach
     void setUp() {
@@ -139,7 +139,8 @@ class JwtServiceTest {
         assertTrue(isTokenValid);
     }
 
-    private Authentication createAuthentication(User user) {
+    @Contract("_ -> new")
+    private @NotNull Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
         return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
     }

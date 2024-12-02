@@ -1,29 +1,40 @@
 package com.andwis.travel_with_anna.trip.budget;
 
-
 import com.andwis.travel_with_anna.handler.exception.BudgetNotFoundException;
+import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
 import com.andwis.travel_with_anna.trip.expanse.*;
 import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.user.SecurityUser;
+import com.andwis.travel_with_anna.user.User;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.*;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Budget Service tests")
 class BudgetServiceTest {
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @Mock
     private BudgetRepository budgetRepository;
     @Mock
@@ -32,13 +43,32 @@ class BudgetServiceTest {
     private ActivityService activityService;
     @Mock
     private DayService dayService;
+    @Mock
+    private BudgetAuthorizationService budgetAuthorizationService;
     @InjectMocks
     private BudgetService budgetService;
     private Budget budget;
+    private UserDetails userDetails;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+
+        when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
+        User user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("password"))
+                .role(role)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
+                .build();
+        user.setEnabled(true);
+
         budget = Budget.builder()
                 .budgetId(1L)
                 .toSpend(new BigDecimal("1000.00"))
@@ -48,16 +78,8 @@ class BudgetServiceTest {
         Trip trip = new Trip();
         trip.setTripId(1L);
         budget.setTrip(trip);
-    }
 
-    @Test
-    void testSaveBudget() {
-        // Given
-        // When
-        budgetService.saveBudget(budget);
-
-        // Then
-        verify(budgetRepository).save(budget);
+        userDetails = createUserDetails(user);
     }
 
     @Test
@@ -67,12 +89,13 @@ class BudgetServiceTest {
                 .budgetId(1L)
                 .toSpend(new BigDecimal("1200.00"))
                 .currency("EUR")
+                .tripId(1L)
                 .build();
         when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
-        when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
+        doNothing().when(budgetAuthorizationService).verifyBudgetOwner(budget, userDetails);
 
         // When
-        budgetService.updateBudget(request);
+        budgetService.updateBudget(request, userDetails);
 
         // Then
         assertEquals(new BigDecimal("1200.00"), budget.getToSpend());
@@ -90,7 +113,7 @@ class BudgetServiceTest {
         when(budgetRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(BudgetNotFoundException.class, () -> budgetService.updateBudget(request));
+        assertThrows(BudgetNotFoundException.class, () -> budgetService.updateBudget(request, userDetails));
     }
 
     @Test
@@ -121,9 +144,10 @@ class BudgetServiceTest {
                 1L,"USD",  new BigDecimal("1500.00"), 1L);
         when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
         doNothing().when(expanseService).changeTripCurrency(any());
+        doNothing().when(budgetAuthorizationService).verifyBudgetOwner(budget, userDetails);
 
         // When
-        budgetService.updateBudget(request);
+        budgetService.updateBudget(request, userDetails);
 
         // Then
         assertEquals(new BigDecimal("1500.00"), budget.getToSpend());
@@ -142,10 +166,10 @@ class BudgetServiceTest {
                 new BigDecimal("100.00"), new BigDecimal("50.00"), new BigDecimal("2.00"),
                 new BigDecimal("200.00"), new BigDecimal("100.00"));
         expanses.add(expanse1);
-        when(expanseService.getExpansesForTrip(tripId)).thenReturn(expanses);
+        when(expanseService.getExpansesForTrip(tripId, userDetails)).thenReturn(expanses);
 
         // When
-        BudgetExpensesRespond budgetExpenses = budgetService.getBudgetExpanses(tripId, budgetId);
+        BudgetExpensesRespond budgetExpenses = budgetService.getBudgetExpanses(tripId, budgetId, userDetails);
 
         // Then
         assertNotNull(budgetExpenses);
@@ -195,15 +219,27 @@ class BudgetServiceTest {
                 .paid(new BigDecimal("70.00"))
                 .build());
         day.setActivities(Set.of(activity1, activity2));
-        when(dayService.getDaysByTripId(tripId)).thenReturn(days);
-        when(activityService.getActivitiesByDayId(any())).thenReturn(List.of(activity1, activity2));
+        when(dayService.getDaysByTripId(tripId, userDetails)).thenReturn(days);
+        when(activityService.getActivitiesByDayId(any(), any())).thenReturn(List.of(activity1, activity2));
 
         // When
-        List<ExpanseTotalByBadge> result = budgetService.calculateExpansesByBadgeByTripId(tripId);
+        List<ExpanseTotalByBadge> result = budgetService.calculateExpansesByBadgeByTripId(tripId, userDetails);
 
         // Then
         assertEquals(2, result.size());
         assertEquals("badge1", result.get(0).getType());
         assertEquals("badge2", result.get(1).getType());
+    }
+
+    private @NotNull UserDetails createUserDetails(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

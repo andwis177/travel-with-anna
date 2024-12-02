@@ -1,134 +1,243 @@
 package com.andwis.travel_with_anna.trip.note;
 
 import com.andwis.travel_with_anna.handler.exception.NoteTypeException;
-import com.andwis.travel_with_anna.trip.day.DayService;
-import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.trip.backpack.Backpack;
+import com.andwis.travel_with_anna.trip.budget.Budget;
+import com.andwis.travel_with_anna.trip.day.Day;
+import com.andwis.travel_with_anna.trip.day.DayRepository;
+import com.andwis.travel_with_anna.trip.day.activity.Activity;
+import com.andwis.travel_with_anna.trip.day.activity.ActivityRepository;
+import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.user.SecurityUser;
+import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.UserRepository;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Optional;
+
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 @DisplayName("Note Facade Tests")
 class NoteFacadeTest {
-    @InjectMocks
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
     private NoteFacade noteFacade;
-    @Mock
-    private NoteService noteService;
-    @Mock
-    private DayService dayService;
-    @Mock
-    private ActivityService activityService;
-    private NoteRequest noteRequest;
+    @Autowired
+    private ActivityRepository activityRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private DayRepository dayRepository;
+    private User user;
+    private Note note;
+    private Day retrivedDay;
+    private Long dayId;
+    private Long dayNoteId;
+    private Long activityId;
+    private Long activityNoteId;
 
     @BeforeEach
     void setUp() {
-        noteRequest = NoteRequest.builder()
-                .noteId(1L)
-                .entityId(10L)
-                .note("Sample note")
-                .entityType("day")
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
+        Role retrivedRole =  existingRole.orElseGet(() -> roleRepository.save(role));
+
+        String encodedPassword = passwordEncoder.encode("password");
+        user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(encodedPassword)
+                .role(retrivedRole)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
                 .build();
+        user.setEnabled(true);
+
+        Budget budget = Budget.builder()
+                .currency("USD")
+                .toSpend(BigDecimal.valueOf(1000))
+                .build();
+
+        note = Note.builder()
+                .note("Sample note")
+                .build();
+
+        Activity activity = Activity.builder()
+                .activityTitle("Sample activity")
+                .build();
+        activity.addNote(note);
+        activityId = activityRepository.save(activity).getActivityId();
+
+        Day day = Day.builder()
+                .date(LocalDate.now())
+                .activities(new HashSet<>())
+                .build();
+        day.addNote(note);
+        day.addActivity(activity);
+        dayId = dayRepository.save(day).getDayId();
+
+        Trip trip = Trip.builder()
+                .tripName("Initial Trip")
+                .days(new HashSet<>())
+                .build();
+        trip.addBackpack(new Backpack());
+        trip.addBudget(budget);
+        trip.addDay(day);
+
+        user.addTrip(trip);
+        userRepository.save(user);
+
+        Trip retrivedTrip = user.getOwnedTrips().stream().findFirst().orElse(null);
+        assert retrivedTrip != null;
+        retrivedDay = retrivedTrip.getDays().stream().findFirst().orElse(null);
+        assert retrivedDay != null;
+        dayNoteId = retrivedDay.getNote().getNoteId();
+        Activity retrivedActivity = retrivedDay.getActivities().stream().findFirst().orElse(null);
+        assert retrivedActivity != null;
+        activityNoteId = retrivedActivity.getNote().getNoteId();
+    }
+
+    @AfterEach
+    void tearDown() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
     }
 
     @Test
+    @Transactional
     void testSaveNoteWithValidDayEntity() {
         // Given
+        UserDetails connectedUser = createUserDetails(user);
+        NoteRequest noteRequest = NoteRequest.builder()
+                .noteId(dayNoteId)
+                .entityId(retrivedDay.getDayId())
+                .note("Request day note")
+                .entityType("day")
+                .build();
 
         // When
-        noteFacade.saveNote(noteRequest);
+        noteFacade.saveNote(noteRequest, connectedUser);
 
         // Then
-        verify(noteService, times(1)).saveNote(
-                eq(noteRequest),
-                any(),
-                any(),
-                any(),
-                any());
+        Note retrivedNote = retrivedDay.getNote();
+        assertNotNull(retrivedNote);
+        assertEquals("Request day note", retrivedNote.getNote());
+        assertEquals(retrivedDay.getDayId(), retrivedNote.getDay().getDayId());
     }
 
     @Test
+    @Transactional
     void testSaveNoteWithValidActivityEntity() {
         // Given
-        noteRequest.setEntityType("activity");
+        UserDetails connectedUser = createUserDetails(user);
+        NoteRequest noteRequest = NoteRequest.builder()
+                .noteId(activityNoteId)
+                .entityId(retrivedDay.getDayId())
+                .note("Request activity note")
+                .entityType("activity")
+                .build();
 
         // When
-        noteFacade.saveNote(noteRequest);
+        noteFacade.saveNote(noteRequest, connectedUser);
 
         // Then
-        verify(noteService, times(1)).saveNote(
-                eq(noteRequest),
-                any(),
-                any(),
-                any(),
-                any());
+        Note retrivedNote = retrivedDay.getNote();
+        assertNotNull(retrivedNote);
+        assertEquals("Request activity note", retrivedNote.getNote());
+        assertEquals(retrivedDay.getDayId(), retrivedNote.getDay().getDayId());
     }
 
     @Test
+    @Transactional
     void testSaveNoteWithInvalidType() {
         // Given
-        noteRequest.setEntityType("invalid_type");
+        NoteRequest noteRequest = NoteRequest.builder()
+                .note("Request note")
+                .entityType("invalid_type")
+                .build();
 
         // When
-        NoteTypeException exception = assertThrows(NoteTypeException.class, () -> {
-            noteFacade.saveNote(noteRequest);
-        });
+        NoteTypeException exception = assertThrows(NoteTypeException.class, () ->
+            noteFacade.saveNote(noteRequest, createUserDetails(user)));
 
         // Then
         assertTrue(exception.getMessage().contains("Invalid note type"));
     }
 
     @Test
+    @Transactional
     void testGetNoteForDayEntity() {
         // Given
-        Long dayId = 10L;
-        NoteResponse expectedResponse = new NoteResponse(1L, "Sample note");
-        when(noteService.getNoteById(eq(dayId), any(), any())).thenReturn(expectedResponse);
-
         // When
-        NoteResponse actualResponse = noteFacade.getNote(dayId, "day");
+        NoteResponse actualResponse = noteFacade.getNote(dayId, "day", createUserDetails(user));
 
         // Then
         assertNotNull(actualResponse);
-        assertEquals(expectedResponse.noteId(), actualResponse.noteId());
-        assertEquals(expectedResponse.note(), actualResponse.note());
-        verify(noteService, times(1)).getNoteById(eq(dayId), any(), any());
+        assertEquals(note.getNoteId(), actualResponse.noteId());
+        assertEquals(note.getNote(), actualResponse.note());
     }
 
     @Test
+    @Transactional
     void testGetNoteForActivityEntity() {
         // Given
-        Long activityId = 20L;
-        NoteResponse expectedResponse = new NoteResponse(1L, "Sample note");
-        when(noteService.getNoteById(eq(activityId), any(), any())).thenReturn(expectedResponse);
-
         // When
-        NoteResponse actualResponse = noteFacade.getNote(activityId, "activity");
+        NoteResponse actualResponse = noteFacade.getNote(activityId, "activity", createUserDetails(user));
 
         // Then
         assertNotNull(actualResponse);
-        assertEquals(expectedResponse.noteId(), actualResponse.noteId());
-        assertEquals(expectedResponse.note(), actualResponse.note());
-        verify(noteService, times(1)).getNoteById(eq(activityId), any(), any());
+        assertEquals(note.getNoteId(), actualResponse.noteId());
+        assertEquals(note.getNote(), actualResponse.note());
     }
 
     @Test
+    @Transactional
     void testGetNoteWithInvalidType() {
         // Given
         Long invalidEntityId = 30L;
 
         // When
-        NoteResponse response = noteFacade.getNote(invalidEntityId, "invalid_type");
+        NoteResponse response = noteFacade.getNote(invalidEntityId, "invalid_type", createUserDetails(user));
 
         // Then
         assertNotNull(response);
         assertEquals(-1L, response.noteId());
         assertEquals("", response.note());
+    }
+
+    private @NotNull UserDetails createUserDetails(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

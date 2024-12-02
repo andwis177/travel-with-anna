@@ -12,14 +12,17 @@ import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayResponse;
 import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
+import com.andwis.travel_with_anna.utility.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,6 +37,7 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
     private final DayService dayService;
     private final AddressService addressService;
+    private final ActivityAuthorizationService activityAuthorizationService;
 
     public Activity getById(Long activityId) {
         return activityRepository.findById(activityId)
@@ -41,22 +45,23 @@ public class ActivityService {
     }
 
     @Transactional
-    public Long createSingleActivity(ActivityRequest request) {
+    public Activity createSingleActivity(ActivityRequest request, UserDetails connectedUser) {
         Address address;
-        Activity activity = createActivity(request);
+        Activity activity = createActivity(request, connectedUser);
+        activityAuthorizationService.verifyActivityOwner(activity, connectedUser);
 
         if (request.getAddressRequest() != null) {
             address = AddressMapper.toAddress(request.getAddressRequest());
             addressService.save(address);
             address.addActivity(activity);
         }
-        return activityRepository.save(activity).getActivityId();
+        return activityRepository.save(activity);
     }
 
     @Transactional
-    public void createAssociatedActivities(@NotNull ActivityAssociatedRequest request) {
-        Activity firstActivity = createActivity(request.getFirstRequest());
-        Activity secondActivity = createActivity(request.getSecondRequest());
+    public void createAssociatedActivities(@NotNull ActivityAssociatedRequest request, UserDetails connectedUser) {
+        Activity firstActivity = createActivity(request.getFirstRequest(), connectedUser);
+        Activity secondActivity = createActivity(request.getSecondRequest(), connectedUser);
 
         if (request.isAddressSeparated()) {
             setActivityAddress(request.getFirstRequest(), firstActivity);
@@ -66,9 +71,7 @@ public class ActivityService {
             secondActivity.addAddress(firstActivity.getAddress());
         }
 
-        List<Activity> activities = List.of(
-                firstActivity,
-                secondActivity);
+        List<Activity> activities = List.of(firstActivity, secondActivity);
 
         firstActivity.setAssociatedId(secondActivity.getActivityId());
         secondActivity.setAssociatedId(firstActivity.getActivityId());
@@ -86,7 +89,7 @@ public class ActivityService {
     }
 
     @Transactional
-    public Activity createActivity(@NotNull ActivityRequest request) {
+    public Activity createActivity(@NotNull ActivityRequest request, UserDetails connectedUser) {
         if (request.getTripId() == null) {
             throw new TripNotFoundException("Trip ID is required");
         }
@@ -94,8 +97,8 @@ public class ActivityService {
             throw new DateTimeException("Date and Time is required");
         }
 
-        Day day = dayService.getByTripIdAndDate(request.getTripId(),
-                toLocalDateTime(request.getDateTime()).toLocalDate());
+        LocalDate requestedDateTime = toLocalDateTime(request.getDateTime()).toLocalDate();
+        Day day = dayService.getByTripIdAndDate(request.getTripId(), requestedDateTime, connectedUser);
 
         Activity activity = ActivityMapper.toActivity(request);
         day.addActivity(activity);
@@ -105,39 +108,42 @@ public class ActivityService {
     }
 
     @Transactional
-    public String updateActivity(@NotNull ActivityUpdateRequest request) {
+    public MessageResponse updateActivity(@NotNull ActivityUpdateRequest request, UserDetails connectedUser) {
         Activity activity = getById(request.getActivityId());
         ActivityMapper.updateActivity(activity, request);
 
+        String message;
         if (!toLocalDate(request.getOldDate()).equals(toLocalDate(request.getNewDate()))) {
-            updateActivityDate(activity, request.getNewDate());
-            return "Activity date updated";
-        }
-
+            updateActivityDate(activity, request.getNewDate(), connectedUser);
+            message = "Activity date updated";
+        } else
         if (activity.getAssociatedId() != null) {
-            updateAssociatedActivity(activity);
-            return "Associated activity updated";
+            updateAssociatedActivity(activity, connectedUser);
+            message = "Associated activity updated";
         } else {
+            activityAuthorizationService.verifyActivityOwner(activity, connectedUser);
             activityRepository.save(activity);
-            return "Activity updated";
+            message = "Activity updated";
         }
+        return new MessageResponse(message);
     }
 
     @Transactional
-    protected void updateActivityDate(@NotNull Activity activity, String newDate) {
+    protected void updateActivityDate(@NotNull Activity activity, String newDate, UserDetails connectedUser) {
         Day oldDay = activity.getDay();
-        Day newDay = dayService.getByTripIdAndDate(
-                activity.getDay().getTrip().getTripId(),
-                toLocalDate(newDate));
+        Long tripId = activity.getDay().getTrip().getTripId();
+        LocalDate newActivityDate = toLocalDate(newDate);
+        Day newDay = dayService.getByTripIdAndDate(tripId, newActivityDate, connectedUser);
         oldDay.removeActivities(Set.of(activity));
         newDay.addActivity(activity);
         dayService.saveAllDays(Set.of(oldDay, newDay));
     }
 
     @Transactional
-    protected void updateAssociatedActivity(@NotNull Activity activity) {
+    protected void updateAssociatedActivity(@NotNull Activity activity, UserDetails connectedUser) {
         try {
             Activity associatedActivity = getById(activity.getAssociatedId());
+            activityAuthorizationService.verifyActivityOwner(associatedActivity, connectedUser);
             associatedActivity.setType(activity.getType());
             activityRepository.saveAll(List.of(activity, associatedActivity));
         } catch (ActivityNotFoundException _) {
@@ -146,12 +152,14 @@ public class ActivityService {
         }
     }
 
-    public List<Activity> getActivitiesByDayId(Long dayId) {
-        return activityRepository.findByDayDayIdOrderByBeginTimeAsc(dayId);
+    public List<Activity> getActivitiesByDayId(Long dayId, UserDetails connectedUser) {
+        List<Activity> activities = activityRepository.findByDayDayIdOrderByBeginTimeAsc(dayId);
+        activityAuthorizationService.checkActivitiesAuthorization(new HashSet<>(activities), connectedUser);
+        return activities;
     }
 
-    public ActivityDetailedResponse fetchActivitiesByDayId(Long dayId) {
-        List<Activity> activities = getActivitiesByDayId(dayId);
+    public ActivityDetailedResponse fetchActivitiesByDayId(Long dayId, UserDetails connectedUser) {
+        List<Activity> activities = getActivitiesByDayId(dayId, connectedUser);
         List<ActivityResponse> activityResponses = ActivityMapper.toActivityResponseList(activities);
         AddressDetail addressDetail = buildAddressDetail(
                 getActivitiesCountriesFromDay(activityResponses),
@@ -233,8 +241,8 @@ public class ActivityService {
         );
     }
 
-    public AddressDetail fetchAddressDetailByDayId(Long dayId) {
-        List<Activity> activities = getActivitiesByDayId(dayId);
+    public AddressDetail fetchAddressDetailByDayId(Long dayId, UserDetails connectedUser) {
+        List<Activity> activities = getActivitiesByDayId(dayId, connectedUser);
         List<ActivityResponse> activityResponses = ActivityMapper.toActivityResponseList(activities);
         return buildAddressDetail(
                 getActivitiesCountriesFromDay(activityResponses),
@@ -242,11 +250,11 @@ public class ActivityService {
         );
     }
 
-    public AddressDetail fetchAddressDetailByTripId(Long tripId) {
-        List<DayResponse> days = dayService.getDays(tripId);
+    public AddressDetail fetchAddressDetailByTripId(Long tripId, UserDetails connectedUser) {
+        List<DayResponse> days = dayService.getDays(tripId, connectedUser);
         List<ActivityResponse> activityResponses = new ArrayList<>();
         for (DayResponse day : days) {
-            List<Activity> activities = getActivitiesByDayId(day.dayId());
+            List<Activity> activities = getActivitiesByDayId(day.dayId(), connectedUser);
             activityResponses.addAll(ActivityMapper.toActivityResponseList(activities));
         }
         return buildAddressDetail(
@@ -256,8 +264,9 @@ public class ActivityService {
     }
 
     @Transactional
-    public void deleteActivityById(@NotNull Long activityId) {
+    public void deleteActivityById(@NotNull Long activityId, UserDetails connectedUser) {
         Activity activity = getById(activityId);
+        activityAuthorizationService.verifyActivityOwner(activity, connectedUser);
         deleteActivities(Set.of(activity));
     }
 

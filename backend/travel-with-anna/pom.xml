@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version>
+		<version>3.3.5</version>
 		<relativePath/>
 	</parent>
 	<groupId>com.andwis</groupId>
@@ -21,33 +21,33 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>3.3.4</version>
+			<version>3.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
-			<version>3.3.4</version>
+			<version>3.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-			<version>3.3.4</version>
+			<version>3.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-			<version>3.3.4</version>
+			<version>3.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
-			<version>3.3.4</version>
+			<version>3.3.5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>3.3.4</version>
+			<version>3.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-			<version>3.3.4</version>
+			<version>3.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -92,7 +92,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<version>3.3.4</version>
+			<version>3.3.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -139,6 +139,22 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>kernel</artifactId>
+			<version>8.0.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>layout</artifactId>
+			<version>8.0.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf.tool</groupId>
+			<artifactId>xmlworker</artifactId>
+			<version>5.5.13.4</version>
+		</dependency>
+
 
     </dependencies>
 	<build>

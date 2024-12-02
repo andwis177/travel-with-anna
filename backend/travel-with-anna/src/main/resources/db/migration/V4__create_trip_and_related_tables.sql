@@ -38,10 +38,10 @@ CREATE TABLE IF NOT EXISTS backpack (
 
 CREATE TABLE IF NOT EXISTS addresses (
                                         address_id BIGSERIAL PRIMARY KEY,
-                                        place VARCHAR(100),
-                                        country VARCHAR(100),
+                                        place VARCHAR(60),
+                                        country VARCHAR(40),
                                         country_code VARCHAR(3),
-                                        city VARCHAR(100),
+                                        city VARCHAR(40),
                                         address VARCHAR(200),
                                         website VARCHAR(255),
                                         phone VARCHAR(30),

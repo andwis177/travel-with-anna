@@ -18,12 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,12 +33,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @EnableJpaAuditing
 public class UserService {
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final UserDetailsService userDetailsService;
+    private final UserAuthenticationService userAuthenticationService;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final AvatarService avatarService;
     private final AddressService addressService;
@@ -75,11 +70,6 @@ public class UserService {
         return userRepository.findAllExcept(pageable, userId);
     }
 
-    public User getConnectedUser(Authentication connectedUser) {
-        var securityUser = getSecurityUser(connectedUser);
-        return securityUser.getUser();
-    }
-
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->
                 new EmailNotFoundException("User not found"));
@@ -106,12 +96,12 @@ public class UserService {
 
     @Transactional
     public AuthenticationResponse updateUserExecution(
-            @NotNull UserCredentialsRequest userCredentials, Authentication connectedUser)
+            @NotNull UserCredentialsRequest userCredentials, UserDetails connectedUser)
             throws WrongPasswordException {
-        var user = getSecurityUser(connectedUser).getUser();
-        verifyPassword(user, userCredentials.getPassword());
+        var user = userAuthenticationService.getSecurityUser(connectedUser).getUser();
+        userAuthenticationService.verifyPassword(user, userCredentials.getPassword());
         updateUser(userCredentials, user);
-        updateSecurityContext(userCredentials.getEmail());
+        userAuthenticationService.updateSecurityContext(userCredentials.getEmail());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String newJwtToken = jwtService.generateJwtToken(authentication);
         return AuthenticationResponse.builder()
@@ -151,25 +141,15 @@ public class UserService {
         }
     }
 
-    private void updateSecurityContext(String userName) {
-        SecurityUser user = (SecurityUser) userDetailsService.loadUserByUsername(userName);
-        if (user == null) {
-            throw new UsernameNotFoundException("User is logged out");
-        }
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
     @Transactional
-    public UserResponse changePassword(@NotNull ChangePasswordRequest request, Authentication connectedUser) throws WrongPasswordException {
-        var user = getSecurityUser(connectedUser);
+    public UserResponse changePassword(@NotNull ChangePasswordRequest request, UserDetails connectedUser) throws WrongPasswordException {
+        var user = userAuthenticationService.getSecurityUser(connectedUser);
         var currentUser = user.getUser();
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new WrongPasswordException("Passwords do not match");
         }
 
-        verifyPassword(currentUser, request.getCurrentPassword());
+        userAuthenticationService.verifyPassword(currentUser, request.getCurrentPassword());
         currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(currentUser);
         return UserResponse.builder()
@@ -178,12 +158,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse deleteConnectedUser(@NotNull PasswordRequest request, Authentication connectedUser)
+    public UserResponse deleteConnectedUser(@NotNull PasswordRequest request, UserDetails connectedUser)
             throws UsernameNotFoundException, WrongPasswordException {
-        var securityUser = getSecurityUser(connectedUser);
+        var securityUser = userAuthenticationService.getSecurityUser(connectedUser);
         var currentUser = securityUser.getUser();
         String userName = currentUser.getUserName();
-        verifyPassword(currentUser, request.password());
+        userAuthenticationService.verifyPassword(currentUser, request.password());
         deleteUser(currentUser);
         return UserResponse.builder()
                 .message("User " + userName + " has been deleted!")
@@ -204,22 +184,5 @@ public class UserService {
         Set<Trip> trips = user.getOwnedTrips();
         Set<Long> tripIds = trips.stream().map(Trip::getTripId).collect(Collectors.toSet());
         return dayService.getDaysByTripIds(tripIds);
-    }
-
-    public void verifyPassword(@NotNull User user, String password) throws WrongPasswordException {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getEmail(), password));
-        } catch (AuthenticationException exp) {
-            throw new WrongPasswordException("Wrong password");
-        }
-    }
-
-    private static @NotNull SecurityUser getSecurityUser(@NotNull Authentication connectedUser) throws UsernameNotFoundException {
-        var securityUser  = (SecurityUser) connectedUser.getPrincipal();
-        if (securityUser  == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return securityUser ;
     }
 }

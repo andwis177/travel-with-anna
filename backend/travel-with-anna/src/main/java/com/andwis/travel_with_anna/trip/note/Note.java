@@ -1,7 +1,9 @@
 package com.andwis.travel_with_anna.trip.note;
 
+import com.andwis.travel_with_anna.security.OwnableByUser;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
+import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -16,7 +18,7 @@ import java.util.Objects;
 @Builder
 @Entity
 @Table(name = "notes")
-public class Note {
+public class Note implements OwnableByUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "note_id")
@@ -56,5 +58,10 @@ public class Note {
         if (day.getNote() == this) {
             day.setNote(null);
         }
+    }
+
+    @Override
+    public User getOwner() {
+        return this.day.getOwner();
     }
 }

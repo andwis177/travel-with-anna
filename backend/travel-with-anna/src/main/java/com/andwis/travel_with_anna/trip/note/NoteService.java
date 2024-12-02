@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.trip.note;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,7 @@ import java.util.function.Function;
 public class NoteService {
     private final NoteRepository noteRepository;
 
-    public void saveNote(Note note) {
+    public void save(Note note) {
         noteRepository.save(note);
     }
 
@@ -25,10 +26,13 @@ public class NoteService {
     public <T> NoteResponse getNoteById(
             Long entityId,
             @NotNull Function<Long, T> getByIdFunction,
-            @NotNull Function<T, Note> getNoteFunction)
+            @NotNull Function<T, Note> getNoteFunction,
+            @NotNull BiConsumer<T, UserDetails> userAuthorizationFunction,
+            UserDetails connectedUser
+    )
     {
         T entity = getByIdFunction.apply(entityId);
-
+        userAuthorizationFunction.accept(entity, connectedUser);
         Note note = getNoteFunction.apply(entity);
         if (note == null) {
             return new NoteResponse(-1L, "");
@@ -42,16 +46,20 @@ public class NoteService {
             @NotNull Function<Long, T> getByIdFunction,
             @NotNull Function<T, Note> getNoteFunction,
             @NotNull BiConsumer<T, Note> addNoteFunction,
-            @NotNull Consumer<T> removeNoteFunction
+            @NotNull Consumer<T> removeNoteFunction,
+            @NotNull BiConsumer<T, UserDetails> userAuthorizationFunction,
+            UserDetails connectedUser
     ) {
         T entity = getByIdFunction.apply(noteRequest.getEntityId());
+        userAuthorizationFunction.accept(entity, connectedUser);
         Note note = getNoteFunction.apply(entity);
+
         if (note == null) {
             note = Note.builder()
                     .note(noteRequest.getNote())
                     .build();
             addNoteFunction.accept(entity, note);
-            saveNote(note);
+            save(note);
         } else {
             if (noteRequest.getNote() != null) {
 
@@ -59,7 +67,7 @@ public class NoteService {
 
                     if (!noteRequest.getNote().isBlank()) {
                         note.setNote(noteRequest.getNote());
-                        saveNote(note);
+                        save(note);
                     } else {
                         deleteNote(note);
                     }

@@ -24,10 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CountryControllerTest {
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
-    private CountryClient countryClient;
     @Autowired
     private ObjectMapper objectMapper;
+    @MockBean
+    private CountryClient countryClient;
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")

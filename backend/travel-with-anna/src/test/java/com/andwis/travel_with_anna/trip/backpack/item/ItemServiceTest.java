@@ -1,19 +1,40 @@
 package com.andwis.travel_with_anna.trip.backpack.item;
 
 import com.andwis.travel_with_anna.handler.exception.ItemNotFoundException;
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.trip.backpack.Backpack;
+import com.andwis.travel_with_anna.trip.backpack.BackpackRepository;
+import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
+import com.andwis.travel_with_anna.trip.expanse.ExpanseRepository;
+import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.trip.trip.TripRepository;
+import com.andwis.travel_with_anna.user.SecurityUser;
+import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.UserRepository;
 import jakarta.persistence.EntityManager;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -25,10 +46,66 @@ class ItemServiceTest {
     private ItemRepository itemRepository;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private TripRepository tripRepository;
+    @Autowired
+    private BackpackRepository backpackRepository;
+    @Autowired
+    private ExpanseRepository expanseRepository;
     private Item item;
+    private Long backpackId;
+    private UserDetails userDetails;
 
     @BeforeEach
     void setUp() {
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
+        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+
+        User user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("password"))
+                .role(retrivedRole)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
+                .build();
+        user.setEnabled(true);
+
+        User secondaryUser = User.builder()
+                .userName("userName2")
+                .email("email2@example.com")
+                .password(passwordEncoder.encode("password"))
+                .role(retrivedRole)
+                .avatarId(2L)
+                .build();
+        secondaryUser.setEnabled(true);
+        userRepository.save(secondaryUser);
+
+        Budget budget = Budget.builder()
+                .currency("USD")
+                .toSpend(BigDecimal.valueOf(1000))
+                .build();
+
+        Trip trip = Trip.builder()
+                .tripName("Test Trip")
+                .days(new HashSet<>())
+                .budget(budget)
+                .build();
+        trip.addBackpack(new Backpack());
+        trip.addBudget(budget);
+        tripRepository.save(trip);
+        user.addTrip(trip);
+        userRepository.save(user);
+
         item = Item.builder()
                 .itemName("Flight Ticket")
                 .quantity("1")
@@ -41,14 +118,23 @@ class ItemServiceTest {
                 .paid(BigDecimal.valueOf(100))
                 .exchangeRate(BigDecimal.valueOf(2.0))
                 .build();
-
+        expanseRepository.save(expanse);
         item.setExpanse(expanse);
-        itemRepository.save(item);
+
+        Backpack backpack = Backpack.builder()
+                .items(new ArrayList<>())
+                .build();
+        backpack.addItem(item);
+        backpack.setTrip(trip);
+        backpackId = backpackRepository.save(backpack).getBackpackId();
+
+        userDetails = createUserDetails(user);
     }
 
     @AfterEach
     void tearDown() {
-        itemRepository.deleteAll();
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
     }
 
     @Test
@@ -97,7 +183,7 @@ class ItemServiceTest {
     @Transactional
     void testCreateItem() {
         // Given
-        ItemWithExpanseRequest request = ItemWithExpanseRequest.builder()
+        ItemRequest request = ItemRequest.builder()
                 .itemName("Tent")
                 .qty("1")
                 .isPacked(true)
@@ -117,7 +203,7 @@ class ItemServiceTest {
     @Transactional
     void testCreateItemWithLongItemName() {
         // Given
-        ItemWithExpanseRequest longNameRequest = ItemWithExpanseRequest.builder()
+        ItemRequest longNameRequest = ItemRequest.builder()
                 .itemName("A very long item name that exceeds the sixty character limit enforced by validation")
                 .qty("1")
                 .isPacked(false)
@@ -128,7 +214,8 @@ class ItemServiceTest {
 
         // Then
         assertNotNull(createdItem);
-        assertEquals("A very long item name that exceeds the sixty character limit enforced by validation", createdItem.getItemName());
+        assertEquals("A very long item name that exceeds the sixty character limit enforced by validation",
+                createdItem.getItemName());
         assertEquals("1", createdItem.getQuantity());
         assertFalse(createdItem.isPacked());
     }
@@ -137,10 +224,8 @@ class ItemServiceTest {
     @Transactional
     void testGetAllItemsByBackpackId() {
         // Given
-        Long backpackId = 1L;
-
         // When
-        List<ItemResponse> itemResponses = itemService.getAllItemsByBackpackId(backpackId);
+        List<ItemResponse> itemResponses = itemService.getAllItemsByBackpackId(backpackId, userDetails);
 
         // Then
         assertNotNull(itemResponses);
@@ -150,12 +235,12 @@ class ItemServiceTest {
     @Transactional
     void testSaveAllItems() {
         // Given
-        ItemRequest itemRequest = new ItemRequest(
-                item.getItemId(), "Updated Flight Ticket", "2", false);
-        List<ItemRequest> itemRequests = List.of(itemRequest);
+        ItemResponse itemResponse = new ItemResponse(
+                item.getItemId(), "Updated Flight Ticket", "2", false, null);
+        List<ItemResponse> itemResponses = List.of(itemResponse);
 
         // When
-        itemService.saveAllItems(itemRequests);
+        itemService.saveAllItems(itemResponses, userDetails);
 
         // Then
         Item updatedItem = itemRepository.findById(item.getItemId()).orElseThrow();
@@ -179,14 +264,14 @@ class ItemServiceTest {
         item2.addExpanse(expanse2);
         itemRepository.save(item2);
 
-        ItemRequest request1 = new ItemRequest(
-                item.getItemId(), "Updated Ticket", "3", false);
-        ItemRequest request2 = new ItemRequest(
-                item2.getItemId(), "Passport", "1", true);
-        List<ItemRequest> requests = List.of(request1, request2);
+        ItemResponse response1 = new ItemResponse(
+                item.getItemId(), "Updated Ticket", "3", false, null);
+        ItemResponse response2 = new ItemResponse(
+                item2.getItemId(), "Passport", "1", true, null);
+        List<ItemResponse> responses = List.of(response1, response2);
 
         // When
-        itemService.saveAllItems(requests);
+        itemService.saveAllItems(responses, userDetails);
 
         // Then
         Item updatedItem1 = itemRepository.findById(item.getItemId()).orElseThrow();
@@ -228,5 +313,17 @@ class ItemServiceTest {
 
         // Then
         assertFalse(itemRepository.findById(itemId).isPresent());
+    }
+
+    private @NotNull UserDetails createUserDetails(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

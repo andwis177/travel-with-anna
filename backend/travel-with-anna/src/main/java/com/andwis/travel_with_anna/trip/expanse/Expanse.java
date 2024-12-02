@@ -1,8 +1,10 @@
 package com.andwis.travel_with_anna.trip.expanse;
 
+import com.andwis.travel_with_anna.security.OwnableByUser;
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,7 +21,7 @@ import java.util.Objects;
 @Builder
 @Entity
 @Table(name = "expanses")
-public class Expanse {
+public class Expanse implements OwnableByUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "expanse_id")
@@ -84,5 +86,10 @@ public class Expanse {
             return BigDecimal.ZERO;
         }
         return exchangeRate.multiply(paid).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public User getOwner() {
+        return this.trip.getOwner();
     }
 }

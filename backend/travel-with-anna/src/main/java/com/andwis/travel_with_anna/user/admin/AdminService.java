@@ -3,10 +3,7 @@ package com.andwis.travel_with_anna.user.admin;
 import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.RoleService;
-import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserMapper;
-import com.andwis.travel_with_anna.user.UserResponse;
-import com.andwis.travel_with_anna.user.UserService;
+import com.andwis.travel_with_anna.user.*;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.utility.NumberUtils;
@@ -17,7 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,10 +30,11 @@ public class AdminService {
     private final AvatarService avatarService;
     private final UserMapper userMapper;
     private final UserService userService;
+    private final UserAuthenticationService userAuthenticationService;
     private final RoleService roleService;
 
-    public PageResponse<UserAdminResponse> getAllUsers(int page, int size, Authentication connectedUser) {
-        var user  = userService.getConnectedUser(connectedUser);
+    public PageResponse<UserAdminResponse> getAllUsers(int page, int size, UserDetails connectedUser) {
+        var user  = userAuthenticationService.getConnectedUser(connectedUser);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("userId").ascending());
         Page<User> users = userService.getAllUsersExcept(pageable, user.getUserId());
@@ -60,9 +58,9 @@ public class AdminService {
         return avatarService.getAvatar(user);
     }
 
-    public UserAdminResponse getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
+    public UserAdminResponse getUserAdminViewByIdentifier(String identifier, UserDetails connectedUser) {
         User user = getUserBasedOnIdentifier(identifier);
-        if (user.getUserId().equals(userService.getConnectedUser(connectedUser).getUserId())) {
+        if (user.getUserId().equals(userAuthenticationService.getConnectedUser(connectedUser).getUserId())) {
             throw new UserNotFoundException("You can't view your own profile");
         }
         List<Long> avatarsId = List.of(user.getAvatarId());
@@ -86,10 +84,10 @@ public class AdminService {
 
     @Transactional
     public Long updateUser(
-            @NotNull UserAdminUpdateRequest request, Authentication authentication)
+            @NotNull UserAdminUpdateRequest request, UserDetails authentication)
             throws RoleNotFoundException, WrongPasswordException {
-        User adminUser = userService.getConnectedUser(authentication);
-        userService.verifyPassword(adminUser, request.getPassword());
+        User adminUser = userAuthenticationService.getConnectedUser(authentication);
+        userAuthenticationService.verifyPassword(adminUser, request.getPassword());
         UserAdminEditRequest userAdminEditRequest = request.getUserAdminEditRequest();
         User user = userService.getUserById(userAdminEditRequest.userId());
         user.setAccountLocked(userAdminEditRequest.accountLocked());
@@ -101,10 +99,10 @@ public class AdminService {
 
     @Transactional
     public UserResponse deleteUser(
-            @NotNull UserAdminDeleteRequest request, Authentication authentication)
+            @NotNull UserAdminDeleteRequest request, UserDetails authentication)
             throws WrongPasswordException {
-        User adminUser = userService.getConnectedUser(authentication);
-        userService.verifyPassword(adminUser, request.password());
+        User adminUser = userAuthenticationService.getConnectedUser(authentication);
+        userAuthenticationService.verifyPassword(adminUser, request.password());
         User userToBeDeleted = userService.getUserById(request.userId());
         userService.deleteUser(userToBeDeleted);
         return UserResponse.builder().message("User has been deleted").build();

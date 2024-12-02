@@ -65,7 +65,6 @@ class AuthenticationServiceTest {
     private AuthenticationService authenticationService;
     @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
-
     private static RegistrationRequest request;
     private static User user;
     private static Role role;

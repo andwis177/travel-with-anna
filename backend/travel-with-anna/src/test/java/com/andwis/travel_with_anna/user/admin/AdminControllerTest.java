@@ -2,8 +2,10 @@ package com.andwis.travel_with_anna.user.admin;
 
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
-import com.andwis.travel_with_anna.trip.trip.TripRepository;
-import com.andwis.travel_with_anna.user.*;
+import com.andwis.travel_with_anna.user.SecurityUser;
+import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.UserRepository;
+import com.andwis.travel_with_anna.user.UserResponse;
 import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
@@ -20,6 +22,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,34 +44,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Admin Controller tests")
 class AdminControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TripRepository tripRepository;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
-    private UserService userService;
-
+    private AdminFacade adminFacade;
     @MockBean
     private AdminService adminService;
-
     private User user;
     private Role retrivedAdminRole;
     private User adminUser;
+    private UserDetails userDetails;
 
     @BeforeEach
     void setup() {
@@ -103,13 +97,14 @@ class AdminControllerTest {
                 .build();
         adminUser.setAccountLocked(false);
         adminUser.setEnabled(true);
+
+        userDetails = createUserDetails(adminUser);
     }
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
         roleRepository.deleteAll();
-        tripRepository.deleteAll();
     }
 
     @Test
@@ -135,14 +130,14 @@ class AdminControllerTest {
 
         String jsonContent = objectMapper.writeValueAsString(response);
 
-        when(adminService.getAllUsers(anyInt(), anyInt(), any(Authentication.class)))
+        when(adminService.getAllUsers(anyInt(), anyInt(), any()))
                 .thenReturn(response);
 
         // When & Then
         mockMvc.perform(get("/admin/users")
                         .param("page", "0")
                         .param("size", "10")
-                        .principal(createAuthentication(user))) // Simulate an authenticated user
+                        .principal(createAuthentication(user)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));
 
@@ -152,7 +147,7 @@ class AdminControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "Admin")
     void shouldGetAllUsersWithDefaultParams() throws Exception {
         // Given
-        when(adminService.getAllUsers(anyInt(), anyInt(), any(Authentication.class)))
+        when(adminService.getAllUsers(anyInt(), anyInt(), any()))
                 .thenReturn(new PageResponse<>(List.of(), 0, 10, 0, 0, true, true));
 
         // When & Then
@@ -191,7 +186,7 @@ class AdminControllerTest {
         String identifier = "TestUser";
         String jsonContent = objectMapper.writeValueAsString(userResponse);
 
-        when(adminService.getUserAdminViewByIdentifier(eq(identifier), any(Authentication.class)))
+        when(adminService.getUserAdminViewByIdentifier(eq(identifier), any()))
                 .thenReturn(userResponse);
 
         // When & Then
@@ -242,11 +237,11 @@ class AdminControllerTest {
                 .avatarId(user.getAvatarId())
                 .build();
 
-        userService.saveUser(updatedUser);
+        adminFacade.updateUser(request, userDetails);
 
         String jsonContent = objectMapper.writeValueAsString(request);
 
-        when(adminService.updateUser(any(UserAdminUpdateRequest.class), any(Authentication.class)))
+        when(adminService.updateUser(any(UserAdminUpdateRequest.class), any()))
                 .thenReturn(updatedUser.getUserId());
 
         // When & Then
@@ -296,8 +291,23 @@ class AdminControllerTest {
                 .andExpect(content().json(jsonContent));
     }
 
-    private @NotNull Authentication createAuthentication(User user) {
+    private @NotNull UserDetails createUserDetails(User user) {
         SecurityUser securityUser = new SecurityUser(user);
-        return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
+    }
+
+    private @NotNull Authentication createAuthentication(User user) {
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                user.getPassword(),
+                userDetails.getAuthorities()
+        );
     }
 }

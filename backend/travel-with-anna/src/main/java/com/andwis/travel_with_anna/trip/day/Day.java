@@ -1,8 +1,10 @@
 package com.andwis.travel_with_anna.trip.day;
 
+import com.andwis.travel_with_anna.security.OwnableByUser;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.note.Note;
 import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -19,7 +21,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "days")
-public class Day {
+public class Day implements OwnableByUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "day_id")
@@ -37,6 +39,7 @@ public class Day {
     @JoinColumn(name = "trip_id")
     private Trip trip;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Activity> activities = new HashSet<>();
 
@@ -68,7 +71,6 @@ public class Day {
     public void removeActivities(Set<Activity> activities) {
         activities.forEach(activity -> activity.setDay(null));
         this.activities.removeAll(activities);
-
     }
 
     public void addNote (Note note) {
@@ -81,5 +83,10 @@ public class Day {
             this.note.removeDay(this);
             this.note = null;
         }
+    }
+
+    @Override
+    public User getOwner() {
+        return this.trip.getOwner();
     }
 }

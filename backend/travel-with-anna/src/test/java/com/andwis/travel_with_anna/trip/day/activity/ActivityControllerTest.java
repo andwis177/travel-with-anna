@@ -3,6 +3,8 @@ package com.andwis.travel_with_anna.trip.day.activity;
 import com.andwis.travel_with_anna.address.AddressDetail;
 import com.andwis.travel_with_anna.api.country.City;
 import com.andwis.travel_with_anna.api.country.Country;
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.utility.MessageResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,13 +15,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -34,15 +41,31 @@ class ActivityControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @MockBean
     private ActivityFacade facade;
     private AddressDetail addressDetail;
-    private MessageResponse messageResponse;
     private ActivityDetailedResponse activityDetailedResponse;
     private ActivityRequest activityRequest;
 
     @BeforeEach
     void setUp() {
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+
+        String encodedPassword = passwordEncoder.encode("password");
+        User user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(encodedPassword)
+                .role(role)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
+                .build();
+        user.setEnabled(true);
+
         activityRequest = ActivityRequest.builder()
                 .tripId(1L)
                 .dateTime("2021-12-12T12:00")
@@ -58,15 +81,16 @@ class ActivityControllerTest {
         Country country = Country.builder().build();
         City city = City.builder().build();
         addressDetail = new AddressDetail(List.of(), country, List.of(), city);
-        messageResponse = new MessageResponse("Activity updated successfully");
-        activityDetailedResponse = new ActivityDetailedResponse(addressDetail, List.of(), BigDecimal.ZERO, BigDecimal.ZERO);
+        activityDetailedResponse = new ActivityDetailedResponse(
+                addressDetail, List.of(), BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
     @Test
+    @Transactional
     @WithMockUser(username = "email@example.com", authorities = "User")
     void createActivity_ShouldReturnAcceptedStatus() throws Exception {
         // Given
-        doNothing().when(facade).createSingleActivity(any(ActivityRequest.class));
+        doNothing().when(facade).createSingleActivity(eq(activityRequest), any());
         String jsonContent = objectMapper.writeValueAsString(activityRequest);
 
         // When & Then
@@ -98,7 +122,7 @@ class ActivityControllerTest {
                 .isAddressSeparated(false)
                 .build();
 
-        doNothing().when(facade).createAssociatedActivities(any(ActivityAssociatedRequest.class));
+        doNothing().when(facade).createAssociatedActivities(eq(associatedRequest), any());
         String jsonContent = objectMapper.writeValueAsString(associatedRequest);
 
         // When & Then
@@ -120,13 +144,25 @@ class ActivityControllerTest {
                 .startTime("12:00")
                 .build();
 
-        when(facade.updateActivity(any(ActivityUpdateRequest.class))).thenReturn(messageResponse);
+        when(facade.updateActivity(argThat(argument ->
+                argument.getActivityId().equals(updateRequest.getActivityId()) &&
+                        argument.getDayId().equals(updateRequest.getDayId()) &&
+                        argument.getOldDate().equals(updateRequest.getOldDate()) &&
+                        argument.getNewDate().equals(updateRequest.getNewDate()) &&
+                        argument.getStartTime().equals(updateRequest.getStartTime())
+        ), any()))
+                .thenReturn(new MessageResponse("Activity updated successfully"));
         String jsonContent = objectMapper.writeValueAsString(updateRequest);
+
 
         // When & Then
         mockMvc.perform(patch("/activity/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andDo(result -> {
+                    System.out.println("Response Status: " + result.getResponse().getStatus());
+                    System.out.println("Response Content: " + result.getResponse().getContentAsString());
+                })
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.message").value("Activity updated successfully"));
     }
@@ -135,7 +171,7 @@ class ActivityControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void fetchActivitiesByDayId_ShouldReturnOkWithActivityDetailedResponse() throws Exception {
         // Given
-        when(facade.fetchActivitiesByDayId(any(Long.class))).thenReturn(activityDetailedResponse);
+        when(facade.fetchActivitiesByDayId(any(Long.class),any())).thenReturn(activityDetailedResponse);
 
         // When & Then
         mockMvc.perform(get("/activity/day/1")
@@ -151,7 +187,7 @@ class ActivityControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void fetchAddressDetailsByDayId_ShouldReturnOkWithAddressDetail() throws Exception {
         // Given
-        when(facade.fetchAddressDetailsByDayId(any(Long.class))).thenReturn(addressDetail);
+        when(facade.fetchAddressDetailsByDayId(any(Long.class), any())).thenReturn(addressDetail);
 
         // When & Then
         mockMvc.perform(get("/activity/day/1/details")
@@ -164,7 +200,7 @@ class ActivityControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void fetchAddressDetailsByTripId_ShouldReturnOkWithAddressDetail() throws Exception {
         // Given
-        when(facade.fetchAddressDetailsByTripId(any(Long.class))).thenReturn(addressDetail);
+        when(facade.fetchAddressDetailsByTripId(any(), any())).thenReturn(addressDetail);
 
         // When & Then
         mockMvc.perform(get("/activity/trip/1/details")
@@ -177,7 +213,7 @@ class ActivityControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void deleteActivityById_ShouldReturnNoContentStatus() throws Exception {
         // Given
-        doNothing().when(facade).deleteActivityById(any(Long.class));
+        doNothing().when(facade).deleteActivityById(any(Long.class), any());
 
         // When & Then
         mockMvc.perform(delete("/activity/1")

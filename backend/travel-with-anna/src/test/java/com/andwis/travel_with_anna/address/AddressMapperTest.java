@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Address Mapper Tests")
 class AddressMapperTest {
-
     private AddressRequest addressRequest;
     private Address address;
 

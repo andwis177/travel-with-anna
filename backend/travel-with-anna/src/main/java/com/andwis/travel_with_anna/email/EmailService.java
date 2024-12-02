@@ -56,7 +56,6 @@ public class EmailService {
         mailSender.send(mimeMessage);
     }
 
-
     @Async
     public void sendValidationEmail(
             String to,

@@ -27,16 +27,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 class CurrencyExchangeClientTest {
     @Autowired
     MockRestServiceServer server;
-
     @Autowired
     CurrencyExchangeClient currencyExchangeService;
-
     @Autowired
     ObjectMapper objectMapper;
-
     @Value("${my_apis.currency.currency_url}")
     private String baseUrl;
-
     @Value("${my_apis.currency.header.apikey}")
     private String apiKey;
 

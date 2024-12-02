@@ -61,7 +61,8 @@ public class SecurityConfig  {
                                         "/budget/**",
                                         "/backpack/**",
                                         "/trip/**",
-                                        "/api/country/**"
+                                        "/api/country/**",
+                                        "/pdf/reports/**"
                                 ).hasAuthority(getUserAuthority())
                                 .requestMatchers(
                                         "/admin/**"

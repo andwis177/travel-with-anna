@@ -18,7 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -210,7 +211,7 @@ class AvatarServiceTest {
     @Test
     void testGetAllUsers() {
         // Getter
-        PageResponse<UserAdminResponse> result = adminService.getAllUsers(0, 10, createAuthentication(user));
+        PageResponse<UserAdminResponse> result = adminService.getAllUsers(0, 10, createUserDetails(user));
 
         // When & Then
         assertNotNull(result);
@@ -238,8 +239,15 @@ class AvatarServiceTest {
         assertArrayEquals(avatar2Bytes, avatars.get(avatar2Id));
     }
 
-    private @NotNull Authentication createAuthentication(User user) {
+    private @NotNull UserDetails createUserDetails(User user) {
         SecurityUser securityUser = new SecurityUser(user);
-        return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

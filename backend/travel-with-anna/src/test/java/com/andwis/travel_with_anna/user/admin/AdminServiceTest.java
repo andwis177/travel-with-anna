@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
@@ -33,8 +33,6 @@ import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional
-@Rollback
 @DisplayName("Admin Service tests")
 class AdminServiceTest {
     @Autowired
@@ -134,7 +132,8 @@ class AdminServiceTest {
     void testGetUserAdminViewByIdentifier_UserId() {
         // Getter
         // When
-        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUserId.toString(), createAuthentication(user));
+        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(
+                secondaryUserId.toString(), createUserDetails(user));
 
         // Then
         assertNotNull(userAdminView);
@@ -145,7 +144,8 @@ class AdminServiceTest {
     void testGetUserAdminViewByIdentifier_UserName() {
         // Getter
         // When
-        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(secondaryUser.getUserName(), createAuthentication(user));
+        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(
+                secondaryUser.getUserName(), createUserDetails(user));
 
         // Then
         assertNotNull(userAdminView);
@@ -154,6 +154,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void testUpdateUser() throws RoleNotFoundException, WrongPasswordException {
         // Getter
         UserAdminEditRequest userAdminEdit = new UserAdminEditRequest(
@@ -165,7 +166,7 @@ class AdminServiceTest {
                 .build();
 
         // When
-        adminService.updateUser(request, createAuthentication(user));
+        adminService.updateUser(request, createUserDetails(user));
 
         // Then
         assertTrue(secondaryUser.isAccountLocked());
@@ -177,7 +178,8 @@ class AdminServiceTest {
     void getUserAdminViewByIdentifier_Email() {
         // Getter
         // When
-        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(user.getEmail(), createAuthentication(secondaryUser));
+        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(
+                user.getEmail(), createUserDetails(secondaryUser));
 
         // Then
         assertNotNull(userAdminView);
@@ -190,7 +192,7 @@ class AdminServiceTest {
         // Getter
         // When & Then
         assertThrows(UserNotFoundException.class,
-                () -> adminService.getUserAdminViewByIdentifier(user.getEmail(), createAuthentication(user)));
+                () -> adminService.getUserAdminViewByIdentifier(user.getEmail(), createUserDetails(user)));
     }
 
     @Test
@@ -199,7 +201,7 @@ class AdminServiceTest {
         UserAdminDeleteRequest request = new UserAdminDeleteRequest(secondaryUserId, "password");
 
         // When
-        adminService.deleteUser(request, createAuthentication(user));
+        adminService.deleteUser(request, createUserDetails(user));
 
         // Then
         assertFalse(userService.existsByUserId(secondaryUserId));
@@ -216,8 +218,15 @@ class AdminServiceTest {
         assertTrue(roles.contains(getAdminRole()));
     }
 
-    private @NotNull Authentication createAuthentication(User user) {
+    private @NotNull UserDetails createUserDetails(User user) {
         SecurityUser securityUser = new SecurityUser(user);
-        return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

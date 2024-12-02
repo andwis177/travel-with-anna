@@ -19,12 +19,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.*;
@@ -45,54 +48,36 @@ class TripControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private TripRepository tripRepository;
-    @Autowired
     private ObjectMapper objectMapper;
     @MockBean
     private TripMgr tripFacade;
-    private User user;
+    private UserDetails userDetails;
+    private User adminUser;
 
     @BeforeEach
     void setup() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
-
-        user = User.builder()
-                .userName("userName")
-                .email("email@example.com")
-                .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
-                .avatarId(1L)
-                .build();
-        user.setAccountLocked(false);
-        user.setEnabled(true);
-
         Role adminRole = new Role();
-        adminRole.setRoleName(getAdminRole());
-        adminRole.setAuthority(getAdminAuthority());
+        adminRole.setRoleName(getUserRole());
+        adminRole.setAuthority(getUserAuthority());
         Optional<Role> existingAdminRole = roleRepository.findByRoleName(getAdminRole());
         Role retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
 
-        User adminUser = User.builder()
+        adminUser = User.builder()
                 .userName("adminUserName")
                 .email("adminEmail@example.com")
                 .password(passwordEncoder.encode("adminPassword"))
                 .role(retrivedAdminRole)
                 .avatarId(2L)
-
                 .build();
         adminUser.setAccountLocked(false);
         adminUser.setEnabled(true);
+        userDetails = createUserDetails(adminUser);
     }
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
         roleRepository.deleteAll();
-        tripRepository.deleteAll();
     }
 
     @Test
@@ -100,14 +85,14 @@ class TripControllerTest {
     void createTrip_ShouldReturnCreated() throws Exception {
         TripCreatorRequest trip = new TripCreatorRequest("Trip name", "EUR", new BigDecimal("1000"));
         Long tripId = 1L;
-        when(tripFacade.createTrip(trip, createAuthentication(user))).thenReturn(tripId);
+        when(tripFacade.createTrip(trip, userDetails)).thenReturn(tripId);
         String jsonContent = objectMapper.writeValueAsString(trip);
 
         // When & Then
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .post("/trip")
-                        .principal(createAuthentication(user))
+                        .principal(createAuthentication(adminUser))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
                         .content(jsonContent))
@@ -121,7 +106,7 @@ class TripControllerTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/trip")
-                        .principal(createAuthentication(user))
+                        .principal(createAuthentication(adminUser))
                         .param("page", "0")
                         .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -148,18 +133,18 @@ class TripControllerTest {
         // Given
         DayGeneratorRequest dayGeneratorRequest = DayGeneratorRequest.builder()
                 .tripId(1L)
-                .startDate(null)
-                .endDate(null)
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(5))
                 .build();
         TripEditRequest request = new TripEditRequest(dayGeneratorRequest, "Updated Trip Name");
         String requestBody = objectMapper.writeValueAsString(request);
-        doNothing().when(tripFacade).updateTrip(request);
+        doNothing().when(tripFacade).updateTrip(request, userDetails);
 
         // When & Then
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .patch("/trip")
-                        .principal(createAuthentication(user))
+                        .principal(createAuthentication(adminUser))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk());
@@ -178,15 +163,31 @@ class TripControllerTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .delete("/trip")
-                        .principal(createAuthentication(user))
+                        .principal(createAuthentication(adminUser))
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
+    private @NotNull UserDetails createUserDetails(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
+    }
+
     private @NotNull Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
-        return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(
+                securityUser,
+                user.getPassword(),
+                securityUser.getAuthorities()
+        );
     }
 }
 

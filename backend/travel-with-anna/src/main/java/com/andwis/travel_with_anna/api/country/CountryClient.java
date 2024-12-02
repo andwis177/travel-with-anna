@@ -45,7 +45,7 @@ public class CountryClient {
     }
 
     public List<City> fetchAllCountryCities(String country) {
-        if (country == null || country.isBlank() || country.isEmpty()) {
+        if (country == null || country.isBlank()) {
             return Collections.emptyList();
         }
         try {

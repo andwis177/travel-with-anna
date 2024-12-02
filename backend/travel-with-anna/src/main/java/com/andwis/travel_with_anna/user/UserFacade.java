@@ -3,7 +3,7 @@ package com.andwis.travel_with_anna.user;
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +17,18 @@ public class UserFacade {
     }
 
     public AuthenticationResponse updateUserExecution(
-            UserCredentialsRequest userCredentials, Authentication connectedUser)
+            UserCredentialsRequest userCredentials, UserDetails connectedUser)
             throws WrongPasswordException {
         return userService.updateUserExecution(userCredentials, connectedUser);
     }
 
     public UserResponse changePassword(
-            ChangePasswordRequest request, Authentication connectedUser)
+            ChangePasswordRequest request, UserDetails connectedUser)
             throws WrongPasswordException {
         return userService.changePassword(request, connectedUser);
     }
 
-    public UserResponse deleteConnectedUser(PasswordRequest request, Authentication connectedUser)
+    public UserResponse deleteConnectedUser(PasswordRequest request, UserDetails connectedUser)
             throws UsernameNotFoundException, WrongPasswordException {
         return userService.deleteConnectedUser(request, connectedUser);
     }

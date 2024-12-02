@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.trip.trip;
 
+import com.andwis.travel_with_anna.security.OwnableByUser;
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.day.Day;
@@ -19,7 +20,7 @@ import java.util.*;
 @Builder
 @Entity
 @Table(name = "trips")
-public class Trip {
+public class Trip implements OwnableByUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trip_id")
@@ -33,8 +34,9 @@ public class Trip {
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Day> days;
+    private Set<Day> days = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "backpack_id")
@@ -44,9 +46,9 @@ public class Trip {
     @JoinColumn(name = "budget_id")
     private Budget budget;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Expanse> expanses = new HashSet<>();
-
 
     @Override
     public boolean equals(Object o) {

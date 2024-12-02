@@ -16,7 +16,7 @@ import java.util.Objects;
 @Builder
 @Entity
 @Table(name = "items")
-public class Item{
+public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")

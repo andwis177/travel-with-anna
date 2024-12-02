@@ -6,6 +6,7 @@ import com.andwis.travel_with_anna.trip.trip.TripService;
 import com.andwis.travel_with_anna.utility.NumberDistributor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.function.Consumer;
 public class DayService {
     private final DayRepository dayRepository;
     private final TripService tripService;
+    private final DayAuthorizationService dayAuthorizationService;
 
     public void saveDay(Day day) {
         dayRepository.save(day);
@@ -32,7 +34,7 @@ public class DayService {
 
     @Transactional
     public void createDay(@NotNull DayRequest request) {
-        Trip trip = tripService.getTripById(request.getEntityId());
+        Trip trip = request.getTrip();
         Day day = Day.builder()
                 .date(request.getDate())
                 .build();
@@ -45,27 +47,34 @@ public class DayService {
                 .orElseThrow(() -> new DayNotFoundException("Day not found"));
     }
 
-    public Set<Day> getDaysByTripId(Long tripId) {
-        return dayRepository.findByTripTripId(tripId);
+    public Set<Day> getDaysByTripId(Long tripId, UserDetails connectedUser) {
+        Set<Day> days = dayRepository.findByTripTripId(tripId);
+        dayAuthorizationService.checkDaysAuthorization(days, connectedUser);
+        return days;
     }
 
-    public Day getByTripIdAndDate(Long tripId, LocalDate date) {
-        return dayRepository.findByTripTripIdAndDate(tripId, date)
+    public Day getByTripIdAndDate(Long tripId, LocalDate date, UserDetails connectedUser) {
+        Day day = dayRepository.findByTripTripIdAndDate(tripId, date)
                 .orElseThrow(() -> new DayNotFoundException("Day not found"));
+        dayAuthorizationService.verifyDayOwner(day, connectedUser);
+        return day;
     }
 
-    public DayResponse getDayById(Long dayId) {
+    public DayResponse getDayById(Long dayId, UserDetails connectedUser) {
         Day day = getById(dayId);
+        dayAuthorizationService.verifyDayOwner(day, connectedUser);
         return DayMapper.toDayResponse(day);
     }
 
     @Transactional
-    public void addDay (@NotNull DayAddDeleteRequest request) {
+    public void addDay (@NotNull DayAddDeleteRequest request, UserDetails connectedUser) {
+        Trip trip = tripService.getTripById(request.getTripId());
+        dayAuthorizationService.verifyTripOwner(trip, connectedUser);
         List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(request.getTripId());
         LocalDate dayToAdd = getDayToAdd(days, request.isFirst());
         DayRequest dayRequest = DayRequest.builder()
                 .date(dayToAdd)
-                .entityId(request.getTripId())
+                .trip(trip)
                 .build();
         createDay(dayRequest);
     }
@@ -87,8 +96,9 @@ public class DayService {
         return dayRepository.findByTripTripIdIn(tripIds);
     }
 
-    public List<DayResponse> getDays(Long tripId) {
+    public List<DayResponse> getDays(Long tripId, UserDetails connectedUser) {
         List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(tripId);
+        dayAuthorizationService.checkDaysAuthorization(Set.copyOf(days), connectedUser);
         List<DayResponse> response = days.stream()
                 .map(DayMapper::toDayResponse)
                 .toList();
@@ -110,9 +120,10 @@ public class DayService {
     }
 
     @Transactional
-    public void generateDays(@NotNull DayGeneratorRequest request) {
+    public void generateDays(@NotNull DayGeneratorRequest request, UserDetails connectedUser) {
         validateDates(request.getStartDate(), request.getEndDate());
         Trip trip = tripService.getTripById(request.getTripId());
+        dayAuthorizationService.verifyTripOwner(trip, connectedUser);
 
         List<Day> days = createDays(request.getStartDate(), request.getEndDate());
         trip.addDays(days);
@@ -146,7 +157,6 @@ public class DayService {
         }
     }
 
-    @Transactional
     public void deleteDay(@NotNull Day day, @NotNull Consumer<Day> deleteFunction) {
         deleteFunction.accept(day);
         day.getTrip().getDays().remove(day);
@@ -154,8 +164,12 @@ public class DayService {
     }
 
     @Transactional
-    public void deleteFirstOrLastDay (@NotNull DayAddDeleteRequest request, Consumer<Day> deleteFunction) {
+    public void deleteFirstOrLastDay (
+            @NotNull DayAddDeleteRequest request,
+            Consumer<Day> deleteFunction,
+            UserDetails connectedUser) {
         List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(request.getTripId());
+        dayAuthorizationService.checkDaysAuthorization(Set.copyOf(days), connectedUser);
         if (request.isFirst()) {
             deleteDay(days.getFirst(), deleteFunction);
         } else {

@@ -9,7 +9,7 @@ import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.user.User;
-import com.andwis.travel_with_anna.user.UserService;
+import com.andwis.travel_with_anna.user.UserAuthenticationService;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,13 +32,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class TripMgr {
     private final TripService tripService;
-    private final UserService userService;
+    private final UserAuthenticationService userAuthenticationService;
     private final DayService dayService;
     private final AddressService addressService;
 
     @Transactional
-    public Long createTrip(@NotNull @Valid TripCreatorRequest request, Authentication connectedUser) {
-        User user = userService.getConnectedUser(connectedUser);
+    public Long createTrip(@NotNull @Valid TripCreatorRequest request, UserDetails connectedUser) {
+        User user = userAuthenticationService.getConnectedUser(connectedUser);
 
         Backpack backpack = Backpack.builder()
                 .build();
@@ -59,9 +59,8 @@ public class TripMgr {
         return tripService.saveTrip(trip);
     }
 
-    public PageResponse<TripResponse> getAllOwnersTrips(int page, int size, Authentication connectedUser) {
-        User user = userService.getConnectedUser(connectedUser);
-
+    public PageResponse<TripResponse> getAllOwnersTrips(int page, int size, UserDetails connectedUser) {
+        User user = userAuthenticationService.getConnectedUser(connectedUser);
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Trip> trips = tripService.getTripsByOwnerId(user.getUserId(), pageable);
         List<TripResponse> tripsDto = trips.stream().map(TripMapper::toTripResponse).toList();
@@ -76,17 +75,20 @@ public class TripMgr {
         );
     }
 
-    public TripResponse getTripById(Long tripId) {
-        return TripMapper.toTripResponse(tripService.getTripById(tripId));
+    public TripResponse getTripById(Long tripId, UserDetails connectedUser) {
+        Trip trip = tripService.getTripById(tripId);
+        userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, "");
+        return TripMapper.toTripResponse(trip);
     }
 
     @Transactional
     public void deleteTrip(
-            @NotNull TripRequest request, Authentication connectedUser)
+            @NotNull TripRequest request, UserDetails connectedUser)
             throws WrongPasswordException {
-        User adminUser = userService.getConnectedUser(connectedUser);
-        userService.verifyPassword(adminUser, request.password());
+        User adminUser = userAuthenticationService.getConnectedUser(connectedUser);
+        userAuthenticationService.verifyPassword(adminUser, request.password());
         Trip trip = tripService.getTripById(request.tripId());
+        userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, "");
         trip.removeTripAssociations();
         tripService.delete(trip);
         addressService.deleteAllByAddressIdIn(getAllTripAddresses(trip));
@@ -99,8 +101,10 @@ public class TripMgr {
     }
 
     @Transactional
-    public void updateTrip(@NotNull TripEditRequest request) {
-        Trip trip = tripService.getTripById(request.getDayGeneratorRequest().getTripId());
+    public void updateTrip(@NotNull TripEditRequest request, UserDetails connectedUser) {
+        Long tripId = request.getDayGeneratorRequest().getTripId();
+        Trip trip = tripService.getTripById(tripId);
+        userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, "You are not authorized to edit this trip");
         LocalDate startDate = request.getDayGeneratorRequest().getStartDate();
         LocalDate endDate = request.getDayGeneratorRequest().getEndDate();
 

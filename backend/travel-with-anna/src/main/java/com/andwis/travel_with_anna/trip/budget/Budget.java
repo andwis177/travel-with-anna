@@ -1,6 +1,8 @@
 package com.andwis.travel_with_anna.trip.budget;
 
+import com.andwis.travel_with_anna.security.OwnableByUser;
 import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +19,7 @@ import java.util.Objects;
 @Builder
 @Entity
 @Table(name = "budget")
-public class Budget {
+public class Budget implements OwnableByUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "budget_id")
@@ -50,5 +52,10 @@ public class Budget {
     @Override
     public int hashCode() {
         return Objects.hash(budgetId, currency, toSpend);
+    }
+
+    @Override
+    public User getOwner() {
+        return this.trip.getOwner();
     }
 }

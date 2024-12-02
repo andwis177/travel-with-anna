@@ -1,10 +1,14 @@
 package com.andwis.travel_with_anna.trip.budget;
 
+import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseByCurrency;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseTotalByBadge;
+import com.andwis.travel_with_anna.user.SecurityUser;
+import com.andwis.travel_with_anna.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +16,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -28,29 +41,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Budget Controller Tests")
 class BudgetControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
     @MockBean
     private BudgetFacade budgetFacade;
     @Autowired
+    private MockMvc mockMvc;
+    @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    private UserDetails userDetails;
 
-    @Test
-    @WithMockUser(username = "email@example.com", authorities = "User")
-    void testSaveBudget_ShouldReturnAccepted() throws Exception {
-        // Given
-        Budget budget = new Budget();
-        budget.setCurrency("USD");
-        budget.setToSpend(BigDecimal.valueOf(1000));
-        String requestBody = objectMapper.writeValueAsString(budget);
-        doNothing().when(budgetFacade).saveBudget(budget);
+    @BeforeEach
+    void setUp() {
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
 
-        // When & Then
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/budget")
-                        .content(requestBody)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isAccepted());
+        String encodedPassword = passwordEncoder.encode("password");
+        User user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(encodedPassword)
+                .role(role)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
+                .build();
+        user.setEnabled(true);
+
+        userDetails = createUserDetails(user);
     }
 
     @Test
@@ -60,7 +78,7 @@ class BudgetControllerTest {
         Long budgetId = 1L;
         BudgetResponse budgetResponse = new BudgetResponse(
                 budgetId, "USD", BigDecimal.valueOf(500), 1L);
-        when(budgetFacade.getBudgetById(budgetId)).thenReturn(budgetResponse);
+        when(budgetFacade.getBudgetById(eq(budgetId), any())).thenReturn(budgetResponse);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -90,7 +108,7 @@ class BudgetControllerTest {
         );
 
         BudgetExpensesRespond budgetExpensesRespond = getBudgetExpensesRespond(budgetResponse, expanses);
-        when(budgetFacade.getBudgetExpanses(tripId, budgetId)).thenReturn(budgetExpensesRespond);
+        when(budgetFacade.getBudgetExpanses(eq(tripId), eq(budgetId), any())).thenReturn(budgetExpensesRespond);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -107,7 +125,7 @@ class BudgetControllerTest {
         BudgetRequest budgetRequest = new BudgetRequest(
                 1L, "USD", BigDecimal.valueOf(1000), 1L);
         String requestBody = objectMapper.writeValueAsString(budgetRequest);
-        doNothing().when(budgetFacade).updateBudget(budgetRequest);
+        doNothing().when(budgetFacade).updateBudget(budgetRequest, userDetails);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -126,7 +144,7 @@ class BudgetControllerTest {
                 new ExpanseTotalByBadge("Food", BigDecimal.valueOf(150), BigDecimal.valueOf(75)),
                 new ExpanseTotalByBadge("Transport", BigDecimal.valueOf(200), BigDecimal.valueOf(100))
         );
-        when(budgetFacade.getExpansesByBadgeByTripId(tripId)).thenReturn(expanseTotals);
+        when(budgetFacade.getExpansesByBadgeByTripId(eq(tripId), any())).thenReturn(expanseTotals);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -136,13 +154,19 @@ class BudgetControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(expanseTotals)));
     }
 
-    private static @NotNull BudgetExpensesRespond getBudgetExpensesRespond(BudgetResponse budgetResponse, List<ExpanseResponse> expanses) {
+    private static @NotNull BudgetExpensesRespond getBudgetExpensesRespond(
+            BudgetResponse budgetResponse, List<ExpanseResponse> expanses) {
         List<ExpanseByCurrency> sumsByCurrency = List.of(
-                new ExpanseByCurrency(
-                        "USD", BigDecimal.valueOf(300), BigDecimal.valueOf(150),
-                        BigDecimal.valueOf(300), BigDecimal.valueOf(150), BigDecimal.valueOf(150)
-                )
-        );
+                ExpanseByCurrency.builder().
+                        currency("USD").
+                        totalPrice(BigDecimal.valueOf(300)).
+                        totalPaid(BigDecimal.valueOf(150)).
+                        totalPriceInTripCurrency(BigDecimal.valueOf(300)).
+                        totalPaidInTripCurrency(BigDecimal.valueOf(150)).
+                        totalDebt(BigDecimal.valueOf(150)).
+                        build()
+                );
+
 
         return new BudgetExpensesRespond(
                 budgetResponse,
@@ -154,5 +178,17 @@ class BudgetControllerTest {
                 BigDecimal.valueOf(100),
                 BigDecimal.valueOf(50)
         );
+    }
+
+    private @NotNull UserDetails createUserDetails(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

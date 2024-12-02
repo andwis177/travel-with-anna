@@ -1,6 +1,9 @@
 package com.andwis.travel_with_anna.trip.expanse;
 
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,14 +11,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,10 +34,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ExpanseControllerTest {
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
-    private ExpanseFacade expanseFacade;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @MockBean
+    private ExpanseFacade expanseFacade;
+
+    @BeforeEach
+    void setUp() {
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+
+        String encodedPassword = passwordEncoder.encode("password");
+        User user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(encodedPassword)
+                .role(role)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
+                .build();
+        user.setEnabled(true);
+    }
 
     @Test
     @WithMockUser(username = "user@example.com", authorities = "User")
@@ -57,7 +86,7 @@ class ExpanseControllerTest {
 
         String requestBody = objectMapper.writeValueAsString(request);
         String jsonResponse = objectMapper.writeValueAsString(response);
-        when(expanseFacade.createOrUpdateExpanse(any(ExpanseRequest.class))).thenReturn(response);
+        when(expanseFacade.createOrUpdateExpanse(any(ExpanseRequest.class), any())).thenReturn(response);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -83,7 +112,7 @@ class ExpanseControllerTest {
                 BigDecimal.valueOf(120.00),
                 BigDecimal.valueOf(96.00)
         );
-        when(expanseFacade.getExpanseById(expanseId)).thenReturn(response);
+        when(expanseFacade.getExpanseById(eq(expanseId), any())).thenReturn(response);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -109,7 +138,7 @@ class ExpanseControllerTest {
                 BigDecimal.valueOf(120.00),
                 BigDecimal.valueOf(96.00)
         );
-        when(expanseFacade.getExpanseByEntityId(entityId, entityType)).thenReturn(response);
+        when(expanseFacade.getExpanseByEntityId(eq(entityId), eq(entityType), any())).thenReturn(response);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -145,19 +174,22 @@ class ExpanseControllerTest {
         BigDecimal price = BigDecimal.valueOf(500.00);
         BigDecimal paid = BigDecimal.valueOf(400.00);
         BigDecimal exchangeRate = BigDecimal.valueOf(1.20);
+
         ExpanseInTripCurrency expanseInTripCurrency = new ExpanseInTripCurrency(
                 BigDecimal.valueOf(600.00),
                 BigDecimal.valueOf(480.00)
         );
-        when(expanseFacade.getExpanseInTripCurrency(price, paid, exchangeRate)).thenReturn(expanseInTripCurrency);
+
+        TripCurrencyValuesRequest request = new TripCurrencyValuesRequest(price, paid, exchangeRate);
+
+        when(expanseFacade.getExpanseInTripCurrency(eq(request))).thenReturn(expanseInTripCurrency);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/expanse/trip-currency-values")
-                        .param("price", price.toString())
-                        .param("paid", paid.toString())
-                        .param("exchangeRate", exchangeRate.toString())
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .post("/expanse/trip-currency-values")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expanseInTripCurrency)));
     }

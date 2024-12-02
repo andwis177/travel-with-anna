@@ -18,8 +18,8 @@ public class City implements Comparable<City> {
     private String city;
 
     @Override
-    public int compareTo(@NotNull City obj) {
-        return this.city.compareTo(obj.city);
+    public int compareTo(@NotNull City o) {
+        return this.city.compareTo(o.city);
     }
 
     @Override

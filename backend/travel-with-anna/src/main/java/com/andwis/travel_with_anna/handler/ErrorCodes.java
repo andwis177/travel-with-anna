@@ -42,7 +42,9 @@ public enum ErrorCodes {
 
     MISSING_PARAMETER(6000, "Missing parameter", BAD_REQUEST),
     NOTE_TYPE_NOT_FOUND(6100, "Note type not found", NOT_IMPLEMENTED),
-    ENTITY_NOT_FOUND(6200, "Entity not found", NOT_FOUND);
+    ENTITY_NOT_FOUND(6200, "Entity not found", NOT_FOUND),
+
+    PDF_REPORT_ERROR(7000, "Error while creating trip PDF", INTERNAL_SERVER_ERROR);
 
     private final int code;
     private final String message;

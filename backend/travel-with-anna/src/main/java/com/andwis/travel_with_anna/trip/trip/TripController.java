@@ -7,7 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,7 +20,9 @@ public class TripController {
     private final TripFacade facade;
 
     @PostMapping
-    public ResponseEntity<Long> createTrip(@RequestBody @Valid TripCreatorRequest trip, Authentication connectedUser) {
+    public ResponseEntity<Long> createTrip(
+            @RequestBody @Valid TripCreatorRequest trip,
+            @AuthenticationPrincipal UserDetails connectedUser) {
         Long tripId = facade.createTrip(trip, connectedUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(tripId);
     }
@@ -28,24 +31,30 @@ public class TripController {
     public PageResponse<TripResponse> getAllOwnersTrips(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size,
-            Authentication connectedUser) {
+            @AuthenticationPrincipal UserDetails connectedUser) {
         return facade.getAllOwnersTrips(page, size, connectedUser);
     }
 
     @GetMapping("/{tripId}")
-    public ResponseEntity<TripResponse> getTripById(@PathVariable("tripId") Long tripId) {
-        TripResponse tripDto = facade.getTripById(tripId);
+    public ResponseEntity<TripResponse> getTripById(
+            @PathVariable("tripId") Long tripId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        TripResponse tripDto = facade.getTripById(tripId, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(tripDto);
     }
 
     @PatchMapping
-    public ResponseEntity<Void> updateTrip(@RequestBody @Valid TripEditRequest request) {
-        facade.updateTrip(request);
+    public ResponseEntity<Void> updateTrip(
+            @RequestBody @Valid TripEditRequest request,
+            @AuthenticationPrincipal UserDetails connectedUser) {
+        facade.updateTrip(request, connectedUser);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteTrip(@RequestBody TripRequest request, Authentication connectedUser)
+    public ResponseEntity<Void> deleteTrip(
+            @RequestBody TripRequest request,
+            @AuthenticationPrincipal UserDetails connectedUser)
             throws WrongPasswordException {
         facade.deleteTrip(request, connectedUser);
         return ResponseEntity.noContent().build();

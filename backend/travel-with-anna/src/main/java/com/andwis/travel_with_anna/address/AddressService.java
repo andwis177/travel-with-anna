@@ -5,6 +5,7 @@ import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,8 +15,9 @@ import java.util.stream.Collectors;
 public class AddressService {
     private final AddressRepository addressRepository;
 
-    public void save(Address address) {
-        addressRepository.save(address);
+    @Transactional
+    public Address save(Address address) {
+       return addressRepository.save(address);
     }
 
     public Set<Long> getAddressFromDays(@NotNull Set<Day> days) {

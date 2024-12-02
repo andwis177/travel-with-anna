@@ -1,13 +1,23 @@
 package com.andwis.travel_with_anna.trip.expanse;
 
+import lombok.Builder;
+import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 
-public record ExpanseByCurrency(
-        String currency,
-        BigDecimal totalPrice,
-        BigDecimal totalPaid,
-        BigDecimal totalPriceInTripCurrency,
-        BigDecimal totalPaidInTripCurrency,
-        BigDecimal totalDebt
-) {
+@Data
+@Builder
+public class ExpanseByCurrency implements Comparable<ExpanseByCurrency> {
+    private String currency;
+    private BigDecimal totalPrice;
+    private BigDecimal totalPaid;
+    private BigDecimal totalPriceInTripCurrency;
+    private BigDecimal totalPaidInTripCurrency;
+    private BigDecimal totalDebt;
+
+    @Override
+    public int compareTo(@NotNull ExpanseByCurrency o) {
+        return this.currency.compareTo(o.currency);
+    }
 }

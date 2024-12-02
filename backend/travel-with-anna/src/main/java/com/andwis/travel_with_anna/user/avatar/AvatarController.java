@@ -1,13 +1,13 @@
 package com.andwis.travel_with_anna.user.avatar;
 
-import com.andwis.travel_with_anna.handler.exception.FileNotSaved;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,13 +21,17 @@ public class AvatarController {
     private final AvatarFacade facade;
 
     @PostMapping
-    public ResponseEntity<?> uploadAvatar(@RequestParam("file")  MultipartFile file, Authentication connectedUser) throws IOException {
+    public ResponseEntity<?> uploadAvatar(
+            @RequestParam("file")  MultipartFile file,
+            @AuthenticationPrincipal UserDetails connectedUser)
+            throws IOException {
         facade.setAvatar(file, connectedUser);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public ResponseEntity<byte[]> getCurrentUserAvatar(Authentication connectedUser) throws FileNotSaved {
+    public ResponseEntity<byte[]> getCurrentUserAvatar(
+            @AuthenticationPrincipal UserDetails connectedUser) {
         byte[] avatarBytes = facade.getAvatar(connectedUser);
 
         HttpHeaders headers = new HttpHeaders();

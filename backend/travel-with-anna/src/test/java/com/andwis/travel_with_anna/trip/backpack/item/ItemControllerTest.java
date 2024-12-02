@@ -1,9 +1,16 @@
 package com.andwis.travel_with_anna.trip.backpack.item;
 
 import com.andwis.travel_with_anna.handler.exception.BackpackNotFoundException;
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
+import com.andwis.travel_with_anna.trip.trip.Trip;
+import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +18,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyList;
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -28,12 +41,58 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Item Controller tests")
 class ItemControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
     @MockBean
     private ItemFacade itemFacade;
     @Autowired
+    private MockMvc mockMvc;
+    @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @BeforeEach
+    void setUp() {
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
+        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+
+        Trip trip = Trip.builder()
+                .tripName("tripName")
+                .build();
+
+        User user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("password"))
+                .role(retrivedRole)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
+                .build();
+        user.setEnabled(true);
+        user.addTrip(trip);
+
+        User secondaryUser = User.builder()
+                .userName("userName2")
+                .email("email2@example.com")
+                .password(passwordEncoder.encode("password"))
+                .role(retrivedRole)
+                .avatarId(2L)
+                .build();
+        secondaryUser.setEnabled(true);
+        userRepository.save(secondaryUser);
+    }
+
+    @AfterEach()
+    void cleanUp() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+    }
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")
@@ -49,7 +108,7 @@ class ItemControllerTest {
                 null
         );
         List<ItemResponse> items = List.of(itemResponse1, itemResponse2);
-        when(itemFacade.getAllItemsByBackpackId(backpackId)).thenReturn(items);
+        when(itemFacade.getAllItemsByBackpackId(eq(backpackId), any())).thenReturn(items);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -85,7 +144,7 @@ class ItemControllerTest {
     void getAllItemsByBackpackId_WithNonExistentId_ShouldReturnNotFound() throws Exception {
         // Given
         Long nonExistentBackpackId = 999L;
-        when(itemFacade.getAllItemsByBackpackId(nonExistentBackpackId)).
+        when(itemFacade.getAllItemsByBackpackId(eq(nonExistentBackpackId), any())).
                 thenThrow(new BackpackNotFoundException("Backpack not found"));
 
         // When & Then
@@ -99,23 +158,24 @@ class ItemControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "User")
     void saveAllItemsFromTheList_ShouldReturnOk() throws Exception {
         // Given
-        ItemRequest itemRequest1 = ItemRequest.builder()
-                .itemId(1L)
-                .itemName("Water Bottle")
-                .qty("2")
-                .isPacked(true)
-                .build();
+        ItemResponse itemRequest1 = new ItemResponse(
+                1L,
+                "Water Bottle",
+                "2",
+                true,
+                null);
 
-        ItemRequest itemRequest2 = ItemRequest.builder()
-                .itemId(2L)
-                .itemName("Sleeping Bag")
-                .qty("1")
-                .isPacked(false)
-                .build();
 
-        List<ItemRequest> items = List.of(itemRequest1, itemRequest2);
+        ItemResponse itemRequest2 = new ItemResponse(
+                2L,
+                "Sleeping Bag",
+                "1",
+                false,
+                null);
+
+        List<ItemResponse> items = List.of(itemRequest1, itemRequest2);
         String requestBody = objectMapper.writeValueAsString(items);
-        doNothing().when(itemFacade).saveAllItems(anyList());
+        doNothing().when(itemFacade).saveAllItems(eq(items), any());
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders

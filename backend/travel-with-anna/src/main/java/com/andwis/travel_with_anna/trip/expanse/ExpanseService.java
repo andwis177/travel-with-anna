@@ -10,6 +10,7 @@ import com.andwis.travel_with_anna.trip.trip.TripService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class ExpanseService {
     private final CurrencyRepository currencyRepository;
     private final CurrencyExchangeClient currencyExchangeService;
     private final TripService tripService;
+    private final ExpanseAuthorizationService expanseAuthorizationService;
 
     public Expanse save(Expanse expanse) {
         return expanseRepository.save(expanse);
@@ -52,14 +54,19 @@ public class ExpanseService {
             @NotNull ExpanseRequest expanseRequest,
             @NotNull Function<Long, T> getByIdFunction,
             @NotNull Supplier<Expanse> getExpanseFunction,
-            @NotNull BiConsumer<T, Expanse> addExpanseFunction
+            @NotNull BiConsumer<T, Expanse> addExpanseFunction,
+            UserDetails connectedUser
     ){
         if (isValidId(expanseRequest.getExpanseId())) {
-            return ExpanseMapper.toExpanseResponse(updateExpanse(expanseRequest));
+            return ExpanseMapper.toExpanseResponse(updateExpanse(expanseRequest, connectedUser));
         }
         if (isValidId(expanseRequest.getEntityId()) && isValidId(expanseRequest.getTripId())) {
             return ExpanseMapper.toExpanseResponse(saveExpanse(
-                    expanseRequest, getByIdFunction, getExpanseFunction, addExpanseFunction));
+                    expanseRequest,
+                    getByIdFunction,
+                    getExpanseFunction,
+                    addExpanseFunction,
+                    connectedUser));
         }
         throw new ExpanseNotSaveException("Expanse not saved");
     }
@@ -73,8 +80,11 @@ public class ExpanseService {
             @NotNull ExpanseRequest request,
             @NotNull Function<Long, T> getByIdFunction,
             @NotNull Supplier<Expanse> expanseSupplier,
-            @NotNull BiConsumer<T, Expanse> addExpanseFunction
+            @NotNull BiConsumer<T, Expanse> addExpanseFunction,
+            UserDetails connectedUser
     ) {
+        Trip trip = tripService.getTripById(request.getTripId());
+        expanseAuthorizationService.verifyTripOwner(trip, connectedUser);
         Expanse expanse;
 
         T entity = getByIdFunction.apply(request.getEntityId());
@@ -87,30 +97,33 @@ public class ExpanseService {
         ExpanseMapper.mapToExpanse(expanse, request);
         addExpanseFunction.accept(entity, expanse);
 
-        Trip trip = tripService.getTripById(request.getTripId());
         trip.addExpanse(expanse);
         save(expanse);
         return expanse;
     }
 
     @Transactional
-    public Expanse updateExpanse(@NotNull ExpanseRequest request) {
+    public Expanse updateExpanse(@NotNull ExpanseRequest request, UserDetails connectedUser) {
         if (request.getExpanseId() == null) {
             throw new ExpanseNotFoundException("Expanse not found");
         }
         Expanse expanse = findById(request.getExpanseId());
+        expanseAuthorizationService.verifyExpanseOwner(expanse, connectedUser);
         ExpanseMapper.mapToExpanse(expanse, request);
         save(expanse);
         return expanse;
     }
 
-    public ExpanseResponse getExpanseById(Long expanseId) {
+    public ExpanseResponse getExpanseById(Long expanseId, UserDetails connectedUser) {
         Expanse expanse = expanseRepository.findById(expanseId).orElseThrow(() -> new ExpanseNotFoundException(
                 "Expanse not found"));
+        expanseAuthorizationService.verifyExpanseOwner(expanse, connectedUser);
         return ExpanseMapper.toExpanseResponse(expanse);
     }
 
-    public List<ExpanseResponse> getExpansesForTrip(Long tripId) {
+    public List<ExpanseResponse> getExpansesForTrip(Long tripId, UserDetails connectedUser) {
+        Trip trip = tripService.getTripById(tripId);
+        expanseAuthorizationService.verifyTripOwner(trip,connectedUser);
         List<Expanse> expanses = expanseRepository.findByTripId(tripId);
         return ExpanseMapper.mapToExpanseResponseList(expanses);
     }
@@ -118,7 +131,8 @@ public class ExpanseService {
     public <T> ExpanseResponse getExpanseByEntityId(
             @NotNull Long entityId,
             @NotNull Function<Long, T> getByIdFunction,
-            @NotNull Function<T, Expanse> getExpanseFunction
+            @NotNull Function<T, Expanse> getExpanseFunction,
+            UserDetails connectedUser
     ) {
         T entity = getByIdFunction.apply(entityId);
         Expanse expanse = getExpanseFunction.apply(entity);
@@ -126,6 +140,7 @@ public class ExpanseService {
         if (expanse == null) {
             return null;
         }
+        expanseAuthorizationService.verifyExpanseOwner(expanse, connectedUser);
         return ExpanseMapper.toExpanseResponse(expanse);
     }
 
@@ -156,7 +171,7 @@ public class ExpanseService {
                 getUSD.multiply(currencyToExchange.getExchangeValue().setScale(5, RoundingMode.HALF_UP)));
     }
 
-    void verifyCurrencyExchange() {
+    private void verifyCurrencyExchange() {
         if (currencyRepository.count() == 0) {
             saveAllCurrencyExchange();
         }
@@ -182,12 +197,11 @@ public class ExpanseService {
         currencyRepository.saveAll(currencyExchangeList);
     }
 
-    public ExpanseInTripCurrency getExpanseInTripCurrency(BigDecimal price, BigDecimal paid, BigDecimal exchangeRate) {
-
-        BigDecimal priceInTripCurrency = calculatePriceInTripCurrency(price, exchangeRate);
+    public ExpanseInTripCurrency getExpanseInTripCurrency(@NotNull TripCurrencyValuesRequest request) {
+        BigDecimal priceInTripCurrency = calculatePriceInTripCurrency(request.getPrice(), request.getExchangeRate());
         priceInTripCurrency = priceInTripCurrency.setScale(2, RoundingMode.HALF_UP);
 
-        BigDecimal paidInTripCurrency = calculatePriceInTripCurrency(paid, exchangeRate);
+        BigDecimal paidInTripCurrency = calculatePriceInTripCurrency(request.getPaid(), request.getExchangeRate());
         paidInTripCurrency = paidInTripCurrency.setScale(2, RoundingMode.HALF_UP);
 
         return new ExpanseInTripCurrency(priceInTripCurrency, paidInTripCurrency);

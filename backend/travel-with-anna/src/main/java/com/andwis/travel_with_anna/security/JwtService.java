@@ -28,7 +28,7 @@ public class JwtService {
         this.key = Jwts.SIG.HS256.key().build();
     }
 
-    public String generateJwtToken(Authentication authentication) {
+    public String generateJwtToken(@NotNull Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Map<String, Object> claims = createClaims(userDetails);
 

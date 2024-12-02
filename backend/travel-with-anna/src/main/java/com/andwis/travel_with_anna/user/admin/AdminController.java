@@ -9,7 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.relation.RoleNotFoundException;
@@ -26,12 +27,14 @@ public class AdminController {
     public PageResponse<UserAdminResponse> getAllUsers(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size,
-            Authentication connectedUser) {
+            @AuthenticationPrincipal UserDetails connectedUser) {
         return facade.getAllUsers(page, size, connectedUser);
     }
 
     @GetMapping("/user/{identifier}")
-    public ResponseEntity<UserAdminResponse> getUserAdminViewByIdentifier(@PathVariable String identifier, Authentication connectedUser) {
+    public ResponseEntity<UserAdminResponse> getUserAdminViewByIdentifier(
+            @PathVariable String identifier,
+            @AuthenticationPrincipal UserDetails connectedUser) {
         UserAdminResponse user = facade.getUserAdminViewByIdentifier(identifier, connectedUser);
         return ResponseEntity.ok(user);
     }
@@ -45,17 +48,18 @@ public class AdminController {
     @PatchMapping
     public ResponseEntity<Void> updateUser(
             @RequestBody @Valid UserAdminUpdateRequest request,
-            Authentication authentication)
+            @AuthenticationPrincipal UserDetails connectedUser)
             throws RoleNotFoundException, WrongPasswordException {
-        facade.updateUser(request, authentication);
+        facade.updateUser(request, connectedUser);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<UserResponse> deleteUser(
             @RequestBody @Valid UserAdminDeleteRequest request,
-            Authentication authentication) throws WrongPasswordException {
-        UserResponse respond = facade.deleteUser(request, authentication);
+            @AuthenticationPrincipal UserDetails connectedUser)
+            throws WrongPasswordException {
+        UserResponse respond = facade.deleteUser(request, connectedUser);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respond);
     }
 

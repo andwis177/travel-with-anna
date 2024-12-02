@@ -89,8 +89,6 @@ class CountryClientTest {
         );
 
         CountryCitiesResponse mockCityResponse = CountryCitiesResponse.builder()
-//                .error(false)
-//                .msg("Success")
                 .data(citiesData)
                 .build();
 

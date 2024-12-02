@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.backpack.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,11 +11,11 @@ import java.util.List;
 public class ItemFacade {
     private final ItemService itemService;
 
-    public void saveAllItems(List<ItemRequest> items) {
-        itemService.saveAllItems(items);
+    public void saveAllItems(List<ItemResponse> items, UserDetails connectedUser) {
+        itemService.saveAllItems(items, connectedUser);
     }
 
-    public List<ItemResponse> getAllItemsByBackpackId(Long backpackId) {
-        return itemService.getAllItemsByBackpackId(backpackId);
+    public List<ItemResponse> getAllItemsByBackpackId(Long backpackId, UserDetails connectedUser) {
+        return itemService.getAllItemsByBackpackId(backpackId, connectedUser);
     }
 }

@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("User Mapper tests")
 class UserMapperTest {
-
     private UserMapper userMapper;
 
     @BeforeEach
@@ -77,7 +76,7 @@ class UserMapperTest {
                 .createdDate(LocalDateTime.of(2023, 1, 5, 15, 0))
                 .lastModifiedDate(LocalDateTime.of(2023, 1, 6, 15, 0))
                 .role(role)
-                .avatarId(200L) // ID does not exist in the map
+                .avatarId(200L)
                 .build();
 
         Map<Long, byte[]> avatarsWithUsersId = new HashMap<>();

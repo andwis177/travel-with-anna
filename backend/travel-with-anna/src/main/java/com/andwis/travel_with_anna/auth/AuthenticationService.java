@@ -79,8 +79,7 @@ public class AuthenticationService {
         avatarService.createAvatar(user);
         userService.saveUser(user);
 
-           sendValidationEmail(user);
-        System.out.println(generateAndSaveActivationToken(user));
+        sendValidationEmail(user);
     }
 
 

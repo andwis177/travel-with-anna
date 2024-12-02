@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,20 +22,23 @@ public class ExpanseFacade {
     private final ItemService itemService;
     private final ActivityService activityService;
 
-    public ExpanseResponse createOrUpdateExpanse(@NotNull ExpanseRequest expanseRequest) {
+    public ExpanseResponse createOrUpdateExpanse(@NotNull ExpanseRequest expanseRequest, UserDetails connectedUser) {
         ExpanseType expanseType = ExpanseType.fromString(expanseRequest.getEntityType());
 
         if (expanseType == null) {
-            return updateExpanse(expanseRequest);
+            return updateExpanse(expanseRequest, connectedUser);
         } else {
             return switch (expanseType) {
-                case ITEM -> createOrUpdateExpanseForItem(expanseRequest);
-                case ACTIVITY -> createOrUpdateExpanseForActivity(expanseRequest);
+                case ITEM -> createOrUpdateExpanseForItem(expanseRequest, connectedUser);
+                case ACTIVITY -> createOrUpdateExpanseForActivity(expanseRequest, connectedUser);
             };
         }
     }
 
-    public ExpanseResponse getExpanseByEntityId(Long entityId, @NotNull @NotEmpty @NotBlank String entityType) {
+    public ExpanseResponse getExpanseByEntityId(
+            Long entityId,
+            @NotNull @NotEmpty @NotBlank String entityType,
+            UserDetails connectedUser) {
         ExpanseType expanseType = ExpanseType.fromString(entityType);
 
         if (expanseType == null) {
@@ -50,61 +54,67 @@ public class ExpanseFacade {
             );
         }
         return switch (expanseType) {
-            case ITEM -> getExpanseByItemId(entityId);
-            case ACTIVITY -> getExpanseByActivityId(entityId);
+            case ITEM -> getExpanseByItemId(entityId, connectedUser);
+            case ACTIVITY -> getExpanseByActivityId(entityId, connectedUser);
         };
     }
 
     private ExpanseResponse createOrUpdateExpanseForItem(
-            @NotNull ExpanseRequest expanseRequest) {
+            @NotNull ExpanseRequest expanseRequest,
+            UserDetails connectedUser) {
         Item item = itemService.findById(expanseRequest.getEntityId());
         return expanseService.createOrUpdateExpanse(
                 expanseRequest,
-                id -> item,
+                _ -> item,
                 item::getExpanse,
-                Item::addExpanse);
+                Item::addExpanse,
+                connectedUser);
     }
 
     private ExpanseResponse createOrUpdateExpanseForActivity(
-            @NotNull ExpanseRequest expanseRequest) {
+            @NotNull ExpanseRequest expanseRequest,
+            UserDetails connectedUser) {
         Activity activity = activityService.getById(expanseRequest.getEntityId());
         return expanseService.createOrUpdateExpanse(
                 expanseRequest,
-                id -> activity,
+                _ -> activity,
                 activity::getExpanse,
-                Activity::addExpanse);
+                Activity::addExpanse,
+                connectedUser);
     }
 
-    public ExpanseResponse updateExpanse(@NotNull ExpanseRequest expanseRequest) {
-        return toExpanseResponse(expanseService.updateExpanse(expanseRequest));
+    private @NotNull ExpanseResponse updateExpanse(@NotNull ExpanseRequest expanseRequest, UserDetails connectedUser) {
+        return toExpanseResponse(expanseService.updateExpanse(expanseRequest, connectedUser));
     }
 
-    public ExpanseResponse getExpanseById(Long expanseId) {
-        return expanseService.getExpanseById(expanseId);
+    public ExpanseResponse getExpanseById(Long expanseId, UserDetails connectedUser) {
+        return expanseService.getExpanseById(expanseId, connectedUser);
     }
 
-    private ExpanseResponse getExpanseByItemId(Long itemId) {
+    private ExpanseResponse getExpanseByItemId(Long itemId, UserDetails connectedUser) {
         Item item = itemService.findById(itemId);
         return expanseService.getExpanseByEntityId(
                 itemId,
-                id -> item,
-                Item::getExpanse
+                _ -> item,
+                Item::getExpanse,
+                connectedUser
         );
     }
 
-    private ExpanseResponse getExpanseByActivityId(Long activityId) {
+    private ExpanseResponse getExpanseByActivityId(Long activityId, UserDetails connectedUser) {
         Activity activity = activityService.getById(activityId);
         return expanseService.getExpanseByEntityId(
                 activityId,
-                id -> activity,
-                Activity::getExpanse
+                _ -> activity,
+                Activity::getExpanse,
+                connectedUser
         );
     }
 
     public ExchangeResponse getExchangeRate(String currencyFrom, String currencyTo) {
         return expanseService.getExchangeRate(currencyFrom, currencyTo);
     }
-    public ExpanseInTripCurrency getExpanseInTripCurrency(BigDecimal price, BigDecimal paid, BigDecimal exchangeRate) {
-        return expanseService.getExpanseInTripCurrency(price, paid, exchangeRate);
+    public ExpanseInTripCurrency getExpanseInTripCurrency(TripCurrencyValuesRequest request) {
+        return expanseService.getExpanseInTripCurrency(request);
     }
 }

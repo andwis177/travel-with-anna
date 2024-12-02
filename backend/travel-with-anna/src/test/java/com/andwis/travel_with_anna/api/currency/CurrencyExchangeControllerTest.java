@@ -26,12 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CurrencyExchangeControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private CurrencyExchangeClient currencyExchangeClient;
-
     @Autowired
     private ObjectMapper objectMapper;
+    @MockBean
+    private CurrencyExchangeClient currencyExchangeClient;
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")

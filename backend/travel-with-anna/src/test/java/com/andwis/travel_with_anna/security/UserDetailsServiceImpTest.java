@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 class UserDetailsServiceImpTest {
     @Mock
     private UserRepository userRepository;
-
     @InjectMocks
     private UserDetailsServiceImp userService;
     private User user;
@@ -31,9 +30,6 @@ class UserDetailsServiceImpTest {
         user = User.builder()
                 .email("existing@example.com")
                 .build();
-
-        when(userRepository.findByEmail("existing@example.com"))
-                .thenReturn(Optional.empty());
     }
 
     @Test
@@ -55,11 +51,9 @@ class UserDetailsServiceImpTest {
         //Given
         when(userRepository.findByEmail("nonexisting@example.com"))
                 .thenReturn(Optional.empty());
+
         //When & Then
-        assertThrows(UsernameNotFoundException.class, () -> {
-            userService.loadUserByUsername("nonexisting@example.com");
-        });
+        assertThrows(UsernameNotFoundException.class, () ->
+            userService.loadUserByUsername("nonexisting@example.com"));
     }
-
-
 }

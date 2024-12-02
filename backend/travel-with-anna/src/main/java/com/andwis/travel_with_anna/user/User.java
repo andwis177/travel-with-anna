@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.security.OwnableByUser;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -27,8 +28,7 @@ import static jakarta.persistence.FetchType.EAGER;
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
-public class User implements Principal {
-
+public class User implements Principal, OwnableByUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
@@ -59,7 +59,6 @@ public class User implements Principal {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @NotNull
     @Column(name = "avatar_id")
     private Long avatarId;
 
@@ -84,5 +83,22 @@ public class User implements Principal {
     public void removeTrip(Trip trip) {
         this.ownedTrips.remove(trip);
         trip.setOwner(null);
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return userId != null && userId.equals(user.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return userId != null ? userId.hashCode() : 0;
+    }
+
+    @Override
+    public User getOwner() {
+        return this;
     }
 }

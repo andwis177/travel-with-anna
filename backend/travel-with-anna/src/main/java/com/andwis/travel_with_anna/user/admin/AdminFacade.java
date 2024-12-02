@@ -5,7 +5,7 @@ import com.andwis.travel_with_anna.user.UserResponse;
 import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.RoleNotFoundException;
@@ -16,11 +16,11 @@ import java.util.List;
 public class AdminFacade {
     private final AdminService adminService;
 
-    public PageResponse<UserAdminResponse> getAllUsers(int page, int size, Authentication connectedUser) {
+    public PageResponse<UserAdminResponse> getAllUsers(int page, int size, UserDetails connectedUser) {
         return adminService.getAllUsers(page, size, connectedUser);
     }
 
-    public UserAdminResponse getUserAdminViewByIdentifier(String identifier, Authentication connectedUser) {
+    public UserAdminResponse getUserAdminViewByIdentifier(String identifier, UserDetails connectedUser) {
         return adminService.getUserAdminViewByIdentifier(identifier, connectedUser);
     }
 
@@ -28,12 +28,12 @@ public class AdminFacade {
         return adminService.getAvatar(userId);
     }
 
-    public void updateUser(UserAdminUpdateRequest request, Authentication authentication)
+    public void updateUser(UserAdminUpdateRequest request, UserDetails authentication)
             throws RoleNotFoundException, WrongPasswordException {
         adminService.updateUser(request, authentication);
     }
 
-    public UserResponse deleteUser(UserAdminDeleteRequest request, Authentication authentication)
+    public UserResponse deleteUser(UserAdminDeleteRequest request, UserDetails authentication)
             throws WrongPasswordException {
         return adminService.deleteUser(request, authentication);
     }

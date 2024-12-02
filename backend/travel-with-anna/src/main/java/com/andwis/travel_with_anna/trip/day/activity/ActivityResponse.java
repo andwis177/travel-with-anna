@@ -23,5 +23,4 @@ public class ActivityResponse {
     private Long associatedId;
     private AddressResponse address;
     private boolean isDayTag;
-
 }

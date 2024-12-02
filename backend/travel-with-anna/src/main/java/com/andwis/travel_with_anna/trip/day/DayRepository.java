@@ -8,12 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface DayRepository extends JpaRepository<Day, Long> {
-
     Optional<Day> findByTripTripIdAndDate(Long tripId, LocalDate date);
-
     Set<Day> findByTripTripId(Long tripId);
-
     List<Day> findByTripTripIdOrderByDateAsc(Long tripId);
-
     Set<Day> findByTripTripIdIn(Set<Long> tripIds);
 }

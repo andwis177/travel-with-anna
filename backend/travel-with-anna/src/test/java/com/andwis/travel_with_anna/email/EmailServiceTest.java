@@ -1,7 +1,5 @@
 package com.andwis.travel_with_anna.email;
 
-import com.andwis.travel_with_anna.handler.exception.NoteTypeException;
-import com.andwis.travel_with_anna.trip.note.NoteType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.AfterEach;
@@ -18,7 +16,6 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,19 +23,15 @@ import static org.mockito.Mockito.*;
 
 @DisplayName("Email Service tests")
 public class EmailServiceTest {
-
     @Mock
     private JavaMailSender mailSender;
-
     @Mock
     private SpringTemplateEngine templateEngine;
-
     @InjectMocks
     private EmailService emailService;
-
     private final String to = "test@example.com";
     private final String userName = "John Doe";
-    private final String confirmationUrl = "http://example.com/activate-account";
+    private final String confirmationUrl = "https://example.com/activate-account";
     private final String loginUrl ="http://localhost:4200/login";
     private final String activationCode = "12345";
     private final String resetPassword = "ResetPassword1234567890";
@@ -114,10 +107,8 @@ public class EmailServiceTest {
                 .thenThrow(new RuntimeException("Template processing error"));
 
         // When
-        MessagingException exception = assertThrows(MessagingException.class, () -> {
-                    emailService.sendValidationEmail(to, userName, confirmationUrl, activationCode, subject);
-                }
-        );
+        MessagingException exception = assertThrows(MessagingException.class, () ->
+                emailService.sendValidationEmail(to, userName, confirmationUrl, activationCode, subject));
 
         // Then
         assertEquals("Failed to send validation email", exception.getMessage());
@@ -131,10 +122,8 @@ public class EmailServiceTest {
                 .thenThrow(new RuntimeException("Template processing error"));
 
         // When
-        MessagingException exception = assertThrows(MessagingException.class, () -> {
-                    emailService.sendResetPassword(to, userName, loginUrl, resetPassword, subject);
-                }
-        );
+        MessagingException exception = assertThrows(MessagingException.class, () ->
+                emailService.sendResetPassword(to, userName, loginUrl, resetPassword, subject));
 
         // Then
         assertEquals("Failed to send email with new password", exception.getMessage());

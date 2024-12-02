@@ -75,13 +75,14 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ExceptionResponse> handleException() {
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull BadCredentialsException exp) {
         return ResponseEntity
                 .status(UNAUTHORIZED)
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(BAD_CREDENTIALS.getCode())
-                                .errors(List.of(BAD_CREDENTIALS.getMessage()))
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(BAD_CREDENTIALS.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -393,6 +394,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(NOTE_TYPE_NOT_FOUND.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(NOTE_TYPE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(PdfReportCreationException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull PdfReportCreationException exp) {
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(PDF_REPORT_ERROR.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(PDF_REPORT_ERROR.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }

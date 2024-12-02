@@ -14,15 +14,22 @@ import com.andwis.travel_with_anna.trip.day.DayRepository;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseRepository;
 import com.andwis.travel_with_anna.trip.trip.Trip;
-import com.andwis.travel_with_anna.trip.trip.TripRepository;
 import com.andwis.travel_with_anna.trip.trip.TripService;
+import com.andwis.travel_with_anna.user.SecurityUser;
+import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
+import com.andwis.travel_with_anna.utility.MessageResponse;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -30,7 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
 import static com.andwis.travel_with_anna.role.Role.getUserRole;
@@ -50,13 +57,13 @@ class ActivityServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private TripRepository tripRepository;
-    @Autowired
     private TripService tripService;
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
     private ExpanseRepository expanseRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     private Trip testTrip;
     private Activity activity;
     private Activity associatedActivity;
@@ -67,31 +74,10 @@ class ActivityServiceTest {
     private Long tripId;
     private Long activityId;
     private Long associatedActivityId;
+    private UserDetails userDetails;
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-
-        Budget budget = Budget.builder()
-                .currency("USD")
-                .toSpend(BigDecimal.valueOf(1000))
-                .build();
-
-        day = Day.builder()
-                .date(LocalDate.of(2023, 10, 10))
-                .activities(new HashSet<>()).build();
-
-        testTrip = Trip.builder()
-                .tripName("Initial Trip")
-                .days(new HashSet<>())
-                .build();
-        testTrip.addBackpack(new Backpack());
-        testTrip.addBudget(budget);
-        testTrip.addDay(day);
-        tripId = tripService.saveTrip(testTrip);
-
         activity = Activity.builder()
                 .activityTitle("Title")
                 .beginTime(LocalTime.of(10, 10))
@@ -110,6 +96,45 @@ class ActivityServiceTest {
                 .status("Status associated")
                 .build();
 
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
+        Role retrivedRole =  existingRole.orElseGet(() -> roleRepository.save(role));
+
+        String encodedPassword = passwordEncoder.encode("password");
+        User user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(encodedPassword)
+                .role(retrivedRole)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
+                .build();
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        Budget budget = Budget.builder()
+                .currency("USD")
+                .toSpend(BigDecimal.valueOf(1000))
+                .build();
+
+        day = Day.builder()
+                .date(LocalDate.of(2023, 10, 10))
+                .activities(new HashSet<>()).build();
+        day.addActivity(activity);
+        day.addActivity(associatedActivity);
+
+        testTrip = Trip.builder()
+                .tripName("Initial Trip")
+                .days(new HashSet<>())
+                .build();
+        testTrip.addBackpack(new Backpack());
+        testTrip.addBudget(budget);
+        testTrip.addDay(day);
+        user.addTrip(testTrip);
+        tripId = tripService.saveTrip(testTrip);
+
         day.addActivity(activity);
         day.addActivity(associatedActivity);
         activityId = activityRepository.save(activity).getActivityId();
@@ -126,8 +151,6 @@ class ActivityServiceTest {
                 .website("Website")
                 .currency("Currency")
                 .build();
-
-        addressRepository.save(address);
 
         addressRequest = AddressRequest.builder()
                 .address("Address")
@@ -151,17 +174,14 @@ class ActivityServiceTest {
                 .status("Status")
                 .isDayTag(true)
                 .build();
+
+        userDetails = createUserDetails(user);
     }
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
         roleRepository.deleteAll();
-        activityRepository.deleteAll();
-        dayRepository.deleteAll();
-        addressRepository.deleteAll();
-        tripRepository.deleteAll();
-        expanseRepository.deleteAll();
     }
 
     @Test
@@ -177,28 +197,31 @@ class ActivityServiceTest {
 
     @Test
     void testGetById_NotFound() {
-        assertThrows(ActivityNotFoundException.class, () -> activityService.getById(2L));
+        assertThrows(ActivityNotFoundException.class,
+                () -> activityService.getById(2L));
     }
 
     @Test
+    @Transactional
     void testCreateSingleActivity_WithAddress() {
         // Given
         activityRequest.setAddressRequest(addressRequest);
 
         // When
-        Long activityId = activityService.createSingleActivity(activityRequest);
+        Activity createdActivity = activityService.createSingleActivity(
+                activityRequest, userDetails);
 
         // Then
-        Activity savedActivity = activityService.getById(activityId);
-        assertEquals(activityRequest.getActivityTitle(), savedActivity.getActivityTitle());
-        assertEquals(activityRequest.getAddressRequest().getAddress(), savedActivity.getAddress().getAddress());
+        Address address = createdActivity.getAddress();
+        assertEquals(activityRequest.getActivityTitle(), createdActivity.getActivityTitle());
+        assertEquals(addressRequest.getAddress(), address.getAddress());
     }
 
     @Test
     void testCreateSingleActivity_WithoutAddress() {
         // Given
         // When
-        Long activityId = activityService.createSingleActivity(activityRequest);
+        activityService.createSingleActivity(activityRequest, userDetails);
 
         // Then
         Activity savedActivity = activityService.getById(activityId);
@@ -250,7 +273,7 @@ class ActivityServiceTest {
                 .build();
 
         // When
-        activityService.createAssociatedActivities(request);
+        activityService.createAssociatedActivities(request, userDetails);
         List<Activity> activities = activityRepository.findAll();
 
         // Then
@@ -299,7 +322,7 @@ class ActivityServiceTest {
                 .build();
 
         // When
-        activityService.createAssociatedActivities(request);
+        activityService.createAssociatedActivities(request, userDetails);
         List<Activity> activities = activityRepository.findAll();
 
         // Then
@@ -309,7 +332,6 @@ class ActivityServiceTest {
         assertEquals(secondRequest.getActivityTitle(), activities.getLast().getActivityTitle());
         assertEquals(firstAddressRequest.getAddress(), activities.getLast().getAddress().getAddress());
     }
-
 
     @Test
     void testUpdateActivity_UpdateDate() {
@@ -330,12 +352,13 @@ class ActivityServiceTest {
                 .build();
 
         // When
-        String result = activityService.updateActivity(request);
+        MessageResponse result = activityService.updateActivity(request, userDetails);
 
         // Then
         Activity updatedActivity = activityService.getById(activityId);
-        assertEquals("Activity date updated", result);
-        assertEquals(LocalDate.of(2023, 12, 12), updatedActivity.getDay().getDate());
+        assertEquals("Activity date updated", result.message());
+        assertEquals(LocalDate.of(2023, 12, 12),
+                updatedActivity.getDay().getDate());
     }
 
     @Test
@@ -360,11 +383,11 @@ class ActivityServiceTest {
                 .build();
 
         // When
-        String result = activityService.updateActivity(request);
+        MessageResponse result = activityService.updateActivity(request, userDetails);
 
         // Then
         Activity updatedActivity = activityService.getById(activityId);
-        assertEquals("Associated activity updated", result);
+        assertEquals("Associated activity updated", result.message());
         assertEquals("New Type", updatedActivity.getType());
     }
 
@@ -372,7 +395,8 @@ class ActivityServiceTest {
     void testGetActivitiesByDayId() {
         // Given
         // When
-        List<Activity> activities = activityService.getActivitiesByDayId(day.getDayId());
+        List<Activity> activities = activityService.getActivitiesByDayId(
+                day.getDayId(), userDetails);
 
         // Then
         assertEquals(2, activities.size());
@@ -382,19 +406,12 @@ class ActivityServiceTest {
     @Transactional
     void testFetchActivitiesByDayId() {
         // Given
-        Expanse expanse = Expanse.builder()
+        Expanse firstexpanse = Expanse.builder()
                 .price(BigDecimal.valueOf(200))
                 .paid(BigDecimal.valueOf(100))
                 .currency("PLN")
                 .exchangeRate(BigDecimal.valueOf(2.0))
                 .build();
-
-        testTrip.addExpanse(expanse);
-        expanseRepository.save(expanse);
-
-        activity.addAddress(address);
-        activity.addExpanse(expanse);
-        activityRepository.save(activity);
 
         Expanse expanseAssociated = Expanse.builder()
                 .price(BigDecimal.valueOf(60))
@@ -403,16 +420,24 @@ class ActivityServiceTest {
                 .exchangeRate(BigDecimal.valueOf(1.0))
                 .build();
 
+        testTrip.addExpanse(firstexpanse);
         testTrip.addExpanse(expanseAssociated);
         expanseRepository.save(expanseAssociated);
+        expanseRepository.save(firstexpanse);
 
+        addressRepository.save(address);
+        activity.addAddress(address);
+
+        activity.addExpanse(firstexpanse);
         associatedActivity.addAddress(address);
         associatedActivity.addExpanse(expanseAssociated);
+        activityRepository.save(activity);
         activityRepository.save(associatedActivity);
 
         // When
-        ActivityDetailedResponse response = activityService.fetchActivitiesByDayId(day.getDayId());
-        System.out.println(response);
+        ActivityDetailedResponse response = activityService.fetchActivitiesByDayId(
+                day.getDayId(), userDetails);
+
         // Then
         assertEquals(1, response.addressDetail().countries().size());
         assertEquals("Country", response.addressDetail().countries().getFirst().getName());
@@ -434,14 +459,15 @@ class ActivityServiceTest {
     @Test
     void testFetchAddressDetailsByDayId() {
         // Given
+        addressRepository.save(address);
         activity.addAddress(address);
-        activityRepository.save(activity);
-
         associatedActivity.addAddress(address);
+        activityRepository.save(activity);
         activityRepository.save(associatedActivity);
 
         // When
-        AddressDetail response = activityService.fetchAddressDetailByDayId(day.getDayId());
+        AddressDetail response = activityService.fetchAddressDetailByDayId(
+                day.getDayId(), userDetails);
 
         // Then
         assertEquals(1, response.countries().size());
@@ -456,14 +482,15 @@ class ActivityServiceTest {
     @Transactional
     void testFetchAddressDetailByTripId() {
         // Given
+        addressRepository.save(address);
         activity.addAddress(address);
-        activityRepository.save(activity);
-
         associatedActivity.addAddress(address);
+        activityRepository.save(activity);
         activityRepository.save(associatedActivity);
 
         // When
-        AddressDetail response = activityService.fetchAddressDetailByTripId(tripId);
+        AddressDetail response = activityService.fetchAddressDetailByTripId(
+                tripId, userDetails);
 
         // Then
         assertEquals(1, response.countries().size());
@@ -481,7 +508,7 @@ class ActivityServiceTest {
         activityRepository.save(activity);
 
         // When
-        activityService.deleteActivityById(activityId);
+        activityService.deleteActivityById(activityId, userDetails);
 
         // Then
         assertTrue(activityRepository.findAll().isEmpty());
@@ -498,5 +525,17 @@ class ActivityServiceTest {
 
         // Then
         assertTrue(activityRepository.findAll().isEmpty());
+    }
+
+    private @NotNull UserDetails createUserDetails(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

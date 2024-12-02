@@ -23,7 +23,7 @@ public class CurrencyExchange {
     @Column(name = "code")
     private String code;
 
-    @Column(name = "exchange_value ")
+    @Column(name = "exchange_value")
     private BigDecimal exchangeValue ;
 
     @NotNull

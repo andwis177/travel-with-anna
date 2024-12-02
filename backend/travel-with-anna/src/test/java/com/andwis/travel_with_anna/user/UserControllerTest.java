@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,13 +23,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("User Controller tests")
 class UserControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
     @MockBean
-    private UserService service;
+    private UserFacade facade;
     @MockBean
     private Authentication connectedUser;
 
@@ -38,23 +38,20 @@ class UserControllerTest {
         // Given
         UserCredentialsResponse userCredentials = new UserCredentialsResponse(
                 "email@example.com",
-                "username",
-                "USER"
+                "email@example.com",
+                "User"
         );
 
-        when(service.getCredentials("email@example.com")).thenReturn(userCredentials);
+        String jsonResponse = objectMapper.writeValueAsString(userCredentials);
+
+        when(facade.getCredentials(any())).thenReturn(userCredentials);
         when(connectedUser.getName()).thenReturn("email@example.com");
 
         // When & Then
         mockMvc.perform(get("/user/credentials")
-                        .principal(connectedUser))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(
-                        "{" +
-                                "'email': 'email@example.com'," +
-                                " 'userName': 'username'," +
-                                " 'role': 'USER'" +
-                                "}"));
+                .andExpect(content().json(jsonResponse));
     }
 
     @Test
@@ -73,14 +70,14 @@ class UserControllerTest {
                 .userName("username")
                 .build();
 
-        when(service.updateUserExecution(any(UserCredentialsRequest.class), any(Authentication.class)))
+        when(facade.updateUserExecution(any(), any()))
                 .thenReturn(expectedResponse);
         when(connectedUser.getName()).thenReturn("email@example.com");
 
         // When & Then
         mockMvc.perform(patch("/user")
                         .principal(connectedUser)
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'token': 'token'}"));
@@ -98,14 +95,14 @@ class UserControllerTest {
         String jsonContent = objectMapper.writeValueAsString(request);
         UserResponse expectedResponse = new UserResponse("Password changed successfully");
 
-        when(service.changePassword(any(ChangePasswordRequest.class), any(Authentication.class)))
+        when(facade.changePassword(any(), any()))
                 .thenReturn(expectedResponse);
         when(connectedUser.getName()).thenReturn("email@example.com");
 
         // When & Then
         mockMvc.perform(patch("/user/change-password")
                         .principal(connectedUser)
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isAccepted())
                 .andExpect(content().json("{'message': 'Password changed successfully'}"));
@@ -119,12 +116,12 @@ class UserControllerTest {
         String jsonContent = objectMapper.writeValueAsString(request);
         UserResponse expectedResponse = new UserResponse("User deleted successfully");
 
-        when(service.deleteConnectedUser(any(PasswordRequest.class), any(Authentication.class)))
+        when(facade.deleteConnectedUser(any(), any()))
                 .thenReturn(expectedResponse);
 
         // When & Then
         mockMvc.perform(delete("/user")
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isNoContent())
                 .andExpect(content().json("{'message': 'User deleted successfully'}"));

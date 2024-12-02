@@ -2,14 +2,17 @@ package com.andwis.travel_with_anna.trip.expanse;
 
 import com.andwis.travel_with_anna.api.currency.CurrencyExchange;
 import com.andwis.travel_with_anna.api.currency.CurrencyExchangeClient;
-import com.andwis.travel_with_anna.api.currency.CurrencyExchangeResponse;
 import com.andwis.travel_with_anna.api.currency.CurrencyRepository;
 import com.andwis.travel_with_anna.handler.exception.CurrencyNotProvidedException;
 import com.andwis.travel_with_anna.handler.exception.ExpanseNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.ExpanseNotSaveException;
+import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
+import com.andwis.travel_with_anna.user.SecurityUser;
+import com.andwis.travel_with_anna.user.User;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,13 +20,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
+import static com.andwis.travel_with_anna.role.Role.getUserRole;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -40,18 +51,39 @@ class ExpanseServiceTest {
     private CurrencyExchangeClient currencyExchangeService;
     @Mock
     private TripService tripService;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private ExpanseAuthorizationService expanseAuthorizationService;
     private Expanse expanse;
     private ExpanseRequest expanseRequest;
+    private UserDetails userDetails;
 
     @BeforeEach
     void setUp() {
+        Role role = new Role();
+        role.setRoleName(getUserRole());
+        role.setAuthority(getUserAuthority());
+
+        when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
+        User user = User.builder()
+                .userName("userName")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("password"))
+                .role(role)
+                .avatarId(1L)
+                .ownedTrips(new HashSet<>())
+                .build();
+        user.setEnabled(true);
+
         expanse = Expanse.builder()
-                .expanseId(1L)
+                .expanseName("Hotel Booking")
                 .currency("USD")
                 .price(BigDecimal.valueOf(100.00))
                 .paid(BigDecimal.valueOf(50.00))
                 .exchangeRate(BigDecimal.valueOf(1.2))
                 .build();
+
         expanseRequest = ExpanseRequest.builder()
                 .expanseId(1L)
                 .entityId(2L)
@@ -61,18 +93,21 @@ class ExpanseServiceTest {
                 .paid(BigDecimal.valueOf(50.00))
                 .exchangeRate(BigDecimal.valueOf(1.2))
                 .build();
+
+        userDetails = createUserDetails(user);
     }
 
     @Test
     void testSaveExpanse() {
         // Given
-        when(expanseRepository.save(any(Expanse.class))).thenReturn(expanse);
+        when(expanseRepository.save(expanse)).thenReturn(expanse);
 
         // When
         Expanse savedExpanse = expanseService.save(expanse);
 
         // Then
         assertNotNull(savedExpanse);
+        assertEquals("Hotel Booking", savedExpanse.getExpanseName());
         verify(expanseRepository, times(1)).save(expanse);
     }
 
@@ -95,9 +130,8 @@ class ExpanseServiceTest {
         when(expanseRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When
-        Exception exception = assertThrows(ExpanseNotFoundException.class, () -> {
-            expanseService.findById(1L);
-        });
+        Exception exception = assertThrows(ExpanseNotFoundException.class, () ->
+                expanseService.findById(1L));
 
         // Then
         assertEquals("Expanse not found", exception.getMessage());
@@ -109,7 +143,8 @@ class ExpanseServiceTest {
         CurrencyExchange currencyExchange =  CurrencyExchange.builder()
                 .code("USD")
                 .exchangeValue(BigDecimal.valueOf(1.0))
-                .timeStamp(LocalDateTime.of(2024, 1, 1, 0, 0))
+                .timeStamp(LocalDateTime.of(
+                        2024, 1, 1, 0, 0))
                 .build();
         when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(currencyExchange));
 
@@ -127,35 +162,37 @@ class ExpanseServiceTest {
         when(currencyRepository.findByCode("EUR")).thenReturn(Optional.empty());
 
         // When
-        Exception exception = assertThrows(CurrencyNotProvidedException.class, () -> {
-            expanseService.getCurrencyExchangeByCode("EUR");
-        });
+        Exception exception = assertThrows(CurrencyNotProvidedException.class,
+                () -> expanseService.getCurrencyExchangeByCode("EUR"));
 
         // Then
         assertEquals("EUR", exception.getMessage());
     }
 
     @Test
+    @Transactional
     void testCreateOrUpdateExpanse_Create() {
         // Given
         ExpanseRequest expanseRequest = ExpanseRequest.builder()
-                .expanseId(0L)
+                .expanseId(null)
                 .entityId(2L)
                 .tripId(3L)
+                .expanseName("Hotel Booking")
                 .currency("USD")
                 .price(BigDecimal.valueOf(200.00))
                 .paid(BigDecimal.valueOf(150.00))
                 .exchangeRate(BigDecimal.valueOf(1.5))
                 .build();
 
-        when(expanseRepository.save(any(Expanse.class))).thenReturn(expanse);
+        when(expanseRepository.save(any())).thenReturn(expanse);
         when(tripService.getTripById(3L)).thenReturn(new Trip());
 
         // When
         ExpanseResponse response = expanseService.createOrUpdateExpanse(expanseRequest,
-                id -> new Object(),
+                _ -> new Object(),
                 () -> expanse,
-                (entity, exp) -> {});
+                (_, _) -> {},
+                userDetails);
 
         // Then
         assertNotNull(response);
@@ -170,9 +207,10 @@ class ExpanseServiceTest {
 
         // When
         ExpanseResponse response = expanseService.createOrUpdateExpanse(expanseRequest,
-                id -> new Object(),
+                _ -> new Object(),
                 Expanse::new,
-                (entity, exp) -> {});
+                (_, _) -> {},
+                userDetails);
 
         // Then
         assertNotNull(response);
@@ -187,12 +225,12 @@ class ExpanseServiceTest {
         expanseRequest.setTripId(null);
 
         // When
-        Exception exception = assertThrows(ExpanseNotSaveException.class, () -> {
-            expanseService.createOrUpdateExpanse(expanseRequest,
-                    id -> new Object(),
-                    Expanse::new,
-                    (entity, exp) -> {});
-        });
+        Exception exception = assertThrows(ExpanseNotSaveException.class, () ->
+                expanseService.createOrUpdateExpanse(expanseRequest,
+                        _ -> new Object(),
+                        Expanse::new,
+                        (_, _) -> {},
+                        userDetails));
 
         // Then
         assertEquals("Expanse not saved", exception.getMessage());
@@ -204,7 +242,7 @@ class ExpanseServiceTest {
         when(expanseRepository.findById(1L)).thenReturn(Optional.of(expanse));
 
         // When
-        ExpanseResponse response = expanseService.getExpanseById(1L);
+        ExpanseResponse response = expanseService.getExpanseById(1L, userDetails);
 
         // Then
         assertNotNull(response);
@@ -216,9 +254,8 @@ class ExpanseServiceTest {
     void testGetExpanseById_NotFound() {
         // Given
         // When
-        Exception response = assertThrows(ExpanseNotFoundException.class, () -> {
-            expanseService.getExpanseById(101L);
-        });
+        Exception response = assertThrows(ExpanseNotFoundException.class, () ->
+                expanseService.getExpanseById(101L, userDetails));
 
         // Then
         assertEquals("Expanse not found", response.getMessage());
@@ -231,12 +268,12 @@ class ExpanseServiceTest {
         when(expanseRepository.findByTripId(3L)).thenReturn(List.of(expanse));
 
         // When
-        List<ExpanseResponse> responseList = expanseService.getExpansesForTrip(3L);
+        List<ExpanseResponse> responseList = expanseService.getExpansesForTrip(3L, userDetails);
 
         // Then
         assertNotNull(responseList);
         assertEquals(1, responseList.size());
-        assertEquals(expanse.getExpanseId(), responseList.get(0).expanseId());
+        assertEquals(expanse.getExpanseId(), responseList.getFirst().expanseId());
         verify(expanseRepository, times(1)).findByTripId(3L);
     }
 
@@ -244,11 +281,11 @@ class ExpanseServiceTest {
     void testGetExpanseByEntityId_EntityWithExpanse() {
         // Given
         Long entityId = 2L;
-        Function<Long, Object> getByIdFunction = id -> new Object();
-        Function<Object, Expanse> getExpanseFunction = entity -> expanse;
+        Function<Long, Object> getByIdFunction = _ -> new Object();
+        Function<Object, Expanse> getExpanseFunction = _ -> expanse;
 
         // When
-        ExpanseResponse response = expanseService.getExpanseByEntityId(entityId, getByIdFunction, getExpanseFunction);
+        ExpanseResponse response = expanseService.getExpanseByEntityId(entityId, getByIdFunction, getExpanseFunction, userDetails);
 
         // Then
         assertNotNull(response);
@@ -259,50 +296,154 @@ class ExpanseServiceTest {
     void testGetExpanseByEntityId_EntityWithoutExpanse() {
         // Given
         Long entityId = 2L;
-        Function<Long, Object> getByIdFunction = id -> new Object();
-        Function<Object, Expanse> getExpanseFunction = entity -> null;
+        Function<Long, Object> getByIdFunction = _ -> new Object();
+        Function<Object, Expanse> getExpanseFunction = _ -> null;
 
         // When
-        ExpanseResponse response = expanseService.getExpanseByEntityId(entityId, getByIdFunction, getExpanseFunction);
+        ExpanseResponse response = expanseService.getExpanseByEntityId(
+                entityId, getByIdFunction, getExpanseFunction, userDetails);
 
         // Then
         assertNull(response);
     }
 
+    @Test
+    void testGetExchangeRate_WhenCurrencyFromOrToIsNullOrBlank() {
+        // Given
+        // When
+        ExchangeResponse response = expanseService.getExchangeRate(null, "USD");
+
+        // Then
+        assertNotNull(response);
+        assertEquals("Currency not provided", response.errorMsg());
+        assertEquals(BigDecimal.ZERO, response.exchangeRate());
+
+        // When
+        response = expanseService.getExchangeRate("USD", null);
+
+        // Then
+        assertNotNull(response);
+        assertEquals("Currency not provided", response.errorMsg());
+        assertEquals(BigDecimal.ZERO, response.exchangeRate());
+
+        // When
+        response = expanseService.getExchangeRate("", "USD");
+
+        // Then
+        assertNotNull(response);
+        assertEquals("Currency not provided", response.errorMsg());
+        assertEquals(BigDecimal.ZERO, response.exchangeRate());
+
+        // When
+        response = expanseService.getExchangeRate("USD", "");
+        // Then
+        assertNotNull(response);
+        assertEquals("Currency not provided", response.errorMsg());
+        assertEquals(BigDecimal.ZERO, response.exchangeRate());
+    }
 
     @Test
-    void testGetExchangeRate() {
+    void testGetExchangeRate_WhenCurrencyFromEqualsCurrencyTo() {
         // Given
-        when(currencyRepository.count()).thenReturn(1L);
-        when(currencyExchangeService.fetchAllExchangeRates()).thenReturn(List.of(
-                CurrencyExchangeResponse.builder().code("USD")
-                        .value(BigDecimal.valueOf(1.0))
-                        .build(),
-                CurrencyExchangeResponse.builder()
-                        .code("EUR")
-                        .value(BigDecimal.valueOf(0.85)).build()));
+        // When
+        ExchangeResponse response = expanseService.getExchangeRate("USD", "USD");
 
-        CurrencyExchange currencyExchangeUSD = CurrencyExchange.builder()
+        // Then
+        assertNotNull(response);
+        assertNull(response.errorMsg());
+        assertEquals(BigDecimal.ONE, response.exchangeRate());
+    }
+
+    @Test
+    void testGetExchangeRate_WhenCurrencyFromAndToAreValid() {
+        // Given
+        CurrencyExchange usdExchange = CurrencyExchange.builder()
                 .code("USD")
                 .exchangeValue(BigDecimal.valueOf(1.0))
-                .timeStamp(LocalDateTime.of(2024, 1, 1, 0, 0))
+                .timeStamp(LocalDateTime.now())
                 .build();
-        when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(currencyExchangeUSD));
-
-        CurrencyExchange currencyExchangeEUR = CurrencyExchange.builder()
+        CurrencyExchange eurExchange = CurrencyExchange.builder()
                 .code("EUR")
                 .exchangeValue(BigDecimal.valueOf(0.85))
-                .timeStamp(LocalDateTime.of(2024, 1, 1, 0, 0))
+                .timeStamp(LocalDateTime.now())
                 .build();
-        when(currencyRepository.findByCode("EUR")).thenReturn(Optional.of(currencyExchangeEUR));
+        when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(usdExchange));
+        when(currencyRepository.findByCode("EUR")).thenReturn(Optional.of(eurExchange));
 
         // When
         ExchangeResponse response = expanseService.getExchangeRate("USD", "EUR");
 
         // Then
         assertNotNull(response);
-        assertEquals(0,response.exchangeRate().compareTo(BigDecimal.valueOf(0.85))); // assuming exchange value for EUR is 0.85
+        assertNull(response.errorMsg());
+        assertEquals(0, BigDecimal.valueOf(0.85).compareTo(response.exchangeRate()));
     }
+
+    @Test
+    void testGetExchangeRate_WhenCurrencyNotFound() {
+        // Given
+        // When
+        ExchangeResponse response = expanseService.getExchangeRate("USD", "XYZ");
+
+        // Then
+        assertNotNull(response);
+        assertEquals("Currency not supported", response.errorMsg());
+        assertEquals(BigDecimal.ZERO, response.exchangeRate());
+    }
+
+    @Test
+    void testGetExchangeRate_WhenCurrenciesAreFetchedFromService() {
+        // Given
+        CurrencyExchange usdExchange = CurrencyExchange.builder()
+                .code("USD")
+                .exchangeValue(BigDecimal.valueOf(1.0))
+                .timeStamp(LocalDateTime.now())
+                .build();
+        CurrencyExchange eurExchange = CurrencyExchange.builder()
+                .code("EUR")
+                .exchangeValue(BigDecimal.valueOf(0.85))
+                .timeStamp(LocalDateTime.now())
+                .build();
+
+        when(currencyRepository.count()).thenReturn(1L);
+
+        when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(usdExchange));
+        when(currencyRepository.findByCode("EUR")).thenReturn(Optional.of(eurExchange));
+
+        // When
+        ExchangeResponse response = expanseService.getExchangeRate("USD", "EUR");
+
+        // Then
+        assertNotNull(response);
+        assertNull(response.errorMsg());
+        assertEquals(0, BigDecimal.valueOf(0.85).compareTo(response.exchangeRate()));
+    }
+
+    @Test
+    void testGetExchangeRate_WhenCurrencyUpdateIsRequired() {
+        // Given
+        when(currencyRepository.count()).thenReturn(1L);
+        when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(CurrencyExchange.builder()
+                .code("USD")
+                .exchangeValue(BigDecimal.valueOf(1.0))
+                .timeStamp(LocalDateTime.now().minusHours(1))
+                .build()));
+
+        when(currencyRepository.findByCode("EUR")).thenReturn(Optional.of(CurrencyExchange.builder()
+                .code("EUR")
+                .exchangeValue(BigDecimal.valueOf(0.85))
+                .timeStamp(LocalDateTime.now().minusHours(1))
+                .build()));
+
+        // When
+        ExchangeResponse response = expanseService.getExchangeRate("USD", "EUR");
+
+        // Then
+        assertNotNull(response);
+        assertNull(response.errorMsg());
+        assertEquals(0, BigDecimal.valueOf(0.85).compareTo(response.exchangeRate()));
+    }
+
 
     @Test
     void testGetExchangeRateWithNullCurrency() {
@@ -318,12 +459,12 @@ class ExpanseServiceTest {
     @Test
     void testGetExpanseInTripCurrency() {
         // Given
-        // When
-        ExpanseInTripCurrency inTripCurrency = expanseService.getExpanseInTripCurrency(
-                BigDecimal.valueOf(100),
-                BigDecimal.valueOf(50),
-                BigDecimal.valueOf(1.2)
+        TripCurrencyValuesRequest request = new TripCurrencyValuesRequest(
+                BigDecimal.valueOf(100), BigDecimal.valueOf(50), BigDecimal.valueOf(1.2)
         );
+        // When
+
+        ExpanseInTripCurrency inTripCurrency = expanseService.getExpanseInTripCurrency(request);
 
         // Then
         assertNotNull(inTripCurrency);
@@ -347,5 +488,17 @@ class ExpanseServiceTest {
 
         // Then
         verify(expanseRepository).saveAll(anyList());
+    }
+
+    private @NotNull UserDetails createUserDetails(User user) {
+        SecurityUser securityUser = new SecurityUser(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        securityUser,
+                        user.getPassword(),
+                        securityUser.getAuthorities()
+                )
+        );
+        return securityUser;
     }
 }

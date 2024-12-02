@@ -20,10 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @DisplayName("Token Repository tests")
 class TokenRepositoryTest {
-
     @Autowired
     private TokenRepository tokenRepository;
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -33,6 +31,7 @@ class TokenRepositoryTest {
     void tearDown() {
         tokenRepository.deleteAll();
         userRepository.deleteAll();
+        roleRepository.deleteAll();
     }
 
     @Test

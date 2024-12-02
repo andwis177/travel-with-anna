@@ -1,10 +1,11 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
-
 import com.andwis.travel_with_anna.address.Address;
+import com.andwis.travel_with_anna.security.OwnableByUser;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
 import com.andwis.travel_with_anna.trip.note.Note;
+import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -21,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 @Builder
 @Entity
 @Table(name = "activities")
-public class Activity {
+public class Activity implements OwnableByUser, Comparable<Activity> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "activity_id")
@@ -64,7 +65,7 @@ public class Activity {
     @Column(name = "associated_id")
     private Long associatedId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL )
     @JoinColumn(name = "address_id")
     private Address address;
 
@@ -101,5 +102,15 @@ public class Activity {
     public void addAddress(@NotNull Address address) {
         this.address = address;
         address.addActivity(this);
+    }
+
+    @Override
+    public User getOwner() {
+        return this.day.getOwner();
+    }
+
+    @Override
+    public int compareTo(@NotNull Activity o) {
+        return this.beginTime.compareTo(o.beginTime);
     }
 }

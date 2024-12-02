@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
 import com.andwis.travel_with_anna.address.AddressRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -26,6 +27,6 @@ public class ActivityUpdateRequest {
     private String activityTitle;
     @Size(max = 20, message = "Type should be 20 characters or less")
     private String type;
-    private AddressRequest addressRequest;
+    private @Valid AddressRequest addressRequest;
     private boolean isDayTag;
 }

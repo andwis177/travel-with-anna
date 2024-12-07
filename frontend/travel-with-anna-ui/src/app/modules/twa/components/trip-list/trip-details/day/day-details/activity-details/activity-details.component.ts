@@ -28,6 +28,7 @@ import {MatBadge} from "@angular/material/badge";
 })
 export class ActivityDetailsComponent implements OnInit {
   @Input()_activity: ActivityResponse = {};
+  @Input()_date: string = '';
   tripId: number = -1;
   isBadgeVisible: boolean = false;
   @Output() _afterActivityEditClosed: EventEmitter<void> = new EventEmitter<void>();
@@ -109,11 +110,13 @@ export class ActivityDetailsComponent implements OnInit {
         id: 'expanse-dialog',
         data: {
           expanse: this._activity.expanse,
-          description: this._activity.activityTitle,
           entityId: this._activity.activityId,
           tripId: this.tripId,
           currency: this._activity.address?.currency,
           entityType: 'activity',
+          expanseCategory: this._activity.badge?.toUpperCase()! + ": " + this._activity.type +
+           + "\n" + this._activity.address!.place + "\n[" +
+            this._activity.address!.city!.toUpperCase() + "]"
         }
       });
       dialogRef.afterClosed().subscribe(() => {

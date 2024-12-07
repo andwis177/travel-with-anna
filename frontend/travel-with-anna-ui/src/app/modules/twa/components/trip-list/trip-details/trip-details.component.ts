@@ -2,8 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {TripService} from "../../../../../services/services/trip.service";
 import {GetTripById$Params} from "../../../../../services/fn/trip/get-trip-by-id";
-import {TripListButtons} from "../trip-list-buttons/trip-list-buttons.component";
-import {MatFormField} from "@angular/material/form-field";
 import {TripDetailsButtonsComponent} from "./trip-details-buttons/trip-details-buttons.component";
 import {NgForOf, NgIf} from "@angular/common";
 import {UserComponent} from "../../../../components/menu/user/user.component";
@@ -12,26 +10,20 @@ import {TripResponse} from "../../../../../services/models/trip-response";
 import {DayService} from "../../../../../services/services/day.service";
 import {DayResponse} from "../../../../../services/models/day-response";
 import {GetDays$Params} from "../../../../../services/fn/day/get-days";
-import {TripCardComponent} from "../trip-card/trip-card.component";
 import {DayCardComponent} from "./day/day-card/day-card.component";
 import {SharedService} from "../../../../../services/shared/shared.service";
 import {BudgetService} from "../../../../../services/services/budget.service";
-import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-trip-details',
   standalone: true,
   imports: [
     LogoComponent,
-    TripListButtons,
     UserComponent,
-    MatFormField,
     TripDetailsButtonsComponent,
     NgIf,
     NgForOf,
-    TripCardComponent,
-    DayCardComponent,
-    MatTooltip
+    DayCardComponent
   ],
   templateUrl: './trip-details.component.html',
   styleUrl: './trip-details.component.scss'

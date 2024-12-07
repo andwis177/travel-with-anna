@@ -1,15 +1,14 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatCardContent} from "@angular/material/card";
 import {MatDivider} from "@angular/material/divider";
-import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatError, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {provideNativeDateAdapter} from "@angular/material/core";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatToolbarRow} from "@angular/material/toolbar";
-import {MatTooltip} from "@angular/material/tooltip";
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {AddressRequest} from "../../../../../../../../../services/models/address-request";
 import {Country} from "../../../../../../../../../services/models/country";
@@ -22,7 +21,6 @@ import {CreateActivity$Params} from "../../../../../../../../../services/fn/acti
 import {
   CreateAssociatedActivities$Params
 } from "../../../../../../../../../services/fn/activity/create-associated-activities";
-import {DayDetailsButtonsComponent} from "../../day-details-buttons/day-details-buttons.component";
 import {StayComponent} from "../buttons/stay/stay.component";
 import {TravelComponent} from "../buttons/travel/travel.component";
 import {RentComponent} from "../buttons/rent/rent.component";
@@ -43,7 +41,6 @@ import {MatCheckbox} from "@angular/material/checkbox";
     MatCardContent,
     MatDivider,
     MatError,
-    MatFormField,
     MatIcon,
     MatIconButton,
     MatInput,
@@ -51,11 +48,9 @@ import {MatCheckbox} from "@angular/material/checkbox";
     MatOption,
     MatSelect,
     MatToolbarRow,
-    MatTooltip,
     NgForOf,
     NgIf,
     ReactiveFormsModule,
-    DayDetailsButtonsComponent,
     StayComponent,
     TravelComponent,
     RentComponent,
@@ -96,8 +91,10 @@ export class ActivityComponent implements OnInit{
   city: City = {};
   badge: string = '';
   associated: boolean = false;
-  firstActivity: ActivityRequest = {tripId: -1, activityTitle: '', dateTime:''};
+  isAddressSeparated: boolean = false;
+  activity: ActivityRequest = {tripId: -1, activityTitle: '', dateTime:''};
   secondActivity: ActivityRequest = {tripId:-1 , activityTitle: '', dateTime:''};
+  @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
 
   constructor(public dialog: MatDialog,
               private datePipe: DatePipe,
@@ -114,8 +111,12 @@ export class ActivityComponent implements OnInit{
                 lastCity: string,
                 lastCountryCurrency: string,
                 dayTag: boolean
+                isAddressSeparated: boolean
               }
   ) {
+  }
+
+  ngOnInit(): void {
     this.sharedService.getTrip().subscribe({
       next: (trip) => {
         this.trip = trip!;
@@ -124,20 +125,19 @@ export class ActivityComponent implements OnInit{
         this.errorMsg = this.errorService.errorHandler(error);
       }
     });
-    this.startDate = data.startDate;
+    this.startDate = this.data.startDate;
     this.lastTripDay = this.trip.endDate!;
-    this.badge = data.badge;
-    this.associated = data.associated;
-    this.firstActivity.dayTag = data.dayTag;
-    this.country = {name: data.lastCountry,currency: data.lastCountryCurrency, iso2: data.lastCountryCode};
-    this.city = {city: data.lastCity};
+    this.badge = this.data.badge;
+    this.associated = this.data.associated;
+    this.activity.dayTag = this.data.dayTag;
+    this.isAddressSeparated = this.data.isAddressSeparated;
+    this.country = {name: this.data.lastCountry,currency: this.data.lastCountryCurrency, iso2: this.data.lastCountryCode};
+    this.city = {city: this.data.lastCity};
     this.addressRequest.country = this.country.name;
     this.addressRequest.countryCode = this.country.iso2;
     this.addressRequest.currency = this.country.currency;
     this.addressRequest.city = this.city.city;
-  }
-
-  ngOnInit(): void {
+    this.secondActivity.type = this.activity.type;
     this.generateDatesBetween();
     this.getCountries();
     if (this.addressRequest.country!)
@@ -151,29 +151,36 @@ export class ActivityComponent implements OnInit{
   }
 
   receiveBadge(badge: string) {
-    this.firstActivity.badge = badge;
+    this.activity.badge = badge;
     this.secondActivity.badge = badge;
   }
 
   receiveType(type: string) {
-    this.firstActivity.type = type;
+    this.activity.type = type;
     this.secondActivity.type = type;
   }
 
   receiveFirstStatus(status: string) {
-    this.firstActivity.status = status;
+    this.activity.status = status;
   }
 
   receiveSecondStatus(status: string) {
     this.secondActivity.status = status;
   }
 
+  executeActivitySave() {
+    if (this.associated) {
+      this.executeAssociatedActivity(this.isAddressSeparated);
+    } else {
+      this.executeSingleActivity();
+    }
+  }
+
   executeSingleActivity() {
     this.errorMsg = [];
     if (this.startTime != '' && this.endTime != '') {
       this.buildSingleActivity();
-      this.createSingleActivity(this.firstActivity);
-      this.onClose();
+      this.createSingleActivity(this.activity);
     } else {
       this.errorMsg.push('Please select date and time');
     }
@@ -183,30 +190,30 @@ export class ActivityComponent implements OnInit{
     this.errorMsg = [];
     if (this.endDate != '' && this.startDate != '' && this.startTime != '' && this.endTime != '') {
       this.buildAssociatedActivity();
-      this.createAssociatedActivities(this.firstActivity, this.secondActivity, addressSeparated);
+      this.createAssociatedActivities(this.activity, this.secondActivity, addressSeparated);
     } else {
       this.errorMsg.push('Please select date and time');
     }
   }
 
   buildSingleActivity() {
-    this.firstActivity.dateTime = this.startDate + 'T' + this.startTime;
-    this.firstActivity.endTime = this.endTime;
-    this.firstActivity.tripId = this.trip.tripId!;
-    this.firstActivity.addressRequest = this.addressRequest;
+    this.activity.dateTime = this.startDate + 'T' + this.startTime;
+    this.activity.endTime = this.endTime;
+    this.activity.tripId = this.trip.tripId!;
+    this.activity.addressRequest = this.addressRequest;
   }
 
   buildAssociatedActivity() {
-    this.secondActivity.activityTitle = this.firstActivity.activityTitle;
-    this.secondActivity.dayTag = this.firstActivity.dayTag;
+    this.secondActivity.activityTitle = this.activity.activityTitle;
+    this.secondActivity.dayTag = this.activity.dayTag;
 
-    this.firstActivity.dateTime = this.startDate + 'T' + this.startTime;
+    this.activity.dateTime = this.startDate + 'T' + this.startTime;
     this.secondActivity.dateTime = this.endDate + 'T' + this.endTime;
 
-    this.firstActivity.tripId = this.trip.tripId!;
+    this.activity.tripId = this.trip.tripId!;
     this.secondActivity.tripId = this.trip.tripId!;
 
-    this.firstActivity.addressRequest = this.addressRequest;
+    this.activity.addressRequest = this.addressRequest;
     this.secondActivity.addressRequest = this.addressRequest;
   }
 
@@ -277,7 +284,6 @@ export class ActivityComponent implements OnInit{
     this.addressRequest.city = '';
     if (this.cities.length == 0) {
       this.errorMsg = [];
-      console.log("Country: ", country);
       this.countryService.findAllCountryCities({country: country}).subscribe({
         next: (response) => {
           this.cities = response;
@@ -354,7 +360,6 @@ export class ActivityComponent implements OnInit{
         this.cities.find(
           city =>
             city.city?.toLocaleUpperCase() === cityName?.toLocaleUpperCase());
-      console.log("Inserted City: ", insertedCity);
       if (insertedCity) {
         this.city =  insertedCity;
         this.addressRequest.city = insertedCity.city;

@@ -1,49 +1,24 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRow,
-  MatRowDef,
-  MatTable
-} from "@angular/material/table";
 import {MatDivider} from "@angular/material/divider";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
-import {MatSort, MatSortHeader} from "@angular/material/sort";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {ExpanseTotalByBadge} from "../../../../../../../services/models/expanse-total-by-badge";
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {BudgetService} from "../../../../../../../services/services/budget.service";
 import {ErrorService} from "../../../../../../../services/error/error.service";
-import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-budget-badges',
   standalone: true,
   imports: [
-    MatCell,
-    MatCellDef,
-    MatColumnDef,
     MatDivider,
-    MatHeaderCell,
-    MatHeaderRow,
-    MatHeaderRowDef,
     MatIcon,
     MatIconButton,
-    MatRow,
-    MatRowDef,
-    MatSort,
-    MatSortHeader,
-    MatTable,
     MatToolbarRow,
     NgForOf,
     NgIf,
-    MatTooltip,
     NgClass
   ],
   templateUrl: './budget-badges.component.html',

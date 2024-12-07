@@ -2,6 +2,12 @@
   width: 25vh !important;
 }
 
+.header-column{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
 .currency-column {
   width: 5vh !important;
 }
@@ -75,3 +81,10 @@ th.mat-sort-header-sorted {
   color: palevioletred !important;
 }
 
+.activity-button-image{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: transparent;
+  cursor: pointer;
+}

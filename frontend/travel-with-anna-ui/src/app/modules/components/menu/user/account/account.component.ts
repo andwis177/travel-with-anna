@@ -1,12 +1,12 @@
 import {Component, ElementRef, HostListener, OnInit, signal, ViewChild} from '@angular/core';
-import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardModule} from "@angular/material/card";
-import {MatButton, MatButtonModule} from "@angular/material/button";
+import {MatCardActions, MatCardModule} from "@angular/material/card";
+import {MatButtonModule} from "@angular/material/button";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatToolbarRow} from "@angular/material/toolbar";
-import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 import {MatDivider} from "@angular/material/divider";
 import {Router} from "@angular/router";
@@ -25,11 +25,7 @@ import {DeleteAccountComponent} from "../../../../../pages/delete-account/delete
   selector: 'app-account',
   standalone: true,
   imports: [
-    MatCard,
-    MatCardHeader,
-    MatCardContent,
     MatCardActions,
-    MatButton,
     MatCardModule,
     MatButtonModule,
     MatFormField,
@@ -44,7 +40,7 @@ import {DeleteAccountComponent} from "../../../../../pages/delete-account/delete
     NgForOf,
     MatSuffix,
     MatTooltip,
-    NgOptimizedImage,
+
   ],
   templateUrl: './account.component.html',
   styleUrl: './account.component.scss',

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
@@ -15,7 +15,8 @@ import {NgClass} from "@angular/common";
   templateUrl: './rent.component.html',
   styleUrl: './rent.component.scss'
 })
-export class RentComponent {
+export class RentComponent implements OnInit, OnChanges {
+  buttonClasses: { [key: string]: string } = {};
   @Input()_type: string = '';
   @Output() provideBadge: EventEmitter<string> = new EventEmitter<string>();
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
@@ -44,10 +45,18 @@ export class RentComponent {
     this.afterRent.emit();
   }
 
-  getButtonType(type: string) : string {
-    if (this._type === type) {
-      return 'selected-button';
-    }
-    return '';
+  ngOnInit(): void {
+    this.updateButtonClasses();
+  }
+
+  ngOnChanges() {
+    this.updateButtonClasses();
+  }
+
+  updateButtonClasses() {
+    this.buttonClasses = {
+      rent_car: this._type === 'rent-car' ? 'selected-button' : '',
+      rent: this._type === 'rent' ? 'selected-button' : '',
+    };
   }
 }

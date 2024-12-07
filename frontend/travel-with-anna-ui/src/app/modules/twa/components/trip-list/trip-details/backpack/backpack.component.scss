@@ -38,15 +38,43 @@ th, td {
 .user-button{
   width: 50px;
   height: 50px;
+  border-radius: 50%;
 }
 
 .user-button-image {
   background-color: #2E3944;
   border-radius: 50% !important;
+  border: 3px solid #F9DBB0;
+  box-shadow: 0 0 0 1px #1C252D;
+}
+
+.item-button {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  cursor: pointer;
+}
+
+.item-button-image{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .user-button-image:hover {
   opacity: 0.5;
+}
+
+.item-button-image:hover {
+  width: 120% !important;
+  height: 120% !important;
 }
 
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
@@ -54,7 +82,7 @@ th, td {
 }
 
 .selected {
-  background-color: lightgrey !important;
+  background-color: #EDEDED !important;
 }
 
 th.mat-sort-header-sorted {
@@ -63,18 +91,20 @@ th.mat-sort-header-sorted {
 
 .input-field {
   width: 100% !important;
-  border: none !important;
-  background-color: transparent !important;
+  border: 1px solid #A6ACB1 !important;
+  border-radius: 5px !important;
+  background-color: whitesmoke !important;
   font-family: 'Montserrat', sans-serif;
-}
+ }
 
 .input-field:focus {
   outline: none !important;
 }
 
 textarea {
-  height: auto !important;
+  height: 32px !important;
   resize: none !important;
+  padding: 5px !important;
 }
 
 .packed-column {
@@ -126,8 +156,28 @@ textarea {
 ::ng-deep .mdc-checkbox__background {
   background-color: #D6E6E9 !important;
   border: 2px solid #2E3944 !important;
+  border-radius: 5px !important;
 }
 
 ::ng-deep .mdc-checkbox__checkmark {
   background-color: #2E3944 !important;
+}
+
+.expanse-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.label-font {
+  font-size: 10px;
+}
+
+.amount-font {
+  font-size: 14px;
+}
+
+.currency-font {
+  font-size: 10px;
 }

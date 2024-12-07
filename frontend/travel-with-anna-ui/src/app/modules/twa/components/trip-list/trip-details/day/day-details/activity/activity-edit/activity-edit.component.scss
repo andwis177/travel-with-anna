@@ -5,15 +5,27 @@
   align-items: center;
 }
 
-.dialog-container {
-  height: 90vh !important;
-  padding: 2% !important;
-  width: 100% !important;
+.activity-main-container {
+  background-color: #EDEAE5 !important;
+  width: auto;
+  height: auto !important;
 }
 
-.activity-container {
-  display: inline-flex;
-  justify-content: space-evenly;
+.activity-sub-container {
+  color: #1C252D !important;
+  display: flex !important;
+  justify-content: start !important;
+  box-sizing: border-box;
+  border: none !important;
+  padding: 2% !important;
+  width: 100% !important;
+  flex-direction: row;
+}
+
+.dialog-container {
+  height: 85vh !important;
+  padding: 2% !important;
+  width: 100% !important;
 }
 
 .time-container {
@@ -24,7 +36,7 @@
   margin: 0 0 0 0;
 }
 
-.activity-container {
+.content-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -34,6 +46,7 @@
 .group-container {
   border: #2E3944 1px solid;
   width: 32vw;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -141,4 +154,26 @@
 
 ::ng-deep .mat-mdc-select {
   width: 11vw !important;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1C252D;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #D1E0E2;
+  border: 1px solid #1C252D;
+  border-radius: 5px;
+}
+
+.button-area {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  text-align: center !important;
+  align-items: center !important;
+  margin-top: 10px;
 }

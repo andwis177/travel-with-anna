@@ -1,9 +1,7 @@
 import {Component, Input} from '@angular/core';
-import {MatDivider} from "@angular/material/divider";
 import {Router} from "@angular/router";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgForOf} from "@angular/common";
 import {TripResponse} from "../../../../../services/models/trip-response";
-import {MatCardContent} from "@angular/material/card";
 import {AddressDetail} from "../../../../../services/models/address-detail";
 import {ActivityService} from "../../../../../services/services/activity.service";
 
@@ -11,9 +9,6 @@ import {ActivityService} from "../../../../../services/services/activity.service
   selector: 'app-trip-card',
   standalone: true,
   imports: [
-    MatDivider,
-    NgIf,
-    MatCardContent,
     NgForOf
   ],
   templateUrl: './trip-card.component.html',

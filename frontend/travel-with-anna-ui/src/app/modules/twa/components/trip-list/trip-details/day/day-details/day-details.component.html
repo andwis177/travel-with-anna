@@ -60,6 +60,7 @@
         <app-activity-details
           *ngIf="activity && activity.activityId"
           [_activity]="activity"
+          [_date]="day.date!"
           (_afterActivityEditClosed)="getActivities()">
         </app-activity-details>
       </div>

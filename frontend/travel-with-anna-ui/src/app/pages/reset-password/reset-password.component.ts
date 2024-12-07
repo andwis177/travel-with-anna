@@ -1,11 +1,8 @@
 import {Component, HostListener} from '@angular/core';
 import {Router} from "@angular/router";
-import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatCard, MatCardHeader} from "@angular/material/card";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
-import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
-import {MatToolbarRow} from "@angular/material/toolbar";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatDivider} from "@angular/material/divider";
 import {ResetPasswordRequest} from "../../services/models/reset-password-request";
@@ -18,15 +15,11 @@ import {ErrorService} from "../../services/error/error.service";
   selector: 'app-reset-password',
   standalone: true,
   imports: [
-    MatButton,
     MatCard,
     MatCardHeader,
     MatFormField,
-    MatIcon,
-    MatIconButton,
     MatInput,
     MatLabel,
-    MatToolbarRow,
     ReactiveFormsModule,
     FormsModule,
     MatDivider,

@@ -7,6 +7,7 @@ import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ public class Backpack implements OwnableByUser {
     private Long backpackId;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "backpack", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Item> items;
+    private List<Item> items = new ArrayList<>();
 
     @OneToOne(mappedBy = "backpack")
     private Trip trip;

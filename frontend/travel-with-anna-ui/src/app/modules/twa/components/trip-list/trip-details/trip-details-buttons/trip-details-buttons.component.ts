@@ -9,18 +9,15 @@ import {AddDay$Params} from "../../../../../../services/fn/day/add-day";
 import {DayService} from "../../../../../../services/services/day.service";
 import {EditTripComponent} from "../edit-trip/edit-trip.component";
 import {SharedService} from "../../../../../../services/shared/shared.service";
-import {NgClass} from "@angular/common";
-import {MatBadge} from "@angular/material/badge";
 import {MatIcon} from "@angular/material/icon";
 import {DayDeleteComponent} from "../day/day-card/day-delete/day-delete.component";
+import {PdfReportComponent} from "../pdf-report/pdf-report.component";
 
 @Component({
   selector: 'app-trip-details-buttons',
   standalone: true,
   imports: [
     MatTooltip,
-    NgClass,
-    MatBadge,
     MatIcon
   ],
   templateUrl: './trip-details-buttons.component.html',
@@ -115,7 +112,6 @@ export class TripDetailsButtonsComponent implements OnInit {
 
   deleteDay(isFirst: boolean, event: Event) {
     event.preventDefault();
-    console.log(this._trip.tripId)
     const dialogRef = this.dialog.open(DayDeleteComponent, {
       panelClass: 'custom-dialog-container',
       maxWidth: '50vw',
@@ -150,6 +146,23 @@ export class TripDetailsButtonsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(() => {
       this.afterAddDay.emit();
+    });
+  }
+
+  printReport(event: Event) {
+    event.preventDefault();
+    const dialogRef = this.dialog.open(PdfReportComponent, {
+      maxWidth: '100%',
+      maxHeight: '100%',
+      width: '97vw',
+      height: '97vh',
+      id: 'pdf-report-dialog',
+      data: {
+        tripId: this._trip.tripId,
+        reportName:"Trip"
+      }
+    });
+    dialogRef.afterClosed().subscribe(() => {
     });
   }
 }

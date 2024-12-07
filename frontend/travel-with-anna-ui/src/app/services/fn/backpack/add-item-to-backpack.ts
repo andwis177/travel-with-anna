@@ -6,11 +6,11 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ItemWithExpanseRequest } from '../../models/item-with-expanse-request';
+import { ItemRequest } from '../../models/item-request';
 
 export interface AddItemToBackpack$Params {
   backpackId: number;
-      body: ItemWithExpanseRequest
+      body: ItemRequest
 }
 
 export function addItemToBackpack(http: HttpClient, rootUrl: string, params: AddItemToBackpack$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {

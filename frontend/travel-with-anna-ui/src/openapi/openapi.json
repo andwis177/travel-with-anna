@@ -220,6 +220,36 @@
         }
       }
     },
+    "/expanse/trip-currency-values": {
+      "post": {
+        "tags": [
+          "Expanse"
+        ],
+        "operationId": "getTripCurrencyValues",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripCurrencyValuesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpanseInTripCurrency"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/day/generate": {
       "post": {
         "tags": [
@@ -259,29 +289,6 @@
           },
           "required": true
         },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/budget": {
-      "post": {
-        "tags": [
-          "Budget"
-        ],
-        "operationId": "saveBudget",
-        "parameters": [
-          {
-            "name": "budget",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Budget"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -585,31 +592,8 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/ItemRequest"
+                  "$ref": "#/components/schemas/ItemResponse"
                 }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/day/change/date": {
-      "patch": {
-        "tags": [
-          "Day"
-        ],
-        "operationId": "changeDayDate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DayRequest"
               }
             }
           },
@@ -666,7 +650,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ItemWithExpanseRequest"
+                "$ref": "#/components/schemas/ItemRequest"
               }
             }
           },
@@ -836,6 +820,70 @@
         }
       }
     },
+    "/pdf/reports/trip/{tripId}": {
+      "get": {
+        "tags": [
+          "Pdf Report"
+        ],
+        "operationId": "generateTripPdfReport",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pdf/reports/expanse/{tripId}": {
+      "get": {
+        "tags": [
+          "Pdf Report"
+        ],
+        "operationId": "generateExpansePdfReport",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/item/{backpackId}": {
       "get": {
         "tags": [
@@ -933,52 +981,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExpanseResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/expanse/trip-currency-values": {
-      "get": {
-        "tags": [
-          "Expanse"
-        ],
-        "operationId": "getTripCurrencyValues",
-        "parameters": [
-          {
-            "name": "price",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "paid",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "exchangeRate",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExpanseInTripCurrency"
                 }
               }
             }
@@ -1712,6 +1714,11 @@
             "minLength": 0,
             "type": "string"
           },
+          "expanseCategory": {
+            "maxLength": 60,
+            "minLength": 0,
+            "type": "string"
+          },
           "currency": {
             "maxLength": 10,
             "minLength": 0,
@@ -1753,6 +1760,9 @@
           "expanseName": {
             "type": "string"
           },
+          "expanseCategory": {
+            "type": "string"
+          },
           "currency": {
             "type": "string"
           },
@@ -1769,6 +1779,42 @@
             "type": "number"
           },
           "paidInTripCurrency": {
+            "type": "number"
+          }
+        }
+      },
+      "TripCurrencyValuesRequest": {
+        "required": [
+          "exchangeRate",
+          "paid",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "price": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
+            "type": "number"
+          },
+          "paid": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
+            "type": "number"
+          },
+          "exchangeRate": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
+            "type": "number"
+          }
+        }
+      },
+      "ExpanseInTripCurrency": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number"
+          },
+          "paid": {
             "type": "number"
           }
         }
@@ -1803,27 +1849,6 @@
           },
           "first": {
             "type": "boolean"
-          }
-        }
-      },
-      "Budget": {
-        "required": [
-          "currency",
-          "toSpend"
-        ],
-        "type": "object",
-        "properties": {
-          "budgetId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "currency": {
-            "maxLength": 10,
-            "minLength": 0,
-            "type": "string"
-          },
-          "toSpend": {
-            "type": "number"
           }
         }
       },
@@ -1942,12 +1967,12 @@
         "type": "object",
         "properties": {
           "place": {
-            "maxLength": 100,
+            "maxLength": 60,
             "minLength": 0,
             "type": "string"
           },
           "country": {
-            "maxLength": 100,
+            "maxLength": 40,
             "minLength": 0,
             "type": "string"
           },
@@ -1957,7 +1982,7 @@
             "type": "string"
           },
           "city": {
-            "maxLength": 100,
+            "maxLength": 40,
             "minLength": 0,
             "type": "string"
           },
@@ -2062,7 +2087,7 @@
           }
         }
       },
-      "ItemRequest": {
+      "ItemResponse": {
         "type": "object",
         "properties": {
           "itemId": {
@@ -2070,34 +2095,24 @@
             "format": "int64"
           },
           "itemName": {
-            "maxLength": 60,
-            "minLength": 0,
             "type": "string"
           },
           "qty": {
-            "maxLength": 40,
-            "minLength": 0,
             "type": "string"
           },
-          "packed": {
+          "isPacked": {
             "type": "boolean"
-          }
-        }
-      },
-      "DayRequest": {
-        "type": "object",
-        "properties": {
-          "entityId": {
-            "type": "integer",
-            "format": "int64"
           },
-          "date": {
-            "type": "string",
-            "format": "date"
+          "expanse": {
+            "$ref": "#/components/schemas/ExpanseResponse"
           }
         }
       },
       "BudgetRequest": {
+        "required": [
+          "currency",
+          "toSpend"
+        ],
         "type": "object",
         "properties": {
           "budgetId": {
@@ -2105,11 +2120,13 @@
             "format": "int64"
           },
           "currency": {
-            "maxLength": 10,
+            "maxLength": 3,
             "minLength": 0,
             "type": "string"
           },
           "toSpend": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
             "type": "number"
           },
           "tripId": {
@@ -2118,7 +2135,7 @@
           }
         }
       },
-      "ItemWithExpanseRequest": {
+      "ItemRequest": {
         "type": "object",
         "properties": {
           "itemName": {
@@ -2130,9 +2147,6 @@
             "maxLength": 40,
             "minLength": 0,
             "type": "string"
-          },
-          "expanseRequest": {
-            "$ref": "#/components/schemas/ExpanseRequest"
           },
           "packed": {
             "type": "boolean"
@@ -2323,38 +2337,6 @@
           },
           "note": {
             "type": "string"
-          }
-        }
-      },
-      "ItemResponse": {
-        "type": "object",
-        "properties": {
-          "itemId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "itemName": {
-            "type": "string"
-          },
-          "qty": {
-            "type": "string"
-          },
-          "isPacked": {
-            "type": "boolean"
-          },
-          "expanse": {
-            "$ref": "#/components/schemas/ExpanseResponse"
-          }
-        }
-      },
-      "ExpanseInTripCurrency": {
-        "type": "object",
-        "properties": {
-          "price": {
-            "type": "number"
-          },
-          "paid": {
-            "type": "number"
           }
         }
       },

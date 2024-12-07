@@ -141,6 +141,11 @@
   cursor: pointer;
 }
 
+.activity-button:hover {
+  width: 35px;
+  height: 35px;
+}
+
 .activities-container > div {
   flex: 1;
 }
@@ -157,11 +162,6 @@
   object-fit: cover;
   background-color: transparent;
   cursor: pointer;
-}
-
-.delete-button:hover,
-.activity-button-image:hover{
-  opacity: 0.5;
 }
 
 .expanse-display{

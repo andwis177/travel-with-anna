@@ -15,12 +15,12 @@ import java.math.BigDecimal;
 @Builder
 public class TripCurrencyValuesRequest {
     @NotNull(message = "Price field is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Price amount must be greater than or equal to 0")
+    @DecimalMin(value = "0.0", message = "Price amount must be greater than or equal to 0")
     private BigDecimal price;
     @NotNull(message = "Paid field is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Paid amount must be greater than or equal to 0")
+    @DecimalMin(value = "0.0", message = "Paid amount must be greater than or equal to 0")
     private BigDecimal paid;
     @NotNull(message = "Exchange rate field is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Exchange amount must be greater than or equal to 0")
+    @DecimalMin(value = "0.0", message = "Exchange amount must be greater than or equal to 0")
     private BigDecimal exchangeRate;
 }

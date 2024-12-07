@@ -30,11 +30,14 @@ body, html {
 }
 
 .table-container {
-  width: 100%;
-  height: 80%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background-color: whitesmoke;
+  width: 100% !important;
+  height: 80% !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  display: block !important;
+  background-color: whitesmoke !important;
+  min-height: 300px;
+  max-height: 80vh;
 }
 
 .mdc-data-table__table {
@@ -57,10 +60,11 @@ body, html {
 }
 
 th, td {
-  white-space: nowrap;
-  text-overflow: unset;
-  overflow: visible;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
   word-wrap: break-word;
+  word-break: break-word;
   align-content: center !important;
 }
 
@@ -72,34 +76,57 @@ th.mat-sort-header-sorted {
   color: black;
 }
 
+.expanse-column {
+  max-width: 17vw !important;
+}
+
 .description-column {
-  width: 30% !important;
-  justify-content: start !important;
+  max-width: 15vw !important;
 }
 
 .currency-column {
-  width: 5% !important;
+  max-width: 6vw !important;
+  min-width: 6vw !important;
 }
 
 .amount-currency-column {
-  width: 15% !important;
+  max-width: 12vw !important;
 }
 
 .trip-currency-column {
-  width: 15% !important;
+  max-width: 12vw !important;
+}
+
+.exchange-column {
+  max-width: 10vw !important;
 }
 
 .action-column {
-  width: 5% !important;
+  max-width: 5vw !important;
 }
 
-.expanse-button {
-  background-color: #EDEAE5;
-  border: 1px solid forestgreen;
-  border-radius: 15%;
-  color: forestgreen;
+.activity-button {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   cursor: pointer;
-  padding: 3px;
+}
+
+.activity-button:hover {
+ opacity: 0.5;
+}
+
+.activity-button-image{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .action-container {
@@ -135,7 +162,7 @@ th.mat-sort-header-sorted {
 }
 
 .label {
-  font-size: 12px !important;
+  font-size: 10px !important;
   font-weight: 500 !important;
   font-family: 'Montserrat', sans-serif;
 }
@@ -149,7 +176,7 @@ th.mat-sort-header-sorted {
 }
 
 .currency-label {
-  font-size: 10px !important;
+  font-size: 8px !important;
   font-family: 'Montserrat', sans-serif;
 }
 
@@ -158,3 +185,38 @@ th.mat-sort-header-sorted {
   font-weight: 500 !important;
   font-family: 'Montserrat', sans-serif;
 }
+
+.header-column{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.mat-row,
+.mat-header-row {
+  height: 20px !important;
+}
+
+.mat-row:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.mat-cell,
+.mat-header-cell {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow: visible;
+  vertical-align: middle !important;
+}
+
+.currency-font {
+  font-size: 10px !important;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.table-content-font {
+  font-size: 14px !important;
+  font-weight: 400;
+}
+

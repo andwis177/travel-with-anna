@@ -3,11 +3,10 @@ import {AuthenticationService} from "../../services/services/authentication.serv
 import {Router} from "@angular/router";
 import {CodeInputModule} from "angular-code-input";
 import {NgForOf, NgIf} from "@angular/common";
-import {MatButton} from "@angular/material/button";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
-import {MatIcon} from "@angular/material/icon";
 import {animate, state, style, transition, trigger} from "@angular/animations";
 import {MatDivider} from "@angular/material/divider";
+import {ErrorService} from "../../services/error/error.service";
 
 @Component({
   selector: 'app-activate-account',
@@ -15,10 +14,8 @@ import {MatDivider} from "@angular/material/divider";
   imports: [
     CodeInputModule,
     NgIf,
-    MatButton,
     MatCard,
     MatCardHeader,
-    MatIcon,
     NgForOf,
     MatCardContent,
     MatDivider
@@ -46,7 +43,8 @@ export class ActivateAccountComponent {
 
   constructor(
     private router: Router,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private errorService: ErrorService
   )
   {}
 
@@ -88,13 +86,7 @@ export class ActivateAccountComponent {
           this.isOkay = true;
         },
         error: (err) => {
-          console.log(err);
-          this.jsonObject = JSON.parse(err.error)
-          if (this.jsonObject.errors ) {
-            this.errorMsg = this.jsonObject.errors;
-          } else {
-            this.errorMsg.push('Unexpected error occurred');
-          }
+         this.errorMsg = this.errorService.errorHandlerWithJson(err);
           this.submitted = true;
           this.isOkay = false;
         }

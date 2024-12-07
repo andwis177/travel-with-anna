@@ -13,14 +13,8 @@ import {
   MatTable,
   MatTableDataSource
 } from "@angular/material/table";
-import {MatCheckbox} from "@angular/material/checkbox";
-import {MatDivider} from "@angular/material/divider";
-import {MatIcon} from "@angular/material/icon";
-import {MatIconButton} from "@angular/material/button";
-import {MatInput} from "@angular/material/input";
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
-import {MatToolbarRow} from "@angular/material/toolbar";
-import {NgClass, NgForOf, NgIf} from "@angular/common";
+import {NgClass, NgIf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {LiveAnnouncer} from "@angular/cdk/a11y";
 import {SelectionModel} from "@angular/cdk/collections";
@@ -31,7 +25,6 @@ import {ExpanseResponse} from "../../../../../../services/models/expanse-respons
 import {BudgetService} from "../../../../../../services/services/budget.service";
 import {GetBudgetExpanses$Params} from "../../../../../../services/fn/budget/get-budget-expanses";
 import {LogoComponent} from "../../../../../components/menu/logo/logo.component";
-import {TripDetailsButtonsComponent} from "../trip-details-buttons/trip-details-buttons.component";
 import {UserComponent} from "../../../../../components/menu/user/user.component";
 import {BudgetButtonsComponent} from "./budget-buttons/budget-buttons.component";
 import {SharedService} from "../../../../../../services/shared/shared.service";
@@ -45,29 +38,21 @@ import {firstValueFrom} from "rxjs";
     MatTooltip,
     MatCell,
     MatCellDef,
-    MatCheckbox,
     MatColumnDef,
-    MatDivider,
     MatHeaderCell,
     MatHeaderRow,
     MatHeaderRowDef,
-    MatIcon,
-    MatIconButton,
-    MatInput,
     MatRow,
     MatRowDef,
     MatSort,
     MatSortHeader,
     MatTable,
-    MatToolbarRow,
-    NgForOf,
     NgIf,
     ReactiveFormsModule,
     FormsModule,
     MatHeaderCellDef,
     NgClass,
     LogoComponent,
-    TripDetailsButtonsComponent,
     UserComponent,
     BudgetButtonsComponent
   ],
@@ -92,6 +77,7 @@ export class BudgetComponent implements OnInit, AfterViewInit {
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
+    'expanseCategory',
     'expanseName',
     'currency',
     'price',
@@ -133,8 +119,6 @@ export class BudgetComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.selection.clear()
     this.getBudgetExpenses().then();
-
-
     if (this.dataSource.filteredData.length > 0) {
       this.currentRowIndex = 0;
       this.selectRowByIndex(this.currentRowIndex);
@@ -180,7 +164,6 @@ export class BudgetComponent implements OnInit, AfterViewInit {
         }
         this.dataSource.sort = this.sort;
       }
-
     } catch (error) {
       console.error(error);
     }
@@ -193,7 +176,6 @@ export class BudgetComponent implements OnInit, AfterViewInit {
     } else {
       this.expanseId = -1;
     }
-    console.log(index);
     const dialogRef = this.dialog.open(ExpanseComponent, {
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -223,5 +205,9 @@ export class BudgetComponent implements OnInit, AfterViewInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount)
+  }
+
+  formatExpanseCategory(category: string): string {
+    return category.replace(/\n/g, '<br>');
   }
 }

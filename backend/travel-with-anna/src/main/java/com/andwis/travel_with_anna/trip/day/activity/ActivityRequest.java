@@ -1,6 +1,8 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
 import com.andwis.travel_with_anna.address.AddressRequest;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -20,6 +22,9 @@ public class ActivityRequest {
     private String activityTitle;
     @Size(max = 20, message = "Badge name should be 20 characters or less")
     private String badge;
+    @NotNull(message = "Please select activity type")
+    @NotEmpty(message = "Please select activity type")
+    @NotBlank(message = "Please select activity type")
     @Size(max = 20, message = "Type should be 20 characters or less")
     private String type;
     @Size(max = 20, message = "Status should be 20 characters or less")

@@ -12,6 +12,7 @@ import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayResponse;
 import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
+import com.andwis.travel_with_anna.trip.expanse.ExpanseService;
 import com.andwis.travel_with_anna.utility.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class ActivityService {
     private final DayService dayService;
     private final AddressService addressService;
     private final ActivityAuthorizationService activityAuthorizationService;
+    private final ExpanseService expanseService;
 
     public Activity getById(Long activityId) {
         return activityRepository.findById(activityId)
@@ -111,7 +113,7 @@ public class ActivityService {
     public MessageResponse updateActivity(@NotNull ActivityUpdateRequest request, UserDetails connectedUser) {
         Activity activity = getById(request.getActivityId());
         ActivityMapper.updateActivity(activity, request);
-
+        updateActivityExpanseCategoryDescription(activity, connectedUser);
         String message;
         if (!toLocalDate(request.getOldDate()).equals(toLocalDate(request.getNewDate()))) {
             updateActivityDate(activity, request.getNewDate(), connectedUser);
@@ -146,6 +148,7 @@ public class ActivityService {
             activityAuthorizationService.verifyActivityOwner(associatedActivity, connectedUser);
             associatedActivity.setType(activity.getType());
             activityRepository.saveAll(List.of(activity, associatedActivity));
+            updateActivityExpanseCategoryDescription(associatedActivity, connectedUser);
         } catch (ActivityNotFoundException _) {
             activityRepository.save(activity);
             log.error("Associated activity not found");
@@ -298,5 +301,26 @@ public class ActivityService {
         if (activities != null) {
             deleteActivities(activities);
         }
+    }
+
+    private StringBuilder createExpanseCategoryDescription(@NotNull Activity activity) {
+        StringBuilder description = new StringBuilder();
+        description
+                .append(activity.getBadge().toUpperCase())
+                .append(": ").append(activity.getType())
+                .append("\n")
+                .append(activity.getAddress().getPlace())
+                .append("\n[")
+                .append(activity.getAddress().getCity())
+                .append("]");
+        return description;
+    }
+
+    private void updateActivityExpanseCategoryDescription(@NotNull Activity activity, UserDetails connectedUser) {
+        if(activity.getExpanse() == null) {
+            return;
+        }
+        StringBuilder description = createExpanseCategoryDescription(activity);
+        expanseService.updateExpanseCategory(activity.getExpanse(), description.toString(), connectedUser);
     }
 }

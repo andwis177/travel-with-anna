@@ -37,35 +37,35 @@ CREATE TABLE IF NOT EXISTS backpack (
 
 
 CREATE TABLE IF NOT EXISTS addresses (
-                                        address_id BIGSERIAL PRIMARY KEY,
-                                        place VARCHAR(60),
-                                        country VARCHAR(40),
-                                        country_code VARCHAR(3),
-                                        city VARCHAR(40),
-                                        address VARCHAR(200),
-                                        website VARCHAR(255),
-                                        phone VARCHAR(30),
-                                        email VARCHAR(150),
-                                        currency VARCHAR(10)
+                                         address_id BIGSERIAL PRIMARY KEY,
+                                         place VARCHAR(60),
+                                         country VARCHAR(40),
+                                         country_code VARCHAR(3),
+                                         city VARCHAR(40),
+                                         address VARCHAR(200),
+                                         website VARCHAR(255),
+                                         phone VARCHAR(30),
+                                         email VARCHAR(150),
+                                         currency VARCHAR(10)
 );
 
 
 CREATE TABLE IF NOT EXISTS activities (
-                                        activity_id BIGSERIAL PRIMARY KEY,
-                                        activity_title VARCHAR(60),
-                                        begin_time TIME,
-                                        end_time TIME,
-                                        badge VARCHAR(20),
-                                        type VARCHAR(20),
-                                        status VARCHAR(20),
-                                        day_id BIGINT,
-                                        associated_id BIGINT,
-                                        address_id BIGINT,
-                                        note_id BIGINT,
-                                        day_tag BOOLEAN DEFAULT FALSE,
-                                        CONSTRAINT fk_day FOREIGN KEY (day_id) REFERENCES days(day_id),
-                                        CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES addresses(address_id),
-                                        CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id)
+                                          activity_id BIGSERIAL PRIMARY KEY,
+                                          activity_title VARCHAR(60),
+                                          begin_time TIME,
+                                          end_time TIME,
+                                          badge VARCHAR(20),
+                                          type VARCHAR(20),
+                                          status VARCHAR(20),
+                                          day_id BIGINT,
+                                          associated_id BIGINT,
+                                          address_id BIGINT,
+                                          note_id BIGINT,
+                                          day_tag BOOLEAN DEFAULT FALSE,
+                                          CONSTRAINT fk_day FOREIGN KEY (day_id) REFERENCES days(day_id),
+                                          CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES addresses(address_id),
+                                          CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id)
 );
 
 
@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS budget (
 CREATE TABLE IF NOT EXISTS expanses (
                                         expanse_id BIGSERIAL PRIMARY KEY,
                                         expanse_name VARCHAR(60),
+                                        expanse_category VARCHAR(255),
                                         currency VARCHAR(10) NOT NULL ,
                                         price DECIMAL(19, 2) NOT NULL,
                                         paid DECIMAL(19, 2) NOT NULL,
@@ -90,7 +91,7 @@ CREATE TABLE IF NOT EXISTS expanses (
 
 CREATE TABLE IF NOT EXISTS items (
                                      item_id BIGSERIAL PRIMARY KEY,
-                                     item_name VARCHAR(60) NOT NULL,
+                                     item_name VARCHAR(60),
                                      quantity VARCHAR(40),
                                      is_packed BOOLEAN DEFAULT FALSE,
                                      backpack_id BIGINT,

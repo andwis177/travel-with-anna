@@ -4,6 +4,8 @@ import com.andwis.travel_with_anna.address.Address;
 import com.andwis.travel_with_anna.address.AddressService;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
+import com.andwis.travel_with_anna.trip.backpack.BackpackService;
+import com.andwis.travel_with_anna.trip.backpack.item.ItemRequest;
 import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayService;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,12 +38,14 @@ public class TripMgr {
     private final UserAuthenticationService userAuthenticationService;
     private final DayService dayService;
     private final AddressService addressService;
+    private final BackpackService backpackService;
 
     @Transactional
     public Long createTrip(@NotNull @Valid TripCreatorRequest request, UserDetails connectedUser) {
         User user = userAuthenticationService.getConnectedUser(connectedUser);
 
         Backpack backpack = Backpack.builder()
+                .items(new ArrayList<>())
                 .build();
 
         Budget budget = Budget.builder()
@@ -56,7 +61,13 @@ public class TripMgr {
         trip.addBudget(budget);
         user.addTrip(trip);
 
-        return tripService.saveTrip(trip);
+        Long tripId =  tripService.saveTrip(trip);
+
+        ItemRequest itemRequest = ItemRequest.builder()
+                .build();
+
+        backpackService.addItemToBackpack(tripId, itemRequest, connectedUser);
+        return tripId;
     }
 
     public PageResponse<TripResponse> getAllOwnersTrips(int page, int size, UserDetails connectedUser) {

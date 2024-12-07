@@ -7,6 +7,7 @@ import {BudgetEditComponent} from "../budget-edit/budget-edit.component";
 import {ExpanseByCurrency} from "../../../../../../../services/models/expanse-by-currency";
 import {BudgetCurrenciesComponent} from "../budget-currencies/budget-currencies.component";
 import {BudgetBadgesComponent} from "../budget-badges/budget-badges.component";
+import {PdfReportComponent} from "../../pdf-report/pdf-report.component";
 
 @Component({
   selector: 'app-budget-buttons',
@@ -22,7 +23,6 @@ export class BudgetButtonsComponent {
   @Input()_budget: BudgetResponse = {};
   @Input()_sumsByCurrency: Array<ExpanseByCurrency> = [];
   @Output() afterSave: EventEmitter<void> = new EventEmitter<void>();
-
 
   constructor(private router: Router,
               public dialog: MatDialog) {
@@ -79,6 +79,23 @@ export class BudgetButtonsComponent {
       data: {
         tripId: this._tripId,
         currency: this._budget.currency
+      }
+    });
+    dialogRef.afterClosed().subscribe(() => {
+    });
+  }
+
+  printReport(event: Event) {
+    event.preventDefault();
+    const dialogRef = this.dialog.open(PdfReportComponent, {
+      maxWidth: '100%',
+      maxHeight: '100%',
+      width: '97vw',
+      height: '97vh',
+      id: 'pdf-report-dialog',
+      data: {
+        tripId: this._tripId,
+        reportName:"Expanses"
       }
     });
     dialogRef.afterClosed().subscribe(() => {

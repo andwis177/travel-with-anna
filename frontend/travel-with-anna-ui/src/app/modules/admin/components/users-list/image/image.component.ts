@@ -3,7 +3,6 @@ import {AdminService} from "../../../../../services/services/admin.service";
 import {MatDialogRef} from "@angular/material/dialog";
 import {SharedService} from "../../../../../services/shared/shared.service";
 import {GetAvatar$Params} from "../../../../../services/fn/admin/get-avatar";
-import {MatCard} from "@angular/material/card";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -15,7 +14,6 @@ import {ErrorService} from "../../../../../services/error/error.service";
   selector: 'app-image',
   standalone: true,
   imports: [
-    MatCard,
     MatToolbarRow,
     MatIconButton,
     MatIcon

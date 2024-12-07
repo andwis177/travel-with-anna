@@ -1,11 +1,7 @@
 <mat-toolbar-row class="dialog-header">
-  <div class="full-width" style="display: flex; flex-direction: row; justify-content: space-between !important; align-items: center;">
+  <div class="full-width activity-edit-toolbar">
 
-    <div class="dialog-title">Edit
-      <mat-label class="dialog-title"> | Tag:
-        <mat-checkbox [(ngModel)]="firstActivity.dayTag"
-                      name="dayTag"
-        ></mat-checkbox> </mat-label>
+    <div class="dialog-title">{{ badge.toUpperCase() }}
     </div>
     <button mat-icon-button class="close-button"
             (click)="onClose()"
@@ -15,258 +11,267 @@
   </div>
 </mat-toolbar-row>
 
-<mat-card-content class="dialog-container">
-  <form>
-    <div class="group-container mat-elevation-z4">
-      <div class="column-container">
-        <mat-label class="label">Description</mat-label>
-        <input type="text"
-               matInput
-               class="insert insert-width"
-               [(ngModel)]="firstActivity.activityTitle"
-               [ngModelOptions]="{standalone: true}"
-               placeholder=""
-               autocomplete="description"
-               (keydown.enter)="$event.preventDefault()">
-      </div>
-
-      <div class="activity-container">
-        <div class="data-time-container ">
-          <div *ngIf="associated" class="column-container">
-            <mat-label class="label">Begins</mat-label>
+<mat-card-content class="activity-main-container">
+  <form class="activity-sub-container">
+    <div style="display: flex; flex-direction: column">
+      <div>
+        <div class="group-container mat-elevation-z4">
+          <div class="column-container">
+            <mat-label class="label">Description</mat-label>
             <input type="text"
                    matInput
-                   class="insert"
-                   [(ngModel)]="startDate"
+                   class="insert insert-width"
+                   [(ngModel)]="activity.activityTitle"
                    [ngModelOptions]="{standalone: true}"
-                   placeholder="check In Date"
-                   autocomplete="Check In Date"
-                   (keydown.enter)="$event.preventDefault()"
-                   [disabled]=true>
+                   placeholder=""
+                   autocomplete="description"
+                   (keydown.enter)="$event.preventDefault()">
           </div>
 
-          <div class="column-container">
-            <mat-label *ngIf="!associated" class="label">Begins</mat-label>
-            <input matInput
-                   type="time"
-                   class="insert"
-                   [ngModelOptions]="{standalone: true}"
-                   [(ngModel)]="startTime"
-                   placeholder="HH:mm">
-            <mat-error *ngIf="startTime && !isValidTime(startTime)">
-              Invalid time format. Please use HH:mm.
-            </mat-error>
-          </div>
-        </div>
+          <div class="content-container">
+            <div class="data-time-container ">
+              <div *ngIf="associated" class="column-container">
+                <mat-label class="label">Begins</mat-label>
+                <input type="text"
+                       matInput
+                       class="insert"
+                       [(ngModel)]="startDate"
+                       [ngModelOptions]="{standalone: true}"
+                       placeholder="check In Date"
+                       autocomplete="Check In Date"
+                       (keydown.enter)="$event.preventDefault()"
+                       [disabled]=true>
+              </div>
 
-        <div class="data-time-container">
-          <div *ngIf="associated" class="column-container">
-            <mat-label class="label">Ends</mat-label>
-            <mat-select class="insert"
-                        [(ngModel)]="endDate"
-                        name="currency"
-                        style="background-color: whitesmoke">
-              <mat-option *ngFor="let date of dates" [value]="date">
-                {{date}}
-              </mat-option>
-            </mat-select>
-          </div>
+              <div class="column-container">
+                <mat-label *ngIf="!associated" class="label">Begins</mat-label>
+                <input matInput
+                       type="time"
+                       class="insert"
+                       [ngModelOptions]="{standalone: true}"
+                       [(ngModel)]="startTime"
+                       placeholder="HH:mm">
+                <mat-error *ngIf="startTime && !isValidTime(startTime)">
+                  Invalid time format. Please use HH:mm.
+                </mat-error>
+              </div>
+            </div>
 
-          <div class="column-container">
-            <mat-label *ngIf="!associated" class="label">Ends</mat-label>
-            <input matInput
-                   type="time"
-                   class="insert"
-                   [ngModelOptions]="{standalone: true}"
-                   [(ngModel)]="endTime"
-                   placeholder="HH:mm">
-            <mat-error *ngIf="endTime && !isValidTime(endTime)">
-              Invalid time format. Please use HH:mm.
-            </mat-error>
-          </div>
-        </div>
-      </div>
-    </div>
+            <div class="data-time-container">
+              <div *ngIf="associated" class="column-container">
+                <mat-label class="label">Ends</mat-label>
+                <mat-select class="insert"
+                            [(ngModel)]="endDate"
+                            name="currency"
+                            style="background-color: whitesmoke">
+                  <mat-option *ngFor="let date of dates" [value]="date">
+                    {{date}}
+                  </mat-option>
+                </mat-select>
+              </div>
 
-    <div class="group-container mat-elevation-z4">
-      <div class="column-container">
-        <mat-label class="label">Place</mat-label>
-        <input type="text"
-               matInput
-               class="insert insert-width"
-               [(ngModel)]="addressRequest.place"
-               [ngModelOptions]="{standalone: true}"
-               placeholder=""
-               autocomplete="place"
-               (keydown.enter)="$event.preventDefault()">
-      </div>
-
-      <div class="country-city-container">
-
-        <div class="insert-column">
-          <div class="column-container">
-            <mat-label class="label">Country</mat-label>
-            <mat-select class="insert country-city-width drop-list-background"
-                        [(ngModel)]="country"
-                        (ngModelChange)="onCountryChange(country!)"
-                        name="country">
-              <mat-option *ngFor="let country of countries" [value]="country" >
-                {{country.name}}
-              </mat-option>
-            </mat-select>
-          </div>
-
-          <div class="column-container">
-            <input type="text"
-                   matInput
-                   class="insert country-city-width"
-                   [(ngModel)]="country.name"
-                   [ngModelOptions]="{standalone: true}"
-                   (blur) = "onCountryChangeInsert(country.name!)">
-          </div>
-        </div>
-
-        <div class="insert-column">
-          <div class="column-container">
-            <mat-label class="label">City</mat-label>
-            <mat-select class="insert country-city-width drop-list-background"
-                        [(ngModel)]="city"
-                        (ngModelChange)="onCityChange(city!)"
-                        name="city"
-            >
-              <mat-option *ngFor="let city of cities" [value]="city" >
-                {{city.city}}
-              </mat-option>
-            </mat-select>
-          </div>
-
-          <div class="column-container">
-            <input type="text"
-                   matInput
-                   class="insert country-city-width"
-                   [(ngModel)]="city.city"
-                   [ngModelOptions]="{standalone: true}"
-                   (blur) = "onCityChangeInsert(city.city!)">
+              <div class="column-container">
+                <mat-label *ngIf="!associated" class="label">Ends</mat-label>
+                <input matInput
+                       type="time"
+                       class="insert"
+                       [ngModelOptions]="{standalone: true}"
+                       [(ngModel)]="endTime"
+                       placeholder="HH:mm">
+                <mat-error *ngIf="endTime && !isValidTime(endTime)">
+                  Invalid time format. Please use HH:mm.
+                </mat-error>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div >
+
+      <div class="group-container mat-elevation-z4">
         <div class="column-container">
-          <mat-label class="label">Address</mat-label>
+          <mat-label class="label">Place</mat-label>
           <input type="text"
                  matInput
                  class="insert insert-width"
-                 [(ngModel)]="addressRequest.address"
+                 [(ngModel)]="addressRequest.place"
                  [ngModelOptions]="{standalone: true}"
                  placeholder=""
-                 autocomplete="address"
+                 autocomplete="place"
                  (keydown.enter)="$event.preventDefault()">
         </div>
+        <div class="country-city-container">
+          <div class="insert-column">
+            <div class="column-container">
+              <mat-label class="label">Country</mat-label>
+              <mat-select class="insert country-city-width drop-list-background"
+                          [(ngModel)]="country"
+                          (ngModelChange)="onCountryChange(country!)"
+                          name="country">
+                <mat-option *ngFor="let country of countries" [value]="country" >
+                  {{country.name}}
+                </mat-option>
+              </mat-select>
+            </div>
 
-        <div class="column-container">
-          <mat-label class="label">Website</mat-label>
-          <input type="text"
-                 matInput
-                 class="insert insert-width"
-                 [(ngModel)]="addressRequest.website"
-                 [ngModelOptions]="{standalone: true}"
-                 placeholder=""
-                 autocomplete="website"
-                 (keydown.enter)="$event.preventDefault()">
+            <div class="column-container">
+              <input type="text"
+                     matInput
+                     class="insert country-city-width"
+                     [(ngModel)]="country.name"
+                     [ngModelOptions]="{standalone: true}"
+                     (blur) = "onCountryChangeInsert(country.name!)">
+            </div>
+          </div>
+
+          <div class="insert-column">
+            <div class="column-container">
+              <mat-label class="label">City</mat-label>
+              <mat-select class="insert country-city-width drop-list-background"
+                          [(ngModel)]="city"
+                          (ngModelChange)="onCityChange(city!)"
+                          name="city">
+                <mat-option *ngFor="let city of cities" [value]="city" >
+                  {{city.city}}
+                </mat-option>
+              </mat-select>
+            </div>
+
+            <div class="column-container">
+              <input type="text"
+                     matInput
+                     class="insert country-city-width"
+                     [(ngModel)]="city.city"
+                     [ngModelOptions]="{standalone: true}"
+                     (blur) = "onCityChangeInsert(city.city!)">
+            </div>
+          </div>
         </div>
-        <div class="phone-email-container">
+        <div>
           <div class="column-container">
-            <mat-label class="label">Phone</mat-label>
+            <mat-label class="label">Address</mat-label>
             <input type="text"
                    matInput
-                   class="insert"
-                   [(ngModel)]="addressRequest.phone"
+                   class="insert insert-width"
+                   [(ngModel)]="addressRequest.address"
                    [ngModelOptions]="{standalone: true}"
                    placeholder=""
-                   autocomplete="phone"
+                   autocomplete="address"
                    (keydown.enter)="$event.preventDefault()">
           </div>
-          <div class="column-container" style="margin-left:5px">
-            <mat-label class="label">Email</mat-label>
-            <input type="email"
+
+          <div class="column-container">
+            <mat-label class="label">Website</mat-label>
+            <input type="text"
                    matInput
-                   class="insert email-width"
-                   [(ngModel)]="addressRequest.email"
+                   class="insert insert-width"
+                   [(ngModel)]="addressRequest.website"
                    [ngModelOptions]="{standalone: true}"
                    placeholder=""
-                   autocomplete="email"
+                   autocomplete="website"
                    (keydown.enter)="$event.preventDefault()">
+          </div>
+          <div class="phone-email-container">
+            <div class="column-container">
+              <mat-label class="label">Phone</mat-label>
+              <input type="text"
+                     matInput
+                     class="insert"
+                     [(ngModel)]="addressRequest.phone"
+                     [ngModelOptions]="{standalone: true}"
+                     placeholder=""
+                     autocomplete="phone"
+                     (keydown.enter)="$event.preventDefault()">
+            </div>
+            <div class="column-container" style="margin-left:5px">
+              <mat-label class="label">Email</mat-label>
+              <input type="email"
+                     matInput
+                     class="insert email-width"
+                     [(ngModel)]="addressRequest.email"
+                     [ngModelOptions]="{standalone: true}"
+                     placeholder=""
+                     autocomplete="email"
+                     (keydown.enter)="$event.preventDefault()">
+            </div>
           </div>
         </div>
       </div>
+      <mat-label class="tag mat-elevation-z4"> Tag to day card:
+        <mat-checkbox [(ngModel)]="activity.dayTag" name="dayTag"></mat-checkbox>
+      </mat-label>
+
+      <div class="button-area">
+        <button class="custom-button-0 " (click)="executeActivitySave()" type="submit">Save</button>
+        <button class="custom-button-1 " (click)="onClose()" type="submit">Cancel</button>
+      </div>
     </div>
 
-    <div *ngIf="badge === 'stay'">
-      <app-stay
-        (provideBadge)="receiveBadge($event)"
-        (provideType)="receiveType($event)"
-        (provideFirstStatus)="receiveFirstStatus($event)"
-        (provideSecondStatus)="receiveSecondStatus($event)"
-        (afterStay)="executeAssociatedActivity(false)"
-      ></app-stay>
-    </div>
+    <div style="margin-left:20px">
+      <div *ngIf="badge === 'stay'">
+        <app-stay
+          [_type]="activity.type!"
+          (provideBadge)="receiveBadge($event)"
+          (provideType)="receiveType($event)"
+          (provideFirstStatus)="receiveFirstStatus($event)"
+          (provideSecondStatus)="receiveSecondStatus($event)"
+        ></app-stay>
+      </div>
 
-    <div *ngIf="badge === 'travel'">
-      <app-travel
-        (provideBadge)="receiveBadge($event)"
-        (provideType)="receiveType($event)"
-        (afterTravel)="executeSingleActivity()"
-      ></app-travel>
-    </div>
+      <div *ngIf="badge === 'travel'">
+        <app-travel
+          [_type]="activity.type!"
+          (provideBadge)="receiveBadge($event)"
+          (provideType)="receiveType($event)"
+        ></app-travel>
+      </div>
 
-    <div *ngIf="badge === 'rent'">
-      <app-rent
-        (provideBadge)="receiveBadge($event)"
-        (provideType)="receiveType($event)"
-        (provideFirstStatus)="receiveFirstStatus($event)"
-        (provideSecondStatus)="receiveSecondStatus($event)"
-        (afterRent)="executeAssociatedActivity(true)"
-      ></app-rent>
-    </div>
+      <div *ngIf="badge === 'rent'">
+        <app-rent
+          [_type]="activity.type!"
+          (provideBadge)="receiveBadge($event)"
+          (provideType)="receiveType($event)"
+          (provideFirstStatus)="receiveFirstStatus($event)"
+          (provideSecondStatus)="receiveSecondStatus($event)"
+        ></app-rent>
+      </div>
 
-    <div *ngIf="badge === 'eat'">
-      <app-eat
-        (provideBadge)="receiveBadge($event)"
-        (provideType)="receiveType($event)"
-        (afterEat)="executeSingleActivity()"
-      ></app-eat>
-    </div>
+      <div *ngIf="badge === 'eat'">
+        <app-eat
+          [_type]="activity.type!"
+          (provideBadge)="receiveBadge($event)"
+          (provideType)="receiveType($event)"
+        ></app-eat>
+      </div>
 
-    <div *ngIf="badge === 'trek'">
-      <app-trek
-        (provideBadge)="receiveBadge($event)"
-        (provideType)="receiveType($event)"
-        (afterTrek)="executeSingleActivity()"
-      ></app-trek>
-    </div>
+      <div *ngIf="badge === 'trek'">
+        <app-trek
+          [_type]="activity.type!"
+          (provideBadge)="receiveBadge($event)"
+          (provideType)="receiveType($event)"
+        ></app-trek>
+      </div>
 
-    <div *ngIf="badge === 'event'">
-      <app-event
-        (provideBadge)="receiveBadge($event)"
-        (provideType)="receiveType($event)"
-        (afterEvent)="executeSingleActivity()"
-      ></app-event>
-    </div>
+      <div *ngIf="badge === 'event'">
+        <app-event
+          [_type]="activity.type!"
+          (provideBadge)="receiveBadge($event)"
+          (provideType)="receiveType($event)"
+        ></app-event>
+      </div>
 
-    <div *ngIf="badge === 'shop'">
-      <app-shop
-        (provideBadge)="receiveBadge($event)"
-        (provideType)="receiveType($event)"
-        (afterShop)="executeSingleActivity()"
-      ></app-shop>
+      <div *ngIf="badge === 'shop'">
+        <app-shop
+          [_type]="activity.type!"
+          (provideBadge)="receiveBadge($event)"
+          (provideType)="receiveType($event)"
+        ></app-shop>
+      </div>
     </div>
-
-    <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-      <mat-divider></mat-divider>
-      <p *ngFor="let msg of errorMsg">{{msg}}</p>
-    </div>
-
   </form>
 </mat-card-content>
+<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+  <mat-divider></mat-divider>
+  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+</div>
 
 

@@ -3,7 +3,6 @@ import {MatDivider} from "@angular/material/divider";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {MatIcon} from "@angular/material/icon";
-import {MatCard, MatCardActions} from "@angular/material/card";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatOption, MatSelect, MatSelectTrigger} from "@angular/material/select";
 import {MatIconButton} from "@angular/material/button";
@@ -21,6 +20,7 @@ import {ErrorService} from "../../../../../../services/error/error.service";
 import {CreateOrUpdateExpanse$Params} from "../../../../../../services/fn/expanse/create-or-update-expanse";
 import {ExpanseRequest} from "../../../../../../services/models/expanse-request";
 import {SharedService} from "../../../../../../services/shared/shared.service";
+import {TripCurrencyValuesRequest} from "../../../../../../services/models/trip-currency-values-request";
 
 @Component({
   selector: 'app-expanse',
@@ -31,12 +31,10 @@ import {SharedService} from "../../../../../../services/shared/shared.service";
     NgForOf,
     MatToolbarRow,
     MatIcon,
-    MatCard,
     MatFormField,
     MatLabel,
     MatSelect,
     MatOption,
-    MatCardActions,
     MatIconButton,
     FormsModule,
     MatInput,
@@ -85,13 +83,14 @@ export class ExpanseComponent implements OnInit {
               private sharedService: SharedService,
               private errorService: ErrorService,
               private countryControllerService: CountryControllerService,
-              @Inject(MAT_DIALOG_DATA) public data: { description: string,
+              @Inject(MAT_DIALOG_DATA) public data: {
                 currency: string,
                 tripId: number,
                 entityId: number,
                 expanseId: number,
                 entityType: string,
                 expanse: ExpanseResponse
+                expanseCategory: string
               }) {
     if (data.expanse) {
       this.expanseResponse = data.expanse;
@@ -105,12 +104,12 @@ export class ExpanseComponent implements OnInit {
       this.expanseRequest.priceInTripCurrency = data.expanse.priceInTripCurrency!;
       this.expanseRequest.expanseId = data.expanse.expanseId! as number;
     } else {
-      this.expanseRequest.expanseName = data.description;
       this.expanseRequest.currency = data.currency;
     }
     this.expanseRequest.entityId = data.entityId;
     this.expanseRequest.tripId = data.tripId;
     this.expanseRequest.entityType = data.entityType;
+    this.expanseRequest.expanseCategory = data.expanseCategory;
   }
 
   ngOnInit(): void {
@@ -185,11 +184,12 @@ export class ExpanseComponent implements OnInit {
   }
 
   calculateTripValue() {
-    const params: GetTripCurrencyValues$Params = {
-      price: this.expanseRequest.price!,
+    const tripCurrencyValuesRequest: TripCurrencyValuesRequest = {
+      exchangeRate: this.expanseRequest.exchangeRate!,
       paid: this.expanseRequest.paid!,
-      exchangeRate: this.expanseRequest.exchangeRate!
-    };
+      price: this.expanseRequest.price!,
+    }
+    const params: GetTripCurrencyValues$Params = {body : tripCurrencyValuesRequest}
     this.expanseService.getTripCurrencyValues(params)
       .subscribe({
         next: (tripCurrencyValue) => {

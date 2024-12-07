@@ -38,8 +38,8 @@
 }
 
 .add-delete-button {
-  width: 25px;
-  height: 25px;
+  width: 40px;
+  height: 20px;
   display: flex;
   justify-content: center !important;
   cursor: pointer;
@@ -48,24 +48,25 @@
 }
 
 .add-delete-description {
-  width: 25px;
-  height: 25px;
+  width: 60px;
+  height: 20px;
   display: flex;
   background-color: transparent;
-  color: lightslategrey;
-  font-size: 2.5vw;
+  color: whitesmoke;
+  font-size: 30px;
   font-weight: 300;
   justify-content: center !important;
+  align-items: center !important;
 }
 
 .add-day-buttons {
-  border: 1px solid limegreen;
+  border: 2px solid limegreen;
   border-radius: 5px;
   align-items: center !important;
 }
 
 .delete-day-buttons {
-  border: 1px solid indianred;
+  border: 2px solid indianred;
   border-radius: 5px;
   align-items: center !important;
 }
@@ -75,6 +76,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 10px;
 }
 
 .add-color {
@@ -91,11 +93,26 @@
 
 .add-delete-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   margin: 10px 10px 10px 50px !important;
   border-radius: 20px;
   background-color: transparent;
 }
 
+.add-delete-line {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  border-radius: 20px;
+  margin: 10px;
+  background-color: transparent;
+}
+
+.add-delete-description-icon {
+    width: 15px;
+    height: 15px;
+    background-color: transparent;
+    padding:5px;
+}
 

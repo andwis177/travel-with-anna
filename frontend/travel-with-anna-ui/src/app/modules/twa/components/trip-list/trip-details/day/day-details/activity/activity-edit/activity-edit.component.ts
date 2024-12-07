@@ -29,7 +29,6 @@ import {Country} from "../../../../../../../../../services/models/country";
 import {City} from "../../../../../../../../../services/models/city";
 import {ActivityUpdateRequest} from "../../../../../../../../../services/models/activity-update-request";
 import {UpdateActivity$Params} from "../../../../../../../../../services/fn/activity/update-activity";
-import {DayDetailsButtonsComponent} from "../../day-details-buttons/day-details-buttons.component";
 import {ShopComponent} from "../buttons/shop/shop.component";
 import {MatCheckbox} from "@angular/material/checkbox";
 
@@ -56,7 +55,6 @@ import {MatCheckbox} from "@angular/material/checkbox";
     StayComponent,
     TravelComponent,
     TrekComponent,
-    DayDetailsButtonsComponent,
     ShopComponent,
     MatCheckbox
   ],
@@ -82,6 +80,7 @@ export class ActivityEditComponent implements OnInit {
   lastTripDay = '';
   startTime: string = '';
   endTime: string = '';
+  isEndTimeIncluded: boolean = false;
   dates: Array<string> = [];
   date: string = '';
   country: Country = {};
@@ -97,6 +96,9 @@ export class ActivityEditComponent implements OnInit {
               private errorService: ErrorService,
               private sharedService: SharedService,
   ) {
+  }
+
+  ngOnInit() {
     this.sharedService.getTrip().subscribe({
       next: (trip) => {
         this.trip = trip!;
@@ -121,21 +123,8 @@ export class ActivityEditComponent implements OnInit {
     {
       this.getCities(this.country.name!);
     }
-    this.provideTypeToButtons(this.activity.type!);
-    this.activityUpdateRequest.activityId = this.activity.activityId!;
-    this.activityUpdateRequest.activityTitle = this.activity.activityTitle!;
-    this.activityUpdateRequest.dayId = this.day.dayId!;
-    this.activityUpdateRequest.newDate = this.day.date!;
     this.activityUpdateRequest.oldDate = this.day.date!;
-    this.activityUpdateRequest.startTime = this.activity.startTime!;
-    this.activityUpdateRequest.dayTag = this.activity.dayTag!;
-  }
-
-  ngOnInit() {
-  }
-
-  provideTypeToButtons(type:string) {
-    this.provideType.emit(type);
+    this.isEndTimeIncluded = this.activity.endTime?.length! > 0;
   }
 
   getActivity() {
@@ -165,12 +154,15 @@ export class ActivityEditComponent implements OnInit {
   }
 
   receiveType(type: string) {
-    this.activityUpdateRequest.type = type;
+    this.activity.type = type;
   }
 
-  isValidTime(time: string): boolean {
-    const regex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
-    return regex.test(time);
+  isValidTime(time: string | null): boolean {
+    if (!time) {
+      return false;
+    }
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    return timeRegex.test(time);
   }
 
   private formatDateToJson(date: Date): string {
@@ -193,7 +185,6 @@ export class ActivityEditComponent implements OnInit {
     }
   }
 
-
   getCountries() {
     this.errorMsg = [];
     this.countryService.findAllCountryNames().subscribe({
@@ -208,17 +199,11 @@ export class ActivityEditComponent implements OnInit {
 
   getCities(country: string) {
     this.cities = [];
-    this.address.city = '';
     if (this.cities.length == 0) {
       this.errorMsg = [];
       this.countryService.findAllCountryCities({country: country}).subscribe({
         next: (response) => {
           this.cities = response;
-          if (response.length === 1) {
-            this.address.city = response[0].city!;
-          } else {
-            this.address.city = '';
-          }
         },
         error: (error) => {
           this.errorMsg = this.errorService.errorHandler(error);
@@ -300,17 +285,21 @@ export class ActivityEditComponent implements OnInit {
   }
 
   updateActivity() {
+    this.activityUpdateRequest.activityId = this.activity.activityId!;
+    this.activityUpdateRequest.activityTitle = this.activity.activityTitle!;
     this.activityUpdateRequest.addressRequest = this.address
+    this.activityUpdateRequest.dayId = this.day.dayId!;
+    this.activityUpdateRequest.dayTag = this.activity.dayTag!;
+    this.activityUpdateRequest.startTime = this.startTime;
     this.activityUpdateRequest.endTime = this.endTime;
     this.activityUpdateRequest.newDate = this.date;
-    this.activityUpdateRequest.startTime = this.startTime;
+    this.activityUpdateRequest.type = this.activity.type!;
 
     const params: UpdateActivity$Params = {body: this.activityUpdateRequest};
     this.activityService.updateActivity(params).subscribe({
-      next: (respond) => {
+      next: () => {
         this.sharedService.setActivity(this.activityUpdateRequest);
         this.dialog.getDialogById('activity-edit-dialog')?.close();
-        console.log(respond.message);
       },
       error: (error) => {
         this.errorMsg = this.errorService.errorHandlerWithJson(error);

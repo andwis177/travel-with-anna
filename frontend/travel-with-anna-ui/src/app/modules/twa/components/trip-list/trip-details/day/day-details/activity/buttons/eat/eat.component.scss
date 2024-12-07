@@ -3,7 +3,12 @@
 }
 
 .buttons-container {
-  justify-content: space-evenly !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
+.user-button {
+  margin: 10px;
+}
 

@@ -1,0 +1,9 @@
+.dialog-header {
+  background-color: whitesmoke;
+  border-bottom: #1C252D;
+  border-radius: 0;
+}
+
+.mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none;
+}

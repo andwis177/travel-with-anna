@@ -15,6 +15,7 @@ public class ExpanseMapper {
         if (expanse == null) {
             expanse = Expanse.builder()
                     .expanseName(expanseRequest.getExpanseName())
+                    .expanseCategory(expanseRequest.getExpanseCategory())
                     .currency(expanseRequest.getCurrency())
                     .price(expanseRequest.getPrice() != null ? expanseRequest.getPrice() : BigDecimal.ZERO)
                     .paid(expanseRequest.getPaid() != null ? expanseRequest.getPaid() : BigDecimal.ZERO)
@@ -26,11 +27,11 @@ public class ExpanseMapper {
         }
     }
 
-
     public static @NotNull ExpanseResponse toExpanseResponse(@NotNull Expanse expanse) {
         return new ExpanseResponse(
                 expanse.getExpanseId(),
                 expanse.getExpanseName(),
+                expanse.getExpanseCategory(),
                 expanse.getCurrency(),
                 expanse.getPrice(),
                 expanse.getPaid(),
@@ -42,6 +43,7 @@ public class ExpanseMapper {
 
     public static void updateExpanse(@NotNull Expanse expanse, @NotNull ExpanseRequest expanseRequest) {
         expanse.setExpanseName(expanseRequest.getExpanseName());
+        expanse.setExpanseCategory(expanseRequest.getExpanseCategory());
         expanse.setCurrency(expanseRequest.getCurrency());
         expanse.setPrice(expanseRequest.getPrice());
         expanse.setPaid(expanseRequest.getPaid());

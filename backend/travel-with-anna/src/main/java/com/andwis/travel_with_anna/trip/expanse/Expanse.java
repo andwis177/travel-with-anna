@@ -31,6 +31,9 @@ public class Expanse implements OwnableByUser {
     @Column(name = "expanse_name", length = 60)
     private String expanseName;
 
+    @Column(name = "expanse_category")
+    private String expanseCategory;
+
     @NotNull
     @Size(max = 10)
     @Column(name = "currency", length = 10)

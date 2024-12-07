@@ -207,7 +207,6 @@ public class ExpanseService {
         return new ExpanseInTripCurrency(priceInTripCurrency, paidInTripCurrency);
     }
 
-    @Contract(pure = true)
     private @NotNull BigDecimal calculatePriceInTripCurrency(@NotNull BigDecimal value, BigDecimal exchangeRate) {
         return value.multiply(exchangeRate);
     }
@@ -220,5 +219,11 @@ public class ExpanseService {
             expanse.setExchangeRate(exchangeResponse.exchangeRate());
         });
         expanseRepository.saveAll(expanses);
+    }
+
+    public void updateExpanseCategory(Expanse expanse, String categoryDescription, UserDetails connectedUser) {
+        expanseAuthorizationService.verifyExpanseOwner(expanse, connectedUser);
+        expanse.setExpanseCategory(categoryDescription);
+        save(expanse);
     }
 }

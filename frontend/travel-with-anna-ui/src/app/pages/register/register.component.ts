@@ -1,8 +1,8 @@
 import {Component, HostListener, OnInit, ViewEncapsulation} from '@angular/core';
 import {RegistrationRequest} from "../../services/models/registration-request";
 import {FormsModule} from "@angular/forms";
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
+import {MatIconButton} from "@angular/material/button";
+import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
@@ -19,11 +19,9 @@ import {ErrorService} from "../../services/error/error.service";
   standalone: true,
   imports: [
     FormsModule,
-    MatButton,
     MatCard,
     MatCardContent,
     MatCardHeader,
-    MatCardTitle,
     MatFormField,
     MatIcon,
     MatIconButton,
@@ -61,7 +59,6 @@ export class RegisterComponent implements OnInit {
         next: (role) => {
           this.roles = role;
           this.registerRequest.roleName = this.roles[0];
-          console.log(role);
         },
         error: (err) => {
           this.errorMsg = this.errorService.errorHandler(err);

@@ -1,9 +1,9 @@
-<form class="buttons-container full-width" style="margin: 20px 0 0 0; display: inline-flex; justify-content: center">
+<form class="buttons-container full-width">
 
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('cinema');
                                               createEvent()"
-          [ngClass]="getButtonType('cinema')"
+          [ngClass]="buttonClasses['cinema']"
           matTooltip="Cinema">
     <img src="../../../../../assets/images/activity/cinema.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -11,7 +11,7 @@
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('concert');
                                               createEvent()"
-          [ngClass]="getButtonType('concert')"
+          [ngClass]="buttonClasses['concert']"
           matTooltip="Concert">
     <img src="../../../../../assets/images/activity/concert.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -19,7 +19,7 @@
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('explore');
                                               createEvent()"
-          [ngClass]="getButtonType('explore')"
+          [ngClass]="buttonClasses['explore']"
           matTooltip="Explore">
     <img src="../../../../../assets/images/activity/explore.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -27,34 +27,23 @@
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('extreme');
                                               createEvent()"
-          [ngClass]="getButtonType('extreme')"
+          [ngClass]="buttonClasses['extreme']"
           matTooltip="Extreme Sport">
     <img src="../../../../../assets/images/activity/extreme.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
 
   <button class="user-button margin" (click)="provideBadgeToParent('event');
-                                              provideTypeToParent('festival');
-                                              createEvent()"
-          [ngClass]="getButtonType('festive')"
-          matTooltip="Festival">
-    <img src="../../../../../assets/images/activity/festival.png" class="user-button-image mat-elevation-z4" alt="">
-  </button>
-
-  <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('museum');
                                               createEvent()"
-          [ngClass]="getButtonType('museum')"
+          [ngClass]="buttonClasses['museum']"
           matTooltip="Museum">
     <img src="../../../../../assets/images/activity/museum.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
 
-</form>
-
-<form class="buttons-container full-width" style="margin: 20px 0 0 0; display: inline-flex; justify-content: center">
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('nightlife');
                                               createEvent()"
-          [ngClass]="getButtonType('nightlife')"
+          [ngClass]="buttonClasses['nightlife']"
           matTooltip="NightLife">
     <img src="../../../../../assets/images/activity/nightlife.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -62,7 +51,7 @@
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('recreation');
                                               createEvent()"
-          [ngClass]="getButtonType('recreation')"
+          [ngClass]="buttonClasses['recreation']"
           matTooltip="Recreation">
     <img src="../../../../../assets/images/activity/recreation.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -70,7 +59,7 @@
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('show');
                                               createEvent()"
-          [ngClass]="getButtonType('show')"
+          [ngClass]="buttonClasses['show']"
           matTooltip="Show">
     <img src="../../../../../assets/images/activity/show.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -78,7 +67,7 @@
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('sport');
                                               createEvent()"
-          [ngClass]="getButtonType('sport')"
+          [ngClass]="buttonClasses['sport']"
           matTooltip="Sport">
     <img src="../../../../../assets/images/activity/sport.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -86,7 +75,7 @@
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('theater');
                                               createEvent()"
-          [ngClass]="getButtonType('theater')"
+          [ngClass]="buttonClasses['theater']"
           matTooltip="Theater">
     <img src="../../../../../assets/images/activity/theater.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -94,7 +83,7 @@
   <button class="user-button margin" (click)="provideBadgeToParent('event');
                                               provideTypeToParent('event');
                                               createEvent()"
-          [ngClass]="getButtonType('event')"
+          [ngClass]="buttonClasses['event']"
           matTooltip="Other">
     <img src="../../../../../assets/images/activity/event.png" class="user-button-image mat-elevation-z4" alt="">
   </button>

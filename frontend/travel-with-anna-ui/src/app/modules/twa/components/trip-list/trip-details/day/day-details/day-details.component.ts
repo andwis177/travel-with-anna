@@ -1,14 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {LogoComponent} from "../../../../../../components/menu/logo/logo.component";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
-import {TripCardComponent} from "../../../trip-card/trip-card.component";
-import {TripListButtons} from "../../../trip-list-buttons/trip-list-buttons.component";
 import {UserComponent} from "../../../../../../components/menu/user/user.component";
 import {DayDetailsButtonsComponent} from "./day-details-buttons/day-details-buttons.component";
 import {DayResponse} from "../../../../../../../services/models/day-response";
 import {TripResponse} from "../../../../../../../services/models/trip-response";
 import {ErrorService} from "../../../../../../../services/error/error.service";
-import {BudgetButtonsComponent} from "../../budget/budget-buttons/budget-buttons.component";
 import {ActivityService} from "../../../../../../../services/services/activity.service";
 import {FetchActivitiesByDayId$Params} from "../../../../../../../services/fn/activity/fetch-activities-by-day-id";
 import {ActivityDetailsComponent} from "./activity-details/activity-details.component";
@@ -16,18 +13,14 @@ import {ActivityDetailedResponse} from "../../../../../../../services/models/act
 import {SharedService} from "../../../../../../../services/shared/shared.service";
 import {MatTooltip} from "@angular/material/tooltip";
 
-
 @Component({
   selector: 'app-day-details',
   standalone: true,
   imports: [
     LogoComponent,
     NgForOf,
-    TripCardComponent,
-    TripListButtons,
     UserComponent,
     DayDetailsButtonsComponent,
-    BudgetButtonsComponent,
     NgIf,
     ActivityDetailsComponent,
     MatTooltip,

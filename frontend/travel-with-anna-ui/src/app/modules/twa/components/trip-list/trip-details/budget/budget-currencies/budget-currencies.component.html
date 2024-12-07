@@ -22,7 +22,10 @@
 
       <ng-container matColumnDef="totalDebt">
         <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-column" sortActionDescription="Sort by totalDebt">
-          Price/Paid
+          <div class="header-column">
+            <div>Price</div>
+            <div>Paid</div>
+          </div>
         </th>
         <td mat-cell *matCellDef="let element" class="amount-column" [ngClass]="getColorAmount(element.totalDebt)">
           {{formatAmount(element.totalDebt)}}
@@ -40,16 +43,6 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="totalPriceInTripCurrency">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-column" sortActionDescription="Sort by totalPriceInTripCurrency">
-          {{tripCurrency}}
-        </th>
-        <td mat-cell *matCellDef="let element" class="amount-column">
-          {{formatAmount(element.totalPriceInTripCurrency)}}
-          <label style="font-size: 10px">{{tripCurrency}} </label>
-        </td>
-      </ng-container>
-
       <ng-container matColumnDef="totalPaid">
         <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-column" sortActionDescription="Sort by totalPaid">
           Paid
@@ -60,9 +53,25 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="totalPriceInTripCurrency">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-column" sortActionDescription="Sort by totalPriceInTripCurrency">
+          <div class="header-column">
+            <div>Price</div>
+            <div style="font-size: 10px">({{tripCurrency}})</div>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element" class="amount-column">
+          {{formatAmount(element.totalPriceInTripCurrency)}}
+          <label style="font-size: 10px">{{tripCurrency}} </label>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="totalPaidInTripCurrency">
         <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-column" sortActionDescription="Sort by totalPaidInTripCurrency">
-          {{tripCurrency}}
+          <div class="header-column">
+            <div>Paid</div>
+            <div style="font-size: 10px">({{tripCurrency}})</div>
+          </div>
         </th>
         <td mat-cell *matCellDef="let element" class="amount-column">
           {{formatAmount(element.totalPaidInTripCurrency)}}

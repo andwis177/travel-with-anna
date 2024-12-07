@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
@@ -14,7 +14,8 @@ import {NgClass} from "@angular/common";
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
 })
-export class ShopComponent {
+export class ShopComponent implements OnInit, OnChanges {
+  buttonClasses: { [key: string]: string } = {};
   @Input()_type: string = '';
   @Output() provideBadge: EventEmitter<string> = new EventEmitter<string>();
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
@@ -33,10 +34,21 @@ export class ShopComponent {
     this.afterShop.emit();
   }
 
-  getButtonType(type: string) : string {
-    if (this._type === type) {
-      return 'selected-button';
-    }
-    return '';
+  ngOnInit(): void {
+    this.updateButtonClasses();
+  }
+
+  ngOnChanges() {
+    this.updateButtonClasses();
+  }
+
+  updateButtonClasses() {
+    this.buttonClasses = {
+      fuel: this._type === 'fuel' ? 'selected-button' : '',
+      grocery: this._type === 'grocery' ? 'selected-button' : '',
+      souvenir: this._type === 'souvenir' ? 'selected-button' : '',
+      clothes: this._type === 'clothes' ? 'selected-button' : '',
+      shop: this._type === 'shop' ? 'selected-button' : '',
+    };
   }
 }

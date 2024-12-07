@@ -8,16 +8,17 @@ import { TripService } from './services/trip.service';
 import { NoteService } from './services/note.service';
 import { ExpanseService } from './services/expanse.service';
 import { DayService } from './services/day.service';
-import { BudgetService } from './services/budget.service';
 import { AvatarService } from './services/avatar.service';
 import { AuthenticationService } from './services/authentication.service';
 import { CountryControllerService } from './services/country-controller.service';
 import { ActivityService } from './services/activity.service';
 import { UserService } from './services/user.service';
 import { ItemService } from './services/item.service';
+import { BudgetService } from './services/budget.service';
 import { BackpackService } from './services/backpack.service';
 import { AdminService } from './services/admin.service';
 import { RoleService } from './services/role.service';
+import { PdfReportService } from './services/pdf-report.service';
 import { CurrencyExchangeControllerService } from './services/currency-exchange-controller.service';
 
 /**
@@ -32,16 +33,17 @@ import { CurrencyExchangeControllerService } from './services/currency-exchange-
     NoteService,
     ExpanseService,
     DayService,
-    BudgetService,
     AvatarService,
     AuthenticationService,
     CountryControllerService,
     ActivityService,
     UserService,
     ItemService,
+    BudgetService,
     BackpackService,
     AdminService,
     RoleService,
+    PdfReportService,
     CurrencyExchangeControllerService,
     ApiConfiguration
   ],

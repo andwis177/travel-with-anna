@@ -3,17 +3,12 @@ import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {MatDivider} from "@angular/material/divider";
-import {MatTooltip} from "@angular/material/tooltip";
 import {NgForOf, NgIf} from "@angular/common";
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {ErrorService} from "../../../../../../services/error/error.service";
 import {NoteService} from "../../../../../../services/services/note.service";
-import {MatCard, MatCardContent, MatCardFooter, MatCardHeader} from "@angular/material/card";
 import {NoteResponse} from "../../../../../../services/models/note-response";
-import {MatChip, MatChipSet} from "@angular/material/chips";
-import {MatFormField} from "@angular/material/form-field";
 import {FormsModule} from "@angular/forms";
-import {MatInput} from "@angular/material/input";
 import {NoteRequest} from "../../../../../../services/models/note-request";
 import {SaveNote$Params} from "../../../../../../services/fn/note/save-note";
 
@@ -25,18 +20,9 @@ import {SaveNote$Params} from "../../../../../../services/fn/note/save-note";
     MatIconButton,
     MatToolbarRow,
     MatDivider,
-    MatTooltip,
     NgForOf,
     NgIf,
-    MatCard,
-    MatCardHeader,
-    MatCardContent,
-    MatCardFooter,
-    MatChipSet,
-    MatChip,
-    MatFormField,
-    FormsModule,
-    MatInput
+    FormsModule
   ],
   templateUrl: './note.component.html',
   styleUrl: './note.component.scss'
@@ -64,7 +50,6 @@ export class NoteComponent implements OnInit {
   }
 
   getNote() {
-    console.log(this.noteRequest);
     this.noteService.getNote({
       entityId: this.noteRequest.entityId!,
       entityType: this.noteRequest.entityType})
@@ -94,10 +79,7 @@ export class NoteComponent implements OnInit {
   saveNote() {
     this.errorMsg = [];
     this.setNote();
-    console.log(this.data.entityId);
-    console.log(this.data.entityType);
     if (this.noteRequest.entityId && this.noteRequest.entityType) {
-      console.log(this.noteRequest);
       const params: SaveNote$Params = {body: this.noteRequest};
       this.noteService.saveNote(params).subscribe({
         next: () => {

@@ -1,8 +1,17 @@
-<form class="buttons-container full-width" style="margin: 20px 0 0 0; display: inline-flex; justify-content: center">
+<form class="buttons-container full-width" >
+
+  <button class="user-button margin" (click)="provideBadgeToParent('trek');
+                                              provideTypeToParent('walking');
+                                              createTrekking()"
+          [ngClass]="buttonClasses['walking']"
+          matTooltip="Hiking">
+    <img src="../../../../../assets/images/activity/walking.png" class="user-button-image mat-elevation-z4" alt="">
+  </button>
+
   <button class="user-button margin" (click)="provideBadgeToParent('trek');
                                               provideTypeToParent('hiking');
                                               createTrekking()"
-          [ngClass]="getButtonType('hiking')"
+          [ngClass]="buttonClasses['hiking']"
           matTooltip="Hiking">
     <img src="../../../../../assets/images/activity/hiking.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -10,7 +19,7 @@
   <button class="user-button margin" (click)="provideBadgeToParent('trek');
                                               provideTypeToParent('climbing');
                                               createTrekking()"
-          [ngClass]="getButtonType('climbing')"
+          [ngClass]="buttonClasses['climbing']"
           matTooltip="Climbing">
     <img src="../../../../../assets/images/activity/climbing.png" class="user-button-image mat-elevation-z4" alt="">
   </button>

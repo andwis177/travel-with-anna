@@ -37,11 +37,55 @@ public class ExpanseSummaryReportCreator {
                 .setFont(pdfFontFactory.reportBoldFont())
                 .setFontSize(7)
                 .setFontColor(WHITE)
-                .setMultipliedLeading(0.4f)
+                .setMultipliedLeading(1.8f)
                 .setPadding(1);
     }
 
     public Paragraph getSummaryHeader(String tripCurrency) throws IOException {
+        Text priceText = new Text("PRICE")
+                .setFont(pdfFontFactory.reportBoldFont())
+                .setFontSize(7);
+
+        Text paidText = new Text("PAID")
+                .setFont(pdfFontFactory.reportBoldFont())
+                .setFontSize(7);
+
+        Text currency = new Text(tripCurrency)
+                .setFont(pdfFontFactory.reportBoldFont())
+                .setFontSize(6)
+                ;
+
+        Paragraph priceHeader = new Paragraph()
+                .add(priceText)
+                .add("\n(")
+                .add(currency)
+                .add(")")
+                .setFont(pdfFontFactory.reportBoldFont())
+                .setFontSize(6)
+                .setFontColor(WHITE)
+                .setMultipliedLeading(1.0f)
+                .setPadding(1);
+
+        Paragraph paidHeader = new Paragraph()
+                .add(paidText)
+                .add("\n(")
+                .add(currency)
+                .add(")")
+                .setFont(pdfFontFactory.reportBoldFont())
+                .setFontSize(6)
+                .setFontColor(WHITE)
+                .setMultipliedLeading(1.0f)
+                .setPadding(1);
+
+        Paragraph price_paid = new Paragraph()
+                .add(priceText)
+                .add("\n")
+                .add(paidText)
+                .setFont(pdfFontFactory.reportBoldFont())
+                .setFontSize(6)
+                .setFontColor(WHITE)
+                .setMultipliedLeading(1.0f)
+                .setPadding(1);
 
         Table table = new Table(new float[]{70, 90, 90, 90, 90, 90});
         table.setWidth(UnitValue.createPointValue(520));
@@ -49,15 +93,15 @@ public class ExpanseSummaryReportCreator {
         table
                 .addCell(new Cell().add(createHeaderParagraph("CURRENCY"))
                         .setBorder(NO_BORDER))
-                .addCell(new Cell().add(createHeaderParagraph("PRICE/PAID"))
+                .addCell(new Cell().add(price_paid)
                         .setBorder(NO_BORDER))
                 .addCell(new Cell().add(createHeaderParagraph("PRICE"))
                         .setBorder(NO_BORDER))
-                .addCell(new Cell().add(createHeaderParagraph(tripCurrency))
-                        .setBorder(NO_BORDER))
                 .addCell(new Cell().add(createHeaderParagraph("PAID"))
                         .setBorder(NO_BORDER))
-                .addCell(new Cell().add(createHeaderParagraph(tripCurrency))
+                .addCell(new Cell().add(priceHeader)
+                        .setBorder(NO_BORDER))
+                .addCell(new Cell().add(paidHeader)
                         .setBorder(NO_BORDER));
 
         return new Paragraph().add(table).setBackgroundColor(GRAY);
@@ -66,35 +110,35 @@ public class ExpanseSummaryReportCreator {
     public Paragraph getSummary(@NotNull ExpanseByCurrency expanse, String tripCurrency) throws IOException {
         Text summaryCurrencyColumnText = new Text(expanse.getCurrency())
                 .setFont(pdfFontFactory.reportBoldFont())
-                .setFontSize(10);
+                .setFontSize(8);
 
         Text summaryCurrencyText = new Text(expanse.getCurrency())
                 .setFont(pdfFontFactory.reportRegularFont())
-                .setFontSize(7);
+                .setFontSize(6);
 
         Text tripCurrencyText = new Text(tripCurrency)
                 .setFont(pdfFontFactory.reportRegularFont())
-                .setFontSize(7);
+                .setFontSize(6);
 
         Text pricePaidText = new Text(expanse.getTotalDebt().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
-                .setFontSize(10);
+                .setFontSize(8);
 
         Text priceText = new Text(expanse.getTotalPrice().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
-                .setFontSize(10);
+                .setFontSize(8);
 
         Text priceInTripCurrencyText = new Text(expanse.getTotalPriceInTripCurrency().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
-                .setFontSize(10);
+                .setFontSize(8);
 
         Text paidText = new Text(expanse.getTotalPaid().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
-                .setFontSize(10);
+                .setFontSize(8);
 
         Text paidInTripCurrencyText = new Text(expanse.getTotalPaidInTripCurrency().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
-                .setFontSize(10);
+                .setFontSize(8);
 
         Paragraph currencyName = new Paragraph()
                 .add(summaryCurrencyColumnText)
@@ -167,14 +211,14 @@ public class ExpanseSummaryReportCreator {
                         .setBorderTop(NO_BORDER)
                         .setPadding(5)
                         .setTextAlignment(TextAlignment.RIGHT))
-                .addCell(new Cell().add(priceInTripCurrency)
+                .addCell(new Cell().add(paid)
                         .setBorderBottom(new SolidBorder(ColorConstants.BLACK, 0.1f))
                         .setBorderRight(NO_BORDER)
                         .setBorderLeft(NO_BORDER)
                         .setBorderTop(NO_BORDER)
                         .setPadding(5)
                         .setTextAlignment(TextAlignment.RIGHT))
-                .addCell(new Cell().add(paid)
+                .addCell(new Cell().add(priceInTripCurrency)
                         .setBorderBottom(new SolidBorder(ColorConstants.BLACK, 0.1f))
                         .setBorderRight(NO_BORDER)
                         .setBorderLeft(NO_BORDER)

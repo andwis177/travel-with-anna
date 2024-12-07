@@ -2,11 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {TripService} from "../../../../services/services/trip.service";
 import {NgForOf} from "@angular/common";
 import {TripCardComponent} from "./trip-card/trip-card.component";
-import {TripListButtons} from "./trip-list-buttons/trip-list-buttons.component";
 import {LogoComponent} from "../../../components/menu/logo/logo.component";
 import {UserComponent} from "../../../components/menu/user/user.component";
 import {PageResponseTripResponse} from "../../../../services/models/page-response-trip-response";
 import {ErrorService} from "../../../../services/error/error.service";
+import {TripListButtonsComponent} from "./trip-list-buttons/trip-list-buttons.component";
 
 @Component({
   selector: 'app-trip-list',
@@ -16,7 +16,7 @@ import {ErrorService} from "../../../../services/error/error.service";
     TripCardComponent,
     LogoComponent,
     UserComponent,
-    TripListButtons,
+    TripListButtonsComponent
   ],
   templateUrl: './trip-list.component.html',
   styleUrl: './trip-list.component.scss'

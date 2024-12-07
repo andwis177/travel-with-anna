@@ -54,6 +54,31 @@ export class ExpanseService extends BaseService {
     );
   }
 
+  /** Path part for operation `getTripCurrencyValues()` */
+  static readonly GetTripCurrencyValuesPath = '/expanse/trip-currency-values';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getTripCurrencyValues()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  getTripCurrencyValues$Response(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseInTripCurrency>> {
+    return getTripCurrencyValues(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getTripCurrencyValues$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  getTripCurrencyValues(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<ExpanseInTripCurrency> {
+    return this.getTripCurrencyValues$Response(params, context).pipe(
+      map((r: StrictHttpResponse<ExpanseInTripCurrency>): ExpanseInTripCurrency => r.body)
+    );
+  }
+
   /** Path part for operation `getExpanseById()` */
   static readonly GetExpanseByIdPath = '/expanse/{expanseId}';
 
@@ -101,31 +126,6 @@ export class ExpanseService extends BaseService {
   getExpanseByEntity(params: GetExpanseByEntity$Params, context?: HttpContext): Observable<ExpanseResponse> {
     return this.getExpanseByEntity$Response(params, context).pipe(
       map((r: StrictHttpResponse<ExpanseResponse>): ExpanseResponse => r.body)
-    );
-  }
-
-  /** Path part for operation `getTripCurrencyValues()` */
-  static readonly GetTripCurrencyValuesPath = '/expanse/trip-currency-values';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getTripCurrencyValues()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getTripCurrencyValues$Response(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseInTripCurrency>> {
-    return getTripCurrencyValues(this.http, this.rootUrl, params, context);
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getTripCurrencyValues$Response()` instead.
-   *
-   * This method doesn't expect any request body.
-   */
-  getTripCurrencyValues(params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<ExpanseInTripCurrency> {
-    return this.getTripCurrencyValues$Response(params, context).pipe(
-      map((r: StrictHttpResponse<ExpanseInTripCurrency>): ExpanseInTripCurrency => r.body)
     );
   }
 

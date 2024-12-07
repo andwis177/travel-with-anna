@@ -1,10 +1,10 @@
-<form class="buttons-container full-width" style="margin: 20px 0 0 0; display: inline-flex; justify-content: center">
+<form class="buttons-container full-width">
   <button class="user-button margin" (click)="provideBadgeToParent('stay');
                                               provideTypeToParent('hotel');
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
-          [ngClass]="getButtonType('hotel')"
+          [ngClass]="buttonClasses['hotel']"
           matTooltip="Hotel">
     <img src="../../../../../assets/images/activity/hotel.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -13,7 +13,7 @@
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
-          [ngClass]="getButtonType('camping')"
+          [ngClass]="buttonClasses['camping']"
           matTooltip="Camping">
     <img src="../../../../../assets/images/activity/camping.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -22,7 +22,7 @@
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
-          [ngClass]="getButtonType('airbnb')"
+          [ngClass]="buttonClasses['airbnb']"
           matTooltip="Airbnb">
     <img src="../../../../../assets/images/activity/airbnb.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -32,7 +32,7 @@
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
-          [ngClass]="getButtonType('friends')"
+          [ngClass]="buttonClasses['friends']"
           matTooltip="Family or Friends">
     <img src="../../../../../assets/images/activity/friends.png" class="user-button-image mat-elevation-z4" alt="">
   </button>
@@ -41,7 +41,7 @@
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
-          [ngClass]="getButtonType('stay')"
+          [ngClass]="buttonClasses['stay']"
           matTooltip="Other">
     <img src="../../../../../assets/images/activity/stay.png" class="user-button-image mat-elevation-z4" alt="">
   </button>

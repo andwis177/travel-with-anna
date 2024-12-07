@@ -10,7 +10,6 @@ import {SharedService} from "../../../../../../../services/shared/shared.service
 import {ActivityResponse} from "../../../../../../../services/models/activity-response";
 import {NoteComponent} from "../../note/note.component";
 import {MatBadge} from "@angular/material/badge";
-import {DayEditComponent} from "./day-edit/day-edit.component";
 
 @Component({
   selector: 'app-day',
@@ -21,6 +20,7 @@ import {DayEditComponent} from "./day-edit/day-edit.component";
     NgForOf,
     NgIf,
     MatBadge,
+
   ],
   templateUrl: './day-card.component.html',
   styleUrl: './day-card.component.scss'
@@ -59,9 +59,9 @@ export class DayCardComponent implements OnInit {
 
   ngOnInit() {
     if (this._day){
-    this.getAddressDetails();
-    this.getTaggedActivities();
-    this.checkIfNoteExists();
+      this.getAddressDetails();
+      this.getTaggedActivities();
+      this.checkIfNoteExists();
     }
   }
 
@@ -112,7 +112,7 @@ export class DayCardComponent implements OnInit {
     if (activity.address?.city) {
       activityTip.push(`${activity.address.city}`);
     }
-     if (activity.status) {
+    if (activity.status) {
       activityTip.push(`${activity.status}`);
     }
     if (activity.startTime && !activity.endTime) {
@@ -155,25 +155,7 @@ export class DayCardComponent implements OnInit {
     if (this._day.note !== null) {
       const noSpacesStr = this._day.note?.note!.replace(/\s+/g, "");
       if (noSpacesStr!.length > 0)
-      this.isBadgeVisible = true;
+        this.isBadgeVisible = true;
     }
-  }
-
-  changeDate(event: Event) {
-    event.preventDefault();
-    const dialogRef = this.dialog.open(DayEditComponent, {
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      width: 'auto',
-      height: 'auto',
-      id: 'day-edit-dialog',
-      data: {
-        entityId: this._day.dayId,
-        date: this._day.date,
-      }
-    });
-    dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.triggerGetDays();
-    });
   }
 }

@@ -23,9 +23,6 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {EditComponent} from "./edit/edit.component";
 import {ImageComponent} from "./image/image.component";
 import {DeleteComponent} from "./delete/delete.component";
-import {MatIconButton} from "@angular/material/button";
-import {NgOptimizedImage} from "@angular/common";
-import {MatInput} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
 import {UserListButtonsComponent} from "./user-list-buttons/user-list-buttons.component";
 import {LogoComponent} from "../../../components/menu/logo/logo.component";
@@ -53,9 +50,6 @@ import {ErrorService} from "../../../../services/error/error.service";
     MatTooltip,
     UserComponent,
     MatHeaderCellDef,
-    MatIconButton,
-    NgOptimizedImage,
-    MatInput,
     FormsModule,
     UserListButtonsComponent,
     UserComponent,

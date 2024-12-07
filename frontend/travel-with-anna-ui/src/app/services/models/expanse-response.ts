@@ -3,6 +3,7 @@
 export interface ExpanseResponse {
   currency?: string;
   exchangeRate?: number;
+  expanseCategory?: string;
   expanseId?: number;
   expanseName?: string;
   paid?: number;

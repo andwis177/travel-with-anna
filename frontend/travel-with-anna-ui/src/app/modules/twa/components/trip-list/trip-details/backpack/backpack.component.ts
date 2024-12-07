@@ -2,14 +2,11 @@ import {AfterViewInit, Component, HostListener, inject, Inject, OnInit, ViewChil
 import {NgForOf, NgIf} from "@angular/common";
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {FormsModule} from "@angular/forms";
-import {MatCard, MatCardActions, MatCardHeader} from "@angular/material/card";
 import {MatDivider} from "@angular/material/divider";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {MatToolbarRow} from "@angular/material/toolbar";
-import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
 import {BackpackService} from "../../../../../../services/services/backpack.service";
 import {
   MatCell,
@@ -19,7 +16,6 @@ import {
   MatHeaderCellDef,
   MatHeaderRow,
   MatHeaderRowDef,
-  MatNoDataRow,
   MatRow,
   MatRowDef,
   MatTable,
@@ -31,14 +27,11 @@ import {LiveAnnouncer} from "@angular/cdk/a11y";
 import {MatTooltip} from "@angular/material/tooltip";
 import {ItemRequest} from "../../../../../../services/models/item-request";
 import {MatCheckbox} from "@angular/material/checkbox";
-import {TripDetailsButtonsComponent} from "../trip-details-buttons/trip-details-buttons.component";
 import {ItemService} from "../../../../../../services/services/item.service";
 import {AddItemToBackpack$Params} from "../../../../../../services/fn/backpack/add-item-to-backpack";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {DeleteItem$Params} from "../../../../../../services/fn/backpack/delete-item";
 import {ExpanseComponent} from "../expanse/expanse.component";
-import {LogoComponent} from "../../../../../components/menu/logo/logo.component";
-import {UserComponent} from "../../../../../components/menu/user/user.component";
 import {ItemResponse} from "../../../../../../services/models/item-response";
 import {BackpackResponse} from "../../../../../../services/models/backpack-response";
 import {ErrorService} from "../../../../../../services/error/error.service";
@@ -51,20 +44,12 @@ import {BudgetService} from "../../../../../../services/services/budget.service"
   imports: [
     NgIf,
     FormsModule,
-    MatCard,
-    MatCardActions,
-    MatCardHeader,
     MatDivider,
-    MatFormField,
     MatIcon,
     MatIconButton,
     MatInput,
-    MatLabel,
     MatToolbarRow,
     NgForOf,
-    CdkVirtualScrollViewport,
-    CdkFixedSizeVirtualScroll,
-    CdkVirtualForOf,
     MatCell,
     MatCellDef,
     MatColumnDef,
@@ -78,11 +63,7 @@ import {BudgetService} from "../../../../../../services/services/budget.service"
     MatRow,
     MatRowDef,
     MatHeaderCellDef,
-    MatCheckbox,
-    LogoComponent,
-    TripDetailsButtonsComponent,
-    UserComponent,
-    MatNoDataRow
+    MatCheckbox
   ],
   templateUrl: './backpack.component.html',
   styleUrl: './backpack.component.scss'
@@ -95,7 +76,7 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   budgetId: number;
   backpackResponse: BackpackResponse = {};
   items: ItemResponse[] = [];
-  itemRequest: ItemRequest = {itemId: -1, itemName: "", packed: false, qty: '1'};
+  itemRequest: ItemRequest = {itemName: "", packed: false, qty: '1'};
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
@@ -185,7 +166,6 @@ export class BackpackComponent implements OnInit, AfterViewInit {
           if (this.dataSource.filteredData.length > 0) {
             this.selectRowByIndex(0)
             this.toggleRow(this.dataSource.filteredData[0]);
-            console.log(this.items);
           }
           this.dataSource.sort = this.sort;
         },
@@ -209,10 +189,11 @@ export class BackpackComponent implements OnInit, AfterViewInit {
 
   addItem() {
     this.errorMsg = [];
+    this.saveItems();
     const params: AddItemToBackpack$Params = {backpackId: this.backpackId, body: this.itemRequest};
     this.backpackService.addItemToBackpack(params).subscribe({
       next: () => {
-        this.itemRequest = {itemId: -1, itemName: "", packed: false, qty: '1'}
+        this.itemRequest = {itemName: "", packed: false, qty: ""}
         this.receiveItems();
         this.selectRowByIndex(0);
       },
@@ -263,11 +244,11 @@ export class BackpackComponent implements OnInit, AfterViewInit {
         id: 'expanse-dialog',
         data: {
           expanse: item.expanse,
-          description: item.itemName,
           entityId: item.itemId,
           currency: this.tripCurrency,
           tripId: this.tripId,
           entityType: 'item',
+          expanseCategory: 'BACKPACK: ' + item.itemName
         }
       });
       dialogRef.afterClosed().subscribe(() => {

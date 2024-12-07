@@ -12,14 +12,11 @@ import {
   MatTable,
   MatTableDataSource
 } from "@angular/material/table";
-import {MatCheckbox} from "@angular/material/checkbox";
 import {MatDivider} from "@angular/material/divider";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
-import {MatInput} from "@angular/material/input";
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
 import {MatToolbarRow} from "@angular/material/toolbar";
-import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {LiveAnnouncer} from "@angular/cdk/a11y";
@@ -33,7 +30,6 @@ import {ExpanseByCurrency} from "../../../../../../../services/models/expanse-by
   imports: [
     MatCell,
     MatCellDef,
-    MatCheckbox,
     MatColumnDef,
     MatDivider,
     MatHeaderCell,
@@ -41,14 +37,12 @@ import {ExpanseByCurrency} from "../../../../../../../services/models/expanse-by
     MatHeaderRowDef,
     MatIcon,
     MatIconButton,
-    MatInput,
     MatRow,
     MatRowDef,
     MatSort,
     MatSortHeader,
     MatTable,
     MatToolbarRow,
-    MatTooltip,
     NgForOf,
     NgIf,
     ReactiveFormsModule,
@@ -68,8 +62,8 @@ export class BudgetCurrenciesComponent implements OnInit, AfterViewInit {
     'currency',
     'totalDebt',
     'totalPrice',
-    'totalPriceInTripCurrency',
     'totalPaid',
+    'totalPriceInTripCurrency',
     'totalPaidInTripCurrency',
   ];
 

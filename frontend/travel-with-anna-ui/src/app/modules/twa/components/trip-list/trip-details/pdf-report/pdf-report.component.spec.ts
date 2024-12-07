@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DayEditComponent } from './day-edit.component';
+import { PdfReportComponent } from './pdf-report.component';
 
-describe('DayEditComponent', () => {
-  let component: DayEditComponent;
-  let fixture: ComponentFixture<DayEditComponent>;
+describe('PdfReportComponent', () => {
+  let component: PdfReportComponent;
+  let fixture: ComponentFixture<PdfReportComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DayEditComponent]
+      imports: [PdfReportComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DayEditComponent);
+    fixture = TestBed.createComponent(PdfReportComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

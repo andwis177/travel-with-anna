@@ -1,14 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatCard, MatCardActions, MatCardHeader} from "@angular/material/card";
+import {MatCardActions} from "@angular/material/card";
 import {MatDivider} from "@angular/material/divider";
 import {MatFormField, MatFormFieldModule, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
-import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {MatToolbarRow} from "@angular/material/toolbar";
-import {MatTooltip} from "@angular/material/tooltip";
-import {DatePipe, JsonPipe, NgForOf, NgIf} from "@angular/common";
+import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {TripCreatorRequest} from "../../../../../services/models/trip-creator-request";
 import {Router} from "@angular/router";
 import {TripService} from "../../../../../services/services/trip.service";
@@ -18,8 +17,6 @@ import {CountryCurrency} from "../../../../../services/models/country-currency";
 import {CountryControllerService} from "../../../../../services/services/country-controller.service";
 import {ErrorService} from "../../../../../services/error/error.service";
 import {
-  MatDatepicker,
-  MatDatepickerInput,
   MatDatepickerModule,
   MatDatepickerToggle,
   MatDateRangeInput,
@@ -35,9 +32,7 @@ import {GenerateDays$Params} from "../../../../../services/fn/day/generate-days"
   standalone: true,
   imports: [
     FormsModule,
-    MatCard,
     MatCardActions,
-    MatCardHeader,
     MatDivider,
     MatFormField,
     MatIcon,
@@ -46,7 +41,6 @@ import {GenerateDays$Params} from "../../../../../services/fn/day/generate-days"
     MatLabel,
     MatSuffix,
     MatToolbarRow,
-    MatTooltip,
     NgForOf,
     NgIf,
     MatOption,
@@ -55,10 +49,6 @@ import {GenerateDays$Params} from "../../../../../services/fn/day/generate-days"
     ReactiveFormsModule,
     MatDatepickerToggle,
     MatDateRangePicker,
-    JsonPipe,
-    MatDatepickerInput,
-    MatDatepicker,
-    MatButton,
     MatFormFieldModule,
     MatDatepickerModule,
     MatSelectModule
@@ -94,7 +84,6 @@ export class TripNewComponent implements OnInit {
         body: this.tripCreatorRequest
       }).subscribe({
         next: (tripId) => {
-          console.log('Trip created');
           this.generateDays(tripId);
           this.onClose();
         },
@@ -120,16 +109,13 @@ export class TripNewComponent implements OnInit {
       this.errorMsg.push('Start Date and End Date are required.');
       return;
     }
-    console.log('Generating days', this.startDate, this.endDate);
     const formattedStartDate = this.formatDateToJson(this.startDate);
     const formattedEndDate = this.formatDateToJson(this.endDate);
-    console.log('Formatted dates', formattedStartDate, formattedEndDate);
     const params: GenerateDays$Params = {body:
         {startDate: formattedStartDate,  endDate: formattedEndDate, tripId: tripId}};
     this.dayService.generateDays(params)
       .subscribe({
         next: () => {
-          console.log('Days generated');
           this.router.navigate(['/twa/trip-details', tripId]).then();
         },
         error: (err) => {

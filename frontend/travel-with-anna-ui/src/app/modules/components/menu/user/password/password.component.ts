@@ -1,7 +1,6 @@
 import {Component, HostListener, signal} from '@angular/core';
 import {FormsModule} from "@angular/forms";
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatCard, MatCardActions, MatCardHeader} from "@angular/material/card";
+import {MatIconButton} from "@angular/material/button";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatToolbarRow} from "@angular/material/toolbar";
@@ -22,10 +21,6 @@ import {ErrorService} from "../../../../../services/error/error.service";
   standalone: true,
   imports: [
     FormsModule,
-    MatButton,
-    MatCard,
-    MatCardActions,
-    MatCardHeader,
     MatFormField,
     MatInput,
     MatLabel,
@@ -73,12 +68,10 @@ export class PasswordComponent {
 
   changePassword() {
     this.errorMsg = [];
-    console.log("Change Password Request:", this.changePasswordRequest);
     const params: ChangePassword$Params = {body: this.changePasswordRequest};
     this.userService.changePassword(params).
     subscribe({
       next: (respond) => {
-        console.log("Respond:", respond);
         this.userRespond = respond;
         this.dialog.getDialogById('password-dialog')?.close();
         this.openAccountDetails();

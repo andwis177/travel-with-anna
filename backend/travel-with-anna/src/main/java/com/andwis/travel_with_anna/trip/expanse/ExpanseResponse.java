@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public record ExpanseResponse(
         Long expanseId,
         String expanseName,
+        String expanseCategory,
         String currency,
         BigDecimal price,
         BigDecimal paid,

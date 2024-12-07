@@ -1,0 +1,13 @@
+<mat-toolbar-row class="dialog-header">
+  <div class="dialog-title">Print trip report</div>
+  <button mat-icon-button class="close-button"
+          (click)="onClose()"
+          (keydown.enter)="$event.preventDefault()">
+    <mat-icon class="close-icon">close</mat-icon>
+  </button>
+</mat-toolbar-row>
+
+<div *ngIf="pdfUrl">
+  <iframe [src]="pdfUrl" style="width: 100%; height: 90vh;" frameborder="0"></iframe>
+</div>
+<div *ngIf="!pdfUrl">Loading PDF...</div>

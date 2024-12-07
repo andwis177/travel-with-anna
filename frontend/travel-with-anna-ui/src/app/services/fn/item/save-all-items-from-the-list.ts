@@ -6,10 +6,10 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { ItemRequest } from '../../models/item-request';
+import { ItemResponse } from '../../models/item-response';
 
 export interface SaveAllItemsFromTheList$Params {
-      body: Array<ItemRequest>
+      body: Array<ItemResponse>
 }
 
 export function saveAllItemsFromTheList(http: HttpClient, rootUrl: string, params: SaveAllItemsFromTheList$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {

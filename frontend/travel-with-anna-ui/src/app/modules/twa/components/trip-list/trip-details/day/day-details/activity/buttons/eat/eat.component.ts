@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
-import {NgClass, NgIf} from "@angular/common";
+import {NgClass} from "@angular/common";
 
 @Component({
   selector: 'app-eat',
@@ -10,13 +10,13 @@ import {NgClass, NgIf} from "@angular/common";
     FormsModule,
     MatTooltip,
     ReactiveFormsModule,
-    NgIf,
     NgClass
   ],
   templateUrl: './eat.component.html',
   styleUrl: './eat.component.scss'
 })
-export class EatComponent {
+export class EatComponent implements OnInit, OnChanges {
+  buttonClasses: { [key: string]: string } = {};
   @Input()_type: string = '';
   @Output() provideBadge: EventEmitter<string> = new EventEmitter<string>();
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
@@ -35,10 +35,22 @@ export class EatComponent {
     this.afterEat.emit();
   }
 
-  getButtonType(type: string) : string {
-    if (this._type === type) {
-      return 'selected-button';
-    }
-    return '';
+  ngOnInit(): void {
+    this.updateButtonClasses();
+  }
+
+  ngOnChanges() {
+    this.updateButtonClasses();
+  }
+
+  updateButtonClasses() {
+    this.buttonClasses = {
+      breakfast: this._type === 'breakfast' ? 'selected-button' : '',
+      lunch: this._type === 'lunch' ? 'selected-button' : '',
+      dinner: this._type === 'dinner' ? 'selected-button' : '',
+      supper: this._type === 'supper' ? 'selected-button' : '',
+      snack: this._type === 'snack' ? 'selected-button' : '',
+      eat: this._type === 'eat' ? 'selected-button' : '',
+    };
   }
 }

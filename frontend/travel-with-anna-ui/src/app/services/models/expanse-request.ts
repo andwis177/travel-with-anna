@@ -5,6 +5,7 @@ export interface ExpanseRequest {
   entityId?: number;
   entityType?: string;
   exchangeRate: number;
+  expanseCategory?: string;
   expanseId?: number;
   expanseName?: string;
   paid: number;

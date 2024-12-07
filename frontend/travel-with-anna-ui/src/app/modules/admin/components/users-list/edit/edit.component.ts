@@ -7,7 +7,6 @@ import {GetUserAdminViewByIdentifier$Params} from "../../../../../services/fn/ad
 import {UpdateUser$Params} from "../../../../../services/fn/admin/update-user";
 import {MatIcon} from "@angular/material/icon";
 import {MatToolbarRow} from "@angular/material/toolbar";
-import {MatCard} from "@angular/material/card";
 import {MatIconButton} from "@angular/material/button";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
@@ -26,7 +25,6 @@ import {ErrorService} from "../../../../../services/error/error.service";
   imports: [
     MatIcon,
     MatToolbarRow,
-    MatCard,
     MatIconButton,
     MatCheckbox,
     MatFormField,

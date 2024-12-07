@@ -7,19 +7,16 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { ExpanseInTripCurrency } from '../../models/expanse-in-trip-currency';
+import { TripCurrencyValuesRequest } from '../../models/trip-currency-values-request';
 
 export interface GetTripCurrencyValues$Params {
-  price: number;
-  paid: number;
-  exchangeRate: number;
+      body: TripCurrencyValuesRequest
 }
 
 export function getTripCurrencyValues(http: HttpClient, rootUrl: string, params: GetTripCurrencyValues$Params, context?: HttpContext): Observable<StrictHttpResponse<ExpanseInTripCurrency>> {
-  const rb = new RequestBuilder(rootUrl, getTripCurrencyValues.PATH, 'get');
+  const rb = new RequestBuilder(rootUrl, getTripCurrencyValues.PATH, 'post');
   if (params) {
-    rb.query('price', params.price, {});
-    rb.query('paid', params.paid, {});
-    rb.query('exchangeRate', params.exchangeRate, {});
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(

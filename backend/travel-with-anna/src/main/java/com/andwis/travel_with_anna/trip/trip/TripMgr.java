@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDate;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -116,8 +118,8 @@ public class TripMgr {
         Long tripId = request.getDayGeneratorRequest().getTripId();
         Trip trip = tripService.getTripById(tripId);
         userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, "You are not authorized to edit this trip");
-        LocalDate startDate = request.getDayGeneratorRequest().getStartDate();
-        LocalDate endDate = request.getDayGeneratorRequest().getEndDate();
+        LocalDate startDate = toLocalDate(request.getDayGeneratorRequest().getStartDate());
+        LocalDate endDate = toLocalDate(request.getDayGeneratorRequest().getEndDate());
 
         trip.setTripName(request.getTripName());
 

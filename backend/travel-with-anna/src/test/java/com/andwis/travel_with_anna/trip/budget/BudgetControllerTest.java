@@ -97,14 +97,32 @@ class BudgetControllerTest {
         BudgetResponse budgetResponse = new BudgetResponse(
                 budgetId, "USD", BigDecimal.valueOf(1000), 1L);
         List<ExpanseResponse> expanses = List.of(
-                new ExpanseResponse(
-                        1L, "Food", "USD", BigDecimal.valueOf(100), BigDecimal.valueOf(50),
-                        BigDecimal.valueOf(1), BigDecimal.valueOf(100), BigDecimal.valueOf(50)
-                ),
-                new ExpanseResponse(
-                        2L, "Transport", "USD", BigDecimal.valueOf(200), BigDecimal.valueOf(100),
-                        BigDecimal.valueOf(1), BigDecimal.valueOf(200), BigDecimal.valueOf(100)
-                )
+                ExpanseResponse.builder()
+                        .expanseId(1L)
+                        .expanseName("Food")
+                        .expanseCategory("Eat")
+                        .date("2024-12-01")
+                        .currency("USD")
+                        .price(BigDecimal.valueOf(100))
+                        .paid(BigDecimal.valueOf(50))
+                        .exchangeRate(BigDecimal.valueOf(1))
+                        .priceInTripCurrency(BigDecimal.valueOf(100))
+                        .paidInTripCurrency(BigDecimal.valueOf(50))
+                        .build(),
+
+                ExpanseResponse
+                        .builder()
+                        .expanseId(2L)
+                        .expanseName("Transport")
+                        .expanseCategory("Travel")
+                        .date("2024-12-02")
+                        .currency("USD")
+                        .price(BigDecimal.valueOf(200))
+                        .paid(BigDecimal.valueOf(100))
+                        .exchangeRate(BigDecimal.valueOf(1))
+                        .priceInTripCurrency(BigDecimal.valueOf(200))
+                        .paidInTripCurrency(BigDecimal.valueOf(100))
+                        .build()
         );
 
         BudgetExpensesRespond budgetExpensesRespond = getBudgetExpensesRespond(budgetResponse, expanses);
@@ -165,7 +183,7 @@ class BudgetControllerTest {
                         totalPaidInTripCurrency(BigDecimal.valueOf(150)).
                         totalDebt(BigDecimal.valueOf(150)).
                         build()
-                );
+        );
 
 
         return new BudgetExpensesRespond(

@@ -13,7 +13,8 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class BackpackAuthorizationService {
-    private final static String BACKPACK_MSG_EXCEPTION = "You are not authorized to modify or view this backpack or items";
+    private final static String BACKPACK_MSG_EXCEPTION =
+            "You are not authorized to modify or view this backpack or items";
 
     private final BackpackRepository backpackRepository;
     private final UserAuthenticationService userService;

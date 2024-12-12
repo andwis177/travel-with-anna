@@ -343,6 +343,20 @@ class ActivityServiceTest {
         testTrip.addDay(newDay);
         dayRepository.save(newDay);
 
+        Expanse expanse = Expanse.builder()
+                .expanseName("Expanse")
+                .date(LocalDate.of(2023, 10, 10))
+                .price(BigDecimal.valueOf(200))
+                .paid(BigDecimal.valueOf(100))
+                .currency("PLN")
+                .exchangeRate(BigDecimal.valueOf(2.0))
+                .build();
+
+        testTrip.addExpanse(expanse);
+        activity.addExpanse(expanse);
+        activity.addAddress(address);
+        activityRepository.save(activity);
+
         ActivityUpdateRequest request = ActivityUpdateRequest.builder()
                 .activityId(activityId)
                 .oldDate("2023-10-10")
@@ -357,10 +371,12 @@ class ActivityServiceTest {
         // Then
         Activity updatedActivity = activityService.getById(activityId);
         assertEquals("Activity date updated", result.message());
-        assertEquals(LocalDate.of(2023, 12, 12),
-                updatedActivity.getDay().getDate());
+        assertEquals(LocalDate.of(2023, 12, 12), updatedActivity.getDay().getDate());
+        assertEquals("10:10", updatedActivity.getBeginTime());
+        assertEquals("12:10", updatedActivity.getEndTime());
     }
 
+    @Transactional
     @Test
     void testUpdateActivity_UpdateAssociated() {
         // Given
@@ -370,7 +386,62 @@ class ActivityServiceTest {
                 .build();
         testTrip.addDay(newDay);
         dayRepository.save(newDay);
+
+        Expanse expanse = Expanse.builder()
+                .expanseName("Expanse")
+                .date(LocalDate.of(2023, 10, 10))
+                .price(BigDecimal.valueOf(200))
+                .paid(BigDecimal.valueOf(100))
+                .currency("PLN")
+                .exchangeRate(BigDecimal.valueOf(2.0))
+                .build();
+
+        testTrip.addExpanse(expanse);
+        activity.addExpanse(expanse);
+        activity.addAddress(address);
+        associatedActivity.addAddress(address);
         activity.setAssociatedId(associatedActivityId);
+        activityRepository.save(activity);
+
+        ActivityUpdateRequest request = ActivityUpdateRequest.builder()
+                .activityId(activityId)
+                .oldDate("2023-10-10")
+                .newDate("2023-10-10")
+                .startTime("10:10")
+                .type("New Type")
+                .addressRequest(addressRequest)
+                .isDayTag(true)
+                .build();
+
+        String expanseDescription = "BADGE: New Type\nPlace\n[City]";
+
+        // When
+        MessageResponse result = activityService.updateActivity(request, userDetails);
+
+        // Then
+        Activity updatedActivity = activityService.getById(activityId);
+        assertEquals("Associated activity updated", result.message());
+        assertEquals("New Type", updatedActivity.getType());
+        assertEquals(expanseDescription, updatedActivity.getExpanse().getExpanseCategory());
+        assertEquals("10:10", updatedActivity.getBeginTime());
+    }
+
+    @Transactional
+    @Test
+    void testUpdateActivity_ExpanseCategoryDescription() {
+        // Given
+        Expanse expanse = Expanse.builder()
+                .expanseName("Expanse")
+                .expanseCategory("Old Category")
+                .date(LocalDate.of(2023, 10, 10))
+                .price(BigDecimal.valueOf(200))
+                .paid(BigDecimal.valueOf(100))
+                .currency("PLN")
+                .exchangeRate(BigDecimal.valueOf(2.0))
+                .build();
+        testTrip.addExpanse(expanse);
+        activity.addExpanse(expanse);
+        activity.addAddress(address);
         activityRepository.save(activity);
 
         ActivityUpdateRequest request = ActivityUpdateRequest.builder()
@@ -380,16 +451,21 @@ class ActivityServiceTest {
                 .startTime("10:10")
                 .endTime("12:10")
                 .type("New Type")
+                .addressRequest(addressRequest)
+                .isDayTag(true)
                 .build();
+
+        String expanseDescription = "BADGE: New Type\nPlace\n[City]";
 
         // When
         MessageResponse result = activityService.updateActivity(request, userDetails);
 
         // Then
+        assertEquals("Activity updated", result.message());
         Activity updatedActivity = activityService.getById(activityId);
-        assertEquals("Associated activity updated", result.message());
-        assertEquals("New Type", updatedActivity.getType());
+        assertEquals(expanseDescription, updatedActivity.getExpanse().getExpanseCategory());
     }
+
 
     @Test
     void testGetActivitiesByDayId() {

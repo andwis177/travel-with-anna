@@ -18,7 +18,6 @@ import {NgOptimizedImage} from "@angular/common";
 export class LogoComponent {
   role: string | null = '';
 
-
   constructor(
     private router: Router,
   ) {
@@ -28,5 +27,4 @@ export class LogoComponent {
     event.preventDefault();
     this.router.navigate(['twa/']).then();
   }
-
 }

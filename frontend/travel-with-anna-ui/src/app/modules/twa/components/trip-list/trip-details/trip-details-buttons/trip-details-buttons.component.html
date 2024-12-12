@@ -22,34 +22,32 @@
   <div class="add-delete-container">
     <div class="add-delete-line">
 
-        <button class="add-delete-button add-day-buttons" (click)="addDay(true, $event)" matTooltip="Add FIRST Day">
-          <mat-icon class="add-delete-buttons add-color">keyboard_double_arrow_left</mat-icon>
-        </button>
+      <button class="add-delete-button add-day-buttons" (click)="addDay(true, $event)" matTooltip="Add FIRST Day">
+        <mat-icon class="add-delete-buttons add-color">keyboard_double_arrow_left</mat-icon>
+      </button>
 
-        <a class="add-delete-description">
-          <img src="../../../../../assets/images/add.png" class="add-delete-description-icon"  alt="">
-        </a>
+      <a class="add-delete-description">
+        <img src="../../../../../assets/images/add.png" class="add-delete-description-icon"  alt="">
+      </a>
 
       <button class="add-delete-button add-day-buttons" (click)="addDay(false, $event)" matTooltip="Add LAST Day">
         <mat-icon class="add-delete-buttons add-color">keyboard_double_arrow_right</mat-icon>
       </button>
-
-      </div>
+    </div>
 
     <div class="add-delete-line">
       <button class="add-delete-button delete-day-buttons" (click)="deleteDay(true, $event)" matTooltip="Delete FIRST Day">
         <mat-icon class="add-delete-buttons delete-color">keyboard_double_arrow_left</mat-icon>
       </button>
 
-        <a class="add-delete-description">
-          <img src="../../../../../assets/images/delete.png" class="add-delete-description-icon" style="opacity:0.7" alt="">
-        </a>
+      <a class="add-delete-description">
+        <img src="../../../../../assets/images/delete.png" class="add-delete-description-icon" style="opacity:0.7" alt="">
+      </a>
 
-        <button class="add-delete-button delete-day-buttons " (click)="deleteDay(false, $event)" matTooltip="Delete LAST Day">
-          <mat-icon class="add-delete-buttons delete-color">keyboard_double_arrow_right</mat-icon>
-        </button>
-      </div>
+      <button class="add-delete-button delete-day-buttons " (click)="deleteDay(false, $event)" matTooltip="Delete LAST Day">
+        <mat-icon class="add-delete-buttons delete-color">keyboard_double_arrow_right</mat-icon>
+      </button>
     </div>
-
+  </div>
 </form>
 

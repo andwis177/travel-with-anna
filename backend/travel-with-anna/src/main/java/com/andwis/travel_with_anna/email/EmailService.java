@@ -65,8 +65,8 @@ public class EmailService {
             String subject
     ) throws MessagingException {
         try {
-        String templateName =
-                EmailTemplateName.ACTIVATE_ACCOUNT.getTemplateName();
+            String templateName =
+                    EmailTemplateName.ACTIVATE_ACCOUNT.getTemplateName();
             mimeMessageCreator(to, userName, confirmationUrl, activationCode, subject, templateName);
 
         } catch (MessagingException exp) {

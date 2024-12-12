@@ -10,5 +10,5 @@ export interface ActivityRequest {
   endTime?: string;
   status?: string;
   tripId: number;
-  type?: string;
+  type: string;
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "Trip")
 public class TripController {
-
     private final TripFacade facade;
 
     @PostMapping

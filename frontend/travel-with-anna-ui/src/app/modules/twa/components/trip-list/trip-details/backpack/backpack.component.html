@@ -18,7 +18,6 @@
         <td mat-cell *matCellDef="let element" class="packed-column">
           <mat-checkbox [(ngModel)]="element.isPacked"></mat-checkbox>
         </td>
-
       </ng-container>
 
       <ng-container matColumnDef="itemName">
@@ -81,10 +80,9 @@
       </button>
     </div>
   </div>
-
-  <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-    <mat-divider></mat-divider>
-    <p *ngFor="let msg of errorMsg">{{msg}}</p>
-  </div>
+</div>
+<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+  <mat-divider class="padding-bottom"></mat-divider>
+  <p *ngFor="let msg of errorMsg">{{msg}}</p>
 </div>
 

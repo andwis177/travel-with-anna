@@ -8,7 +8,6 @@ import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripService;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -221,9 +221,15 @@ public class ExpanseService {
         expanseRepository.saveAll(expanses);
     }
 
+    @Transactional
     public void updateExpanseCategory(Expanse expanse, String categoryDescription, UserDetails connectedUser) {
-        expanseAuthorizationService.verifyExpanseOwner(expanse, connectedUser);
         expanse.setExpanseCategory(categoryDescription);
+        save(expanse);
+    }
+
+    @Transactional
+    public void updateExpanseDate(Expanse expanse, LocalDate date, UserDetails connectedUser) {
+        expanse.setDate(date);
         save(expanse);
     }
 }

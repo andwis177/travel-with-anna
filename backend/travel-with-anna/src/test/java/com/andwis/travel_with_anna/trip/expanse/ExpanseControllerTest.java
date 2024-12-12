@@ -73,16 +73,18 @@ class ExpanseControllerTest {
                 .paidInTripCurrency(BigDecimal.valueOf(96.00))
                 .build();
 
-        ExpanseResponse response = new ExpanseResponse(
-                1L,
-                "Hotel Booking",
-                "USD",
-                BigDecimal.valueOf(100.00),
-                BigDecimal.valueOf(80.00),
-                BigDecimal.valueOf(1.2),
-                BigDecimal.valueOf(120.00),
-                BigDecimal.valueOf(96.00)
-        );
+        ExpanseResponse response = ExpanseResponse.builder()
+                .expanseId(1L)
+                .expanseName("Hotel Booking")
+                .expanseCategory("Hotel")
+                .date("2022-01-01")
+                .currency("USD")
+                .price(BigDecimal.valueOf(100.00))
+                .paid(BigDecimal.valueOf(80.00))
+                .exchangeRate(BigDecimal.valueOf(1.2))
+                .priceInTripCurrency(BigDecimal.valueOf(120.00))
+                .paidInTripCurrency(BigDecimal.valueOf(96.00))
+                .build();
 
         String requestBody = objectMapper.writeValueAsString(request);
         String jsonResponse = objectMapper.writeValueAsString(response);
@@ -102,16 +104,19 @@ class ExpanseControllerTest {
     void testGetExpanseById_ShouldReturnExpanseResponse() throws Exception {
         // Given
         Long expanseId = 1L;
-        ExpanseResponse response = new ExpanseResponse(
-                1L,
-                "Hotel Booking",
-                "USD",
-                BigDecimal.valueOf(100.00),
-                BigDecimal.valueOf(80.00),
-                BigDecimal.valueOf(1.2),
-                BigDecimal.valueOf(120.00),
-                BigDecimal.valueOf(96.00)
-        );
+        ExpanseResponse response = ExpanseResponse.builder()
+                .expanseId(1L)
+                .expanseName("Hotel Booking")
+                .expanseCategory("Hotel")
+                .date("2022-01-01")
+                .currency("USD")
+                .price(BigDecimal.valueOf(100.00))
+                .paid(BigDecimal.valueOf(80.00))
+                .exchangeRate(BigDecimal.valueOf(1.2))
+                .priceInTripCurrency(BigDecimal.valueOf(120.00))
+                .paidInTripCurrency(BigDecimal.valueOf(96.00))
+                .build();
+
         when(expanseFacade.getExpanseById(eq(expanseId), any())).thenReturn(response);
 
         // When & Then
@@ -128,16 +133,19 @@ class ExpanseControllerTest {
         // Given
         Long entityId = 1L;
         String entityType = "ITEM";
-        ExpanseResponse response = new ExpanseResponse(
-                1L,
-                "Hotel Booking",
-                "USD",
-                BigDecimal.valueOf(100.00),
-                BigDecimal.valueOf(80.00),
-                BigDecimal.valueOf(1.2),
-                BigDecimal.valueOf(120.00),
-                BigDecimal.valueOf(96.00)
-        );
+        ExpanseResponse response = ExpanseResponse.builder()
+                .expanseId(1L)
+                .expanseName("Hotel Booking")
+                .expanseCategory("Hotel")
+                .date("2022-01-01")
+                .currency("USD")
+                .price(BigDecimal.valueOf(100.00))
+                .paid(BigDecimal.valueOf(80.00))
+                .exchangeRate(BigDecimal.valueOf(1.2))
+                .priceInTripCurrency(BigDecimal.valueOf(120.00))
+                .paidInTripCurrency(BigDecimal.valueOf(96.00))
+                .build();
+
         when(expanseFacade.getExpanseByEntityId(eq(entityId), eq(entityType), any())).thenReturn(response);
 
         // When & Then

@@ -102,7 +102,6 @@ export class DeleteComponent implements OnInit {
       }
     })
   }
-
   cancel() {
     this.dialogRef.close();
   }

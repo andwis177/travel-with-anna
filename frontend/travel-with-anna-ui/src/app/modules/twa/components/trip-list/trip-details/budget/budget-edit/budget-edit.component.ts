@@ -69,14 +69,14 @@ export class BudgetEditComponent {
         this.sharedService.setTripCurrency(this.budget.currency!);
         this.onClose();
       },
-      error: (error) => this.errorMsg = this.errorService.errorHandler(error)
+      error: (error) => this.errorMsg = this.errorService.errorHandlerWithJson(error)
     });
   }
 
   getCurrency() {
     this.countryControllerService.findAllCountryCurrencies().subscribe({
       next: (currency) => this.currency = currency,
-      error: (error) => this.errorMsg = this.errorService.errorHandler(error)
+      error: (error) => this.errorMsg = this.errorService.errorHandlerWithJson(error)
     });
   }
 }

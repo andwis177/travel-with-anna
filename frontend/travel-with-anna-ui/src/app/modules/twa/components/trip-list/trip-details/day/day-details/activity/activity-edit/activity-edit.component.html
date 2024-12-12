@@ -1,6 +1,5 @@
 <mat-toolbar-row class="dialog-header">
   <div class="full-width activity-edit-toolbar">
-
     <div class="dialog-title">{{ activity.badge?.toUpperCase() }}
       <div class="dialog-title"> | {{ day.date }}</div>
     </div>
@@ -249,6 +248,6 @@
 </mat-card-content>
 
 <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-  <mat-divider></mat-divider>
+  <mat-divider class="padding-bottom"></mat-divider>
   <p *ngFor="let msg of errorMsg">{{ msg }}</p>
 </div>

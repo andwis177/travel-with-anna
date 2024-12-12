@@ -22,7 +22,6 @@ export class EventComponent implements OnInit, OnChanges  {
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
   @Output() afterEvent: EventEmitter<string> = new EventEmitter<string>();
 
-
   provideBadgeToParent(badge:string) {
     this.provideBadge.emit(badge);
   }

@@ -44,16 +44,16 @@
             </div>
           </mat-card-actions>
         </form>
-
-        <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-          <mat-divider></mat-divider>
-          <p *ngFor="let msg of errorMsg">{{msg}}</p>
-        </div>
       </div>
     </div>
   </form>
 </div>
 
+
+<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+  <mat-divider class="padding-bottom"></mat-divider>
+  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+</div>
 
 
 

@@ -119,16 +119,18 @@ class ItemControllerTest {
     }
 
     private static @NotNull ItemResponse getItemResponse() {
-        ExpanseResponse expanseResponse = new ExpanseResponse(
-                1L,
-                "Camping Fee",
-                "USD",
-                new BigDecimal("20.00"),
-                new BigDecimal("0.00"),
-                new BigDecimal("1.00"),
-                new BigDecimal("20.00"),
-                new BigDecimal("0.00")
-        );
+        ExpanseResponse expanseResponse = ExpanseResponse.builder()
+                .expanseId(1L)
+                .expanseName("Camping Fee")
+                .expanseCategory("Accommodation")
+                .date("2022-01-01")
+                .currency("USD")
+                .price(new BigDecimal("20.00"))
+                .paid(new BigDecimal("0.00"))
+                .exchangeRate(new BigDecimal("1.00"))
+                .priceInTripCurrency(new BigDecimal("20.00"))
+                .paidInTripCurrency(new BigDecimal("0.00"))
+                .build();
 
         return new ItemResponse(
                 1L,

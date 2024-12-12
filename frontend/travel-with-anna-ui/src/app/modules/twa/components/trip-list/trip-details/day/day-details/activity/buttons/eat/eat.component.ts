@@ -22,7 +22,6 @@ export class EatComponent implements OnInit, OnChanges {
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
   @Output() afterEat: EventEmitter<string> = new EventEmitter<string>();
 
-
   provideBadgeToParent(badge:string) {
     this.provideBadge.emit(badge);
   }

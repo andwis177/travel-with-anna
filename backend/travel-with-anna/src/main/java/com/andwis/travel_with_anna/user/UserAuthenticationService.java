@@ -35,7 +35,7 @@ public class UserAuthenticationService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    public void verifyPassword(@NotNull User user, String password) throws WrongPasswordException {
+    public void verifyPassword(@NotNull User user, String password)  {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getEmail(), password));

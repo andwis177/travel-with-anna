@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class DayService {
@@ -121,11 +123,11 @@ public class DayService {
 
     @Transactional
     public void generateDays(@NotNull DayGeneratorRequest request, UserDetails connectedUser) {
-        validateDates(request.getStartDate(), request.getEndDate());
+        validateDates(toLocalDate(request.getStartDate()), toLocalDate(request.getEndDate()));
         Trip trip = tripService.getTripById(request.getTripId());
         dayAuthorizationService.verifyTripOwner(trip, connectedUser);
 
-        List<Day> days = createDays(request.getStartDate(), request.getEndDate());
+        List<Day> days = createDays(toLocalDate(request.getStartDate()), toLocalDate(request.getEndDate()));
         trip.addDays(days);
         tripService.saveTrip(trip);
     }

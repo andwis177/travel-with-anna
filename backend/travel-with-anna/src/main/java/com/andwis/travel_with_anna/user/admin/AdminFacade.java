@@ -33,8 +33,7 @@ public class AdminFacade {
         adminService.updateUser(request, authentication);
     }
 
-    public UserResponse deleteUser(UserAdminDeleteRequest request, UserDetails authentication)
-            throws WrongPasswordException {
+    public UserResponse deleteUser(UserAdminDeleteRequest request, UserDetails authentication) {
         return adminService.deleteUser(request, authentication);
     }
 

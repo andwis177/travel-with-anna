@@ -10,7 +10,6 @@ import java.util.List;
 
 public class TripMapper {
 
-
     public static @NotNull TripResponse toTripResponse(@NotNull Trip trip) {
         LocalDate startDate = null;
         LocalDate endDate = null;

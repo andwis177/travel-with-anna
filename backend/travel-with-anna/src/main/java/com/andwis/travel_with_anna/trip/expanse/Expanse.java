@@ -12,6 +12,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Getter
@@ -33,6 +34,9 @@ public class Expanse implements OwnableByUser {
 
     @Column(name = "expanse_category")
     private String expanseCategory;
+
+    @Column(name = "date")
+    private LocalDate date;
 
     @NotNull
     @Size(max = 10)

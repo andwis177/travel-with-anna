@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "User")
 public class UserController {
-
     private final UserFacade facade;
 
     @GetMapping("/credentials")

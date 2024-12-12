@@ -112,18 +112,19 @@ public class ActivityService {
     @Transactional
     public MessageResponse updateActivity(@NotNull ActivityUpdateRequest request, UserDetails connectedUser) {
         Activity activity = getById(request.getActivityId());
+        activityAuthorizationService.verifyActivityOwner(activity, connectedUser);
         ActivityMapper.updateActivity(activity, request);
         updateActivityExpanseCategoryDescription(activity, connectedUser);
         String message;
         if (!toLocalDate(request.getOldDate()).equals(toLocalDate(request.getNewDate()))) {
             updateActivityDate(activity, request.getNewDate(), connectedUser);
+            updateActivityExpanseDate(activity, toLocalDate(request.getNewDate()), connectedUser);
             message = "Activity date updated";
         } else
         if (activity.getAssociatedId() != null) {
             updateAssociatedActivity(activity, connectedUser);
             message = "Associated activity updated";
         } else {
-            activityAuthorizationService.verifyActivityOwner(activity, connectedUser);
             activityRepository.save(activity);
             message = "Activity updated";
         }
@@ -147,8 +148,8 @@ public class ActivityService {
             Activity associatedActivity = getById(activity.getAssociatedId());
             activityAuthorizationService.verifyActivityOwner(associatedActivity, connectedUser);
             associatedActivity.setType(activity.getType());
+            updateActivityExpanseCategoryDescription(activity, connectedUser);
             activityRepository.saveAll(List.of(activity, associatedActivity));
-            updateActivityExpanseCategoryDescription(associatedActivity, connectedUser);
         } catch (ActivityNotFoundException _) {
             activityRepository.save(activity);
             log.error("Associated activity not found");
@@ -172,8 +173,8 @@ public class ActivityService {
         return new ActivityDetailedResponse(
                 addressDetail,
                 activityResponses,
-                getTotalAmount(activityResponses, ExpanseResponse::priceInTripCurrency),
-                getTotalAmount(activityResponses, ExpanseResponse::paidInTripCurrency)
+                getTotalAmount(activityResponses, ExpanseResponse::getPriceInTripCurrency),
+                getTotalAmount(activityResponses, ExpanseResponse::getPaidInTripCurrency)
         );
     }
 
@@ -303,7 +304,7 @@ public class ActivityService {
         }
     }
 
-    private StringBuilder createExpanseCategoryDescription(@NotNull Activity activity) {
+    private @NotNull StringBuilder createExpanseCategoryDescription(@NotNull Activity activity) {
         StringBuilder description = new StringBuilder();
         description
                 .append(activity.getBadge().toUpperCase())
@@ -322,5 +323,12 @@ public class ActivityService {
         }
         StringBuilder description = createExpanseCategoryDescription(activity);
         expanseService.updateExpanseCategory(activity.getExpanse(), description.toString(), connectedUser);
+    }
+
+    private void updateActivityExpanseDate(@NotNull Activity activity, LocalDate date, UserDetails connectedUser) {
+        if(activity.getExpanse() == null) {
+            return;
+        }
+        expanseService.updateExpanseDate(activity.getExpanse(), date, connectedUser );
     }
 }

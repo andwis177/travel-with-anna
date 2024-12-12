@@ -89,30 +89,33 @@ export class ExpanseComponent implements OnInit {
                 entityId: number,
                 expanseId: number,
                 entityType: string,
-                expanse: ExpanseResponse
-                expanseCategory: string
+                expanse: ExpanseResponse,
+                expanseCategory: string,
+                date: string
               }) {
-    if (data.expanse) {
-      this.expanseResponse = data.expanse;
-      this.expanseRequest.currency = data.expanse.currency!;
-      this.expanseRequest.exchangeRate = data.expanse.exchangeRate!;
-      this.expanseRequest.expanseId = data.expanse.expanseId!;
-      this.expanseRequest.expanseName = data.expanse.expanseName!;
-      this.expanseRequest.paid = data.expanse.paid!;
-      this.expanseRequest.paidInTripCurrency = data.expanse.paidInTripCurrency!;
-      this.expanseRequest.price = data.expanse.price!;
-      this.expanseRequest.priceInTripCurrency = data.expanse.priceInTripCurrency!;
-      this.expanseRequest.expanseId = data.expanse.expanseId! as number;
-    } else {
-      this.expanseRequest.currency = data.currency;
-    }
-    this.expanseRequest.entityId = data.entityId;
-    this.expanseRequest.tripId = data.tripId;
-    this.expanseRequest.entityType = data.entityType;
-    this.expanseRequest.expanseCategory = data.expanseCategory;
   }
 
   ngOnInit(): void {
+    if (this.data.expanse) {
+      this.expanseResponse = this.data.expanse;
+      this.expanseRequest.currency = this.data.expanse.currency!;
+      this.expanseRequest.exchangeRate = this.data.expanse.exchangeRate!;
+      this.expanseRequest.expanseId = this.data.expanse.expanseId!;
+      this.expanseRequest.expanseName = this.data.expanse.expanseName!;
+      this.expanseRequest.paid = this.data.expanse.paid!;
+      this.expanseRequest.paidInTripCurrency = this.data.expanse.paidInTripCurrency!;
+      this.expanseRequest.price = this.data.expanse.price!;
+      this.expanseRequest.priceInTripCurrency = this.data.expanse.priceInTripCurrency!;
+      this.expanseRequest.expanseId = this.data.expanse.expanseId! as number;
+    } else {
+      this.expanseRequest.currency = this.data.currency;
+    }
+    this.expanseRequest.entityId = this.data.entityId;
+    this.expanseRequest.tripId = this.data.tripId;
+    this.expanseRequest.entityType = this.data.entityType;
+    this.expanseRequest.expanseCategory = this.data.expanseCategory;
+    this.expanseRequest.date = this.data.date
+
     this.getCurrency()
     this.getTripCurrency();
     this.calculateLeftToPay()

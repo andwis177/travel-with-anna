@@ -37,18 +37,13 @@
       </div>
     </mat-card-actions>
 
-    <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-      <mat-divider></mat-divider>
-      <p *ngFor="let msg of errorMsg">{{msg}}</p>
-    </div>
-
     <div class="end-align" *ngIf="isEdit">
       <mat-divider></mat-divider>
       <button class="delete-button"
               (click)="deleteAccount()"
               type="submit"
               matTooltip="Delete Account">
-        <img src="../../../../../assets/images/delete.png" class="delete-button-image" style="opacity: 0.8" alt="">
+        <img src="../../../../../assets/images/delete-button.png" class="delete-button-image" style="opacity: 0.8" alt="">
       </button>
     </div>
   </form>
@@ -105,3 +100,7 @@
   </div>
 </ng-template>
 
+<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+  <mat-divider class="padding-bottom"></mat-divider>
+  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+</div>

@@ -81,5 +81,4 @@ public class BeansConfig {
     public CustomLogoutSuccessHandler customLogoutSuccessHandler() {
         return new CustomLogoutSuccessHandler();
     }
-
 }

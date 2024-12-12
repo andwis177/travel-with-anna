@@ -320,7 +320,8 @@ class AuthenticationServiceTest {
 
         // Then
         verify(userService, times(1)).saveUser(user);
-        verify(emailService, times(1)).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+        verify(emailService, times(1))
+                .sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
     }
 
     @Test
@@ -344,14 +345,16 @@ class AuthenticationServiceTest {
 
         // Then
         verify(userService, times(1)).saveUser(user);
-        verify(emailService, times(1)).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+        verify(emailService, times(1))
+                .sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
     }
 
     @Test
     void testResetPasswordWithEmail_Failed() throws MessagingException {
         // Given
         ResetPasswordRequest request = new ResetPasswordRequest("email@example.com");
-        when(userService.getUserByEmail(request.getCredential())).thenThrow(new EmailNotFoundException("User with this email not found"));
+        when(userService.getUserByEmail(request.getCredential()))
+                .thenThrow(new EmailNotFoundException("User with this email not found"));
 
         //When & Then
         assertThrows(EmailNotFoundException.class, () -> authenticationService.resetPassword(request));
@@ -362,7 +365,8 @@ class AuthenticationServiceTest {
     void testResetPasswordWithUserName_Failed() throws MessagingException {
         // Given
         ResetPasswordRequest request = new ResetPasswordRequest("username");
-        when(userService.getUserByUserName(request.getCredential())).thenThrow(new UsernameNotFoundException("User with this user name not found"));
+        when(userService.getUserByUserName(request.getCredential()))
+                .thenThrow(new UsernameNotFoundException("User with this user name not found"));
 
         //When & Then
         assertThrows(UsernameNotFoundException.class, () -> authenticationService.resetPassword(request));

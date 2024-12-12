@@ -10,17 +10,17 @@ import java.util.List;
 public class ExpanseTotalCalculator {
     public static @NotNull ExpanseInTripCurrency calculateInTripCurrency(@NotNull List<ExpanseResponse> expenses) {
     BigDecimal totalPriceInTripCurrency = expenses.stream()
-            .map(ExpanseResponse::priceInTripCurrency)
+            .map(ExpanseResponse::getPriceInTripCurrency)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     BigDecimal totalPaidInTripCurrency = expenses.stream()
-            .map(ExpanseResponse::paidInTripCurrency)
+            .map(ExpanseResponse::getPaidInTripCurrency)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     return new ExpanseInTripCurrency(totalPriceInTripCurrency, totalPaidInTripCurrency);
     }
 
     public static BigDecimal calculateTotalDepth(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
-                .map(expanse -> expanse.priceInTripCurrency().subtract(expanse.paidInTripCurrency()))
+                .map(expanse -> expanse.getPriceInTripCurrency().subtract(expanse.getPaidInTripCurrency()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

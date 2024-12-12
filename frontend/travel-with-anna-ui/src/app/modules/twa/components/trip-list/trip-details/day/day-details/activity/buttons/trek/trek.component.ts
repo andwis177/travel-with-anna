@@ -22,7 +22,6 @@ export class TrekComponent implements OnInit, OnChanges{
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
   @Output() afterTrek: EventEmitter<string> = new EventEmitter<string>();
 
-
   provideBadgeToParent(badge: string) {
     this.provideBadge.emit(badge);
   }

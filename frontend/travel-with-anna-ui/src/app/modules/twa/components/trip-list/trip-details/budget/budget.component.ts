@@ -77,6 +77,7 @@ export class BudgetComponent implements OnInit, AfterViewInit {
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
+    'date',
     'expanseCategory',
     'expanseName',
     'currency',

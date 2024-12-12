@@ -38,8 +38,6 @@ export class ActivateAccountComponent {
   message: string = '';
   isOkay: boolean = true;
   submitted: boolean = false;
-  jsonObject: any;
-
 
   constructor(
     private router: Router,
@@ -86,7 +84,7 @@ export class ActivateAccountComponent {
           this.isOkay = true;
         },
         error: (err) => {
-         this.errorMsg = this.errorService.errorHandlerWithJson(err);
+          this.errorMsg = this.errorService.errorHandlerWithJson(err);
           this.submitted = true;
           this.isOkay = false;
         }

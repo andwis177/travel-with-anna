@@ -24,12 +24,12 @@ import {EditComponent} from "./edit/edit.component";
 import {ImageComponent} from "./image/image.component";
 import {DeleteComponent} from "./delete/delete.component";
 import {FormsModule} from "@angular/forms";
-import {UserListButtonsComponent} from "./user-list-buttons/user-list-buttons.component";
 import {LogoComponent} from "../../../components/menu/logo/logo.component";
 import {UserComponent} from "../../../components/menu/user/user.component";
 import {PageResponseUserAdminResponse} from "../../../../services/models/page-response-user-admin-response";
 import {UserAdminResponse} from "../../../../services/models/user-admin-response";
 import {ErrorService} from "../../../../services/error/error.service";
+import {UserListButtonsComponent} from "./user-list-buttons/user-list-buttons.component";
 
 @Component({
   selector: 'app-users-list',
@@ -51,9 +51,9 @@ import {ErrorService} from "../../../../services/error/error.service";
     UserComponent,
     MatHeaderCellDef,
     FormsModule,
-    UserListButtonsComponent,
     UserComponent,
-    LogoComponent
+    LogoComponent,
+    UserListButtonsComponent
   ],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.scss'

@@ -76,6 +76,10 @@ th.mat-sort-header-sorted {
   color: black;
 }
 
+.date-column {
+  max-width: 6vw !important;
+}
+
 .expanse-column {
   max-width: 17vw !important;
 }
@@ -217,6 +221,11 @@ th.mat-sort-header-sorted {
 
 .table-content-font {
   font-size: 14px !important;
+  font-weight: 400;
+}
+
+.date-font {
+  font-size: 10px !important;
   font-weight: 400;
 }
 

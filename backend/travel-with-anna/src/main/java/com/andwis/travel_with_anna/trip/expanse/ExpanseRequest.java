@@ -17,6 +17,7 @@ public class ExpanseRequest {
        @Size(max = 60, message = "Expanse name should be 60 characters or less")
        private String expanseName;
        private String expanseCategory;
+       private String date;
        @NotNull(message = "Currency field is required")
        @NotEmpty(message = "Currency is required")
        @NotBlank(message = "Currency is required")

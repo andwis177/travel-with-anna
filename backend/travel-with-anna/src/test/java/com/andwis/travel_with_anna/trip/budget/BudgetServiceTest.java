@@ -162,9 +162,20 @@ class BudgetServiceTest {
         Long budgetId = 1L;
         when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget));
         List<ExpanseResponse> expanses = new ArrayList<>();
-        ExpanseResponse expanse1 =  new ExpanseResponse(1L,"First Expanse", "USD",
-                new BigDecimal("100.00"), new BigDecimal("50.00"), new BigDecimal("2.00"),
-                new BigDecimal("200.00"), new BigDecimal("100.00"));
+        ExpanseResponse expanse1 =  ExpanseResponse
+                .builder()
+                .expanseId(1L)
+                .expanseName("First Expanse")
+                .expanseCategory("Category")
+                .date("2022-01-01")
+                .currency("USD")
+                .price(new BigDecimal("100.00"))
+                .paid(new BigDecimal("50.00"))
+                .exchangeRate(new BigDecimal("2.00"))
+                .priceInTripCurrency(new BigDecimal("200.00"))
+                .paidInTripCurrency(new BigDecimal("100.00"))
+                .build();
+
         expanses.add(expanse1);
         when(expanseService.getExpansesForTrip(tripId, userDetails)).thenReturn(expanses);
 
@@ -182,9 +193,19 @@ class BudgetServiceTest {
     void testCalculateSumsByCurrency() {
         // Given
         List<ExpanseResponse> expanses = new ArrayList<>();
-        ExpanseResponse expanse1 =  new ExpanseResponse(1L,"First Expanse", "USD",
-                new BigDecimal("100.00"), new BigDecimal("50.00"), new BigDecimal("2.00"),
-                new BigDecimal("200.00"), new BigDecimal("100.00"));
+        ExpanseResponse expanse1 =  ExpanseResponse
+                .builder()
+                .expanseId(1L)
+                .expanseName("First Expanse")
+                .expanseCategory("Category")
+                .date("2022-01-01")
+                .currency("USD")
+                .price(new BigDecimal("100.00"))
+                .paid(new BigDecimal("50.00"))
+                .exchangeRate(new BigDecimal("2.00"))
+                .priceInTripCurrency(new BigDecimal("200.00"))
+                .paidInTripCurrency(new BigDecimal("100.00"))
+                .build();
         expanses.add(expanse1);
 
         // When

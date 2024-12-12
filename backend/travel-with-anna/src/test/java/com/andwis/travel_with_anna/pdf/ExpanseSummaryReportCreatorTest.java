@@ -74,10 +74,9 @@ class ExpanseSummaryReportCreatorTest {
         assertNotNull(paragraph);
         assertNotNull(table);
         assertTrue(extractedTexts.contains("CURRENCY"));
-        assertTrue(extractedTexts.contains("PRICE/PAID"));
-        assertTrue(extractedTexts.contains("PRICE"));
-        assertTrue(extractedTexts.contains("PAID"));
-        assertTrue(extractedTexts.contains(tripCurrency));
+        assertTrue(extractedTexts.contains("PRICE\nPAID"));
+        assertTrue(extractedTexts.contains("PRICE\n(USD)"));
+        assertTrue(extractedTexts.contains("PAID\n(USD)"));
     }
 
     @Test

@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 @Builder
 public class DayGeneratorRequest {
     private Long tripId;
-    @NotNull(message = "Start Date is required")
-    private LocalDate startDate;
-    @NotNull(message = "End Date is required")
-    private LocalDate endDate;
+    @NotNull(message = "Start date is required")
+    private String startDate;
+    @NotNull(message = "End date is required")
+    private String endDate;
 }

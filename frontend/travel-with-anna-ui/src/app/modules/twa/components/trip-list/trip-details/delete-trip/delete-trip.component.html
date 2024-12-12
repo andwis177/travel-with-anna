@@ -1,6 +1,6 @@
 <mat-card class="second-container" appearance="outlined">
   <mat-card-header class="header-shadow">
-    <h3>DELETE TRIP</h3>
+    <h5>DELETE TRIP</h5>
   </mat-card-header>
 
   <div class="label-padding">
@@ -41,10 +41,9 @@
       </div>
     </form>
   </mat-card-content>
-
-  <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-    <mat-divider class="padding-bottom"></mat-divider>
-    <p *ngFor="let msg of errorMsg">{{msg}}</p>
-    <mat-divider class="padding-bottom"></mat-divider>
-  </div>
 </mat-card>
+
+<mat-divider class="padding-bottom"></mat-divider>
+<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+</div>

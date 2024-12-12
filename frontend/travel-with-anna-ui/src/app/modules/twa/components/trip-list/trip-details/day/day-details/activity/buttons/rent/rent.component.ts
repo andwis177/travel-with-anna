@@ -24,7 +24,6 @@ export class RentComponent implements OnInit, OnChanges {
   @Output() provideSecondStatus: EventEmitter<string> = new EventEmitter<string>();
   @Output() afterRent: EventEmitter<string> = new EventEmitter<string>();
 
-
   provideBadgeToParent(badge:string) {
     this.provideBadge.emit(badge);
   }

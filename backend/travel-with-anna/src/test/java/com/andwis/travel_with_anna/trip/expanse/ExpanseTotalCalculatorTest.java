@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ExpanseTotalCalculatorTest {
     @Test
@@ -24,12 +25,31 @@ class ExpanseTotalCalculatorTest {
     void calculateInTripCurrency_shouldSumPricesAndPaymentsCorrectly() {
         // Given
         List<ExpanseResponse> expenses = List.of(
-                new ExpanseResponse(1L, "Hotel", "USD", new BigDecimal("200.00"),
-                        new BigDecimal("150.00"), new BigDecimal("1.0"), new BigDecimal("200.00"),
-                        new BigDecimal("150.00")),
-                new ExpanseResponse(2L, "Flight", "USD", new BigDecimal("300.00"),
-                        new BigDecimal("250.00"), new BigDecimal("1.0"), new BigDecimal("300.00"),
-                        new BigDecimal("250.00"))
+                ExpanseResponse.builder()
+                        .expanseId(1L)
+                        .expanseName("Hotel")
+                        .expanseCategory("Category")
+                        .currency("USD")
+                        .date("2021-01-01")
+                        .price(new BigDecimal("200.00"))
+                        .paid(new BigDecimal("150.00"))
+                        .exchangeRate(new BigDecimal("1.0"))
+                        .priceInTripCurrency(new BigDecimal("200.00"))
+                        .paidInTripCurrency(new BigDecimal("150.00"))
+                        .build(),
+
+                ExpanseResponse.builder()
+                        .expanseId(2L)
+                        .expanseName("Flight")
+                        .expanseCategory("Category")
+                        .currency("USD")
+                        .date("2021-01-01")
+                        .price(new BigDecimal("300.00"))
+                        .paid(new BigDecimal("250.00"))
+                        .exchangeRate(new BigDecimal("1.0"))
+                        .priceInTripCurrency(new BigDecimal("300.00"))
+                        .paidInTripCurrency(new BigDecimal("250.00"))
+                        .build()
         );
         // When
         ExpanseInTripCurrency result = ExpanseTotalCalculator.calculateInTripCurrency(expenses);
@@ -55,12 +75,31 @@ class ExpanseTotalCalculatorTest {
     void calculateTotalDepth_shouldCalculateDebtCorrectly() {
         // Given
         List<ExpanseResponse> expenses = List.of(
-                new ExpanseResponse(1L, "Hotel", "USD", new BigDecimal("200.00"),
-                        new BigDecimal("150.00"), new BigDecimal("1.0"), new BigDecimal("200.00"),
-                        new BigDecimal("150.00")),
-                new ExpanseResponse(2L, "Flight", "USD", new BigDecimal("300.00"),
-                        new BigDecimal("250.00"), new BigDecimal("1.0"), new BigDecimal("300.00"),
-                        new BigDecimal("250.00"))
+                ExpanseResponse.builder()
+                        .expanseId(1L)
+                        .expanseName("Hotel")
+                        .expanseCategory("Category")
+                        .currency("USD")
+                        .date("2021-01-01")
+                        .price(new BigDecimal("200.00"))
+                        .paid(new BigDecimal("150.00"))
+                        .exchangeRate(new BigDecimal("1.0"))
+                        .priceInTripCurrency(new BigDecimal("200.00"))
+                        .paidInTripCurrency(new BigDecimal("150.00"))
+                        .build(),
+
+                ExpanseResponse.builder()
+                        .expanseId(2L)
+                        .expanseName("Flight")
+                        .expanseCategory("Category")
+                        .currency("USD")
+                        .date("2021-01-01")
+                        .price(new BigDecimal("300.00"))
+                        .paid(new BigDecimal("250.00"))
+                        .exchangeRate(new BigDecimal("1.0"))
+                        .priceInTripCurrency(new BigDecimal("300.00"))
+                        .paidInTripCurrency(new BigDecimal("250.00"))
+                        .build()
         );
 
         // When
@@ -74,12 +113,31 @@ class ExpanseTotalCalculatorTest {
     void calculateTotalDepth_shouldHandleNegativeValues() {
         // Given
         List<ExpanseResponse> expenses = List.of(
-                new ExpanseResponse(1L, "Hotel", "USD", new BigDecimal("200.00"),
-                        new BigDecimal("220.00"), new BigDecimal("1.0"), new BigDecimal("200.00"),
-                        new BigDecimal("220.00")),
-                new ExpanseResponse(2L, "Flight", "USD", new BigDecimal("300.00"),
-                        new BigDecimal("280.00"), new BigDecimal("1.0"), new BigDecimal("300.00"),
-                        new BigDecimal("280.00"))
+                ExpanseResponse.builder()
+                        .expanseId(1L)
+                        .expanseName("Hotel")
+                        .expanseCategory("Category")
+                        .currency("USD")
+                        .date("2021-01-01")
+                        .price(new BigDecimal("200.00"))
+                        .paid(new BigDecimal("220.00"))
+                        .exchangeRate(new BigDecimal("1.0"))
+                        .priceInTripCurrency(new BigDecimal("200.00"))
+                        .paidInTripCurrency(new BigDecimal("220.00"))
+                        .build(),
+
+                ExpanseResponse.builder()
+                        .expanseId(2L)
+                        .expanseName("Flight")
+                        .expanseCategory("Category")
+                        .currency("USD")
+                        .date("2021-01-01")
+                        .price(new BigDecimal("300.00"))
+                        .paid(new BigDecimal("280.00"))
+                        .exchangeRate(new BigDecimal("1.0"))
+                        .priceInTripCurrency(new BigDecimal("300.00"))
+                        .paidInTripCurrency(new BigDecimal("280.00"))
+                        .build()
         );
 
         // When

@@ -99,8 +99,7 @@ public class AdminService {
 
     @Transactional
     public UserResponse deleteUser(
-            @NotNull UserAdminDeleteRequest request, UserDetails authentication)
-            throws WrongPasswordException {
+            @NotNull UserAdminDeleteRequest request, UserDetails authentication) {
         User adminUser = userAuthenticationService.getConnectedUser(authentication);
         userAuthenticationService.verifyPassword(adminUser, request.password());
         User userToBeDeleted = userService.getUserById(request.userId());

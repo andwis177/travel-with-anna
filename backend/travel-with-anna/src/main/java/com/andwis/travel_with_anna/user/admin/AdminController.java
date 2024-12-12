@@ -57,8 +57,7 @@ public class AdminController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<UserResponse> deleteUser(
             @RequestBody @Valid UserAdminDeleteRequest request,
-            @AuthenticationPrincipal UserDetails connectedUser)
-            throws WrongPasswordException {
+            @AuthenticationPrincipal UserDetails connectedUser) {
         UserResponse respond = facade.deleteUser(request, connectedUser);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respond);
     }

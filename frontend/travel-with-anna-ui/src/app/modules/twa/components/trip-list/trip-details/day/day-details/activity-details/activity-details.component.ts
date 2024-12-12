@@ -114,7 +114,8 @@ export class ActivityDetailsComponent implements OnInit {
           tripId: this.tripId,
           currency: this._activity.address?.currency,
           entityType: 'activity',
-          expanseCategory: this._activity.badge?.toUpperCase()! + ": " + this._activity.type +
+          date: this._date,
+          expanseCategory: this._activity.badge?.toUpperCase()! + ": " + this._activity.type
            + "\n" + this._activity.address!.place + "\n[" +
             this._activity.address!.city!.toUpperCase() + "]"
         }

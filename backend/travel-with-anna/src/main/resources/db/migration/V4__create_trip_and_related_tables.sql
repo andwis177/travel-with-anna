@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS expanses (
                                         expanse_id BIGSERIAL PRIMARY KEY,
                                         expanse_name VARCHAR(60),
                                         expanse_category VARCHAR(255),
+                                        date DATE,
                                         currency VARCHAR(10) NOT NULL ,
                                         price DECIMAL(19, 2) NOT NULL,
                                         paid DECIMAL(19, 2) NOT NULL,

@@ -50,7 +50,7 @@ export class ImageComponent implements OnInit{
               this.userAvatar = avatar;
             },
             error: (err) => {
-              console.log(err.error.errors);
+              console.error(err.error.errors);
             }
           })
         } else {

@@ -50,6 +50,7 @@ public class BudgetService {
     public BudgetExpensesRespond getBudgetExpanses(Long tripId, Long budgetId, UserDetails connectedUser) {
         BudgetResponse budgetResponse = getBudgetById(budgetId, connectedUser);
         List<ExpanseResponse> expanses = expanseService.getExpansesForTrip(tripId, connectedUser);
+        Collections.sort(expanses);
         BigDecimal overallPriceInTripCurrency = overallPriceInTripCurrency(expanses);
         BigDecimal overallPaidInTripCurrency = overallPaidInTripCurrency(expanses);
         BigDecimal totalDebt = ExpanseTotalCalculator.calculateTotalDepth(expanses);
@@ -70,15 +71,15 @@ public class BudgetService {
     public Map<String, ExpanseCalculator> calculateSumsByCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
                 .collect(Collectors.groupingBy(
-                        ExpanseResponse::currency,
+                        ExpanseResponse::getCurrency,
                         Collectors.reducing(new ExpanseCalculator(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO),
                                 expanse -> new ExpanseCalculator(
-                                        expanse.price() != null ? expanse.price() : BigDecimal.ZERO,
-                                        expanse.paid() != null ? expanse.paid() : BigDecimal.ZERO,
-                                        expanse.priceInTripCurrency() != null ? expanse.priceInTripCurrency() : BigDecimal.ZERO,
-                                        expanse.paidInTripCurrency() != null ? expanse.paidInTripCurrency() : BigDecimal.ZERO,
-                                        expanse.price() != null && expanse.paid() != null
-                                                ? expanse.price().subtract(expanse.paid()) : BigDecimal.ZERO),
+                                        expanse.getPrice() != null ? expanse.getPrice() : BigDecimal.ZERO,
+                                        expanse.getPaid() != null ? expanse.getPaid() : BigDecimal.ZERO,
+                                        expanse.getPriceInTripCurrency() != null ? expanse.getPriceInTripCurrency() : BigDecimal.ZERO,
+                                        expanse.getPaidInTripCurrency() != null ? expanse.getPaidInTripCurrency() : BigDecimal.ZERO,
+                                        expanse.getPrice() != null && expanse.getPaid() != null
+                                                ? expanse.getPrice().subtract(expanse.getPaid()) : BigDecimal.ZERO),
                                 ExpanseCalculator::add
                         )
                 ));
@@ -130,13 +131,13 @@ public class BudgetService {
 
     private BigDecimal overallPriceInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
-                .map(ExpanseResponse::priceInTripCurrency)
+                .map(ExpanseResponse::getPriceInTripCurrency)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal overallPaidInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
-                .map(ExpanseResponse::paidInTripCurrency)
+                .map(ExpanseResponse::getPaidInTripCurrency)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

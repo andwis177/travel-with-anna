@@ -5,7 +5,7 @@ import {FormsModule, ReactiveFormsModule,} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatAnchor, MatButton, MatIconButton} from "@angular/material/button";
+import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../../services/services/authentication.service";
@@ -23,7 +23,7 @@ import {ErrorService} from "../../services/error/error.service";
   selector: 'app-login',
   standalone: true,
   imports: [
-    MatCardModule, FormsModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, NgIf, NgForOf, MatButton, MatIcon, MatIconButton, MatAnchor, MatDivider
+    MatCardModule, FormsModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, NgIf, NgForOf, MatIcon, MatIconButton, MatDivider
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',

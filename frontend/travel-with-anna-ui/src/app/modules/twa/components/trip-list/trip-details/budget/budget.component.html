@@ -23,39 +23,40 @@
     <div class="full-width budget label-color-light">
       <div>
         <label class="label">Budget: </label>
-        <label class="amount-label label-color-blue ">{{budgetExpanse.budgetResponse?.toSpend}} </label>
+        <label class="amount-label label-color-blue ">
+          {{formatAmount(budgetExpanse.budgetResponse?.toSpend!)}} </label>
         <label class="currency-label">{{budgetExpanse.budgetResponse?.currency}}</label>
       </div>
 
       <div class="left">
         <label class="label label-color-light">PRICE/PAID </label>
-        <label [ngClass]="getColorAmount(budgetExpanse.paidBalanceDue!)" class="amount-label">{{budgetExpanse.totalDebtInTripCurrency}} </label>
+        <label [ngClass]="getColorAmount(budgetExpanse.paidBalanceDue!)"
+               class="amount-label">{{formatAmount(budgetExpanse.totalDebtInTripCurrency!)}} </label>
         <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
       </div>
     </div>
 
     <div class="full-width price-paid">
-
       <div>
         <label class="label label-color-light">Price : </label>
-        <label class="amount-label label-color-blue ">{{budgetExpanse.overallPriceInTripCurrency}} </label>
-        <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
+        <label class="amount-label label-color-blue ">{{formatAmount(budgetExpanse.overallPriceInTripCurrency!)}} </label>
+        <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency!}}</label>
         <label class="label-color-light"> ( </label>
-        <label [ngClass]="getColorAmount(budgetExpanse.priceBalanceDue!)" class="amount-label">{{budgetExpanse.priceBalanceDue}} </label>
+        <label [ngClass]="getColorAmount(budgetExpanse.priceBalanceDue!)" class="amount-label">{{formatAmount(budgetExpanse.priceBalanceDue!)}} </label>
         <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
         <label class="label-color-light"> )</label>
       </div>
 
       <div>
         <label class="label label-color-light">Paid: </label>
-        <label class="amount-label label-color-blue ">{{budgetExpanse.overallPaidInTripCurrency}}</label>
+        <label class="amount-label label-color-blue ">{{formatAmount(budgetExpanse.overallPaidInTripCurrency!)}}</label>
         <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
         <label class="label-color-light label-color-light"> ( </label>
-        <label [ngClass]="getColorAmount(budgetExpanse.paidBalanceDue!)" class="amount-label">{{budgetExpanse.paidBalanceDue}} </label>
+        <label [ngClass]="getColorAmount(budgetExpanse.paidBalanceDue!)"
+               class="amount-label">{{formatAmount(budgetExpanse.paidBalanceDue!)}} </label>
         <label class="currency-label label-color-light">{{budgetExpanse.budgetResponse?.currency}}</label>
         <label class="label-color-light label-color-light"> )</label>
       </div>
-
     </div>
   </div>
 </div>
@@ -63,6 +64,15 @@
 <div class="second-container">
   <div class="table-container mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)">
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="date-column">
+          Date
+        </th>
+        <td mat-cell *matCellDef="let element" class="date-column date-font">
+          <div [innerHTML]="formatExpanseCategory(element.date)"></div>
+        </td>
+      </ng-container>
 
       <ng-container matColumnDef="expanseCategory">
         <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="expanse-column">
@@ -74,7 +84,8 @@
       </ng-container>
 
       <ng-container matColumnDef="expanseName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="description-column" sortActionDescription="Sort by expanseName" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="description-column"
+            sortActionDescription="Sort by expanseName" >
           Description
         </th>
         <td mat-cell *matCellDef="let element" class="description-column table-content-font">
@@ -83,7 +94,8 @@
       </ng-container>
 
       <ng-container matColumnDef="currency">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="currency-column" sortActionDescription="Sort by currency">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="currency-column"
+            sortActionDescription="Sort by currency">
           Currency
         </th>
         <td mat-cell *matCellDef="let element" class="currency-column table-content-font">
@@ -92,7 +104,8 @@
       </ng-container>
 
       <ng-container matColumnDef="price">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-currency-column" sortActionDescription="Sort by price">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-currency-column"
+            sortActionDescription="Sort by price">
           Price
         </th>
         <td mat-cell *matCellDef="let element" class="amount-currency-column table-content-font">
@@ -102,7 +115,8 @@
       </ng-container>
 
       <ng-container matColumnDef="paid">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-currency-column" sortActionDescription="Sort by paid">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="amount-currency-column"
+            sortActionDescription="Sort by paid">
           Paid
         </th>
         <td mat-cell *matCellDef="let element" class="amount-currency-column table-content-font">
@@ -112,7 +126,8 @@
       </ng-container>
 
       <ng-container matColumnDef="exchangeRate">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="exchange-column" sortActionDescription="Sort by exchangeRate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="exchange-column"
+            sortActionDescription="Sort by exchangeRate">
           <div class="header-column">
             <div>Exchange</div>
             <div >Rate</div>
@@ -124,7 +139,8 @@
       </ng-container>
 
       <ng-container matColumnDef="priceInTripCurrency">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="trip-currency-column" sortActionDescription="Sort by priceInTripCurrency">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="trip-currency-column"
+            sortActionDescription="Sort by priceInTripCurrency">
           <div class="header-column">
             <div>Price</div>
             <div class="currency-font">({{budgetExpanse.budgetResponse!.currency}})</div>
@@ -137,7 +153,8 @@
       </ng-container>
 
       <ng-container matColumnDef="paidInTripCurrency">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="trip-currency-column" sortActionDescription="Sort by paidInTripCurrency">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="trip-currency-column"
+            sortActionDescription="Sort by paidInTripCurrency">
           <div class="header-column">
             <div>Paid</div>
             <div class="currency-font">({{budgetExpanse.budgetResponse!.currency}})</div>
@@ -166,7 +183,6 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="toggleRow(row)" [class.selected]="selection.isSelected(row)"></tr>
     </table>
   </div>
-
 </div>
 
 

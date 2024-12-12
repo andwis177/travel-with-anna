@@ -1,5 +1,5 @@
 <mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">Expanses by Badge</div>
+  <div class="dialog-title">Expanses by Category</div>
   <button mat-icon-button class="close-button"
           (click)="onClose()"
           (keydown.enter)="$event.preventDefault()">
@@ -30,13 +30,5 @@
         </div>
       </div>
     </div>
-
-    <div>
-      <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-        <mat-divider></mat-divider>
-        <p *ngFor="let msg of errorMsg">{{msg}}</p>
-      </div>
-    </div>
-
   </div>
 </div>

@@ -50,7 +50,6 @@ export class EditComponent implements OnInit{
   passwordRequest: string = '';
   userAdminUpdateRequest: UserAdminUpdateRequest = {};
 
-
   constructor(private adminService: AdminService,
               public dialogRef: MatDialogRef<EditComponent>,
               private shareService: SharedService,

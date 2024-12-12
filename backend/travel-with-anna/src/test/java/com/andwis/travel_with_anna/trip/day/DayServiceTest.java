@@ -308,7 +308,6 @@ class DayServiceTest {
         assertEquals(LocalDate.of(2024, 1, 1), days.getFirst().getDate());
     }
 
-
     @Test
     @Transactional
     void testChangeTripDates() {

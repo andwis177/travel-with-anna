@@ -1,4 +1,4 @@
-import {Component, HostListener, signal, ViewEncapsulation} from '@angular/core';
+import {ChangeDetectorRef, Component, HostListener, signal, ViewEncapsulation} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {MatDivider} from "@angular/material/divider";
@@ -48,7 +48,8 @@ export class DeleteAccountComponent {
               private _snackBar: MatSnackBar,
               private router: Router,
               private dialog: MatDialog,
-              private errorService: ErrorService)
+              private errorService: ErrorService,
+              private changeDetector: ChangeDetectorRef)
   {
   }
 
@@ -83,6 +84,7 @@ export class DeleteAccountComponent {
       },
       error: (err) => {
         this.errorMsg = this.errorService.errorHandler(err);
+        this.changeDetector.markForCheck();
       }
     })
   }

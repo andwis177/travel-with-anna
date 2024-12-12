@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatCardActions} from "@angular/material/card";
 import {
@@ -65,6 +65,7 @@ export class EditTripComponent {
               private errorService: ErrorService,
               private sharedService: SharedService,
               private datePipe: DatePipe,
+              private changeDetector: ChangeDetectorRef,
               @Inject(MAT_DIALOG_DATA) public data: {
                 tripId: number,
                 tripName: string,
@@ -87,7 +88,8 @@ export class EditTripComponent {
         this.onClose();
       },
       error: (err) => {
-        this.errorMsg = this.errorService.errorHandler(err);
+        this.errorMsg = this.errorService.errorHandlerWithJson(err);
+        this.changeDetector.markForCheck();
       }
     });
   }

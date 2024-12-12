@@ -35,18 +35,29 @@
 }
 
 .delete-button {
+  width: 20px;
+  height: 20px;
   background: transparent !important;
   color: #D46A6A !important;
-  font-size: 18px !important;
-  width: auto;
-  height: auto;
   border: none;
   display: flex;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .edit-avatar-button:hover,
 .delete-button:hover {
   opacity: 0.4;
+}
+
+.delete-button-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .pagination-container {
@@ -84,3 +95,4 @@
   justify-content: start;
   width: auto;
 }
+

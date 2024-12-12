@@ -76,7 +76,7 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   budgetId: number;
   backpackResponse: BackpackResponse = {};
   items: ItemResponse[] = [];
-  itemRequest: ItemRequest = {itemName: "", packed: false, qty: '1'};
+  itemRequest: ItemRequest = {itemName: "", packed: false, qty: ""};
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
@@ -230,7 +230,6 @@ export class BackpackComponent implements OnInit, AfterViewInit {
       }
     });
   }
-
 
   async openExpanse(item: ItemResponse, index: number) {
     try {

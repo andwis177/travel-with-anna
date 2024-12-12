@@ -47,7 +47,7 @@ class ExpanseServiceTest {
     private ExpanseRepository expanseRepository;
     @Mock
     private CurrencyRepository currencyRepository;
-    @Mock
+        @Mock
     private CurrencyExchangeClient currencyExchangeService;
     @Mock
     private TripService tripService;
@@ -246,7 +246,7 @@ class ExpanseServiceTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(expanse.getExpanseId(), response.expanseId());
+        assertEquals(expanse.getExpanseId(), response.getExpanseId());
         verify(expanseRepository, times(1)).findById(1L);
     }
 
@@ -273,7 +273,7 @@ class ExpanseServiceTest {
         // Then
         assertNotNull(responseList);
         assertEquals(1, responseList.size());
-        assertEquals(expanse.getExpanseId(), responseList.getFirst().expanseId());
+        assertEquals(expanse.getExpanseId(), responseList.getFirst().getExpanseId());
         verify(expanseRepository, times(1)).findByTripId(3L);
     }
 
@@ -289,7 +289,7 @@ class ExpanseServiceTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(expanse.getExpanseId(), response.expanseId());
+        assertEquals(expanse.getExpanseId(), response.getExpanseId());
     }
 
     @Test

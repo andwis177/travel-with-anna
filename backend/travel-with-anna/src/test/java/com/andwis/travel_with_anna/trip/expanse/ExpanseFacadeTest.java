@@ -74,9 +74,18 @@ class ExpanseFacadeTest {
                 .build();
         Item mockItem = new Item();
 
-        ExpanseResponse response = new ExpanseResponse(
-                1L, "Test Expanse", "USD", BigDecimal.valueOf(100),
-                BigDecimal.valueOf(50), BigDecimal.valueOf(1.2), BigDecimal.valueOf(120), BigDecimal.valueOf(60));
+        ExpanseResponse response = ExpanseResponse.builder()
+                .expanseId(1L)
+                .expanseName("Test Expanse")
+                .expanseCategory("Category")
+                .date("2021-08-01")
+                .currency("USD")
+                .price(BigDecimal.valueOf(100))
+                .paid(BigDecimal.valueOf(50))
+                .exchangeRate(BigDecimal.valueOf(1.2))
+                .priceInTripCurrency(BigDecimal.valueOf(120))
+                .paidInTripCurrency(BigDecimal.valueOf(60))
+                .build();
 
         when(itemService.findById(request.getEntityId())).thenReturn(mockItem);
         when(expanseService.createOrUpdateExpanse(any(), any(), any(), any(), any()))
@@ -87,7 +96,7 @@ class ExpanseFacadeTest {
 
         // Then
         assertNotNull(updateResponse);
-        assertEquals("Test Expanse", updateResponse.expanseName());
+        assertEquals("Test Expanse", updateResponse.getExpanseName());
         verify(expanseService, times(1)).createOrUpdateExpanse(any(), any(), any(), any(), any());
     }
 
@@ -102,10 +111,18 @@ class ExpanseFacadeTest {
                 .exchangeRate(BigDecimal.valueOf(1.3))
                 .build();
 
-        ExpanseResponse response = new ExpanseResponse(
-                1L, "Test Activity Expanse", "USD", BigDecimal.valueOf(100),
-                BigDecimal.valueOf(50), BigDecimal.valueOf(1.2), BigDecimal.valueOf(120), BigDecimal.valueOf(60));
-
+        ExpanseResponse response = ExpanseResponse.builder()
+                .expanseId(1L)
+                .expanseName("Test Activity Expanse")
+                .expanseCategory("Category")
+                .date("2021-08-01")
+                .currency("USD")
+                .price(BigDecimal.valueOf(150))
+                .paid(BigDecimal.valueOf(70))
+                .exchangeRate(BigDecimal.valueOf(1.3))
+                .priceInTripCurrency(BigDecimal.valueOf(195))
+                .paidInTripCurrency(BigDecimal.valueOf(91))
+                .build();
 
         Activity mockActivity = new Activity();
         when(activityService.getById(request.getEntityId())).thenReturn(mockActivity);
@@ -117,7 +134,7 @@ class ExpanseFacadeTest {
 
         // Then
         assertNotNull(updateResponse);
-        assertEquals("Test Activity Expanse", updateResponse.expanseName());
+        assertEquals("Test Activity Expanse", updateResponse.getExpanseName());
         verify(expanseService, times(1)).createOrUpdateExpanse(any(), any(), any(), any(), any());
     }
 
@@ -128,9 +145,18 @@ class ExpanseFacadeTest {
         String entityType = "item";
         Item mockItem = new Item();
 
-        ExpanseResponse expanseResponse = new ExpanseResponse(
-                1L, "Item Expanse", "USD", BigDecimal.valueOf(100),
-                BigDecimal.valueOf(50), BigDecimal.valueOf(1.2), BigDecimal.valueOf(120), BigDecimal.valueOf(60));
+        ExpanseResponse expanseResponse = ExpanseResponse.builder()
+                .expanseId(1L)
+                .expanseName("Item Expanse")
+                .expanseCategory("Category")
+                .date("2021-08-01")
+                .currency("USD")
+                .price(BigDecimal.valueOf(100))
+                .paid(BigDecimal.valueOf(50))
+                .exchangeRate(BigDecimal.valueOf(1.2))
+                .priceInTripCurrency(BigDecimal.valueOf(120))
+                .paidInTripCurrency(BigDecimal.valueOf(60))
+                .build();
 
         when(itemService.findById(entityId)).thenReturn(mockItem);
         when(expanseService.getExpanseByEntityId(anyLong(), any(), any(), any()))
@@ -141,7 +167,7 @@ class ExpanseFacadeTest {
 
         // Then
         assertNotNull(response);
-        assertEquals("Item Expanse", response.expanseName());
+        assertEquals("Item Expanse", response.getExpanseName());
         verify(expanseService, times(1)).getExpanseByEntityId(anyLong(), any(), any(), any());
     }
 
@@ -152,9 +178,18 @@ class ExpanseFacadeTest {
         String entityType = "activity";
         Activity mockActivity = new Activity();
 
-        ExpanseResponse expanseResponse = new ExpanseResponse(2L, "Activity Expanse", "USD",
-                BigDecimal.valueOf(200), BigDecimal.valueOf(80), BigDecimal.valueOf(1.5),
-                BigDecimal.valueOf(300), BigDecimal.valueOf(120));
+        ExpanseResponse expanseResponse = ExpanseResponse.builder()
+                .expanseId(2L)
+                .expanseName("Activity Expanse")
+                .expanseCategory("Category")
+                .date("2021-08-01")
+                .currency("USD")
+                .price(BigDecimal.valueOf(200))
+                .paid(BigDecimal.valueOf(80))
+                .exchangeRate(BigDecimal.valueOf(1.5))
+                .priceInTripCurrency(BigDecimal.valueOf(300))
+                .paidInTripCurrency(BigDecimal.valueOf(120))
+                .build();
 
         when(activityService.getById(entityId)).thenReturn(mockActivity);
         when(expanseService.getExpanseByEntityId(anyLong(), any(), any(), any()))
@@ -165,7 +200,7 @@ class ExpanseFacadeTest {
 
         // Then
         assertNotNull(response);
-        assertEquals("Activity Expanse", response.expanseName());
+        assertEquals("Activity Expanse", response.getExpanseName());
         verify(expanseService, times(1)).getExpanseByEntityId(anyLong(), any(), any(), any());
     }
 

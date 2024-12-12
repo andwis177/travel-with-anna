@@ -94,6 +94,7 @@ public class PdfReportService {
             userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, USER_UNAUTHORIZED);
             Budget budget = trip.getBudget();
             List<ExpanseResponse> expanses = expanseService.getExpansesForTrip(tripId, connectedUser);
+            Collections.sort(expanses);
             ExpanseInTripCurrency expanseInTripCurrency = ExpanseTotalCalculator.calculateInTripCurrency(expanses);
 
             PdfWriter writer = new PdfWriter(tripPdfReport);

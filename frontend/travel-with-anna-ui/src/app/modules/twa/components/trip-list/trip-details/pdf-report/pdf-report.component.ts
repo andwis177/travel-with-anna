@@ -38,7 +38,7 @@ export class PdfReportComponent implements OnInit, OnDestroy {
   ngOnInit() {
     switch (this.reportName) {
       case  'Trip' : {this.loadTripPdf(this.tripId); break;}
-        case 'Expanses' : {this.loadExpansesPdf(this.tripId); break;}
+      case 'Expanses' : {this.loadExpansesPdf(this.tripId); break;}
     }
   }
 

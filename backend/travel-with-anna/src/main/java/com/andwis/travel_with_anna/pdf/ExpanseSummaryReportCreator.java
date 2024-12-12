@@ -52,8 +52,7 @@ public class ExpanseSummaryReportCreator {
 
         Text currency = new Text(tripCurrency)
                 .setFont(pdfFontFactory.reportBoldFont())
-                .setFontSize(6)
-                ;
+                .setFontSize(6);
 
         Paragraph priceHeader = new Paragraph()
                 .add(priceText)

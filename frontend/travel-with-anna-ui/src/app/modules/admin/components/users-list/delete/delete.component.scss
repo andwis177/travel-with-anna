@@ -1,5 +1,7 @@
 .second-container {
   width: 100% !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }
 
 .warning-icon {
@@ -26,5 +28,6 @@
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
   display: none;
 }
+
 
 

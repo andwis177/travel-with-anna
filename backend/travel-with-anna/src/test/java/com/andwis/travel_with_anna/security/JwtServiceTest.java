@@ -123,7 +123,6 @@ class JwtServiceTest {
         assertNotNull(claimResolver);
         assertFalse(claimResolver.isEmpty());
         assertEquals("email@example.com", claimResolver);
-
     }
 
     @Test

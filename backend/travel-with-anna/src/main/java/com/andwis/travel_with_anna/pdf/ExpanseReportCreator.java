@@ -89,7 +89,8 @@ public class ExpanseReportCreator {
                 .setMultipliedLeading(1.0f);
     }
 
-    private Paragraph createBudgetParagraphWithNote(String title, String budget, String calculatedAmount, String currency) throws IOException {
+    private Paragraph createBudgetParagraphWithNote(
+            String title, String budget, String calculatedAmount, String currency) throws IOException {
         Text titleText = new Text(title)
                 .setFont(pdfFontFactory.reportRegularFont())
                 .setFontSize(8);
@@ -165,10 +166,12 @@ public class ExpanseReportCreator {
                 .setMultipliedLeading(1.0f)
                 .setPadding(1);
 
-        Table table = new Table(new float[]{100, 70, 70, 70, 70, 70, 70});
+        Table table = new Table(new float[]{50, 100, 70, 60, 60, 60, 60, 60});
         table.setWidth(UnitValue.createPointValue(520));
 
         table
+                .addCell(new Cell().add(createHeaderParagraph("DATE"))
+                        .setBorder(NO_BORDER))
                 .addCell(new Cell().add(createHeaderParagraph("EXPANSE"))
                         .setBorder(NO_BORDER))
                 .addCell(new Cell().add(createHeaderParagraph("DESCRIPTION"))
@@ -188,11 +191,16 @@ public class ExpanseReportCreator {
     }
 
     public Paragraph getExpanse(@NotNull ExpanseResponse expanse, String tripCurrency) throws IOException {
-        Text expanseCategoryText = new Text(expanse.expanseCategory())
+
+        Text expanseDateText = new Text(expanse.getDate())
+                .setFont(pdfFontFactory.reportRegularFont())
+                .setFontSize(6);
+
+        Text expanseCategoryText = new Text(expanse.getExpanseCategory())
                 .setFont(pdfFontFactory.reportRegularFont())
                 .setFontSize(8);
 
-        Text expanseNameText = new Text(expanse.expanseName())
+        Text expanseNameText = new Text(expanse.getExpanseName())
                 .setFont(pdfFontFactory.reportRegularFont())
                 .setFontSize(8);
 
@@ -200,29 +208,35 @@ public class ExpanseReportCreator {
                 .setFont(pdfFontFactory.reportRegularFont())
                 .setFontSize(8);
 
-        Text currencyText = new Text(expanse.currency())
+        Text currencyText = new Text(expanse.getCurrency())
                 .setFont(pdfFontFactory.reportRegularFont())
                 .setFontSize(6);
 
-        Text priceText = new Text(expanse.price().toString())
+        Text priceText = new Text(expanse.getPrice().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
                 .setFontSize(8);
 
-        Text paidText = new Text(expanse.paid().toString())
+        Text paidText = new Text(expanse.getPaid().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
                 .setFontSize(8);
 
-        Text exchangeRateText = new Text(expanse.exchangeRate().toString())
+        Text exchangeRateText = new Text(expanse.getExchangeRate().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
                 .setFontSize(8);
 
-        Text priceInTripCurrencyText = new Text(expanse.priceInTripCurrency().toString())
+        Text priceInTripCurrencyText = new Text(expanse.getPriceInTripCurrency().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
                 .setFontSize(8);
 
-        Text paidInTripCurrencyText = new Text(expanse.paidInTripCurrency().toString())
+        Text paidInTripCurrencyText = new Text(expanse.getPaidInTripCurrency().toString())
                 .setFont(pdfFontFactory.reportBoldFont())
                 .setFontSize(8);
+
+        Paragraph date = new Paragraph()
+                .add(expanseDateText)
+                .setFontColor(BLACK)
+                .setTextAlignment(TextAlignment.LEFT)
+                .setMultipliedLeading(1.0f);
 
         Paragraph category = new Paragraph()
                 .add(expanseCategoryText)
@@ -274,10 +288,18 @@ public class ExpanseReportCreator {
                 .setTextAlignment(TextAlignment.LEFT)
                 .setMultipliedLeading(0.4f);
 
-        Table table = new Table(new float[]{100, 70, 70, 70, 70, 70, 70});
+        Table table = new Table(new float[]{50, 100, 70, 60, 60, 60, 60, 60});
         table.setWidth(UnitValue.createPointValue(520));
 
         table
+                .addCell(new Cell().add(date)
+                        .setBorderBottom(new SolidBorder(ColorConstants.BLACK, 0.1f))
+                        .setBorderRight(NO_BORDER)
+                        .setBorderLeft(NO_BORDER)
+                        .setBorderTop(NO_BORDER)
+                        .setTextAlignment(TextAlignment.LEFT)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setPadding(5))
                 .addCell(new Cell().add(category)
                         .setBorderBottom(new SolidBorder(ColorConstants.BLACK, 0.1f))
                         .setBorderRight(NO_BORDER)

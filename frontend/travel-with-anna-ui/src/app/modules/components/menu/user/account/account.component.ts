@@ -40,7 +40,6 @@ import {DeleteAccountComponent} from "../../../../../pages/delete-account/delete
     NgForOf,
     MatSuffix,
     MatTooltip,
-
   ],
   templateUrl: './account.component.html',
   styleUrl: './account.component.scss',

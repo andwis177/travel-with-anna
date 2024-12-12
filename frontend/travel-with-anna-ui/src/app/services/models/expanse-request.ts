@@ -2,6 +2,7 @@
 /* eslint-disable */
 export interface ExpanseRequest {
   currency: string;
+  date?: string;
   entityId?: number;
   entityType?: string;
   exchangeRate: number;

@@ -22,7 +22,6 @@ public class UserAvatarService {
     private final UserAuthenticationService userAuthenticationService;
     private final AvatarService avatarService;
 
-
     public void setAvatar(@NotNull MultipartFile file, UserDetails connectedUser)
             throws IOException {
         String contentType = file.getContentType();

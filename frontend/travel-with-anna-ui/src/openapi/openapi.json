@@ -1715,8 +1715,9 @@
             "type": "string"
           },
           "expanseCategory": {
-            "maxLength": 60,
-            "minLength": 0,
+            "type": "string"
+          },
+          "date": {
             "type": "string"
           },
           "currency": {
@@ -1761,6 +1762,9 @@
             "type": "string"
           },
           "expanseCategory": {
+            "type": "string"
+          },
+          "date": {
             "type": "string"
           },
           "currency": {
@@ -1921,7 +1925,8 @@
       "ActivityRequest": {
         "required": [
           "dateTime",
-          "tripId"
+          "tripId",
+          "type"
         ],
         "type": "object",
         "properties": {

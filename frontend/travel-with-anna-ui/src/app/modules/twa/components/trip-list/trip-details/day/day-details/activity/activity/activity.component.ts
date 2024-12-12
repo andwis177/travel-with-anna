@@ -92,8 +92,8 @@ export class ActivityComponent implements OnInit{
   badge: string = '';
   associated: boolean = false;
   isAddressSeparated: boolean = false;
-  activity: ActivityRequest = {tripId: -1, activityTitle: '', dateTime:''};
-  secondActivity: ActivityRequest = {tripId:-1 , activityTitle: '', dateTime:''};
+  activity: ActivityRequest = {type: "", tripId: -1, activityTitle: '', dateTime:''};
+  secondActivity: ActivityRequest = {type: "", tripId:-1 , activityTitle: '', dateTime:''};
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
 
   constructor(public dialog: MatDialog,
@@ -138,6 +138,7 @@ export class ActivityComponent implements OnInit{
     this.addressRequest.currency = this.country.currency;
     this.addressRequest.city = this.city.city;
     this.secondActivity.type = this.activity.type;
+
     this.generateDatesBetween();
     this.getCountries();
     if (this.addressRequest.country!)

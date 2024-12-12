@@ -84,24 +84,26 @@ class ExpanseReportCreatorTest {
         assertTrue(extractedTexts.contains("EXPANSE"));
         assertTrue(extractedTexts.contains("PRICE"));
         assertTrue(extractedTexts.contains("PAID"));
-        assertTrue(extractedTexts.contains("EXCHANGE RATE"));
-        assertTrue(extractedTexts.contains("PRICE IN EUR"));
-        assertTrue(extractedTexts.contains("PAID IN EUR"));
+        assertTrue(extractedTexts.contains("EXCHANGE"));
+        assertTrue(extractedTexts.contains("PRICE\n(EUR)"));
+        assertTrue(extractedTexts.contains("PAID\n(EUR)"));
     }
 
     @Test
     void testGetExpanse_returnsFormattedParagraphWithTable() throws IOException {
         // Given
-        ExpanseResponse expanse = new ExpanseResponse(
-                1L,
-                "Hotel",
-                "USD",
-                new BigDecimal("200.00"),
-                new BigDecimal("150.00"),
-                new BigDecimal("1.1"),
-                new BigDecimal("220.00"),
-                new BigDecimal("165.00")
-        );
+        ExpanseResponse expanse = ExpanseResponse.builder()
+                .expanseId(1L)
+                .expanseName("Hotel")
+                .currency("USD")
+                .expanseCategory("Stay")
+                .date("2022-01-01")
+                .price(new BigDecimal("200.00"))
+                .paid(new BigDecimal("150.00"))
+                .exchangeRate(new BigDecimal("1.1"))
+                .priceInTripCurrency(new BigDecimal("220.00"))
+                .paidInTripCurrency(new BigDecimal("165.00"))
+                .build();
         String tripCurrency = "EUR";
 
         // When
@@ -113,6 +115,8 @@ class ExpanseReportCreatorTest {
         assertNotNull(expanseParagraph);
         assertNotNull(table);
         assertTrue(extractedTexts.contains("Hotel"));
+        assertTrue(extractedTexts.contains("Stay"));
+        assertTrue(extractedTexts.contains("2022-01-01"));
         assertTrue(extractedTexts.contains("200.00 USD"));
         assertTrue(extractedTexts.contains("150.00 USD"));
         assertTrue(extractedTexts.contains("1.1"));

@@ -140,7 +140,6 @@ class AdminControllerTest {
                         .principal(createAuthentication(user)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));
-
     }
 
     @Test

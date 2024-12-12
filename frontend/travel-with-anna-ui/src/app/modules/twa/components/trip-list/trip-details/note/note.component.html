@@ -15,10 +15,10 @@
       <button class="custom-button-0 " (click)="saveNote()" type="submit">Save</button>
       <button class="custom-button-1 " (click)="onClose()" type="submit">Cancel</button>
     </div>
-
-    <div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-      <mat-divider></mat-divider>
-      <p *ngFor="let msg of errorMsg">{{msg}}</p>
-    </div>
   </div>
+</div>
+
+<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
+  <mat-divider class="padding-bottom"></mat-divider>
+  <p *ngFor="let msg of errorMsg">{{msg}}</p>
 </div>

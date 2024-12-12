@@ -1,7 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {PdfReportService} from "../../../../../../services/pdf/pdf-report.service";
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
-import {NgIf} from "@angular/common";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
@@ -11,7 +10,6 @@ import {MatToolbarRow} from "@angular/material/toolbar";
   selector: 'app-pdf-trip',
   standalone: true,
   imports: [
-    NgIf,
     MatIcon,
     MatIconButton,
     MatToolbarRow

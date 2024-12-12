@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.Time;
 
 import static com.itextpdf.kernel.colors.ColorConstants.*;
 
@@ -88,6 +89,16 @@ public class TripReportCreator {
                 .setBackgroundColor(GRAY);
     }
 
+    public Paragraph getDayNote(@NotNull Note note) throws IOException {
+        return new Paragraph()
+                .add(note.getNote())
+                .setFont(pdfFontFactory.reportItalicFont())
+                .setFontSize(8)
+                .setFontColor(BLACK)
+                .setMultipliedLeading(0.7f)
+                .setTextAlignment(TextAlignment.CENTER);
+
+    }
     public Paragraph getActivity(Activity activity) throws IOException {
         Text timeText = new Text(getTime(activity))
                 .setFont(pdfFontFactory.reportBoldFont())

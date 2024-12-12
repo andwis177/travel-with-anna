@@ -55,6 +55,13 @@ public class PdfReportService {
 
             for (Day day : days) {
                 document.add(tripReportParagraphCreator.getDay(day));
+                if (
+                        day.getNote() != null
+                        && day.getNote().getNote() != null
+                        && !day.getNote().getNote().isBlank()
+                ) {
+                    document.add(tripReportParagraphCreator.getDayNote(day.getNote()));
+                }
                 document.add(tripReportParagraphCreator.getSeparatorLine());
                 List<Activity> activities = new ArrayList<>(day.getActivities());
                 Collections.sort(activities);

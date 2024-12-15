@@ -8,11 +8,11 @@ import { RequestBuilder } from '../../request-builder';
 
 import { CountryCurrency } from '../../models/country-currency';
 
-export interface FindAllCountryCurrencies$Params {
+export interface GetAllCountryCurrencies$Params {
 }
 
-export function findAllCountryCurrencies(http: HttpClient, rootUrl: string, params?: FindAllCountryCurrencies$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CountryCurrency>>> {
-  const rb = new RequestBuilder(rootUrl, findAllCountryCurrencies.PATH, 'get');
+export function getAllCountryCurrencies(http: HttpClient, rootUrl: string, params?: GetAllCountryCurrencies$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CountryCurrency>>> {
+  const rb = new RequestBuilder(rootUrl, getAllCountryCurrencies.PATH, 'get');
   if (params) {
   }
 
@@ -26,4 +26,4 @@ export function findAllCountryCurrencies(http: HttpClient, rootUrl: string, para
   );
 }
 
-findAllCountryCurrencies.PATH = '/api/country/currencies';
+getAllCountryCurrencies.PATH = '/api/country/currencies';

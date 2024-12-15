@@ -129,7 +129,7 @@ export class TripNewComponent implements OnInit {
   }
 
   getCurrency() {
-    this.countryControllerService.findAllCountryCurrencies().subscribe( {
+    this.countryControllerService.getAllCountryCurrencies().subscribe( {
       next: (currency) => {
         this.currency = currency;
         if(currency.length > 0) {

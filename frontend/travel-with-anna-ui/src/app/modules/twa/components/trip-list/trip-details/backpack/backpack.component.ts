@@ -76,7 +76,7 @@ export class BackpackComponent implements OnInit, AfterViewInit {
   budgetId: number;
   backpackResponse: BackpackResponse = {};
   items: ItemResponse[] = [];
-  itemRequest: ItemRequest = {itemName: "", packed: false, qty: ""};
+  itemRequest: ItemRequest = {itemName: "", packed: false, quantity: ""};
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   displayedColumns: string[] = [
@@ -193,7 +193,7 @@ export class BackpackComponent implements OnInit, AfterViewInit {
     const params: AddItemToBackpack$Params = {backpackId: this.backpackId, body: this.itemRequest};
     this.backpackService.addItemToBackpack(params).subscribe({
       next: () => {
-        this.itemRequest = {itemName: "", packed: false, qty: ""}
+        this.itemRequest = {itemName: "", packed: false, quantity: ""}
         this.receiveItems();
         this.selectRowByIndex(0);
       },

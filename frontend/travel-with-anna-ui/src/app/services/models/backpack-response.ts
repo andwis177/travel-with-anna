@@ -2,6 +2,6 @@
 /* eslint-disable */
 export interface BackpackResponse {
   backpackId?: number;
-  isNote?: boolean;
+  noteExists?: boolean;
   tripId?: number;
 }

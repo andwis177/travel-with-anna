@@ -371,14 +371,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -418,7 +411,7 @@
         "tags": [
           "country-controller"
         ],
-        "operationId": "findAllCountryCities",
+        "operationId": "getCountryCities",
         "parameters": [
           {
             "name": "country",
@@ -681,14 +674,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -1278,7 +1264,7 @@
         "tags": [
           "country-controller"
         ],
-        "operationId": "findAllCountryNames",
+        "operationId": "getAllCountryNames",
         "responses": {
           "200": {
             "description": "OK",
@@ -1301,7 +1287,7 @@
         "tags": [
           "country-controller"
         ],
-        "operationId": "findAllCountryCurrencies",
+        "operationId": "getAllCountryCurrencies",
         "responses": {
           "200": {
             "description": "OK",
@@ -1579,8 +1565,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -1835,12 +1821,10 @@
             "format": "int64"
           },
           "startDate": {
-            "type": "string",
-            "format": "date"
+            "type": "string"
           },
           "endDate": {
-            "type": "string",
-            "format": "date"
+            "type": "string"
           }
         }
       },
@@ -1887,6 +1871,10 @@
         }
       },
       "AuthenticationRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
         "type": "object",
         "properties": {
           "email": {
@@ -1972,12 +1960,12 @@
         "type": "object",
         "properties": {
           "place": {
-            "maxLength": 60,
+            "maxLength": 100,
             "minLength": 0,
             "type": "string"
           },
           "country": {
-            "maxLength": 40,
+            "maxLength": 100,
             "minLength": 0,
             "type": "string"
           },
@@ -1987,7 +1975,7 @@
             "type": "string"
           },
           "city": {
-            "maxLength": 40,
+            "maxLength": 100,
             "minLength": 0,
             "type": "string"
           },
@@ -1997,7 +1985,7 @@
           "website": {
             "type": "string"
           },
-          "phone": {
+          "phoneNumber": {
             "maxLength": 30,
             "minLength": 0,
             "type": "string"
@@ -2008,6 +1996,8 @@
             "type": "string"
           },
           "currency": {
+            "maxLength": 10,
+            "minLength": 0,
             "type": "string"
           }
         }
@@ -2115,8 +2105,8 @@
       },
       "BudgetRequest": {
         "required": [
-          "currency",
-          "toSpend"
+          "budgetAmount",
+          "currency"
         ],
         "type": "object",
         "properties": {
@@ -2129,7 +2119,7 @@
             "minLength": 0,
             "type": "string"
           },
-          "toSpend": {
+          "budgetAmount": {
             "minimum": 0.0,
             "exclusiveMinimum": false,
             "type": "number"
@@ -2144,12 +2134,12 @@
         "type": "object",
         "properties": {
           "itemName": {
-            "maxLength": 60,
+            "maxLength": 100,
             "minLength": 0,
             "type": "string"
           },
-          "qty": {
-            "maxLength": 40,
+          "quantity": {
+            "maxLength": 70,
             "minLength": 0,
             "type": "string"
           },
@@ -2481,7 +2471,7 @@
           "currency": {
             "type": "string"
           },
-          "toSpend": {
+          "budgetAmount": {
             "type": "number"
           },
           "tripId": {
@@ -2528,7 +2518,7 @@
       "ExpanseByCurrency": {
         "type": "object",
         "properties": {
-          "currency": {
+          "currencyCode": {
             "type": "string"
           },
           "totalPrice": {
@@ -2573,7 +2563,7 @@
             "type": "integer",
             "format": "int64"
           },
-          "isNote": {
+          "noteExists": {
             "type": "boolean"
           }
         }

@@ -187,7 +187,7 @@ export class ActivityEditComponent implements OnInit {
 
   getCountries() {
     this.errorMsg = [];
-    this.countryService.findAllCountryNames().subscribe({
+    this.countryService.getAllCountryNames().subscribe({
       next: (response) => {
         this.countries = response;
       },
@@ -201,7 +201,7 @@ export class ActivityEditComponent implements OnInit {
     this.cities = [];
     if (this.cities.length == 0) {
       this.errorMsg = [];
-      this.countryService.findAllCountryCities({country: country}).subscribe({
+      this.countryService.getCountryCities({country: country}).subscribe({
         next: (response) => {
           this.cities = response;
         },

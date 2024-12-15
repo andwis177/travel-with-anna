@@ -8,12 +8,12 @@ import { RequestBuilder } from '../../request-builder';
 
 import { City } from '../../models/city';
 
-export interface FindAllCountryCities$Params {
+export interface GetCountryCities$Params {
   country: string;
 }
 
-export function findAllCountryCities(http: HttpClient, rootUrl: string, params: FindAllCountryCities$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<City>>> {
-  const rb = new RequestBuilder(rootUrl, findAllCountryCities.PATH, 'post');
+export function getCountryCities(http: HttpClient, rootUrl: string, params: GetCountryCities$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<City>>> {
+  const rb = new RequestBuilder(rootUrl, getCountryCities.PATH, 'post');
   if (params) {
     rb.query('country', params.country, {});
   }
@@ -28,4 +28,4 @@ export function findAllCountryCities(http: HttpClient, rootUrl: string, params: 
   );
 }
 
-findAllCountryCities.PATH = '/api/country/cities';
+getCountryCities.PATH = '/api/country/cities';

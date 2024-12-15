@@ -3,5 +3,5 @@
 export interface ItemRequest {
   itemName?: string;
   packed?: boolean;
-  qty?: string;
+  quantity?: string;
 }

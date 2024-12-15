@@ -8,11 +8,11 @@ import { RequestBuilder } from '../../request-builder';
 
 import { Country } from '../../models/country';
 
-export interface FindAllCountryNames$Params {
+export interface GetAllCountryNames$Params {
 }
 
-export function findAllCountryNames(http: HttpClient, rootUrl: string, params?: FindAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Country>>> {
-  const rb = new RequestBuilder(rootUrl, findAllCountryNames.PATH, 'get');
+export function getAllCountryNames(http: HttpClient, rootUrl: string, params?: GetAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Country>>> {
+  const rb = new RequestBuilder(rootUrl, getAllCountryNames.PATH, 'get');
   if (params) {
   }
 
@@ -26,4 +26,4 @@ export function findAllCountryNames(http: HttpClient, rootUrl: string, params?: 
   );
 }
 
-findAllCountryNames.PATH = '/api/country/names';
+getAllCountryNames.PATH = '/api/country/names';

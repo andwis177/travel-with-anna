@@ -14,7 +14,9 @@ import {
   MatTableDataSource
 } from "@angular/material/table";
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
-import {NgClass, NgIf} from "@angular/common";
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+// import {NgClass, NgIf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {LiveAnnouncer} from "@angular/cdk/a11y";
 import {SelectionModel} from "@angular/cdk/collections";
@@ -47,14 +49,15 @@ import {firstValueFrom} from "rxjs";
     MatSort,
     MatSortHeader,
     MatTable,
-    NgIf,
+    // NgIf,
     ReactiveFormsModule,
     FormsModule,
     MatHeaderCellDef,
-    NgClass,
+    // NgClass,
     LogoComponent,
     UserComponent,
-    BudgetButtonsComponent
+    BudgetButtonsComponent,
+    CommonModule
   ],
   templateUrl: './budget.component.html',
   styleUrl: './budget.component.scss'

@@ -12,12 +12,12 @@ import { StrictHttpResponse } from '../strict-http-response';
 import { City } from '../models/city';
 import { Country } from '../models/country';
 import { CountryCurrency } from '../models/country-currency';
-import { findAllCountryCities } from '../fn/country-controller/find-all-country-cities';
-import { FindAllCountryCities$Params } from '../fn/country-controller/find-all-country-cities';
-import { findAllCountryCurrencies } from '../fn/country-controller/find-all-country-currencies';
-import { FindAllCountryCurrencies$Params } from '../fn/country-controller/find-all-country-currencies';
-import { findAllCountryNames } from '../fn/country-controller/find-all-country-names';
-import { FindAllCountryNames$Params } from '../fn/country-controller/find-all-country-names';
+import { getAllCountryCurrencies } from '../fn/country-controller/get-all-country-currencies';
+import { GetAllCountryCurrencies$Params } from '../fn/country-controller/get-all-country-currencies';
+import { getAllCountryNames } from '../fn/country-controller/get-all-country-names';
+import { GetAllCountryNames$Params } from '../fn/country-controller/get-all-country-names';
+import { getCountryCities } from '../fn/country-controller/get-country-cities';
+import { GetCountryCities$Params } from '../fn/country-controller/get-country-cities';
 
 @Injectable({ providedIn: 'root' })
 export class CountryControllerService extends BaseService {
@@ -25,77 +25,77 @@ export class CountryControllerService extends BaseService {
     super(config, http);
   }
 
-  /** Path part for operation `findAllCountryCities()` */
-  static readonly FindAllCountryCitiesPath = '/api/country/cities';
+  /** Path part for operation `getCountryCities()` */
+  static readonly GetCountryCitiesPath = '/api/country/cities';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `findAllCountryCities()` instead.
+   * To access only the response body, use `getCountryCities()` instead.
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryCities$Response(params: FindAllCountryCities$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<City>>> {
-    return findAllCountryCities(this.http, this.rootUrl, params, context);
+  getCountryCities$Response(params: GetCountryCities$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<City>>> {
+    return getCountryCities(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `findAllCountryCities$Response()` instead.
+   * To access the full response (for headers, for example), `getCountryCities$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryCities(params: FindAllCountryCities$Params, context?: HttpContext): Observable<Array<City>> {
-    return this.findAllCountryCities$Response(params, context).pipe(
+  getCountryCities(params: GetCountryCities$Params, context?: HttpContext): Observable<Array<City>> {
+    return this.getCountryCities$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<City>>): Array<City> => r.body)
     );
   }
 
-  /** Path part for operation `findAllCountryNames()` */
-  static readonly FindAllCountryNamesPath = '/api/country/names';
+  /** Path part for operation `getAllCountryNames()` */
+  static readonly GetAllCountryNamesPath = '/api/country/names';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `findAllCountryNames()` instead.
+   * To access only the response body, use `getAllCountryNames()` instead.
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryNames$Response(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Country>>> {
-    return findAllCountryNames(this.http, this.rootUrl, params, context);
+  getAllCountryNames$Response(params?: GetAllCountryNames$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<Country>>> {
+    return getAllCountryNames(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `findAllCountryNames$Response()` instead.
+   * To access the full response (for headers, for example), `getAllCountryNames$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryNames(params?: FindAllCountryNames$Params, context?: HttpContext): Observable<Array<Country>> {
-    return this.findAllCountryNames$Response(params, context).pipe(
+  getAllCountryNames(params?: GetAllCountryNames$Params, context?: HttpContext): Observable<Array<Country>> {
+    return this.getAllCountryNames$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<Country>>): Array<Country> => r.body)
     );
   }
 
-  /** Path part for operation `findAllCountryCurrencies()` */
-  static readonly FindAllCountryCurrenciesPath = '/api/country/currencies';
+  /** Path part for operation `getAllCountryCurrencies()` */
+  static readonly GetAllCountryCurrenciesPath = '/api/country/currencies';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `findAllCountryCurrencies()` instead.
+   * To access only the response body, use `getAllCountryCurrencies()` instead.
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryCurrencies$Response(params?: FindAllCountryCurrencies$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CountryCurrency>>> {
-    return findAllCountryCurrencies(this.http, this.rootUrl, params, context);
+  getAllCountryCurrencies$Response(params?: GetAllCountryCurrencies$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<CountryCurrency>>> {
+    return getAllCountryCurrencies(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `findAllCountryCurrencies$Response()` instead.
+   * To access the full response (for headers, for example), `getAllCountryCurrencies$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  findAllCountryCurrencies(params?: FindAllCountryCurrencies$Params, context?: HttpContext): Observable<Array<CountryCurrency>> {
-    return this.findAllCountryCurrencies$Response(params, context).pipe(
+  getAllCountryCurrencies(params?: GetAllCountryCurrencies$Params, context?: HttpContext): Observable<Array<CountryCurrency>> {
+    return this.getAllCountryCurrencies$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<CountryCurrency>>): Array<CountryCurrency> => r.body)
     );
   }

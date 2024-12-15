@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export interface ExpanseByCurrency {
-  currency?: string;
+  currencyCode?: string;
   totalDebt?: number;
   totalPaid?: number;
   totalPaidInTripCurrency?: number;

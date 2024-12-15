@@ -145,7 +145,7 @@ export class ExpanseComponent implements OnInit {
   }
 
   getCurrency() {
-    this.countryControllerService.findAllCountryCurrencies().subscribe( {
+    this.countryControllerService.getAllCountryCurrencies().subscribe( {
       next: (currency) => {
         this.currencyList = currency;
       },

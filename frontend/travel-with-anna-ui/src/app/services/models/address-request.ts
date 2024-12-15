@@ -7,7 +7,7 @@ export interface AddressRequest {
   countryCode?: string;
   currency?: string;
   email?: string;
-  phone?: string;
+  phoneNumber?: string;
   place?: string;
   website?: string;
 }

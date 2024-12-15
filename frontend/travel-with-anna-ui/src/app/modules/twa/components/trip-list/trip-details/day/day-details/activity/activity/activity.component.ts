@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Inject, NgModule, OnInit, Output} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatCardContent} from "@angular/material/card";
 import {MatDivider} from "@angular/material/divider";
@@ -63,8 +63,8 @@ import {MatCheckbox} from "@angular/material/checkbox";
   providers: [provideNativeDateAdapter(), DatePipe],
   templateUrl: './activity.component.html',
   styleUrl: './activity.component.scss'
-
 })
+
 export class ActivityComponent implements OnInit{
   errorMsg: Array<string> = [];
   trip: TripResponse = {};
@@ -82,7 +82,7 @@ export class ActivityComponent implements OnInit{
     address: '',
     website: '',
     email: '',
-    phone: '',
+    phoneNumber: '',
     currency: ''
   };
   country: Country = {currency: '', iso2: '', iso3:'', name: ''};
@@ -270,7 +270,7 @@ export class ActivityComponent implements OnInit{
 
   getCountries() {
     this.errorMsg = [];
-    this.countryService.findAllCountryNames().subscribe({
+    this.countryService.getAllCountryNames().subscribe({
       next: (response) => {
         this.countries = response;
       },
@@ -285,7 +285,7 @@ export class ActivityComponent implements OnInit{
     this.addressRequest.city = '';
     if (this.cities.length == 0) {
       this.errorMsg = [];
-      this.countryService.findAllCountryCities({country: country}).subscribe({
+      this.countryService.getCountryCities({country: country}).subscribe({
         next: (response) => {
           this.cities = response;
           if (response.length > 0) {

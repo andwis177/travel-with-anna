@@ -74,7 +74,7 @@ export class BudgetEditComponent {
   }
 
   getCurrency() {
-    this.countryControllerService.findAllCountryCurrencies().subscribe({
+    this.countryControllerService.getAllCountryCurrencies().subscribe({
       next: (currency) => this.currency = currency,
       error: (error) => this.errorMsg = this.errorService.errorHandlerWithJson(error)
     });

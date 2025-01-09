@@ -9,13 +9,13 @@ import { RequestBuilder } from '../../request-builder';
 import { City } from '../../models/city';
 
 export interface GetCountryCities$Params {
-  country: string;
+  countryName: string;
 }
 
 export function getCountryCities(http: HttpClient, rootUrl: string, params: GetCountryCities$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<City>>> {
   const rb = new RequestBuilder(rootUrl, getCountryCities.PATH, 'post');
   if (params) {
-    rb.query('country', params.country, {});
+    rb.query('countryName', params.countryName, {});
   }
 
   return http.request(

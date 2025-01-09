@@ -42,16 +42,20 @@ class ExpanseReportCreatorTest {
 
         // When
         Paragraph budgetParagraph = expanseReportCreator.getBudget(budget, expanseInTripCurrency, currency);
+        assertNotNull(budgetParagraph, "Budget paragraph should not be null");
+
         Table table = (Table) budgetParagraph.getChildren().getFirst();
+        assertNotNull(table, "Table within budget paragraph should not be null");
+
         List<String> extractedTexts = extractTextsFromTable(table);
 
         // Then
         assertNotNull(budgetParagraph);
         assertNotNull(table);
         assertTrue(extractedTexts.contains("BUDGET: 1000.00 USD"));
-        assertTrue(extractedTexts.contains("PRICE: 800.00 USD (200.00 USD)"));
+        assertTrue(extractedTexts.contains("PRICE: 800.00 USD ( 200.00 USD )"));
         assertTrue(extractedTexts.contains("PRICE/PAID: 200.00 USD"));
-        assertTrue(extractedTexts.contains("PAID: 600.00 USD (400.00 USD)"));
+        assertTrue(extractedTexts.contains("PAID: 600.00 USD ( 400.00 USD )"));
     }
 
     @Test
@@ -110,6 +114,7 @@ class ExpanseReportCreatorTest {
         Paragraph expanseParagraph = expanseReportCreator.getExpanse(expanse, tripCurrency);
         Table table = (Table) expanseParagraph.getChildren().getFirst();
         List<String> extractedTexts = extractTextsFromTable(table);
+        System.out.println(extractedTexts);
 
         // Then
         assertNotNull(expanseParagraph);

@@ -14,6 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ExceptionResponse {
-    private Integer errorCode;
+    private int errorCode;
     private List<String> errors;
 }

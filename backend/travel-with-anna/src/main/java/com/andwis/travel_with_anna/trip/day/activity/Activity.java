@@ -1,7 +1,7 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
 import com.andwis.travel_with_anna.address.Address;
-import com.andwis.travel_with_anna.security.OwnableByUser;
+import com.andwis.travel_with_anna.security.OwnByUser;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
 import com.andwis.travel_with_anna.trip.note.Note;
@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @EqualsAndHashCode()
 @Getter
@@ -22,14 +23,19 @@ import java.time.format.DateTimeFormatter;
 @Builder
 @Entity
 @Table(name = "activities")
-public class Activity implements OwnableByUser, Comparable<Activity> {
+public class Activity implements OwnByUser, Comparable<Activity> {
+
+    protected static final String TIME_FORMAT = "HH:mm";
+    protected static final int MAX_TITLE_LENGTH = 60;
+    protected static final int MAX_LENGTH = 20;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "activity_id")
     private Long activityId;
 
-    @Size(max = 60)
-    @Column(name = "activity_title", length = 60)
+    @Size(max = MAX_TITLE_LENGTH)
+    @Column(name = "activity_title", length = MAX_TITLE_LENGTH)
     private String activityTitle;
 
     @Column(name ="begin_time")
@@ -38,16 +44,16 @@ public class Activity implements OwnableByUser, Comparable<Activity> {
     @Column(name ="end_time")
     private LocalTime endTime;
 
-    @Size(max = 20)
-    @Column(name = "badge" , length = 20)
+    @Size(max = MAX_LENGTH)
+    @Column(name = "badge" , length = MAX_LENGTH)
     private String badge;
 
-    @Size(max = 20)
-    @Column(name = "type", length = 20)
+    @Size(max = MAX_LENGTH)
+    @Column(name = "type", length = MAX_LENGTH)
     private String type;
 
-    @Size(max = 20)
-    @Column(name = "status", length = 20)
+    @Size(max = MAX_LENGTH)
+    @Column(name = "status", length = MAX_LENGTH)
     private String status;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -70,16 +76,22 @@ public class Activity implements OwnableByUser, Comparable<Activity> {
     private Address address;
 
     @Column(name = "day_tag")
-    private boolean isDayTag;
+    private boolean dayTag;
 
-    public String getBeginTime() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return beginTime != null ? this.beginTime.format(formatter) : "";
+    private @NotNull String formatTime(LocalTime time) {
+        if (time == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
+        return time.format(formatter);
     }
 
-    public String getEndTime() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return  associatedId == null && endTime != null ? this.endTime.format(formatter) : "";
+    public String getFormattedBeginTime() {
+        return formatTime(this.beginTime);
+    }
+
+    public String getFormattedEndTime() {
+        return this.associatedId == null ? formatTime(this.endTime) : "";
     }
 
     public void addNote(@NotNull Note note) {
@@ -101,12 +113,13 @@ public class Activity implements OwnableByUser, Comparable<Activity> {
 
     public void addAddress(@NotNull Address address) {
         this.address = address;
-        address.addActivity(this);
+        address.addLinkedActivity(this);
     }
 
     @Override
     public User getOwner() {
-        return this.day.getOwner();
+        return Objects.requireNonNull(this.day, "Backpack must be linked to a day to have an owner")
+                .getOwner();
     }
 
     @Override

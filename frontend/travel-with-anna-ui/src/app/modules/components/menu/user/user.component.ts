@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MatDialog} from "@angular/material/dialog";
 import {MatIconButton} from "@angular/material/button";
-import {MatLabel} from "@angular/material/form-field";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgIf} from "@angular/common";
 import {AccountComponent} from "./account/account.component";
@@ -13,7 +12,6 @@ import {SharedService} from "../../../../services/shared/shared.service";
   standalone: true,
   imports: [
     MatIconButton,
-    MatLabel,
     MatTooltip,
     NgIf
   ],

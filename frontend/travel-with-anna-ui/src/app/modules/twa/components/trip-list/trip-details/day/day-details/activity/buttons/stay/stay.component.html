@@ -1,49 +1,54 @@
-<form class="buttons-container full-width">
-  <button class="user-button margin" (click)="provideBadgeToParent('stay');
+<form class="container-vertical align-center full-width">
+  <button class="user-button puffer user-button-radius information-are-shadow button-background-white button-border-dark"
+          (click)="provideBadgeToParent('stay');
                                               provideTypeToParent('hotel');
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
           [ngClass]="buttonClasses['hotel']"
           matTooltip="Hotel">
-    <img src="../../../../../assets/images/activity/hotel.png" class="user-button-image mat-elevation-z4" alt="">
+    <img src="../../../../../assets/images/activity/hotel.png" class="button-image" alt="">
   </button>
-  <button class="user-button margin" (click)="provideBadgeToParent('stay');
+  <button class="user-button puffer user-button-radius information-are-shadow button-background-white button-border-dark"
+          (click)="provideBadgeToParent('stay');
                                               provideTypeToParent('camping');
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
           [ngClass]="buttonClasses['camping']"
           matTooltip="Camping">
-    <img src="../../../../../assets/images/activity/camping.png" class="user-button-image mat-elevation-z4" alt="">
+    <img src="../../../../../assets/images/activity/camping.png" class="button-image" alt="">
   </button>
-  <button class="user-button margin" (click)="provideBadgeToParent('stay');
+  <button class="user-button puffer user-button-radius information-are-shadow button-background-white button-border-dark"
+          (click)="provideBadgeToParent('stay');
                                               provideTypeToParent('airbnb');
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
           [ngClass]="buttonClasses['airbnb']"
           matTooltip="Airbnb">
-    <img src="../../../../../assets/images/activity/airbnb.png" class="user-button-image mat-elevation-z4" alt="">
+    <img src="../../../../../assets/images/activity/airbnb.png" class="button-image" alt="">
   </button>
 
-  <button class="user-button margin" (click)="provideBadgeToParent('stay');
+  <button class="user-button puffer user-button-radius information-are-shadow button-background-white button-border-dark"
+          (click)="provideBadgeToParent('stay');
                                               provideTypeToParent('friends');
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
           [ngClass]="buttonClasses['friends']"
           matTooltip="Family or Friends">
-    <img src="../../../../../assets/images/activity/friends.png" class="user-button-image mat-elevation-z4" alt="">
+    <img src="../../../../../assets/images/activity/friends.png" class="button-image" alt="">
   </button>
-  <button class="user-button margin" (click)="provideBadgeToParent('stay');
+  <button class="user-button puffer user-button-radius information-are-shadow button-background-white button-border-dark"
+          (click)="provideBadgeToParent('stay');
                                               provideTypeToParent('stay');
                                               provideFirstStatusToParent('check-in');
                                               provideSecondStatusToParent('check-out');
                                               createStay()"
           [ngClass]="buttonClasses['stay']"
           matTooltip="Other">
-    <img src="../../../../../assets/images/activity/stay.png" class="user-button-image mat-elevation-z4" alt="">
+    <img src="../../../../../assets/images/activity/stay.png" class="button-image" alt="">
   </button>
 </form>
 

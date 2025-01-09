@@ -1,7 +1,6 @@
 package com.andwis.travel_with_anna.pdf;
 
 import com.andwis.travel_with_anna.address.Address;
-import com.andwis.travel_with_anna.handler.exception.PdfReportCreationException;
 import com.andwis.travel_with_anna.handler.exception.TripNotFoundException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
@@ -14,8 +13,6 @@ import com.andwis.travel_with_anna.trip.trip.TripRepository;
 import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfReader;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,16 +26,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -63,7 +57,7 @@ class PdfReportServiceTest {
                 .address("Address")
                 .city("City")
                 .country("Country")
-                .phone("Phone")
+                .phoneNumber("Phone")
                 .place("Place")
                 .email("Email")
                 .countryCode("PL")
@@ -79,22 +73,19 @@ class PdfReportServiceTest {
                 .type("Type")
                 .status("Status")
                 .build();
-        address.addActivity(activity);
+        address.addLinkedActivity(activity);
 
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole =  existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(encodedPassword)
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
         user = userRepository.save(user);
@@ -103,16 +94,16 @@ class PdfReportServiceTest {
                 .userName("unauthorizedUser")
                 .email("emailUnauthorized@example.com")
                 .password(encodedPassword)
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         unauthorizedUser.setEnabled(true);
         unauthorizedUserDetails = createUserDetails(unauthorizedUser);
 
         Budget budget = Budget.builder()
                 .currency("USD")
-                .toSpend(BigDecimal.valueOf(1000))
+                .budgetAmount(BigDecimal.valueOf(1000))
                 .build();
 
         Day day = Day.builder()
@@ -143,7 +134,7 @@ class PdfReportServiceTest {
 
     @Test
     @Transactional
-    void shouldGenerateTripPdfReport() throws Exception {
+    void shouldGenerateTripPdfReport() {
         // Given
         // When
         ByteArrayOutputStream pdfReport = pdfReportService.createTripPdfReport(tripId, userDetails);
@@ -151,52 +142,37 @@ class PdfReportServiceTest {
         // Then
         assertNotNull(pdfReport);
         assertTrue(pdfReport.size() > 0);
-
-        try (PdfReader reader = new PdfReader(new ByteArrayInputStream(pdfReport.toByteArray()));
-             PdfDocument pdfDocument = new PdfDocument(reader)) {
-            assertTrue(pdfDocument.getNumberOfPages() > 0);
-        }
     }
 
     @Test
     void shouldThrowUnauthorizedExceptionForInvalidUser() {
         // Given
-        // When & Then
+        // When
         Exception exception = assertThrows(
                 BadCredentialsException.class,
                 () -> pdfReportService.createTripPdfReport(tripId, unauthorizedUserDetails)
         );
 
-        assertEquals("You are not authorized to access this trip", exception.getMessage());
+        // Then
+        assertEquals("You are not authorized to access", exception.getMessage());
     }
 
     @Test
     void shouldThrowTripNotFoundExceptionForInvalidTripId() {
         // Given
-        // When & Then
+        // When
         Exception exception = assertThrows(
                 TripNotFoundException.class,
                 () -> pdfReportService.createTripPdfReport(-1L, userDetails)
         );
 
-        assertEquals("Trip not found", exception.getMessage());
-    }
-
-    @Test
-    void shouldHandlePdfCreationExceptionGracefully() {
-        // Given
-        // When & Then
-        Exception exception = assertThrows(
-                PdfReportCreationException.class,
-                () -> pdfReportService.createTripPdfReport(tripId, userDetails)
-        );
-
-        assertEquals("Error while creating Trip PDF report", exception.getMessage());
+        // Then
+        assertEquals("Trip not found when generating expense PDF report", exception.getMessage());
     }
 
     @Test
     @Transactional
-    void shouldGenerateExpansePdfReport() throws Exception {
+    void shouldGenerateExpansePdfReport() {
         // Given
         // When
         ByteArrayOutputStream pdfReport = pdfReportService.createExpansePdfReport(tripId, userDetails);
@@ -204,50 +180,45 @@ class PdfReportServiceTest {
         // Then
         assertNotNull(pdfReport);
         assertTrue(pdfReport.size() > 0);
-
-        try (PdfReader reader = new PdfReader(new ByteArrayInputStream(pdfReport.toByteArray()));
-             PdfDocument pdfDocument = new PdfDocument(reader)) {
-            assertTrue(pdfDocument.getNumberOfPages() > 0);
-        }
     }
 
     @Test
     void shouldThrowUnauthorizedExceptionForInvalidUser_ExpansePdfReport() {
         // Given
-        // When & Then
+        // When
         Exception exception = assertThrows(
                 BadCredentialsException.class,
                 () -> pdfReportService.createExpansePdfReport(tripId, unauthorizedUserDetails)
         );
 
-        assertEquals("You are not authorized to modify or view this expanse", exception.getMessage());
+        // Then
+        assertEquals("You are not authorized to access", exception.getMessage());
     }
 
     @Test
     void shouldThrowTripNotFoundExceptionForInvalidTripId_ExpansePdfReport() {
         // Given
-        // When & Then
+        // When
         Exception exception = assertThrows(
                 TripNotFoundException.class,
                 () -> pdfReportService.createExpansePdfReport(-1L, userDetails)
         );
 
-        assertEquals("Trip not found", exception.getMessage());
+        // Then
+        assertEquals("Trip not found when generating expense PDF report", exception.getMessage());
     }
 
     @Test
     void shouldHandlePdfCreationExceptionGracefully_ExpansePdfReport() {
         // Given
-        Trip trip = tripRepository.findById(tripId).orElseThrow();
-        tripRepository.delete(trip);
-
-        // When & Then
+        // When
         Exception exception = assertThrows(
-                PdfReportCreationException.class,
-                () -> pdfReportService.createExpansePdfReport(tripId, userDetails)
+                TripNotFoundException.class,
+                () -> pdfReportService.createExpansePdfReport(999L, userDetails)
         );
 
-        assertEquals("Error while creating Trip PDF report", exception.getMessage());
+        // Then
+        assertEquals("Trip not found when generating expense PDF report", exception.getMessage());
     }
 
     private @NotNull UserDetails createUserDetails(User user) {

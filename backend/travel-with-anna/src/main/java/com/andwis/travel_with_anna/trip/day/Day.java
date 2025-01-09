@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.trip.day;
 
-import com.andwis.travel_with_anna.security.OwnableByUser;
+import com.andwis.travel_with_anna.security.OwnByUser;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.note.Note;
 import com.andwis.travel_with_anna.trip.trip.Trip;
@@ -19,14 +19,18 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "days")
-public class Day implements OwnableByUser {
+public class Day implements OwnByUser {
+
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "day_id")
     private Long dayId;
 
+    @EqualsAndHashCode.Include
     @NotNull
     @Column(name = "date")
     private LocalDate date;
@@ -43,27 +47,7 @@ public class Day implements OwnableByUser {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Activity> activities = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Day day = (Day) o;
-        return Objects.equals(dayId, day.dayId)
-                && Objects.equals(date, day.date)
-                && Objects.equals(note, day.note)
-                && Objects.equals(trip, day.trip)
-                && Objects.equals(activities, day.activities);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(dayId, date);
-    }
-
-    public void addActivity(Activity activity) {
-        if (this.activities == null) {
-            this.activities = new HashSet<>();
-        }
+    public void addActivity(@NotNull Activity activity) {
         this.activities.add(activity);
         activity.setDay(this);
     }
@@ -73,7 +57,7 @@ public class Day implements OwnableByUser {
         this.activities.removeAll(activities);
     }
 
-    public void addNote (Note note) {
+    public void addNote(Note note) {
         this.note = note;
         note.setDay(this);
     }
@@ -87,6 +71,7 @@ public class Day implements OwnableByUser {
 
     @Override
     public User getOwner() {
-        return this.trip.getOwner();
+        return Objects.requireNonNull(this.trip, "Day must be linked to a trip to have an owner")
+                .getOwner();
     }
 }

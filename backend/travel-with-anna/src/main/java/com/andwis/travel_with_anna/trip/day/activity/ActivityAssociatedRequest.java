@@ -9,9 +9,13 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ActivityAssociatedRequest {
+
     @Valid
     private ActivityRequest firstRequest;
+
     @Valid
     private ActivityRequest secondRequest;
-    boolean isAddressSeparated;
+
+    @Builder.Default
+    boolean addressSeparated = true;
 }

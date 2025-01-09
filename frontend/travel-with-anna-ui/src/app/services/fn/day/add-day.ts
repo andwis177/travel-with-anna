@@ -6,16 +6,17 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { DayAddDeleteRequest } from '../../models/day-add-delete-request';
 
 export interface AddDay$Params {
-      body: DayAddDeleteRequest
+  tripId: number;
+  isFirst: boolean;
 }
 
 export function addDay(http: HttpClient, rootUrl: string, params: AddDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, addDay.PATH, 'post');
   if (params) {
-    rb.body(params.body, 'application/json');
+    rb.path('tripId', params.tripId, {});
+    rb.query('isFirst', params.isFirst, {});
   }
 
   return http.request(
@@ -28,4 +29,4 @@ export function addDay(http: HttpClient, rootUrl: string, params: AddDay$Params,
   );
 }
 
-addDay.PATH = '/day/add';
+addDay.PATH = '/day/add/{tripId}';

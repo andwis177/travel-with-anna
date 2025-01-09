@@ -94,7 +94,7 @@ export class DayCardComponent implements OnInit {
   }
 
   getTaggedActivities() {
-    for (let activity of this._day.activity!) {
+    for (let activity of this._day.activities!.activity!) {
       if (activity.dayTag) {
         this.taggedActivities.push(activity);
       }

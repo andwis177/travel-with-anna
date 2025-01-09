@@ -6,6 +6,7 @@ import com.andwis.travel_with_anna.handler.exception.UserExistsException;
 import com.andwis.travel_with_anna.handler.exception.UserNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
 import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleNameResponse;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import org.jetbrains.annotations.NotNull;
@@ -23,10 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -44,16 +43,13 @@ class UserServiceTest {
     @Autowired
     private RoleRepository roleRepository;
     private User user;
-    private Role retrivedRole;
+    private Role userRole;
     private Long userId;
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+        userRole = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         Trip trip = Trip.builder()
                 .tripName("tripName")
@@ -63,9 +59,9 @@ class UserServiceTest {
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(userRole)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
         user.addTrip(trip);
@@ -75,7 +71,7 @@ class UserServiceTest {
                 .userName("userName2")
                 .email("email2@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(userRole)
                 .avatarId(2L)
                 .build();
         secondaryUser.setEnabled(true);
@@ -95,7 +91,7 @@ class UserServiceTest {
                 .userName("testUser")
                 .email("test@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(userRole)
                 .avatarId(1L)
                 .build();
         user.setEnabled(true);
@@ -134,7 +130,7 @@ class UserServiceTest {
     void testGetConnectedUser() {
         // Given
         // When
-        User connectedUser = userAuthenticationService.getConnectedUser(createUserDetails(user));
+        User connectedUser = userAuthenticationService.retriveConnectedUser(createUserDetails(user));
 
         // Then
         assertNotNull(connectedUser);
@@ -220,7 +216,7 @@ class UserServiceTest {
                 .build();
 
         // When
-        AuthenticationResponse response = userService.updateUserExecution(userCredentials, createUserDetails(user));
+        AuthenticationResponse response = userService.updateUserDetails(userCredentials, createUserDetails(user));
         User retrivedUser = userService.getUserById(userId);
 
         // Then
@@ -243,7 +239,7 @@ class UserServiceTest {
 
         // When & Then
         assertThrows(UserExistsException.class, () ->
-                userService.updateUserExecution(userCredentials, createUserDetails(user)));
+                userService.updateUserDetails(userCredentials, createUserDetails(user)));
     }
 
     @Test
@@ -257,7 +253,7 @@ class UserServiceTest {
 
         // When & Then
         assertThrows(UserExistsException.class, () ->
-                userService.updateUserExecution(userCredentials, createUserDetails(user)));
+                userService.updateUserDetails(userCredentials, createUserDetails(user)));
     }
 
     @Test
@@ -271,7 +267,7 @@ class UserServiceTest {
 
         // When & Then
         assertThrows(WrongPasswordException.class, () ->
-                userService.updateUserExecution(userCredentials, createUserDetails(user)));
+                userService.updateUserDetails(userCredentials, createUserDetails(user)));
     }
 
     @Test
@@ -281,7 +277,7 @@ class UserServiceTest {
                 .userName("testUser")
                 .email("test@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(userRole)
                 .build();
         testUser.setEnabled(true);
 
@@ -293,7 +289,7 @@ class UserServiceTest {
 
         // When & Then
         assertThrows(WrongPasswordException.class, () ->
-                userService.updateUserExecution(userCredentials, createUserDetails(testUser)));
+                userService.updateUserDetails(userCredentials, createUserDetails(testUser)));
     }
 
     @Test
@@ -336,6 +332,17 @@ class UserServiceTest {
         assertEquals("User userName has been deleted!", response.getMessage());
         assertFalse(userService.existsByEmail("email@example.com"));
         assertEquals(usersQty - 1, userQtyAfterDelete);
+    }
+
+    @Test
+    void testGetUserRoleName() {
+        // Given
+        // When
+        RoleNameResponse roleNameResponse = new RoleNameResponse(user.getRole().getRoleName());
+
+        // Then
+        assertNotNull(roleNameResponse);
+        assertEquals(userRole.getRoleName(), roleNameResponse.roleName());
     }
 
     private @NotNull UserDetails createUserDetails(User user) {

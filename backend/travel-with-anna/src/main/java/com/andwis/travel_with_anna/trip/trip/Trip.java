@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.trip.trip;
 
-import com.andwis.travel_with_anna.security.OwnableByUser;
+import com.andwis.travel_with_anna.security.OwnByUser;
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.day.Day;
@@ -18,16 +18,23 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "trips")
-public class Trip implements OwnableByUser {
+
+public class Trip implements OwnByUser {
+
+    protected final static int TRIP_NAME_LENGTH = 60;
+
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trip_id")
     private Long tripId;
 
-    @Size(max = 60)
-    @Column(name = "trip_name", length = 60)
+    @EqualsAndHashCode.Include
+    @Size(max = TRIP_NAME_LENGTH)
+    @Column(name = "trip_name", length = TRIP_NAME_LENGTH)
     private String tripName;
 
     @ManyToOne
@@ -50,24 +57,6 @@ public class Trip implements OwnableByUser {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Expanse> expanses = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Trip trip = (Trip) o;
-        return Objects.equals(tripId, trip.tripId)
-                && Objects.equals(tripName, trip.tripName)
-                && Objects.equals(owner, trip.owner)
-                && Objects.equals(days, trip.days)
-                && Objects.equals(backpack, trip.backpack)
-                && Objects.equals(budget, trip.budget);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tripId, tripName);
-    }
-
     public void addBackpack(@NotNull Backpack backpack) {
         this.backpack = backpack;
         backpack.setTrip(this);
@@ -83,18 +72,20 @@ public class Trip implements OwnableByUser {
         day.setTrip(this);
     }
 
-    public void addDays(List<Day> days) {
-        this.days.clear();
-        this.days.addAll(days);
+    public void addDays(@NotNull Collection<Day> days) {
         for (Day day : days) {
-            day.setTrip(this);
+            addDay(day);
+        }
+    }
+
+    public void replaceDays(@NotNull List<Day> newDays) {
+        this.days.clear();
+        for (Day day : newDays) {
+            addDay(day);
         }
     }
 
     public void addExpanse(Expanse expanse) {
-        if (this.expanses == null) {
-            this.expanses = new HashSet<>();
-        }
         this.expanses.add(expanse);
         expanse.setTrip(this);
     }
@@ -110,20 +101,15 @@ public class Trip implements OwnableByUser {
                 expanse.setTrip(null);
             }
         }
-        if (this.backpack != null) {
-            this.backpack.setTrip(null);
-        }
-        if (this.budget != null) {
-            this.budget.setTrip(null);
-        }
-        if (this.owner != null) {
-            this.owner.removeTrip(this);
-        }
+        if (this.backpack != null) this.backpack.setTrip(null);
+        if (this.budget != null) this.budget.setTrip(null);
+        if (this.owner != null) this.owner.removeTrip(this);
+
     }
 
     public List<Day> getDaysInOrder() {
-        List<Day> daysList = new ArrayList<>(days);
-        daysList.sort(Comparator.comparing(Day::getDate));
-        return daysList;
+        return days.stream()
+                .sorted(Comparator.comparing(Day::getDate))
+                .toList();
     }
 }

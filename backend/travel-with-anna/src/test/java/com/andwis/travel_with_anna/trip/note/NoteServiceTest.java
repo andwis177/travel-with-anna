@@ -24,8 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -46,13 +45,13 @@ class NoteServiceTest {
         MockitoAnnotations.openMocks(this);
         noteService = new NoteService(noteRepository);
         noteRequest = NoteRequest.builder()
-                .entityId(1L)
-                .note("Note content")
+                .linkedEntityId(1L)
+                .noteContent("Note content")
                 .build();
 
         Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
@@ -61,7 +60,7 @@ class NoteServiceTest {
                 .password(encodedPassword)
                 .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
 
@@ -73,10 +72,10 @@ class NoteServiceTest {
         // Given
         Note note = new Note();
         note.setNoteId(1L);
-        note.setNote("Test Note");
+        note.setContent("Test Note");
 
         // When
-        noteService.save(note);
+        noteService.saveNoteEntity(note);
 
         // Then
         verify(noteRepository, times(1)).save(note);
@@ -102,7 +101,7 @@ class NoteServiceTest {
         Long entityId = 1L;
         Note note = new Note();
         note.setNoteId(entityId);
-        note.setNote("Test Note");
+        note.setContent("Test Note");
         Function<Long, Note> getByIdFunction = _ -> note;
         Function<Note, Note> getNoteFunction = Function.identity();
 
@@ -148,7 +147,7 @@ class NoteServiceTest {
         ArgumentCaptor<Note> noteCaptor = ArgumentCaptor.forClass(Note.class);
         verify(noteRepository, times(1)).save(noteCaptor.capture());
         Note savedNote = noteCaptor.getValue();
-        assertEquals("Note content", savedNote.getNote());
+        assertEquals("Note content", savedNote.getContent());
     }
 
     @Test
@@ -158,7 +157,7 @@ class NoteServiceTest {
         Long noteId = 1L;
         Note existingNote = new Note();
         existingNote.setNoteId(noteId);
-        existingNote.setNote("Existing Note");
+        existingNote.setContent("Existing Note");
 
         Function<Long, Day> getByIdFunction = _ -> new Day();
         Function<Day, Note> getNoteFunction = _ -> existingNote;
@@ -171,7 +170,7 @@ class NoteServiceTest {
 
         // Then
         verify(noteRepository, times(1)).save(existingNote);
-        assertEquals("Note content", existingNote.getNote());
+        assertEquals("Note content", existingNote.getContent());
     }
 
     @Test
@@ -181,14 +180,14 @@ class NoteServiceTest {
         Long noteId = 1L;
         Note existingNote = new Note();
         existingNote.setNoteId(noteId);
-        existingNote.setNote("Existing Note");
+        existingNote.setContent("Existing Note");
 
         Function<Long, Day> getByIdFunction = _ -> new Day();
         Function<Day, Note> getNoteFunction = _ -> existingNote;
         BiConsumer<Day, Note> addNoteFunction = (_, _) -> {};
         Consumer<Day> removeNoteFunction = _ -> {};
 
-        noteRequest.setNote("");
+        noteRequest.setNoteContent("");
 
         // When
         noteService.saveNote(noteRequest, getByIdFunction, getNoteFunction, addNoteFunction, removeNoteFunction,

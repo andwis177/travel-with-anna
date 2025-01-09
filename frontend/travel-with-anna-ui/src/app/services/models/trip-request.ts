@@ -2,5 +2,5 @@
 /* eslint-disable */
 export interface TripRequest {
   password?: string;
-  tripId?: number;
+  tripId: number;
 }

@@ -11,11 +11,12 @@ import java.math.BigDecimal;
 @Setter
 @Builder
 public class CurrencyExchangeResponse implements Comparable<CurrencyExchangeResponse> {
+
     private String code;
     private BigDecimal value;
 
     @Override
-    public int compareTo(@NotNull CurrencyExchangeResponse obj) {
-        return this.code.compareTo(obj.code);
+    public int compareTo(@NotNull CurrencyExchangeResponse o) {
+        return this.code.compareTo(o.code);
     }
 }

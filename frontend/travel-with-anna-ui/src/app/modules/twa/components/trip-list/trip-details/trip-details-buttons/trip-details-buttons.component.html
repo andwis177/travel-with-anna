@@ -1,53 +1,53 @@
-<form class="buttons-container">
+<form class="second-container container-horizontal">
 
-  <button class="user-button margin" (click)="openBackpack($event)" matTooltip="Backpack">
-    <img src="../../../../../assets/images/backpack.png" class="user-button-image" alt="">
+  <button class="user-button puffer button-border button-background user-button-radius" (click)="openBackpack($event)" matTooltip="Backpack">
+    <img src="../../../../../assets/images/backpack.png" class="button-image user-button-radius" alt="">
   </button>
-  <button class="user-button margin" (click)="openBudget($event)" matTooltip="Budget">
-    <img src="../../../../../assets/images/budget.png" class="user-button-image" alt="">
-  </button>
-
-  <button class="user-button margin" (click)="editTrip($event)" matTooltip="Edit Trip">
-    <img src="../../../../../assets/images/edit.png" class="user-button-image" alt="">
+  <button class="user-button puffer button-border button-background user-button-radius" (click)="openBudget($event)" matTooltip="Budget">
+    <img src="../../../../../assets/images/budget.png" class="button-image user-button-radius" alt="">
   </button>
 
-  <button class="user-button margin" (click)="printReport($event)" matTooltip="Edit Trip">
-    <img src="../../../../../assets/images/printer.png" class="user-button-image" alt="">
+  <button class="user-button puffer button-border button-background user-button-radius" (click)="editTrip($event)" matTooltip="Edit Trip">
+    <img src="../../../../../assets/images/edit.png" class="button-image user-button-radius" alt="">
   </button>
 
-  <button class="delete-button margin" (click)="deleteTrip($event)" matTooltip="Delete Trip">
-    <img src="../../../../../assets/images/delete.png" class="delete-button-image" alt="">
+  <button class="user-button puffer button-border button-background user-button-radius" (click)="printReport($event)" matTooltip="Print Report">
+    <img src="../../../../../assets/images/printer.png" class="button-image user-button-radius" alt="">
   </button>
 
-  <div class="add-delete-container">
-    <div class="add-delete-line">
+  <div class="container-vertical margin-main-horizontal">
+    <div class="container-horizontal margin-small-vertical" style="align-items: baseline">
 
-      <button class="add-delete-button add-day-buttons" (click)="addDay(true, $event)" matTooltip="Add FIRST Day">
-        <mat-icon class="add-delete-buttons add-color">keyboard_double_arrow_left</mat-icon>
+      <button class="toolbar-day-button puffer add-day-buttons" (click)="addDay(true, $event)" matTooltip="Add FIRST Day">
+        <img src="../../../../../assets/images/arrow-left.png" class="button-image"  alt="">
       </button>
 
-      <a class="add-delete-description">
-        <img src="../../../../../assets/images/add.png" class="add-delete-description-icon"  alt="">
-      </a>
+      <div class="margin-main-horizontal">
+        <img src="../../../../../assets/images/plus.png" class="toolbar-day-manager-icon"  alt="">
+      </div>
 
-      <button class="add-delete-button add-day-buttons" (click)="addDay(false, $event)" matTooltip="Add LAST Day">
-        <mat-icon class="add-delete-buttons add-color">keyboard_double_arrow_right</mat-icon>
+      <button class="toolbar-day-button puffer add-day-buttons" (click)="addDay(false, $event)" matTooltip="Add LAST Day">
+        <img src="../../../../../assets/images/arrow-right.png" class="button-image"  alt="">
       </button>
     </div>
 
-    <div class="add-delete-line">
-      <button class="add-delete-button delete-day-buttons" (click)="deleteDay(true, $event)" matTooltip="Delete FIRST Day">
-        <mat-icon class="add-delete-buttons delete-color">keyboard_double_arrow_left</mat-icon>
+    <div class="container-horizontal margin-small-vertical" style="align-items: baseline">
+      <button class="toolbar-day-button puffer delete-day-buttons "  (click)="deleteDay(true, $event)" matTooltip="Delete FIRST Day">
+        <img src="../../../../../assets/images/arrow-left.png" class="button-image" alt="">
       </button>
 
-      <a class="add-delete-description">
-        <img src="../../../../../assets/images/delete.png" class="add-delete-description-icon" alt="">
-      </a>
+      <div class="margin-main-horizontal">
+        <img src="../../../../../assets/images/delete.png" class="toolbar-day-manager-icon" alt="">
+      </div>
 
-      <button class="add-delete-button delete-day-buttons " (click)="deleteDay(false, $event)" matTooltip="Delete LAST Day">
-        <mat-icon class="add-delete-buttons delete-color">keyboard_double_arrow_right</mat-icon>
+      <button class="toolbar-day-button puffer delete-day-buttons" (click)="deleteDay(false, $event)" matTooltip="Delete LAST Day">
+        <img src="../../../../../assets/images/arrow-right.png" class="button-image"  alt="">
       </button>
     </div>
   </div>
+
+  <button class="delete-button delete-button-border background-color-toolbar puffer margin-main-horizontal" (click)="deleteTrip($event)" matTooltip="Delete Trip">
+    <img src="../../../../../assets/images/delete.png" class="button-image" alt="">
+  </button>
 </form>
 

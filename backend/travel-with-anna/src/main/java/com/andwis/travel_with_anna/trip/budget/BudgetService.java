@@ -7,6 +7,7 @@ import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
 import com.andwis.travel_with_anna.trip.expanse.*;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BudgetService {
+
     private final BudgetRepository budgetRepository;
     private final ExpanseService expanseService;
     private final ActivityService activityService;
@@ -28,22 +30,31 @@ public class BudgetService {
     @Transactional
     public void updateBudget(@NotNull BudgetRequest request, UserDetails connectedUser) {
         Budget budget = findById(request.getBudgetId());
-        budgetAuthorizationService.verifyBudgetOwner(budget, connectedUser);
-        budget.setToSpend(request.getToSpend());
-        if (!request.getCurrency().equals(budget.getCurrency()) && !request.getCurrency().isEmpty()) {
-            budget.setCurrency(request.getCurrency());
-            expanseService.changeTripCurrency(budget);
-        }
+        budgetAuthorizationService.verifyBudgetOwner(connectedUser, budget);
+
+        updateBudgetDetails(request, budget);
         budgetRepository.save(budget);
     }
 
+    private void updateBudgetDetails(@NotNull BudgetRequest request, @NotNull Budget budget) {
+        budget.setBudgetAmount(request.getBudgetAmount());
+        updateCurrencyIfChanged(request.getCurrency(), budget);
+    }
+
+    private void updateCurrencyIfChanged(@NotNull String newCurrency, @NotNull Budget budget) {
+        if (!newCurrency.equals(budget.getCurrency()) && !newCurrency.isEmpty()) {
+            budget.setCurrency(newCurrency);
+            expanseService.changeTripCurrency(budget);
+        }
+    }
+
     public Budget findById(Long budgetId) {
-        return budgetRepository.findById(budgetId).orElseThrow(BudgetNotFoundException::new);
+        return budgetRepository.findById(budgetId).orElseThrow(() ->new BudgetNotFoundException("Budget Not Found"));
     }
 
     public BudgetResponse getBudgetById(Long budgetId, UserDetails connectedUser) {
         Budget budget = findById(budgetId);
-        budgetAuthorizationService.verifyBudgetOwner(budget, connectedUser);
+        budgetAuthorizationService.verifyBudgetOwner(connectedUser, budget);
         return BudgetMapper.toBudgetResponse(budget);
     }
 
@@ -51,11 +62,14 @@ public class BudgetService {
         BudgetResponse budgetResponse = getBudgetById(budgetId, connectedUser);
         List<ExpanseResponse> expanses = expanseService.getExpansesForTrip(tripId, connectedUser);
         Collections.sort(expanses);
-        BigDecimal overallPriceInTripCurrency = overallPriceInTripCurrency(expanses);
-        BigDecimal overallPaidInTripCurrency = overallPaidInTripCurrency(expanses);
+
+        BigDecimal overallPriceInTripCurrency = calculateOverallPriceInTripCurrency(expanses);
+        BigDecimal overallPaidInTripCurrency = calculateOverallPaidInTripCurrency(expanses);
         BigDecimal totalDebt = ExpanseTotalCalculator.calculateTotalDepth(expanses);
+
         List<ExpanseByCurrency> sumsByCurrency =
                 BudgetMapper.toExpansesByCurrency(calculateSumsByCurrency(expanses));
+
         return new BudgetExpensesRespond(
                 budgetResponse,
                 expanses,
@@ -63,26 +77,53 @@ public class BudgetService {
                 overallPriceInTripCurrency,
                 overallPaidInTripCurrency,
                 totalDebt,
-                budgetResponse.toSpend().subtract(overallPriceInTripCurrency),
-                budgetResponse.toSpend().subtract(overallPaidInTripCurrency)
+                calculateRemainingBudget(budgetResponse.budgetAmount(), overallPriceInTripCurrency),
+                calculateRemainingBudget(budgetResponse.budgetAmount(), overallPaidInTripCurrency)
         );
+    }
+
+    private BigDecimal calculateOverallPriceInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
+        return expanses.stream()
+                .map(ExpanseResponse::getPriceInTripCurrency)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal calculateOverallPaidInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
+        return expanses.stream()
+                .map(ExpanseResponse::getPaidInTripCurrency)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Contract(pure = true)
+    private @NotNull BigDecimal calculateRemainingBudget(@NotNull BigDecimal budgetAmount, BigDecimal totalSpent) {
+        return budgetAmount.subtract(totalSpent);
     }
 
     public Map<String, ExpanseCalculator> calculateSumsByCurrency(@NotNull List<ExpanseResponse> expanses) {
         return expanses.stream()
                 .collect(Collectors.groupingBy(
                         ExpanseResponse::getCurrency,
-                        Collectors.reducing(new ExpanseCalculator(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO),
-                                expanse -> new ExpanseCalculator(
-                                        expanse.getPrice() != null ? expanse.getPrice() : BigDecimal.ZERO,
-                                        expanse.getPaid() != null ? expanse.getPaid() : BigDecimal.ZERO,
-                                        expanse.getPriceInTripCurrency() != null ? expanse.getPriceInTripCurrency() : BigDecimal.ZERO,
-                                        expanse.getPaidInTripCurrency() != null ? expanse.getPaidInTripCurrency() : BigDecimal.ZERO,
-                                        expanse.getPrice() != null && expanse.getPaid() != null
-                                                ? expanse.getPrice().subtract(expanse.getPaid()) : BigDecimal.ZERO),
+                        Collectors.reducing(createEmptyExpanseCalculator(),
+                                this::createExpanseCalculator,
                                 ExpanseCalculator::add
                         )
                 ));
+    }
+
+    @Contract(pure = true)
+    private @NotNull ExpanseCalculator createEmptyExpanseCalculator() {
+        return new ExpanseCalculator(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+    }
+
+    private @NotNull ExpanseCalculator createExpanseCalculator(@NotNull ExpanseResponse expanse) {
+        return new ExpanseCalculator(
+                expanse.getPrice() != null ? expanse.getPrice() : BigDecimal.ZERO,
+                expanse.getPaid() != null ? expanse.getPaid() : BigDecimal.ZERO,
+                expanse.getPriceInTripCurrency() != null ? expanse.getPriceInTripCurrency() : BigDecimal.ZERO,
+                expanse.getPaidInTripCurrency() != null ? expanse.getPaidInTripCurrency() : BigDecimal.ZERO,
+                expanse.getPrice() != null && expanse.getPaid() != null
+                        ? expanse.getPrice().subtract(expanse.getPaid()) : BigDecimal.ZERO
+        );
     }
 
     public List<ExpanseTotalByBadge> calculateExpansesByBadgeByTripId
@@ -109,7 +150,7 @@ public class BudgetService {
 
     private List<ExpanseTotalByBadge> sortByType(@NotNull List<ExpanseTotalByBadge> expanseTotalByBadge) {
         return expanseTotalByBadge.stream()
-                .sorted(Comparator.comparing(ExpanseTotalByBadge::getType))
+                .sorted(Comparator.comparing(ExpanseTotalByBadge::getBadgeType))
                 .toList();
     }
 
@@ -121,23 +162,11 @@ public class BudgetService {
                         Collectors.reducing(
                                 new ExpanseBadgeCalculator(BigDecimal.ZERO, BigDecimal.ZERO),
                                 activity -> new ExpanseBadgeCalculator(
-                                        activity.getExpanse().getPriceInTripCurrency() != null ? activity.getExpanse().getPriceInTripCurrency() : BigDecimal.ZERO,
-                                        activity.getExpanse().getPaidInTripCurrency() != null ? activity.getExpanse().getPaidInTripCurrency() : BigDecimal.ZERO
+                                        activity.getExpanse().calculatePriceInTripCurrency() != null ? activity.getExpanse().calculatePriceInTripCurrency() : BigDecimal.ZERO,
+                                        activity.getExpanse().calculatePaidInTripCurrency() != null ? activity.getExpanse().calculatePaidInTripCurrency() : BigDecimal.ZERO
                                 ),
                                 ExpanseBadgeCalculator::add
                         )
                 ));
-    }
-
-    private BigDecimal overallPriceInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
-        return expanses.stream()
-                .map(ExpanseResponse::getPriceInTripCurrency)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private BigDecimal overallPaidInTripCurrency(@NotNull List<ExpanseResponse> expanses) {
-        return expanses.stream()
-                .map(ExpanseResponse::getPaidInTripCurrency)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

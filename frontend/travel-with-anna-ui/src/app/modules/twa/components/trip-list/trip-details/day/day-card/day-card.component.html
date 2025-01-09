@@ -1,23 +1,24 @@
-<div class="item" >
-  <button class="button" (click)="openDay($event)">
-    <div class="day-number trip-font">- {{day.dayNumber}} -</div>
-    <div class="day-date trip-font" [ngClass]="getTodayClass(day.isToday!)">
-      <div>{{day.date}}</div>
-      <div>{{day.dayOfWeek}}</div>
+<div class="second-container day-card-container puffer-small cart-shadow margin-small-vertical">
+  <button class="day-card-container cursor day-card-container-radius-adjust cart container-vertical align-center background-color-toolbar"
+          (click)="openDay($event)">
+    <div class="trip-font font-size-label font-color-white padding-main">- {{day.dayNumber}} -</div>
+    <div>
+      <div class="trip-font font-size-text font-color-white" [ngClass]="getTodayClass(day.isToday!)">{{day.date}}</div>
+      <div class="trip-font font-size-text font-color-white">{{day.dayOfWeek}}</div>
     </div>
-    <div class="full-width">
-      <div class="places" *ngFor="let city of addressDetails.cities">
-        <div>- {{city.city}}</div>
+    <div class="align-left full-width">
+      <div class="margin-small-horizontal wrap-text align-left font-color-light full-width" *ngFor="let city of addressDetails.cities">
+        <div class="padding-small align-left full-width">- {{city.city}}</div>
       </div>
     </div>
-
   </button>
-  <div class="bottom-menu">
-    <ng-container  class="bottom-menu-element" *ngIf="taggedActivities.length > 4; else defaultDisplay">
-      <div class="scrollable-icon-wrapper">
-        <a class="icon-area" *ngFor="let activity of taggedActivities">
+
+  <div class="container-horizontal day-cart-bottom-menu background-color-white align-to-baseline">
+    <ng-container *ngIf="taggedActivities.length > 4; else defaultDisplay">
+      <div class=" bottom-menu-element scrollable-activity-icon-wrapper">
+        <a class="activity-icon-area" *ngFor="let activity of taggedActivities">
           <img src="../../../../../assets/images/activity/{{iconProvider(activity)}}.png"
-               class="image-container icon"
+               class="activity-icon activity-icon-border border-radius"
                alt=""
                matTooltip="{{getTooltipContent(activity)}}">
         </a>
@@ -25,30 +26,26 @@
     </ng-container>
 
     <ng-template #defaultDisplay>
-      <div  class="bottom-menu-element">
-        <a class="icon-area" *ngFor="let activity of taggedActivities">
+      <div  class="bottom-menu-element container-horizontal">
+        <a class="activity-icon-area" *ngFor="let activity of taggedActivities">
           <img src="../../../../../assets/images/activity/{{iconProvider(activity)}}.png"
-               class="image-container icon"
+               class="activity-icon activity-icon-border border-radius"
                alt=""
                matTooltip="{{getTooltipContent(activity)}}">
         </a>
       </div>
     </ng-template>
 
-    <div class="notes-button">
-      <div
-        matBadge="!"
-        [matBadgeHidden]="!isBadgeVisible">
-        <button class="menu-button"
-                (click)="openNote($event)"
-                matTooltip="Notes">
-          <img src="../../../../../assets/images/notes.png"
-               class="image-container"
-               alt="">
-        </button>
-        <div>
-        </div>
-      </div>
+    <div
+      matBadge="!"
+      [matBadgeHidden]="!isBadgeVisible">
+      <button class="small-button puffer-big" style="margin-left: 15px"
+              (click)="openNote($event); $event.stopPropagation()"
+              matTooltip="Notes">
+        <img src="../../../../../assets/images/notes.png"
+             class="button-image"
+             alt="">
+      </button>
     </div>
   </div>
 </div>

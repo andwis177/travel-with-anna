@@ -5,7 +5,6 @@ import {CodeInputModule} from "angular-code-input";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {animate, state, style, transition, trigger} from "@angular/animations";
-import {MatDivider} from "@angular/material/divider";
 import {ErrorService} from "../../services/error/error.service";
 
 @Component({
@@ -17,8 +16,7 @@ import {ErrorService} from "../../services/error/error.service";
     MatCard,
     MatCardHeader,
     NgForOf,
-    MatCardContent,
-    MatDivider
+    MatCardContent
   ],
   templateUrl: './activate-account.component.html',
   styleUrl: './activate-account.component.scss',

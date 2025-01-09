@@ -28,9 +28,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.*;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,26 +51,23 @@ class TripControllerTest {
     @MockBean
     private TripMgr tripFacade;
     private UserDetails userDetails;
-    private User adminUser;
+    private User user;
 
     @BeforeEach
     void setup() {
-        Role adminRole = new Role();
-        adminRole.setRoleName(getUserRole());
-        adminRole.setAuthority(getUserAuthority());
-        Optional<Role> existingAdminRole = roleRepository.findByRoleName(getAdminRole());
-        Role retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
-        adminUser = User.builder()
+        user = User.builder()
                 .userName("adminUserName")
                 .email("adminEmail@example.com")
                 .password(passwordEncoder.encode("adminPassword"))
-                .role(retrivedAdminRole)
+                .role(role)
                 .avatarId(2L)
                 .build();
-        adminUser.setAccountLocked(false);
-        adminUser.setEnabled(true);
-        userDetails = createUserDetails(adminUser);
+        user.setAccountLocked(false);
+        user.setEnabled(true);
+        userDetails = createUserDetails(user);
     }
 
     @AfterEach
@@ -92,7 +88,7 @@ class TripControllerTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .post("/trip")
-                        .principal(createAuthentication(adminUser))
+                        .principal(createAuthentication(user))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
                         .content(jsonContent))
@@ -106,7 +102,7 @@ class TripControllerTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .get("/trip")
-                        .principal(createAuthentication(adminUser))
+                        .principal(createAuthentication(user))
                         .param("page", "0")
                         .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -132,9 +128,9 @@ class TripControllerTest {
     void updateTrip_ShouldReturnOk() throws Exception {
         // Given
         DayGeneratorRequest dayGeneratorRequest = DayGeneratorRequest.builder()
-                .tripId(1L)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(5))
+                .associatedTripId(1L)
+                .startDate(LocalDate.now().toString())
+                .endDate(LocalDate.now().plusDays(5).toString())
                 .build();
         TripEditRequest request = new TripEditRequest(dayGeneratorRequest, "Updated Trip Name");
         String requestBody = objectMapper.writeValueAsString(request);
@@ -144,7 +140,7 @@ class TripControllerTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .patch("/trip")
-                        .principal(createAuthentication(adminUser))
+                        .principal(createAuthentication(user))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk());
@@ -163,7 +159,7 @@ class TripControllerTest {
         mockMvc
                 .perform(MockMvcRequestBuilders
                         .delete("/trip")
-                        .principal(createAuthentication(adminUser))
+                        .principal(createAuthentication(user))
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());

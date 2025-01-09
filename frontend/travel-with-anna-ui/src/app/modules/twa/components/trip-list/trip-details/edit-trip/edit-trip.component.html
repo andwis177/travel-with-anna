@@ -1,58 +1,53 @@
-<mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">Edit Trip</div>
-  <button mat-icon-button class="close-button"
-          (click)="onClose()"
-          (keydown.enter)="$event.preventDefault()">
-    <mat-icon class="close-icon">close</mat-icon>
-  </button>
+<mat-toolbar-row class="dialog-top-bar background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div>Edit Trip</div>
+    <button mat-icon-button
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
+    </button>
+  </div>
 </mat-toolbar-row>
 
-<div class="dialog-container">
-  <form class="main-form">
-    <div>
-      <div class = "full-width name-button-area" >
-        <div>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Trip name: </mat-label>
-            <input  type="text"
-                    matInput
-                    [(ngModel)]="tripName"
-                    [ngModelOptions]="{standalone: true}"
-                    placeholder="Name your trip"
-                    autocomplete="name"
-                    (keydown.enter)="$event.preventDefault()">
-          </mat-form-field>
-        </div>
+<form class="second-container container-vertical align-left background-color-light padding-big">
 
-        <div class ="margin-form">
-          <mat-form-field appearance="outline" >
-            <mat-label>Enter a date range</mat-label>
-            <mat-date-range-input [rangePicker]="picker">
-              <input matStartDate [(ngModel)]="startDate" name="startDate" placeholder="Start date">
-              <input matEndDate [(ngModel)]="endDate" name="endDate" placeholder="End date">
-            </mat-date-range-input>
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-date-range-picker #picker></mat-date-range-picker>
-          </mat-form-field>
-        </div>
+  <div>
+    <mat-form-field appearance="outline" class="input-main">
+      <mat-label>Trip name: </mat-label>
+      <input  type="text"
+              matInput
+              [(ngModel)]="tripName"
+              [ngModelOptions]="{standalone: true}"
+              placeholder="Name your trip"
+              autocomplete="name"
+              (keydown.enter)="$event.preventDefault()">
+    </mat-form-field>
+  </div>
 
-        <form>
-          <mat-card-actions>
-            <div class="full-width" style="align-items: center">
-              <button class="custom-button-0 " (click)="updateTrip()" type="submit">Change</button>
-              <button class="custom-button-1 " (click)="onClose()" type="submit">Cancel</button>
-            </div>
-          </mat-card-actions>
-        </form>
-      </div>
+  <div class="container-horizontal">
+    <mat-form-field appearance="outline">
+      <mat-label>Enter a date range</mat-label>
+      <mat-date-range-input [rangePicker]="picker" >
+        <input matStartDate [(ngModel)]="startDate" name="startDate" placeholder="Start date">
+        <input matEndDate [(ngModel)]="endDate" name="endDate" placeholder="End date">
+      </mat-date-range-input>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+    <div style="padding: 7px 0 0 10px">
+      <button class="calendar-button puffer" (click)="picker.open()">
+        <img src="../../../../../assets/images/calendar.png" class="button-image" alt="">
+      </button>
     </div>
-  </form>
-</div>
+  </div>
 
+  <div class="full-width container-horizontal align-center">
+    <button class="button button-1 background-color-dark" (click)="updateTrip()">Update</button>
+    <button class="button button-1 background-color-medium" (click)="onClose()">Cancel</button>
+  </div>
+</form>
 
-<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-  <mat-divider class="padding-bottom"></mat-divider>
-  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+<div class="full-width error-msg border-top error-background" role="alert" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
 </div>
 
 

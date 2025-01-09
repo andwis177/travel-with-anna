@@ -131,9 +131,9 @@ export class BudgetCurrenciesComponent implements OnInit, AfterViewInit {
 
   getColorAmount(amount: number): string {
     if (amount < 0) {
-      return 'negative';
+      return 'negative-color';
     } else {
-      return 'positive';
+      return 'default';
     }
   }
 

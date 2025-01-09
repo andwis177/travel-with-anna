@@ -2,8 +2,6 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {EatComponent} from "../buttons/eat/eat.component";
 import {EventComponent} from "../buttons/event/event.component";
 import {FormsModule} from "@angular/forms";
-import {MatCardContent} from "@angular/material/card";
-import {MatDivider} from "@angular/material/divider";
 import {MatError, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
@@ -39,8 +37,6 @@ import {MatCheckbox} from "@angular/material/checkbox";
     EatComponent,
     EventComponent,
     FormsModule,
-    MatCardContent,
-    MatDivider,
     MatError,
     MatIcon,
     MatIconButton,
@@ -64,13 +60,13 @@ import {MatCheckbox} from "@angular/material/checkbox";
 })
 export class ActivityEditComponent implements OnInit {
   errorMsg: Array<string> = [];
-  activity : ActivityResponse = {};
+  activity : ActivityResponse = {type:""};
   day: DayResponse = {};
   activityUpdateRequest: ActivityUpdateRequest = {
     activityId: -1,
     dayId: -1,
-    newDate: "",
-    oldDate: "",
+    newActivityDate: "",
+    oldActivityDate: "",
     startTime: "",
     dayTag: false
   };
@@ -123,7 +119,7 @@ export class ActivityEditComponent implements OnInit {
     {
       this.getCities(this.country.name!);
     }
-    this.activityUpdateRequest.oldDate = this.day.date!;
+    this.activityUpdateRequest.oldActivityDate = this.day.date!;
     this.isEndTimeIncluded = this.activity.endTime?.length! > 0;
   }
 
@@ -201,7 +197,7 @@ export class ActivityEditComponent implements OnInit {
     this.cities = [];
     if (this.cities.length == 0) {
       this.errorMsg = [];
-      this.countryService.getCountryCities({country: country}).subscribe({
+      this.countryService.getCountryCities({countryName: country}).subscribe({
         next: (response) => {
           this.cities = response;
         },
@@ -285,25 +281,45 @@ export class ActivityEditComponent implements OnInit {
   }
 
   updateActivity() {
-    this.activityUpdateRequest.activityId = this.activity.activityId!;
-    this.activityUpdateRequest.activityTitle = this.activity.activityTitle!;
-    this.activityUpdateRequest.addressRequest = this.address
-    this.activityUpdateRequest.dayId = this.day.dayId!;
-    this.activityUpdateRequest.dayTag = this.activity.dayTag!;
-    this.activityUpdateRequest.startTime = this.startTime;
-    this.activityUpdateRequest.endTime = this.endTime;
-    this.activityUpdateRequest.newDate = this.date;
-    this.activityUpdateRequest.type = this.activity.type!;
+    this.errorMsg = [];
+    if (this.startTime != '' && this.isEndTimeApply(this.endTime) ) {
 
-    const params: UpdateActivity$Params = {body: this.activityUpdateRequest};
-    this.activityService.updateActivity(params).subscribe({
-      next: () => {
-        this.sharedService.setActivity(this.activityUpdateRequest);
-        this.dialog.getDialogById('activity-edit-dialog')?.close();
-      },
-      error: (error) => {
-        this.errorMsg = this.errorService.errorHandlerWithJson(error);
-      }
-    });
+      this.activityUpdateRequest.activityId = this.activity.activityId!;
+      this.activityUpdateRequest.activityTitle = this.activity.activityTitle!;
+      this.activityUpdateRequest.addressRequest = this.address;
+      this.activityUpdateRequest.dayId = this.day.dayId!;
+      this.activityUpdateRequest.dayTag = this.activity.dayTag!;
+      this.activityUpdateRequest.startTime = this.startTime;
+      this.activityUpdateRequest.endTime = this.endTime;
+      this.activityUpdateRequest.newActivityDate = this.date;
+      this.activityUpdateRequest.type = this.activity.type!;
+
+      const params: UpdateActivity$Params = {body: this.activityUpdateRequest};
+      this.activityService.updateActivity(params).subscribe({
+        next: () => {
+          this.sharedService.setActivity(this.activityUpdateRequest);
+          this.dialog.getDialogById('activity-edit-dialog')?.close();
+        },
+        error: (error) => {
+          this.errorMsg = this.errorService.errorHandler(error);
+          console.log(this.errorMsg)
+        }
+      });
+    } else {
+      this.errorMsg.push('Please select time');
+    }
   }
+
+  formatToolbarNote(): string {
+    return " - " + this.activity.type + " [" + this.day.date + "]";
+
+  }
+
+  isEndTimeApply(endTime: string): boolean {
+    if (!this.isEndTimeIncluded) {
+      return true;
+    }
+      return (endTime != '')
+  }
+
 }

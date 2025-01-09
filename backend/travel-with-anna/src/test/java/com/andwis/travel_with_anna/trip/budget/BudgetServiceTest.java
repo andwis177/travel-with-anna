@@ -25,8 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -55,8 +54,8 @@ class BudgetServiceTest {
         MockitoAnnotations.openMocks(this);
 
         Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
 
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
         User user = User.builder()
@@ -65,13 +64,13 @@ class BudgetServiceTest {
                 .password(passwordEncoder.encode("password"))
                 .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
 
         budget = Budget.builder()
                 .budgetId(1L)
-                .toSpend(new BigDecimal("1000.00"))
+                .budgetAmount(new BigDecimal("1000.00"))
                 .currency("USD")
                 .trip(new Trip())
                 .build();
@@ -87,18 +86,18 @@ class BudgetServiceTest {
         // Given
         BudgetRequest request = BudgetRequest.builder()
                 .budgetId(1L)
-                .toSpend(new BigDecimal("1200.00"))
+                .budgetAmount(new BigDecimal("1200.00"))
                 .currency("EUR")
                 .tripId(1L)
                 .build();
         when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
-        doNothing().when(budgetAuthorizationService).verifyBudgetOwner(budget, userDetails);
+        doNothing().when(budgetAuthorizationService).verifyBudgetOwner(userDetails, budget);
 
         // When
         budgetService.updateBudget(request, userDetails);
 
         // Then
-        assertEquals(new BigDecimal("1200.00"), budget.getToSpend());
+        assertEquals(new BigDecimal("1200.00"), budget.getBudgetAmount());
         assertEquals("EUR", budget.getCurrency());
         verify(expanseService).changeTripCurrency(budget);
         verify(budgetRepository).save(budget);
@@ -144,13 +143,13 @@ class BudgetServiceTest {
                 1L,"USD",  new BigDecimal("1500.00"), 1L);
         when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
         doNothing().when(expanseService).changeTripCurrency(any());
-        doNothing().when(budgetAuthorizationService).verifyBudgetOwner(budget, userDetails);
+        doNothing().when(budgetAuthorizationService).verifyBudgetOwner(userDetails, budget);
 
         // When
         budgetService.updateBudget(request, userDetails);
 
         // Then
-        assertEquals(new BigDecimal("1500.00"), budget.getToSpend());
+        assertEquals(new BigDecimal("1500.00"), budget.getBudgetAmount());
         assertEquals("USD", budget.getCurrency());
         verify(budgetRepository).save(budget);
     }
@@ -248,8 +247,8 @@ class BudgetServiceTest {
 
         // Then
         assertEquals(2, result.size());
-        assertEquals("badge1", result.get(0).getType());
-        assertEquals("badge2", result.get(1).getType());
+        assertEquals("badge1", result.get(0).getBadgeType());
+        assertEquals("badge2", result.get(1).getBadgeType());
     }
 
     private @NotNull UserDetails createUserDetails(User user) {

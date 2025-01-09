@@ -12,7 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static com.andwis.travel_with_anna.role.Role.*;
+import static com.andwis.travel_with_anna.role.RoleType.ADMIN;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -33,7 +34,7 @@ class RoleControllerTest {
     @WithMockUser(username = "email@example.com", roles = "USER")
     void getAllRoleNames_ShouldReturnOkWithRoleNamesList() throws Exception {
         // Given
-        List<String> roles = List.of(getUserRole(), getAdminRole());
+        List<String> roles = List.of(USER.getRoleName(), ADMIN.getRoleName());
         when(service.getAllRoleNames()).thenReturn(roles);
 
         // When

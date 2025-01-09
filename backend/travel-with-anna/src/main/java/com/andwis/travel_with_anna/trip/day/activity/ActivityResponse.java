@@ -22,5 +22,5 @@ public class ActivityResponse {
     private ExpanseResponse expanse;
     private Long associatedId;
     private AddressResponse address;
-    private boolean isDayTag;
+    private boolean dayTag;
 }

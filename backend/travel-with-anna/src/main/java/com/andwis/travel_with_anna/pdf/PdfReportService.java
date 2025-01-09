@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.pdf;
 
-import com.andwis.travel_with_anna.handler.exception.PdfReportCreationException;
+import com.andwis.travel_with_anna.handler.exception.BudgetNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.TripNotFoundException;
 import com.andwis.travel_with_anna.trip.budget.Budget;
 import com.andwis.travel_with_anna.trip.budget.BudgetMapper;
@@ -19,8 +19,10 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +30,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PdfReportService {
-    private static final String USER_UNAUTHORIZED = "You are not authorized to access this trip";
+    private static final String USER_UNAUTHORIZED = "You are not authorized to access";
+    private static final String TRIP_NOT_FOUND_MESSAGE = "Trip not found when generating expense PDF report";
+    private static final String BUDGET_NOT_FOUND_MESSAGE = "Budget cannot be null when generating expense PDF report";
+
     private final TripReportCreator tripReportParagraphCreator;
     private final ExpanseReportCreator expanseReportParagraphCreator;
     private final TripService tripService;
@@ -37,102 +42,115 @@ public class PdfReportService {
     private final ExpanseSummaryReportCreator expanseSummaryReportCreator;
     private final BudgetService budgetService;
 
-    public ByteArrayOutputStream createTripPdfReport(Long tripId, UserDetails connectedUser) throws PdfReportCreationException {
-        ByteArrayOutputStream tripPdfReport = new ByteArrayOutputStream();
+    @Transactional
+    public ByteArrayOutputStream createTripPdfReport(Long tripId, UserDetails connectedUser) {
         try {
-            Trip trip = tripService.getTripById(tripId);
-            userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, USER_UNAUTHORIZED);
+            ByteArrayOutputStream tripPdfReport = new ByteArrayOutputStream();
+            Trip trip = authenticateAndFetchTrip(tripId, connectedUser);
             List<Day> days = trip.getDaysInOrder();
 
-            PdfWriter writer = new PdfWriter(tripPdfReport);
-            PdfDocument pdfDocument = new PdfDocument(writer);
-            Document document = new Document(pdfDocument);
-
+            Document document = initializePdfDocument(tripPdfReport);
             document.add(tripReportParagraphCreator.getTitle(trip.getTripName()));
             document.add(tripReportParagraphCreator.getDates(
                     days.getFirst().getDate().toString(),
-                    days.getLast().getDate().toString()));
+                    days.getLast().getDate().toString()
+            ));
 
             for (Day day : days) {
-                document.add(tripReportParagraphCreator.getDay(day));
-                if (
-                        day.getNote() != null
-                        && day.getNote().getNote() != null
-                        && !day.getNote().getNote().isBlank()
-                ) {
-                    document.add(tripReportParagraphCreator.getDayNote(day.getNote()));
-                }
-                document.add(tripReportParagraphCreator.getSeparatorLine());
-                List<Activity> activities = new ArrayList<>(day.getActivities());
-                Collections.sort(activities);
-                for (Activity activity : activities) {
-                    document.add(tripReportParagraphCreator.getActivity(activity));
-                    document.add(tripReportParagraphCreator.getActivityAddress(activity));
-                    if (activity.getNote() != null) {
-                        document.add(tripReportParagraphCreator.getNote(
-                                activity.getNote()));
-                    }
-                    if (activity.getExpanse() != null) {
-                        document.add(tripReportParagraphCreator.getExpanse(activity.getExpanse()));
-                        document.add(tripReportParagraphCreator.getSeparatorLine());
-                    } else {
-                        document.add(tripReportParagraphCreator.getSeparatorLine());
-                    }
-                }
+                processDay(document, day);
             }
+
             document.close();
             return tripPdfReport;
-        }
-        catch (BadCredentialsException e) {
-            throw e;
-        } catch (TripNotFoundException e) {
-            throw new TripNotFoundException("Trip not found");
-
         } catch (Exception e) {
-            throw new PdfReportCreationException("Error while creating Trip PDF report");
+            handleException(e);
+            return new ByteArrayOutputStream();
         }
     }
 
-    public ByteArrayOutputStream createExpansePdfReport(Long tripId, UserDetails connectedUser) throws PdfReportCreationException {
-        List<ExpanseByCurrency> expanseByCurrency = getExpanseByCurrency(expanseService.getExpansesForTrip(tripId, connectedUser));
-        ByteArrayOutputStream tripPdfReport = new ByteArrayOutputStream();
+    @Transactional
+    public ByteArrayOutputStream createExpansePdfReport(Long tripId, UserDetails connectedUser) {
         try {
-            Trip trip = tripService.getTripById(tripId);
-            userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, USER_UNAUTHORIZED);
+            ByteArrayOutputStream tripPdfReport = new ByteArrayOutputStream();
+            Trip trip = authenticateAndFetchTrip(tripId, connectedUser);
+
             Budget budget = trip.getBudget();
+            if (budget == null) {
+                throw new BudgetNotFoundException(BUDGET_NOT_FOUND_MESSAGE);
+            }
             List<ExpanseResponse> expanses = expanseService.getExpansesForTrip(tripId, connectedUser);
             Collections.sort(expanses);
             ExpanseInTripCurrency expanseInTripCurrency = ExpanseTotalCalculator.calculateInTripCurrency(expanses);
+            List<ExpanseByCurrency> expanseByCurrency = getExpanseByCurrency(expanses);
 
-            PdfWriter writer = new PdfWriter(tripPdfReport);
-            PdfDocument pdfDocument = new PdfDocument(writer);
-            Document document = new Document(pdfDocument);
-
+            Document document = initializePdfDocument(tripPdfReport);
             document.add(tripReportParagraphCreator.getTitle(trip.getTripName()));
             document.add(expanseReportParagraphCreator.getBudget(
-                    budget.getToSpend(),
-                    expanseInTripCurrency,
-                    budget.getCurrency()));
+                    budget.getBudgetAmount(), expanseInTripCurrency, budget.getCurrency()));
             document.add(expanseReportParagraphCreator.getExpanseHeader(budget.getCurrency()));
+
             for (ExpanseResponse expanse : expanses) {
                 document.add(expanseReportParagraphCreator.getExpanse(expanse, budget.getCurrency()));
             }
+
             document.add(expanseSummaryReportCreator.summaryByCurrency("Summary by currency"));
             document.add(expanseSummaryReportCreator.getSummaryHeader(budget.getCurrency()));
             for (ExpanseByCurrency expanse : expanseByCurrency) {
                 document.add(expanseSummaryReportCreator.getSummary(expanse, budget.getCurrency()));
             }
-
             document.close();
             return tripPdfReport;
-        }
-        catch (BadCredentialsException e) {
-            throw e;
-        } catch (TripNotFoundException e) {
-            throw new TripNotFoundException("Trip not found");
-
         } catch (Exception e) {
-            throw new PdfReportCreationException("Error while creating Trip PDF report");
+            handleException(e);
+            return new ByteArrayOutputStream();
+        }
+    }
+
+    private @NotNull Trip authenticateAndFetchTrip(Long tripId, UserDetails connectedUser) {
+        Trip trip = tripService.getTripById(tripId);
+        userAuthenticationService.validateOwnership(trip.getOwner(), connectedUser, USER_UNAUTHORIZED);
+        return trip;
+    }
+
+    private @NotNull Document initializePdfDocument(ByteArrayOutputStream outputStream) {
+        PdfWriter writer = new PdfWriter(outputStream);
+        PdfDocument pdfDocument = new PdfDocument(writer);
+        return new Document(pdfDocument);
+    }
+
+    private void processDay(@NotNull Document document, Day day) throws IOException {
+        document.add(tripReportParagraphCreator.getDay(day));
+        if (day.getNote() != null && !day.getNote().getContent().isBlank()) {
+            document.add(tripReportParagraphCreator.getDayNote(day.getNote()));
+        }
+        document.add(tripReportParagraphCreator.getSeparatorLine());
+        List<Activity> activities = new ArrayList<>(day.getActivities());
+        Collections.sort(activities);
+        for (Activity activity : activities) {
+            processActivity(document, activity);
+        }
+    }
+
+    private void processActivity(@NotNull Document document, @NotNull Activity activity) throws IOException {
+        if (activity.getAddress() != null) {
+            document.add(tripReportParagraphCreator.getActivityAddress(activity));
+        }
+        if (activity.getNote() != null) {
+            document.add(tripReportParagraphCreator.getNote(activity.getNote()));
+        }
+        if (activity.getExpanse() != null) {
+            document.add(tripReportParagraphCreator.getExpanse(activity.getExpanse()));
+        }
+        document.add(tripReportParagraphCreator.getSeparatorLine());
+    }
+
+    private void handleException(Exception e) {
+        if (e instanceof BadCredentialsException) {
+            throw new BadCredentialsException(USER_UNAUTHORIZED, e);
+        } else if (e instanceof TripNotFoundException) {
+            throw new TripNotFoundException(TRIP_NOT_FOUND_MESSAGE);
+        } else if (e instanceof BudgetNotFoundException) {
+            throw new BudgetNotFoundException(BUDGET_NOT_FOUND_MESSAGE);
         }
     }
 

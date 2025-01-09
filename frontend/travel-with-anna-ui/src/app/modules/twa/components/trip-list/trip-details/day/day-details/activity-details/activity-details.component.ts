@@ -74,7 +74,7 @@ export class ActivityDetailsComponent implements OnInit {
       height: 'auto',
       id: 'contact-information-dialog',
       data: {
-        phone: this._activity.address!.phone,
+        phone: this._activity.address!.phoneNumber,
         email: this._activity.address!.email,
         website: this._activity.address!.website,
       }
@@ -116,7 +116,7 @@ export class ActivityDetailsComponent implements OnInit {
           entityType: 'activity',
           date: this._date,
           expanseCategory: this._activity.badge?.toUpperCase()! + ": " + this._activity.type
-           + "\n" + this._activity.address!.place + "\n[" +
+            + "\n" + this._activity.address!.place + "\n[" +
             this._activity.address!.city!.toUpperCase() + "]"
         }
       });
@@ -132,9 +132,9 @@ export class ActivityDetailsComponent implements OnInit {
 
     const dialogRef = this.dialog.open(ActivityEditComponent, {
       panelClass: 'custom-dialog-container',
-      maxWidth: '90vw',
-      maxHeight: '90vw',
-      width: '40vw',
+      maxWidth: '43vw',
+      maxHeight: '110vh',
+      width: 'auto',
       height: 'auto',
       id: 'activity-edit-dialog',
     });
@@ -167,9 +167,9 @@ export class ActivityDetailsComponent implements OnInit {
   getToPayClass(amount: number): string {
     switch (amount >= 0) {
       case false:
-        return 'negative';
+        return 'negative-color';
       default:
-        return 'default-activity';
+        return 'positive-color';
     }
   }
 

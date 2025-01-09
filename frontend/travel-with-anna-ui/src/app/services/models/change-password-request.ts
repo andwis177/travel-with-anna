@@ -2,6 +2,6 @@
 /* eslint-disable */
 export interface ChangePasswordRequest {
   confirmPassword?: string;
-  currentPassword: string;
+  currentPassword?: string;
   newPassword: string;
 }

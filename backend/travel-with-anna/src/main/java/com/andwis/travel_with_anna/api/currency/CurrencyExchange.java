@@ -15,18 +15,21 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "currency_exchange")
 public class CurrencyExchange {
+
+    public static final int EXCHANGE_VALUE_SCALE = 5;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "currency_id")
-    private Long currencyId;
+    private Long id;
 
-    @Column(name = "code")
+    @Column(name = "code", nullable = false)
     private String code;
 
-    @Column(name = "exchange_value")
-    private BigDecimal exchangeValue ;
+    @Column(name = "exchange_value", precision = 20, scale = EXCHANGE_VALUE_SCALE)
+    private BigDecimal exchangeValue;
 
     @NotNull
-    @Column(name = "date")
-    private LocalDateTime timeStamp;
+    @Column(name = "date", nullable = false)
+    private LocalDateTime timestamp;
 }

@@ -1,75 +1,97 @@
-<a class="title trip-font">{{_activity.activityTitle}}</a>
-<div [ngClass]="_activity.badge">
-  <button class="button" (click)="openEditActivity()">
-    <div class="activities-container">
+<button class="second-container cursor activity-details-padding puffer-small activity-details-main-button" (click)="openEditActivity()">
+  <a class="margin-main-horizontal font-size-text align-left trip-font" *ngIf="_activity.activityTitle!.length > 0">- {{_activity.activityTitle}} -</a>
+  <div [ngClass]="_activity.badge" class="container-vertical">
 
-      <div class="activity-content">
+    <div class="container-horizontal align-center margin-main">
+
+      <div class="badge-container container-vertical align-center badge-status-icon-margin">
         <img src="../../../../../assets/images/activity/{{_activity.type}}.png"
-             class="image-container"
+             class="button-image"
              alt=""
              matTooltip="{{_activity.badge?.toUpperCase()}}">
-        <div style="margin-top:10px">
-          <a class="time">{{_activity.startTime}}</a> <a *ngIf="_activity.endTime"> - </a> <a class="time">{{_activity.endTime}}</a>
+        <div class="padding-small-vertical container-horizontal">
+          <a class="font-size-label font-weight">{{_activity.startTime}}</a>
+          <a *ngIf="_activity.endTime"> - </a>
+          <a class="font-size-label font-weight">{{_activity.endTime}}</a>
         </div>
       </div>
 
-      <div class="activity-content">
-        <a class="place">{{_activity.address?.place}}</a>
-        <a class="city-country">{{_activity.address?.city}}</a>
-        <a class="city-country">{{_activity.address?.country}}</a>
-        <a class="address">{{_activity.address?.address}}</a>
+      <div class="address-container margin-main-horizontal container-vertical align-left">
+        <a class="font-size-label-plus font-weight">{{_activity.address?.place}}</a>
+        <a class="font-size-label-plus">{{_activity.address?.city}}</a>
+        <a class="font-size-label-plus">{{_activity.address?.country}}</a>
+        <a class="font-size-label-plus">{{_activity.address?.address}}</a>
       </div>
 
-      <div class="activity-content">
-
-        <button class="activity-button"
-                (click)="getContactInformation(); $event.stopPropagation()"
-                matTooltip="Contact Information">
-          <img src="../../../../../assets/images/activity/information.png" class="activity-button-image" alt="">
-        </button>
-
-        <button class="activity-button "
-                (click)="openNote(); $event.stopPropagation()"
-                matTooltip="Contact Information"
-                matBadge="!"
-                [matBadgeHidden]="!isBadgeVisible">
-          <img src="../../../../../assets/images/notes.png" class="activity-button-image" alt="">
-        </button>
-        <button class="activity-button"
-                (click)="openExpanse(); $event.stopPropagation()"
-                matTooltip="Open Expanse">
-          <img src="../../../../../assets/images/expanse-dollar.png" class="activity-button-image" alt="">
-        </button>
-
-        <button class="activity-button delete-button"
-                (click)="deleteActivity(); $event.stopPropagation()"
-                matTooltip="Delete Activity">
-          <img src="../../../../../assets/images/delete-button.png" class="activity-button-image" alt="">
-        </button>
+      <div class="action-buttons-container container-horizontal align-center">
+        <div class="padding-main">
+          <button class="action-button puffer"
+                  (click)="getContactInformation(); $event.stopPropagation()"
+                  matTooltip="Contact Information">
+            <img src="../../../../../assets/images/activity/information.png" class="button-image" alt="">
+          </button>
+        </div>
+        <div class="padding-main">
+          <button class="action-button puffer"
+                  (click)="openNote(); $event.stopPropagation()"
+                  matTooltip="Make a note"
+                  matBadge="!"
+                  [matBadgeHidden]="!isBadgeVisible">
+            <img src="../../../../../assets/images/notes.png" class="button-image" alt="">
+          </button>
+        </div>
+        <div class="padding-main">
+          <button class="action-button puffer"
+                  (click)="openExpanse(); $event.stopPropagation()"
+                  matTooltip="Open Expanse">
+            <img src="../../../../../assets/images/expanse-dollar.png" class="button-image" alt="">
+          </button>
+        </div>
+        <div class="padding-main">
+          <button class="action-button puffer"
+                  (click)="deleteActivity(); $event.stopPropagation()"
+                  matTooltip="Delete Activity">
+            <img src="../../../../../assets/images/delete-button.png" class="button-image" alt="">
+          </button>
+        </div>
       </div>
 
-      <div class="activity-content">
+      <div class="badge-container container-vertical align-center badge-status-icon-margin">
         <img *ngIf="_activity.status"
              src="../../../../../assets/images/activity/{{_activity.status}}.png"
-             class="image-container"
+             class="button-image"
              alt=""
              matTooltip="{{_activity.status.toUpperCase()}}">
       </div>
-
     </div>
 
-    <div class="expanse-display">
-      <label class="label-currency">Price: <label *ngIf="_activity && _activity.expanse" class="amount">  {{formatAmount(_activity.expanse.price!)}}
-        <label class="label-currency">{{_activity.expanse.currency}}</label> </label>
-      </label>
+    <div class=" activity-details-expanse-container background-color-toolbar font-color-white container-vertical">
+      <div *ngIf="_activity && _activity.expanse" class="container-vertical" >
+        <label
+          class="font-size-label expanse-name-padding full-width">
+          {{_activity.expanse.expanseName}}
+        </label>
 
-      <label *ngIf="_activity && _activity.expanse" class="amount" [ngClass]="getToPayClass(calculateLeftToPay())">{{formatAmount(calculateLeftToPay())}}
-        <label class="label-currency">{{_activity.expanse.currency}}</label>
-      </label>
+        <div class="activity-details-expanse-amount-spread container-horizontal">
+          <div class="padding-small">
+            <label class="font-size-small">Price: <label class="font-size-label-plus font-weight">  {{formatAmount(_activity.expanse.price!)}}
+              <label class="font-size-small">{{_activity.expanse.currency}}</label> </label>
+            </label>
+          </div>
+          <div class="padding-small">
+            <label class="amount" [ngClass]="getToPayClass(calculateLeftToPay())">{{formatAmount(calculateLeftToPay())}}
+              <label class="label-currency">{{_activity.expanse.currency}}</label>
+            </label>
+          </div>
 
-      <label class="label-currency">Paid:  <label *ngIf="_activity && _activity.expanse" class="amount">{{formatAmount(_activity.expanse.paid!)}}
-        <label class="label-currency">{{_activity.expanse.currency}}</label></label>
-      </label>
+          <div class="padding-small">
+            <label class="label-currency">Paid:  <label *ngIf="_activity && _activity.expanse" class="amount">{{formatAmount(_activity.expanse.paid!)}}
+              <label class="label-currency">{{_activity.expanse.currency}}</label></label>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
-  </button>
-</div>
+  </div>
+</button>
+

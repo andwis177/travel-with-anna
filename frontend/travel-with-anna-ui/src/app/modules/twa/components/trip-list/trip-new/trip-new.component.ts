@@ -1,8 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatCardActions} from "@angular/material/card";
-import {MatDivider} from "@angular/material/divider";
-import {MatFormField, MatFormFieldModule, MatLabel, MatSuffix} from "@angular/material/form-field";
+import {MatFormField, MatFormFieldModule, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
@@ -16,12 +14,7 @@ import {MatOption, MatSelect, MatSelectModule} from "@angular/material/select";
 import {CountryCurrency} from "../../../../../services/models/country-currency";
 import {CountryControllerService} from "../../../../../services/services/country-controller.service";
 import {ErrorService} from "../../../../../services/error/error.service";
-import {
-  MatDatepickerModule,
-  MatDatepickerToggle,
-  MatDateRangeInput,
-  MatDateRangePicker,
-} from "@angular/material/datepicker";
+import {MatDatepickerModule, MatDateRangeInput, MatDateRangePicker,} from "@angular/material/datepicker";
 
 import {provideNativeDateAdapter} from "@angular/material/core";
 import {DayService} from "../../../../../services/services/day.service";
@@ -32,14 +25,11 @@ import {GenerateDays$Params} from "../../../../../services/fn/day/generate-days"
   standalone: true,
   imports: [
     FormsModule,
-    MatCardActions,
-    MatDivider,
     MatFormField,
     MatIcon,
     MatIconButton,
     MatInput,
     MatLabel,
-    MatSuffix,
     MatToolbarRow,
     NgForOf,
     NgIf,
@@ -47,7 +37,6 @@ import {GenerateDays$Params} from "../../../../../services/fn/day/generate-days"
     MatSelect,
     MatDateRangeInput,
     ReactiveFormsModule,
-    MatDatepickerToggle,
     MatDateRangePicker,
     MatFormFieldModule,
     MatDatepickerModule,
@@ -112,7 +101,7 @@ export class TripNewComponent implements OnInit {
     const formattedStartDate = this.formatDateToJson(this.startDate);
     const formattedEndDate = this.formatDateToJson(this.endDate);
     const params: GenerateDays$Params = {body:
-        {startDate: formattedStartDate,  endDate: formattedEndDate, tripId: tripId}};
+        {startDate: formattedStartDate,  endDate: formattedEndDate, associatedTripId: tripId}};
     this.dayService.generateDays(params)
       .subscribe({
         next: () => {
@@ -132,8 +121,10 @@ export class TripNewComponent implements OnInit {
     this.countryControllerService.getAllCountryCurrencies().subscribe( {
       next: (currency) => {
         this.currency = currency;
+        this.replaceCurrencyListIfEmpty()
+
         if(currency.length > 0) {
-          this.tripCreatorRequest.currency = currency[0].currency!;
+          this.tripCreatorRequest.currency = currency[0]?.currency! || ' ';
           this.currency = currency;
         }
       },
@@ -145,5 +136,15 @@ export class TripNewComponent implements OnInit {
 
   onClose() {
     this.dialog.closeAll();
+  }
+
+  replaceCurrencyListIfEmpty(): void {
+    if (!this.currency || this.currency.length === 0) {
+      {
+        this.currency = [{currency: 'USD', country: 'United States'},
+          {currency: 'EUR', country: 'European Union'},
+          {currency: 'PLN', country: 'Poland'}]
+      }
+    }
   }
 }

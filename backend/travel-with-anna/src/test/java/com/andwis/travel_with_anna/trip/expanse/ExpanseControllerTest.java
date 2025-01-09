@@ -19,8 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.math.BigDecimal;
 import java.util.HashSet;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -32,20 +31,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Expanse Controller Tests")
 class ExpanseControllerTest {
+    @MockBean
+    private ExpanseFacade expanseFacade;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @MockBean
-    private ExpanseFacade expanseFacade;
 
     @BeforeEach
     void setUp() {
         Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
@@ -54,7 +53,7 @@ class ExpanseControllerTest {
                 .password(encodedPassword)
                 .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
     }
@@ -65,6 +64,7 @@ class ExpanseControllerTest {
         // Given
         ExpanseRequest request = ExpanseRequest.builder()
                 .expanseName("Hotel Booking")
+                .expanseCategory("Hotel")
                 .currency("USD")
                 .price(BigDecimal.valueOf(100.00))
                 .paid(BigDecimal.valueOf(80.00))
@@ -86,17 +86,15 @@ class ExpanseControllerTest {
                 .paidInTripCurrency(BigDecimal.valueOf(96.00))
                 .build();
 
-        String requestBody = objectMapper.writeValueAsString(request);
-        String jsonResponse = objectMapper.writeValueAsString(response);
         when(expanseFacade.createOrUpdateExpanse(any(ExpanseRequest.class), any())).thenReturn(response);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/expanse")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(content().json(jsonResponse));
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
     }
 
     @Test
@@ -105,7 +103,7 @@ class ExpanseControllerTest {
         // Given
         Long expanseId = 1L;
         ExpanseResponse response = ExpanseResponse.builder()
-                .expanseId(1L)
+                .expanseId(expanseId)
                 .expanseName("Hotel Booking")
                 .expanseCategory("Hotel")
                 .date("2022-01-01")
@@ -134,7 +132,7 @@ class ExpanseControllerTest {
         Long entityId = 1L;
         String entityType = "ITEM";
         ExpanseResponse response = ExpanseResponse.builder()
-                .expanseId(1L)
+                .expanseId(entityId)
                 .expanseName("Hotel Booking")
                 .expanseCategory("Hotel")
                 .date("2022-01-01")
@@ -163,6 +161,7 @@ class ExpanseControllerTest {
         String currencyFrom = "USD";
         String currencyTo = "EUR";
         ExchangeResponse exchangeResponse = new ExchangeResponse("", BigDecimal.valueOf(1.18));
+
         when(expanseFacade.getExchangeRate(currencyFrom, currencyTo)).thenReturn(exchangeResponse);
 
         // When & Then

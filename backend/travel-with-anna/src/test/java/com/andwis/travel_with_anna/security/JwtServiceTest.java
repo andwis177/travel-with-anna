@@ -7,7 +7,6 @@ import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import io.jsonwebtoken.Claims;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,10 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -45,17 +42,14 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
                 .build();
         user.setEnabled(true);
@@ -130,15 +124,14 @@ class JwtServiceTest {
         // Given
         String jwtToken =  jwtService.generateJwtToken(createAuthentication(user));
         UserDetails userDetails1 = (UserDetails) createAuthentication(user).getPrincipal();
-        // When
 
+        // When
         boolean isTokenValid = jwtService.isTokenValid(jwtToken, userDetails1);
 
         // Then
         assertTrue(isTokenValid);
     }
 
-    @Contract("_ -> new")
     private @NotNull Authentication createAuthentication(User user) {
         SecurityUser securityUser = new SecurityUser(user);
         return new UsernamePasswordAuthenticationToken(securityUser, user.getPassword(), securityUser.getAuthorities());

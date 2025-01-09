@@ -1,10 +1,9 @@
 import {Component, HostListener} from '@angular/core';
 import {Router} from "@angular/router";
-import {MatCard, MatCardHeader} from "@angular/material/card";
+import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatDivider} from "@angular/material/divider";
 import {ResetPasswordRequest} from "../../services/models/reset-password-request";
 import {AuthenticationService} from "../../services/services/authentication.service";
 import {NgForOf, NgIf} from "@angular/common";
@@ -22,9 +21,9 @@ import {ErrorService} from "../../services/error/error.service";
     MatLabel,
     ReactiveFormsModule,
     FormsModule,
-    MatDivider,
     NgIf,
-    NgForOf
+    NgForOf,
+    MatCardContent
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'
@@ -59,7 +58,7 @@ export class ResetPasswordComponent {
       body: this.credential
     }).subscribe({
       next: () => {
-        this.router.navigate(['login']).then(r => this._snackBar.open('Your password has been successfully reset and sent to your email.', 'Close'));
+        this.router.navigate(['login']).then(() => this._snackBar.open('Your password has been successfully reset and sent to your email.', 'Close'));
       },
       error: (err) => {
         this.errorMsg = this.errorService.errorHandler(err);

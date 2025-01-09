@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +24,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
+    private static final String AUTH_WHITELIST_URL = "/twa/v1/auth";
+    private static final String BEARER_PREFIX = "Bearer ";
+
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
@@ -30,33 +35,50 @@ public class JwtFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getServletPath().contains("/twa/v1/auth")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        final String authHeader = request.getHeader(AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (isWhitelistedURL(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String jwt = authHeader.split(" ")[1].trim();
-        final String userEmail = jwtService.extractUsername(jwt);
-
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
+        final String jwt = extractJwtFromRequest(request);
+        if (jwt == null) {
+            filterChain.doFilter(request, response);
+            return;
         }
+
+        authenticateRequest(jwt, request);
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isWhitelistedURL(@NotNull HttpServletRequest request) {
+        return request.getServletPath().contains(AUTH_WHITELIST_URL);
+    }
+
+    private @Nullable String extractJwtFromRequest(@NotNull HttpServletRequest request) {
+        final String authorizationHeader = request.getHeader(AUTHORIZATION);
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+            return null;
+        }
+        return authorizationHeader.substring(BEARER_PREFIX.length()).trim();
+    }
+
+    private void authenticateRequest(String jwt, HttpServletRequest request) {
+        final String userEmail = jwtService.extractUsername(jwt);
+        if (userEmail == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+            return;
+        }
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+        if (jwtService.isTokenValid(jwt, userDetails)) {
+            setAuthentication(userDetails, request);
+        }
+    }
+
+    private void setAuthentication(UserDetails userDetails, HttpServletRequest request) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities()
+        );
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 }

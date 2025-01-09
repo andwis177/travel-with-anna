@@ -8,7 +8,7 @@ public record AddressResponse(
         String city,
         String address,
         String website,
-        String phone,
+        String phoneNumber,
         String email,
         String currency
 ) {

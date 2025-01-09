@@ -1,6 +1,8 @@
 package com.andwis.travel_with_anna.security;
 
+import com.andwis.travel_with_anna.role.RoleType;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -12,8 +14,6 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.andwis.travel_with_anna.role.Role.getAdminAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -52,9 +52,7 @@ public class SecurityConfig  {
                                 ).permitAll()
                                 .requestMatchers(
                                         "/user/**",
-                                        "/avatar/**"
-                                ).hasAnyAuthority(getUserAuthority(), getAdminAuthority())
-                                .requestMatchers(
+                                        "/avatar/**",
                                         "/expanse/**",
                                         "/note/**",
                                         "/day/**",
@@ -62,11 +60,12 @@ public class SecurityConfig  {
                                         "/backpack/**",
                                         "/trip/**",
                                         "/api/country/**",
+                                        "/api/exchange/**",
                                         "/pdf/reports/**"
-                                ).hasAuthority(getUserAuthority())
+                                ).hasAnyAuthority(RoleType.USER.getAuthority(), RoleType.ADMIN.getAuthority())
                                 .requestMatchers(
                                         "/admin/**"
-                                ).hasAuthority(getAdminAuthority())
+                                ).hasAuthority(RoleType.ADMIN.getAuthority())
                                 .anyRequest()
                                 .authenticated()
                 )
@@ -75,15 +74,18 @@ public class SecurityConfig  {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/execute_logout")
-                    .invalidateHttpSession(true)
-                    .logoutSuccessHandler(customLogoutSuccessHandler)
-                    .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true)
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
+                        .deleteCookies("JSESSIONID")
                 )
-                .headers(headers -> headers
-                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
-                );
+                .headers(this::configureSecurityHeaders);
 
         return http.build();
+    }
+
+    private void configureSecurityHeaders(@NotNull HeadersConfigurer<?> headers) {
+        headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny);
     }
 }

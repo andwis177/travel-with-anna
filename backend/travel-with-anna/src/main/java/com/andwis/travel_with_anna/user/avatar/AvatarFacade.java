@@ -11,6 +11,7 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 public class AvatarFacade {
+
     private final UserAvatarService userAvatarService;
 
     public void setAvatar(MultipartFile file, UserDetails connectedUser)

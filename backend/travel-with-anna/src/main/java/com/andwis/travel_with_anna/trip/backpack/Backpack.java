@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.trip.backpack;
 
-import com.andwis.travel_with_anna.security.OwnableByUser;
+import com.andwis.travel_with_anna.security.OwnByUser;
 import com.andwis.travel_with_anna.trip.backpack.item.Item;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.user.User;
@@ -16,47 +16,41 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "backpack")
-public class Backpack implements OwnableByUser {
+public class Backpack implements OwnByUser {
+
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "backpack_id")
     private Long backpackId;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "backpack", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Item> items = new ArrayList<>();
+    private List<Item> backpackItems = new ArrayList<>();
 
     @OneToOne(mappedBy = "backpack")
     private Trip trip;
 
     public void addItem(Item item) {
-        items.add(item);
+        this.backpackItems.add(item);
         item.setBackpack(this);
     }
 
     public void removeItem(Item item) {
-        items.remove(item);
+        this.backpackItems.remove(item);
         item.setBackpack(null);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Backpack backpack = (Backpack) o;
-        return Objects.equals(backpackId, backpack.backpackId)
-                && Objects.equals(items, backpack.items)
-                && Objects.equals(trip, backpack.trip);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(backpackId);
+    public List<Item> getBackpackItems() {
+        return List.copyOf(this.backpackItems);
     }
 
     @Override
     public User getOwner() {
-        return this.trip.getOwner();
+        return Objects.requireNonNull(this.trip, "Backpack must be linked to a trip to have an owner")
+                .getOwner();
     }
 }

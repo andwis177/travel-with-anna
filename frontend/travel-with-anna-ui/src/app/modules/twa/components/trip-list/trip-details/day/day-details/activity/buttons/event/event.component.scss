@@ -1,15 +1,8 @@
-.user-button-image {
-  background-color: whitesmoke !important;
-}
-
-.buttons-container {
+.alignment-container-from-top {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.user-button {
-  margin: 10px;
+  align-items: start;
+  justify-content: start;
+  text-align: center;
 }
 
 

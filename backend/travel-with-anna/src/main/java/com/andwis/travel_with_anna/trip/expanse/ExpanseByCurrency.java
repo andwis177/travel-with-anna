@@ -9,7 +9,8 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class ExpanseByCurrency implements Comparable<ExpanseByCurrency> {
-    private String currency;
+
+    private String currencyCode;
     private BigDecimal totalPrice;
     private BigDecimal totalPaid;
     private BigDecimal totalPriceInTripCurrency;
@@ -18,6 +19,6 @@ public class ExpanseByCurrency implements Comparable<ExpanseByCurrency> {
 
     @Override
     public int compareTo(@NotNull ExpanseByCurrency o) {
-        return this.currency.compareTo(o.currency);
+        return this.currencyCode.compareTo(o.currencyCode);
     }
 }

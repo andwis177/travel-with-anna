@@ -15,10 +15,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "avatars")
 @EntityListeners(AuditingEntityListener.class)
 public class Avatar {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "avatar_id")
     private Long avatarId;
+
     @Lob
     @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar;

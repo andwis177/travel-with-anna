@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class TripService {
+
     private final TripRepository tripRepository;
 
     public Long saveTrip(Trip trip) {
@@ -20,7 +21,8 @@ public class TripService {
     }
 
     public Trip getTripById(Long tripId) {
-        return tripRepository.findById(tripId).orElseThrow(() -> new TripNotFoundException("Trip not found"));
+        return tripRepository.findById(tripId).orElseThrow(() ->
+                new TripNotFoundException("Trip not found"));
     }
 
     public void deleteById(Long tripId) {

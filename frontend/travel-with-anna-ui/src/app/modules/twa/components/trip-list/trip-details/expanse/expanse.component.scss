@@ -2,112 +2,31 @@
   display: none;
 }
 
-mat-form-field {
-  max-width: 100% !important;
-}
-
-.insert-size {
-  width: 40% !important;
-}
-
-.insert-description-size {
-  width: 95% !important;
-  margin-right: 10px;
-}
-
-.insert-size {
-  width: 70% !important;
-}
-
-.insert-size-paid {
-  width: 80% !important;
-}
-
-.button-input:hover {
-  opacity: 0.5;
-}
-
-.input-with-currency {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.currency {
-  font-size: 0.8em;
-  font-weight: 400;
-  color: #2E3944;
-}
-
-.main-expanse-container{
+.currency-label{
   width: 100% !important;
-  height: 100% !important;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: start;
 }
 
-.expanse-container {
-  width: 35% !important;
-  height: 50% !important;
-  border-radius: 5% !important;
-  border: 2px solid #2E3944 !important;
-  margin: 1% !important;
-  padding: 4% 4% 2% 2% !important;
-  background-color: #D1E0E2 !important;
-  text-align: start !important;
+.expanse-font-label{
+  color: #2E3944 !important;
 }
 
-.center-align {
-  text-align: center !important;
+.expanse-currency-label {
+  color:  #2E3944 !important;
 }
 
-.padding-label{
-  padding: 3% !important;
-  width: 30vh !important;
-  font-size: 22px !important;
-  font-weight: 550 !important;
-  color: whitesmoke !important;
-  background-color: #2E3944;
-  font-family: 'Montserrat', sans-serif;
+.container-height-auto {
+  height: auto !important;
+  max-height: 40vh !important;
 }
 
-.value-container {
-  display: flex !important;
-  justify-content: start !important;
-  align-items: baseline !important;
-  margin-top: 5% !important;
-  padding: 2% !important;
-}
-
-.title-label{
+.balance-font-size {
   font-size: 18px !important;
-  font-weight: 500 !important;
-  color: #7B9D9C !important;
-  margin-right: 7% !important;
-  font-family: 'Montserrat', sans-serif;
 }
 
-.value-label{
-  font-size: 18px !important;
-  font-weight: 650 !important;
-  color:  #5A6D6E !important;
-  font-family: 'Montserrat', sans-serif;
+.balance-padding {
+  padding: 15px 0 10px 20px !important;
 }
 
-.currency-label {
-  font-size: 10px !important;
-  font-weight: 450 !important;
-  color:  #5A6D6E !important;
-  margin-left: 2% !important;
-  font-family: 'Montserrat', sans-serif;
-}
-
-.positive{
-  color: forestgreen !important;
-}
-
-.negative{
-  color: palevioletred !important;
+.currency-font-size-large {
+  font-size: 24px !important;
 }

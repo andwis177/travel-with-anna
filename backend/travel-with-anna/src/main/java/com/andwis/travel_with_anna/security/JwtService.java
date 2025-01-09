@@ -20,51 +20,53 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+
+    private static final String CLAIM_AUTHORITIES = "authorities";
+
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
-    private final SecretKey key;
+
+    private final SecretKey jwtSecretKey;
 
     public JwtService() {
-        this.key = Jwts.SIG.HS256.key().build();
+        this.jwtSecretKey = Jwts.SIG.HS256.key().build();
     }
 
     public String generateJwtToken(@NotNull Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Map<String, Object> claims = createClaims(userDetails);
+        UserDetails authenticatedUser = (UserDetails) authentication.getPrincipal();
+        Map<String, Object> claims = buildClaims(authenticatedUser);
 
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(authenticatedUser.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .claims(claims)
-                .signWith(this.key)
+                .signWith(this.jwtSecretKey)
                 .compact();
     }
 
-    private @NotNull @Unmodifiable Map<String, Object> createClaims(@NotNull UserDetails userDetails) {
-        List<String> authorities = userDetails.getAuthorities().stream()
+    private @NotNull @Unmodifiable Map<String, Object> buildClaims(@NotNull UserDetails authenticatedUser) {
+        List<String> authorities = authenticatedUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        return Map.of(
-                "authorities", authorities);
+        return Map.of(CLAIM_AUTHORITIES, authorities);
     }
 
     public <T> T extractClaim(String token, @NotNull Function<Claims, T> claimResolver) {
-        final Claims claims = extractAllClaims(token);
+        final Claims claims = parseClaimsFromToken(token);
         return claimResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    private Claims parseClaimsFromToken(String token) {
         try {
             return Jwts.parser()
-                    .verifyWith(this.key)
+                    .verifyWith(this.jwtSecretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch (JwtException exp) {
-            System.out.println("JWT parsing failed: " + exp.getMessage());
-            throw new JwtParsingException("JWT parsing failed");
+        } catch (JwtException e) {
+            throw new JwtParsingException("Failed to parse JWT: " + e.getMessage());
         }
     }
 
@@ -78,10 +80,7 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+        Date expiration = extractClaim(token, Claims::getExpiration);
+        return expiration.before(new Date());
     }
 }

@@ -20,12 +20,12 @@ public class UserMapper {
                 user.getUserId(),
                 user.getUserName(),
                 user.getEmail(),
+                avatarsWithUsersId.get(user.getAvatarId()),
                 user.isAccountLocked(),
                 user.isEnabled(),
                 user.getCreatedDate().toLocalDate(),
                 lastModifiedDate,
-                user.getRole().getRoleName(),
-                avatarsWithUsersId.get(user.getAvatarId())
+                user.getRole().getRoleName()
         );
     }
 }

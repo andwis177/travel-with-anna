@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/exchange")
+@RequestMapping("api/exchange")
 @RequiredArgsConstructor
 public class CurrencyExchangeController {
+
     private final CurrencyExchangeClient currencyExchangeClient;
 
     @GetMapping("/rates")

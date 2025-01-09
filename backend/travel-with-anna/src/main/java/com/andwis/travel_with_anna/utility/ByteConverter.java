@@ -1,31 +1,34 @@
 package com.andwis.travel_with_anna.utility;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ByteConverter {
 
-    public static @NotNull String bytesToHex(byte @NotNull [] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b));
+    private static final String HEX_FORMAT = "%02x";
+
+    public static @NotNull String bytesToHex(byte @NotNull [] byteArray) {
+        StringBuilder sb = new StringBuilder(byteArray.length * 2);
+        for (byte b : byteArray) {
+            sb.append(String.format(HEX_FORMAT, b));
         }
         return sb.toString();
     }
 
-    @Contract("null -> fail")
-    public static byte @NotNull [] hexToBytes(String hex) {
-        if (hex == null || hex.length() % 2 != 0) {
-            throw new IllegalArgumentException("Invalid hex string");
+    public static byte @NotNull [] hexToBytes(String hexString) {
+        if (hexString == null || hexString.length() % 2 != 0) {
+            throw new IllegalArgumentException("Invalid hex string. Must be non-null and have an even length.");
         }
 
-        byte[] bytes = new byte[hex.length() / 2];
-        for (int i = 0; i < hex.length(); i += 2) {
-            bytes[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                    + Character.digit(hex.charAt(i+1), 16));
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int i = 0; i < hexString.length(); i += 2) {
+            bytes[i / 2] = parseHexPairToByte(hexString.charAt(i), hexString.charAt(i + 1));
         }
         return bytes;
+    }
+
+    private static byte parseHexPairToByte(char high, char low) {
+        return (byte) ((Character.digit(high, 16) << 4) + Character.digit(low, 16));
     }
 }

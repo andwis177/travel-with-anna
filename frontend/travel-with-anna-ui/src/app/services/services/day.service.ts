@@ -53,13 +53,13 @@ export class DayService extends BaseService {
   }
 
   /** Path part for operation `addDay()` */
-  static readonly AddDayPath = '/day/add';
+  static readonly AddDayPath = '/day/add/{tripId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `addDay()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method doesn't expect any request body.
    */
   addDay$Response(params: AddDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     return addDay(this.http, this.rootUrl, params, context);
@@ -69,7 +69,7 @@ export class DayService extends BaseService {
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `addDay$Response()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method doesn't expect any request body.
    */
   addDay(params: AddDay$Params, context?: HttpContext): Observable<void> {
     return this.addDay$Response(params, context).pipe(
@@ -128,13 +128,13 @@ export class DayService extends BaseService {
   }
 
   /** Path part for operation `deleteDay()` */
-  static readonly DeleteDayPath = '/day';
+  static readonly DeleteDayPath = '/day/{tripId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `deleteDay()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method doesn't expect any request body.
    */
   deleteDay$Response(params: DeleteDay$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     return deleteDay(this.http, this.rootUrl, params, context);
@@ -144,7 +144,7 @@ export class DayService extends BaseService {
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `deleteDay$Response()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method doesn't expect any request body.
    */
   deleteDay(params: DeleteDay$Params, context?: HttpContext): Observable<void> {
     return this.deleteDay$Response(params, context).pipe(

@@ -11,9 +11,18 @@ import java.io.IOException;
 
 @Component
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
+
+    private static final int SUCCESS_STATUS_CODE = HttpServletResponse.SC_OK;
+
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, @NotNull HttpServletResponse response, Authentication authentication) throws IOException {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public void onLogoutSuccess(HttpServletRequest request,
+                                @NotNull HttpServletResponse response, Authentication authentication)
+            throws IOException {
+        handleLogoutSuccess(response);
+    }
+
+    private void handleLogoutSuccess(@NotNull HttpServletResponse response) throws IOException {
+        response.setStatus(CustomLogoutSuccessHandler.SUCCESS_STATUS_CODE);
         response.getWriter().flush();
     }
 }

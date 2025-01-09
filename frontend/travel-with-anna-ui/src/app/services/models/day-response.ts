@@ -1,9 +1,9 @@
 /* tslint:disable */
 /* eslint-disable */
-import { ActivityResponse } from '../models/activity-response';
+import { ActivityListResponse } from '../models/activity-list-response';
 import { NoteResponse } from '../models/note-response';
 export interface DayResponse {
-  activity?: Array<ActivityResponse>;
+  activities?: ActivityListResponse;
   date?: string;
   dayId?: number;
   dayNumber?: number;

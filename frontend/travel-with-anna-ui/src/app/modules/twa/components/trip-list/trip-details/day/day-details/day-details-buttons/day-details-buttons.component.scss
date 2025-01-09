@@ -1,13 +1,6 @@
-.buttons-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly !important;
-  width: 100% !important;
-  align-items: center;
-}
-
-.margin {
-  margin: 20px;
+.button-background-radius {
+  border-radius:4px;
+  padding: 2px;
 }
 
 

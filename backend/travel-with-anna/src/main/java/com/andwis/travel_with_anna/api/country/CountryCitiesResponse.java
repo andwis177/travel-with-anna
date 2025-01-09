@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -12,7 +13,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CountryCitiesResponse {
-    @JsonProperty("data")
-    private List<City> data;
+public class CountryCitiesResponse implements EntityResponse<City> {
+
+    private static final String DATA_PROPERTY = "data";
+
+    @Builder.Default
+    @JsonProperty(DATA_PROPERTY)
+    private List<City> cities = new ArrayList<>();
+
+    @Override
+    public List<City> getEntities() {
+        return cities;
+    }
 }

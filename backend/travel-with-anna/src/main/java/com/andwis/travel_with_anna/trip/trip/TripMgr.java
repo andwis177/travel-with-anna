@@ -7,7 +7,6 @@ import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.backpack.BackpackService;
 import com.andwis.travel_with_anna.trip.backpack.item.ItemRequest;
 import com.andwis.travel_with_anna.trip.budget.Budget;
-import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.user.User;
@@ -36,6 +35,9 @@ import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDate;
 @RequiredArgsConstructor
 @Transactional
 public class TripMgr {
+
+    private static final String SORT_BY_ID = "id";
+
     private final TripService tripService;
     private final UserAuthenticationService userAuthenticationService;
     private final DayService dayService;
@@ -44,41 +46,36 @@ public class TripMgr {
 
     @Transactional
     public Long createTrip(@NotNull @Valid TripCreatorRequest request, UserDetails connectedUser) {
-        User user = userAuthenticationService.getConnectedUser(connectedUser);
+        User user = userAuthenticationService.retriveConnectedUser(connectedUser);
 
-        Backpack backpack = Backpack.builder()
-                .items(new ArrayList<>())
-                .build();
-
-        Budget budget = Budget.builder()
-                .currency(request.getCurrency())
-                .toSpend(request.getToSpend())
-                .build();
+        Backpack backpack = createBackpack();
+        Budget budget = createBudget(request);
 
         Trip trip = Trip.builder()
                 .tripName(request.getTripName())
                 .build();
-
         trip.addBackpack(backpack);
         trip.addBudget(budget);
         user.addTrip(trip);
 
         Long tripId =  tripService.saveTrip(trip);
 
-        ItemRequest itemRequest = ItemRequest.builder()
-                .build();
-
-        backpackService.addItemToBackpack(tripId, itemRequest, connectedUser);
+        addDefaultItemsToBackpack(tripId, connectedUser);
         return tripId;
     }
 
     public PageResponse<TripResponse> getAllOwnersTrips(int page, int size, UserDetails connectedUser) {
-        User user = userAuthenticationService.getConnectedUser(connectedUser);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        User user = userAuthenticationService.retriveConnectedUser(connectedUser);
+
+        Pageable pageable = createPageRequest(page, size);
         Page<Trip> trips = tripService.getTripsByOwnerId(user.getUserId(), pageable);
-        List<TripResponse> tripsDto = trips.stream().map(TripMapper::toTripResponse).toList();
+
+        List<TripResponse> tripResponses = trips.stream()
+                .map(TripMapper::toTripResponse)
+                .toList();
+
         return new PageResponse<>(
-                tripsDto,
+                tripResponses,
                 trips.getNumber(),
                 trips.getSize(),
                 trips.getTotalElements(),
@@ -90,44 +87,78 @@ public class TripMgr {
 
     public TripResponse getTripById(Long tripId, UserDetails connectedUser) {
         Trip trip = tripService.getTripById(tripId);
-        userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, "");
+        userAuthenticationService.validateOwnership(trip.getOwner(), connectedUser, "");
         return TripMapper.toTripResponse(trip);
     }
 
     @Transactional
-    public void deleteTrip(
-            @NotNull TripRequest request, UserDetails connectedUser)
+    public void deleteTrip(@NotNull TripRequest request, UserDetails connectedUser)
             throws WrongPasswordException {
-        User adminUser = userAuthenticationService.getConnectedUser(connectedUser);
+        User adminUser = userAuthenticationService.retriveConnectedUser(connectedUser);
         userAuthenticationService.verifyPassword(adminUser, request.password());
+
         Trip trip = tripService.getTripById(request.tripId());
-        userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, "");
+        userAuthenticationService.validateOwnership(trip.getOwner(), connectedUser, "");
+
         trip.removeTripAssociations();
         tripService.delete(trip);
-        addressService.deleteAllByAddressIdIn(getAllTripAddresses(trip));
+
+        addressService.deleteExistingAddressesByIds(getAllTripAddresses(trip));
     }
 
     private Set<Long> getAllTripAddresses(@NotNull Trip trip) {
-        Set<Day> days = trip.getDays();
-        Set<Activity> activities = days.stream().map(Day::getActivities).flatMap(Set::stream).collect(Collectors.toSet());
-        return activities.stream().map(Activity::getAddress).map(Address::getAddressId).collect(Collectors.toSet());
+        return trip.getDays().stream()
+                .flatMap(day -> day.getActivities().stream())
+                .map(Activity::getAddress)
+                .map(Address::getAddressId)
+                .collect(Collectors.toSet());
     }
 
     @Transactional
     public void updateTrip(@NotNull TripEditRequest request, UserDetails connectedUser) {
-        Long tripId = request.getDayGeneratorRequest().getTripId();
+        Long tripId = request.getDayGeneratorRequest().getAssociatedTripId();
         Trip trip = tripService.getTripById(tripId);
-        userAuthenticationService.verifyOwner(trip.getOwner(), connectedUser, "You are not authorized to edit this trip");
+
+        userAuthenticationService.validateOwnership(trip.getOwner(), connectedUser, "You are not authorized to edit this trip");
+
         LocalDate startDate = toLocalDate(request.getDayGeneratorRequest().getStartDate());
         LocalDate endDate = toLocalDate(request.getDayGeneratorRequest().getEndDate());
-
         trip.setTripName(request.getTripName());
 
-        if (!trip.getDaysInOrder().getFirst().getDate().equals(startDate)
-                || !trip.getDaysInOrder().getLast().getDate().equals(endDate)) {
-            dayService.changeTripDates(
-                    trip, startDate, endDate);
+        if (hasTripDatesChanged(trip, startDate, endDate)) {
+            dayService.changeTripDates(trip, startDate, endDate);
         }
+
         tripService.saveTrip(trip);
+    }
+
+    private boolean hasTripDatesChanged(@NotNull Trip trip, LocalDate startDate, LocalDate endDate) {
+        return !trip.getDaysInOrder().getFirst().getDate().equals(startDate)
+                || !trip.getDaysInOrder().getLast().getDate().equals(endDate);
+    }
+
+    private Backpack createBackpack() {
+        return Backpack.builder()
+                .backpackItems(new ArrayList<>())
+                .build();
+    }
+
+    private Budget createBudget(@NotNull TripCreatorRequest request) {
+        return Budget.builder()
+                .currency(request.getCurrency())
+                .budgetAmount(request.getToSpend())
+                .build();
+    }
+
+    private void addDefaultItemsToBackpack(Long tripId, UserDetails userDetails) {
+        ItemRequest itemRequest = ItemRequest.builder()
+                .itemName("")
+                .quantity("")
+                .build();
+        backpackService.addItemToBackpack(tripId, itemRequest, userDetails);
+    }
+
+    private Pageable createPageRequest(int page, int size) {
+        return PageRequest.of(page, size, Sort.by(SORT_BY_ID).descending());
     }
 }

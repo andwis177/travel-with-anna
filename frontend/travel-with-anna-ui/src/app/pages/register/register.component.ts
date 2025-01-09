@@ -2,14 +2,13 @@ import {Component, HostListener, OnInit, ViewEncapsulation} from '@angular/core'
 import {RegistrationRequest} from "../../services/models/registration-request";
 import {FormsModule} from "@angular/forms";
 import {MatIconButton} from "@angular/material/button";
-import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
+import {MatCard, MatCardHeader} from "@angular/material/card";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../../services/services/authentication.service";
-import {MatDivider} from "@angular/material/divider";
 import {RoleService} from "../../services/services/role.service";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {ErrorService} from "../../services/error/error.service";
@@ -20,7 +19,6 @@ import {ErrorService} from "../../services/error/error.service";
   imports: [
     FormsModule,
     MatCard,
-    MatCardContent,
     MatCardHeader,
     MatFormField,
     MatIcon,
@@ -30,7 +28,7 @@ import {ErrorService} from "../../services/error/error.service";
     MatSuffix,
     NgForOf,
     NgIf,
-    MatDivider,
+
     MatSelect,
     MatOption,
     NgClass
@@ -89,7 +87,7 @@ export class RegisterComponent implements OnInit {
         this.router.navigate(['activate-account']).then();
       },
       error: (err) => {
-        this.errorMsg = this.errorService.errorHandler(err);
+        this.errorMsg = this.errorService.errorHandlerWithJson(err);
       }
     })
   }
@@ -101,9 +99,9 @@ export class RegisterComponent implements OnInit {
   getRoleClass(role: string): string {
     switch (role) {
       case 'ADMIN':
-        return 'admin';
+        return 'negative-color';
       default:
-        return 'default';
+        return 'positive-color';
     }
   }
 }

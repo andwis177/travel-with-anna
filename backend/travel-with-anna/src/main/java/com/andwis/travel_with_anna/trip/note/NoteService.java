@@ -13,9 +13,12 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class NoteService {
+
+    private static final NoteResponse MISSING_NOTE_RESPONSE = new NoteResponse(-1L, "");
+
     private final NoteRepository noteRepository;
 
-    public void save(Note note) {
+    public void saveNoteEntity(Note note) {
         noteRepository.save(note);
     }
 
@@ -33,11 +36,12 @@ public class NoteService {
     {
         T entity = getByIdFunction.apply(entityId);
         userAuthorizationFunction.accept(entity, connectedUser);
+
         Note note = getNoteFunction.apply(entity);
-        if (note == null) {
-            return new NoteResponse(-1L, "");
-        }
-        return new NoteResponse(note.getNoteId(), note.getNote());
+
+        return (note == null)
+                ? MISSING_NOTE_RESPONSE
+                : new NoteResponse(note.getNoteId(), note.getContent());
     }
 
     @Transactional
@@ -50,34 +54,47 @@ public class NoteService {
             @NotNull BiConsumer<T, UserDetails> userAuthorizationFunction,
             UserDetails connectedUser
     ) {
-        T entity = getByIdFunction.apply(noteRequest.getEntityId());
+        T entity = getByIdFunction.apply(noteRequest.getLinkedEntityId());
         userAuthorizationFunction.accept(entity, connectedUser);
+
         Note note = getNoteFunction.apply(entity);
 
         if (note == null) {
-            note = Note.builder()
-                    .note(noteRequest.getNote())
-                    .build();
-            addNoteFunction.accept(entity, note);
-            save(note);
+            createAndSaveNewNote(noteRequest, entity, addNoteFunction);
         } else {
-            if (noteRequest.getNote() != null) {
-
-                if (!noteRequest.getNote().isEmpty()) {
-
-                    if (!noteRequest.getNote().isBlank()) {
-                        note.setNote(noteRequest.getNote());
-                        save(note);
-                    } else {
-                        deleteNote(note);
-                    }
-                } else
-                {
-                    removeNoteFunction.accept(entity);
-                    deleteNote(note);
-                }
-            }
+            updateOrDeleteNote(noteRequest, entity, note, removeNoteFunction);
         }
+    }
+
+    private <T> void createAndSaveNewNote(
+            @NotNull NoteRequest noteRequest,
+            T entity,
+            @NotNull BiConsumer<T, Note> addNoteFunction
+    ) {
+        Note newNote = Note.builder()
+                .content(noteRequest.getNoteContent())
+                .build();
+
+        addNoteFunction.accept(entity, newNote);
+        saveNoteEntity(newNote);
+    }
+
+    private <T> void updateOrDeleteNote(
+            @NotNull NoteRequest noteRequest,
+            T entity,
+            Note existingNote,
+            @NotNull Consumer<T> removeNoteFunction
+    ) {
+        String noteContent = noteRequest.getNoteContent();
+
+        if (noteContent == null || noteContent.isBlank()) {
+            removeNoteFunction.accept(entity);
+            deleteNote(existingNote);
+            return;
+        }
+
+        existingNote.setContent(noteContent);
+        saveNoteEntity(existingNote);
     }
 
     private void deleteNote(Note note) {

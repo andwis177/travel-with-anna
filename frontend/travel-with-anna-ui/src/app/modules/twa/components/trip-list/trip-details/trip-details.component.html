@@ -1,25 +1,23 @@
-<div class="component-background">
-  <div class="menu-components-background toolbar-menu">
-    <div class="logo">
-      <app-logo></app-logo>
-    </div>
-    <div class="menu-buttons">
-      <app-trip-details-buttons
-        [trip]="trip"
-        (afterAddDay)="getDays(trip.tripId!); getTrip()">
-      </app-trip-details-buttons>
-    </div>
-    <div class="user">
-      <app-user></app-user>
-    </div>
+<div class="container-horizontal align-center background-color-toolbar toolbar-menu">
+  <div class="logo">
+    <app-logo></app-logo>
+  </div>
+  <div class="menu-buttons">
+    <app-trip-details-buttons
+      [trip]="trip"
+      (afterAddDay)="getDays(trip.tripId!); getTrip()">
+    </app-trip-details-buttons>
+  </div>
+  <div class="user">
+    <app-user></app-user>
   </div>
 </div>
 
-<div class="main-form">
+<div class="main-form align-center background-color-light">
   <div *ngIf="trip.tripName">
-    <h3 class="trip-name trip-name-padding trip-font">{{ trip.tripName }}</h3>
+    <h5 class="trip-font header margin-main margin-main-horizontal padding-small-vertical">{{ trip.tripName }}</h5>
   </div>
-  <div class="days-container">
+  <div class="cart-container">
 
     <app-day
       [day]="day"

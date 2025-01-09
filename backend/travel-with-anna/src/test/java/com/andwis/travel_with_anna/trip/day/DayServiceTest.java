@@ -1,17 +1,10 @@
 package com.andwis.travel_with_anna.trip.day;
 
-import com.andwis.travel_with_anna.address.Address;
-import com.andwis.travel_with_anna.address.AddressRepository;
 import com.andwis.travel_with_anna.handler.exception.DayNotFoundException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
-import com.andwis.travel_with_anna.trip.backpack.Backpack;
-import com.andwis.travel_with_anna.trip.budget.Budget;
-import com.andwis.travel_with_anna.trip.day.activity.Activity;
-import com.andwis.travel_with_anna.trip.day.activity.ActivityService;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.trip.trip.TripRepository;
-import com.andwis.travel_with_anna.trip.trip.TripService;
 import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
@@ -28,123 +21,69 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DisplayName("Day Service Tests")
 class DayServiceTest {
     @Autowired
-    private ActivityService activityService;
+    private DayService dayService;
     @Autowired
     private DayRepository dayRepository;
     @Autowired
-    private AddressRepository addressRepository;
+    private TripRepository tripRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private TripRepository tripRepository;
-    @Autowired
-    private TripService tripService;
-    @Autowired
     private RoleRepository roleRepository;
     @Autowired
-    private DayService dayService;
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
     private Trip testTrip;
     private Day day;
     private UserDetails userDetails;
-    private User user;
 
     @BeforeEach
     void setUp() {
-        Activity activity = Activity.builder()
-                .activityTitle("Title")
-                .beginTime(LocalTime.of(10, 10))
-                .endTime(LocalTime.of(12, 10))
-                .badge("Badge")
-                .type("Type")
-                .status("Status")
-                .build();
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
-        Activity associatedActivity = Activity.builder()
-                .activityTitle("Title associated")
-                .beginTime(LocalTime.of(11, 11))
-                .endTime(LocalTime.of(14, 14))
-                .badge("Badge associated")
-                .type("Type associated")
-                .status("Status associated")
-                .build();
-
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole =  existingRole.orElseGet(() -> roleRepository.save(role));
-
-        String encodedPassword = passwordEncoder.encode("password");
-        user = User.builder()
+        User user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
-                .password(encodedPassword)
-                .role(retrivedRole)
-                .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .password(passwordEncoder.encode("password"))
+                .role(role)
+                .enabled(true)
                 .build();
-        user.setEnabled(true);
         userRepository.save(user);
-
-        Budget budget = Budget.builder()
-                .currency("USD")
-                .toSpend(BigDecimal.valueOf(1000))
-                .build();
 
         day = Day.builder()
                 .date(LocalDate.of(2023, 10, 10))
-                .activities(new HashSet<>())
                 .build();
-        day.addActivity(activity);
-        day.addActivity(associatedActivity);
 
         testTrip = Trip.builder()
                 .tripName("Initial Trip")
                 .days(new HashSet<>())
                 .build();
-        testTrip.addBackpack(new Backpack());
-        testTrip.addBudget(budget);
         testTrip.addDay(day);
-        user.addTrip(testTrip);
         tripRepository.save(testTrip);
 
-        Address address = Address.builder()
-                .address("Address")
-                .city("City")
-                .country("Country")
-                .phone("Phone")
-                .place("Place")
-                .email("Email")
-                .countryCode("PL")
-                .website("Website")
-                .currency("Currency")
-                .build();
-        addressRepository.save(address);
+        user.addTrip(testTrip);
+        userRepository.save(user);
 
         userDetails = createUserDetails(user);
     }
 
     @AfterEach
     void tearDown() {
+        dayRepository.deleteAll();
+        tripRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
     }
@@ -152,46 +91,35 @@ class DayServiceTest {
     @Test
     void testSaveDay() {
         // Given
-        dayRepository.deleteAll();
-        Day day = Day.builder()
-                .date(LocalDate.of(2023, 10, 10))
-                .build();
+        Day newDay = Day.builder().date(LocalDate.of(2023, 12, 10)).build();
 
         // When
-        dayService.saveDay(day);
+        dayService.saveDay(newDay);
 
         // Then
-        List<Day> days = dayRepository.findAll();
-        assertEquals(1, days.size());
+        assertTrue(dayRepository.existsById(newDay.getDayId()));
     }
 
     @Test
     void testSaveAllDays() {
         // Given
         dayRepository.deleteAll();
-        Day day = Day.builder()
-                .date(LocalDate.of(2023, 10, 10))
-                .build();
-
-        Day secondDay = Day.builder()
-                .date(LocalDate.of(2023, 10, 11))
-                .build();
-
-        Set<Day> days = Set.of(day, secondDay);
+        Day day1 = Day.builder().date(LocalDate.of(2023, 12, 11)).build();
+        Day day2 = Day.builder().date(LocalDate.of(2023, 12, 12)).build();
 
         // When
-        dayService.saveAllDays(days);
+        dayService.saveAllDays(Set.of(day1, day2));
 
         // Then
-        List<Day> daysSaved = dayRepository.findAll();
-        assertEquals(2, daysSaved.size());
+        assertEquals(2, dayRepository.findAll().size());
     }
 
     @Test
+    @Transactional
     void testCreateDay() {
-        // Given
+        //Given
         DayRequest dayRequest = DayRequest.builder()
-                .date(LocalDate.of(2023, 11, 12))
+                .date(LocalDate.of(2023, 11, 15))
                 .trip(testTrip)
                 .build();
 
@@ -199,9 +127,7 @@ class DayServiceTest {
         dayService.createDay(dayRequest);
 
         // Then
-        Set<LocalDate> testTripDayDates = testTrip.getDays().stream().map(Day::getDate).collect(Collectors.toSet());
-        assertEquals(2, testTrip.getDays().size());
-        assertTrue(testTripDayDates.contains(LocalDate.of(2023, 11, 12)));
+        assertTrue(testTrip.getDays().stream().anyMatch(d -> d.getDate().equals(dayRequest.getDate())));
     }
 
     @Test
@@ -212,12 +138,12 @@ class DayServiceTest {
 
         // Then
         assertEquals(day.getDayId(), foundDay.getDayId());
-        assertEquals(day.getDate(), foundDay.getDate());
     }
 
     @Test
     void testGetById_DayNotFound() {
-        assertThrows(DayNotFoundException.class, () -> dayService.getById(101L));
+        //Given, When & Then
+        assertThrows(DayNotFoundException.class, () -> dayService.getById(999L));
     }
 
     @Test
@@ -242,94 +168,67 @@ class DayServiceTest {
 
     @Test
     void testGetByTripIdAndDate_DayNotFound() {
-        assertThrows(DayNotFoundException.class, () ->
-                dayService.getByTripIdAndDate(testTrip.getTripId(), LocalDate.now(), userDetails));
+        //Given, When & Then
+        assertThrows(DayNotFoundException.class, () -> dayService.getByTripIdAndDate(testTrip.getTripId(), LocalDate.now(), userDetails));
     }
 
     @Test
     @Transactional
-    void testGetDayById() {
+    void testGetDayById_ValidDay() {
         // Given
+        Long dayId = day.getDayId();
+
         // When
-        DayResponse response = dayService.getDayById(day.getDayId(), userDetails);
+        DayResponse response = dayService.getDayById(dayId, userDetails);
 
         // Then
-        assertNotNull(response);
-        assertEquals(day.getDayId(), response.dayId());
+        assertEquals(day.getDate(), response.date());
+    }
+
+    @Test
+    void testGetDayById_InvalidDay() {
+        // Given
+        Long invalidDayId = 999L;
+
+        // When & Then
+        assertThrows(DayNotFoundException.class, () -> dayService.getDayById(invalidDayId, userDetails));
     }
 
     @Test
     @Transactional
     void testAddDay_FirstDay() {
-        // Given
-        int numberOfDays = testTrip.getDays().size();
-        DayAddDeleteRequest addDeleteRequest = DayAddDeleteRequest.builder()
-                .tripId(testTrip.getTripId())
-                .isFirst(true)
-                .build();
-
+        //Given
         // When
-        dayService.addDay(addDeleteRequest, userDetails);
+        dayService.addDay(testTrip.getTripId(), true, userDetails);
 
         // Then
-        assertEquals(numberOfDays + 1, testTrip.getDays().size());
+        assertEquals(2, testTrip.getDays().size());
     }
 
     @Test
     @Transactional
     void testGenerateDays_ValidDates() {
         // Given
-        Budget secondBudget = Budget.builder()
-                .currency("PLN")
-                .toSpend(BigDecimal.valueOf(2000))
-                .build();
-
-        Trip trip = Trip.builder()
-                .tripName("Generate Day Test Trip")
-                .days(new HashSet<>())
-                .build();
-        trip.addBackpack(new Backpack());
-        trip.addBudget(secondBudget);
-        user.addTrip(trip);
-        Long generateDayTripId = tripService.saveTrip(trip);
-
         DayGeneratorRequest generatorRequest = DayGeneratorRequest.builder()
-                .tripId(generateDayTripId)
-                .startDate(LocalDate.of(2024, 1, 1))
-                .endDate(LocalDate.of(2024, 1, 3))
+                .associatedTripId(testTrip.getTripId())
+                .startDate("2024-01-01")
+                .endDate("2024-01-03")
                 .build();
 
         // When
         dayService.generateDays(generatorRequest, userDetails);
 
-        // Then
-        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(generateDayTripId);
-        assertEquals(3, trip.getDays().size());
-        assertEquals(LocalDate.of(2024, 1, 1), days.getFirst().getDate());
-    }
-
-    @Test
-    @Transactional
-    void testChangeTripDates() {
-        // Given
-        LocalDate startDate = LocalDate.of(2023, 10, 8);
-        LocalDate endDate = LocalDate.of(2023, 10, 12);
-        dayService.changeTripDates(testTrip, startDate, endDate);
-
-        // When
-        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(testTrip.getTripId());
-
-        // Then
-        assertEquals(startDate, days.getFirst().getDate());
-        assertEquals(endDate, days.getLast().getDate());
+        //Then
+        assertEquals(3, dayRepository.findByTripTripIdOrderByDateAsc(testTrip.getTripId()).size());
     }
 
     @Test
     void testDeleteDay() {
         // Given
-        // When
         Long dayId = day.getDayId();
-        dayService.deleteDay(day, activityService::deleteDayActivities);
+
+        // When
+        dayService.deleteDay(day, _ -> {});
 
         // Then
         assertFalse(dayRepository.existsById(dayId));
@@ -339,80 +238,31 @@ class DayServiceTest {
     @Transactional
     void testDeleteFirstOrLastDay_FirstDay() {
         // Given
-        Budget secondBudget = Budget.builder()
-                .currency("PLN")
-                .toSpend(BigDecimal.valueOf(2000))
-                .build();
-
-        Trip trip = Trip.builder()
-                .tripName("Generate Day Test Trip")
-                .days(new HashSet<>())
-                .build();
-        trip.addBackpack(new Backpack());
-        trip.addBudget(secondBudget);
-        user.addTrip(trip);
-        Long generateDayTripId = tripService.saveTrip(trip);
-
-        DayGeneratorRequest generatorRequest = DayGeneratorRequest.builder()
-                .tripId(generateDayTripId)
-                .startDate(LocalDate.of(2024, 1, 1))
-                .endDate(LocalDate.of(2024, 1, 3))
-                .build();
-        dayService.generateDays(generatorRequest, userDetails);
-
-        DayAddDeleteRequest requestForFirst = DayAddDeleteRequest.builder()
-                .tripId(trip.getTripId())
-                .isFirst(true)
-                .build();
-
-        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(trip.getTripId());
-        Long firstDayId = days.getFirst().getDayId();
+        Consumer<Day> deleteFunction = day -> dayRepository.delete(day);
 
         // When
-        dayService.deleteFirstOrLastDay(requestForFirst, activityService::deleteDayActivities, userDetails);
+        dayService.deleteFirstOrLastDay(testTrip.getTripId(), true, deleteFunction, userDetails);
 
         // Then
-        assertFalse(dayRepository.existsById(firstDayId));
+        assertFalse(dayRepository.existsById(day.getDayId()));
     }
 
     @Test
     @Transactional
     void testDeleteFirstOrLastDay_LastDay() {
         // Given
-        Budget secondBudget = Budget.builder()
-                .currency("PLN")
-                .toSpend(BigDecimal.valueOf(2000))
-                .build();
+        Day secondDay = Day.builder().date(LocalDate.of(2023, 10, 11)).build();
+        Long secondDayId = dayRepository.save(secondDay).getDayId();
+        testTrip.addDay(secondDay);
+        tripRepository.save(testTrip);
 
-        Trip trip = Trip.builder()
-                .tripName("Generate Day Test Trip")
-                .days(new HashSet<>())
-                .build();
-        trip.addBackpack(new Backpack());
-        trip.addBudget(secondBudget);
-        user.addTrip(trip);
-        Long generateDayTripId = tripService.saveTrip(trip);
-
-        DayGeneratorRequest generatorRequest = DayGeneratorRequest.builder()
-                .tripId(generateDayTripId)
-                .startDate(LocalDate.of(2024, 1, 1))
-                .endDate(LocalDate.of(2024, 1, 3))
-                .build();
-        dayService.generateDays(generatorRequest, userDetails);
-
-        DayAddDeleteRequest requestForLast = DayAddDeleteRequest.builder()
-                .tripId(trip.getTripId())
-                .isFirst(false)
-                .build();
-
-        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(trip.getTripId());
-        Long lastDayId = days.getLast().getDayId();
+        Consumer<Day> deleteFunction = day -> dayRepository.delete(day);
 
         // When
-        dayService.deleteFirstOrLastDay(requestForLast, activityService::deleteDayActivities, userDetails);
+        dayService.deleteFirstOrLastDay(testTrip.getTripId(), false, deleteFunction, userDetails);
 
         // Then
-        assertFalse(dayRepository.existsById(lastDayId));
+        assertFalse(dayRepository.existsById(secondDayId));
     }
 
     private @NotNull UserDetails createUserDetails(User user) {

@@ -56,7 +56,7 @@ class AddressServiceTest {
         testDays.add(day);
 
         // When
-        Set<Long> result = addressService.getAddressFromDays(testDays);
+        Set<Long> result = addressService.extractAddressIdsFromDays(testDays);
 
         // Then
         assertEquals(Set.of(1L), result);
@@ -85,7 +85,7 @@ class AddressServiceTest {
         when(addressRepository.existsById(2L)).thenReturn(false);
 
         // When
-        addressService.deleteAllByAddressIdIn(addressIds);
+        addressService.deleteExistingAddressesByIds(addressIds);
 
         // Then
         verify(addressRepository).deleteAllByAddressIdIn(Set.of(1L));

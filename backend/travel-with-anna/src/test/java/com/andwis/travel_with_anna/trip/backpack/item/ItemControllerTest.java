@@ -26,10 +26,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -56,11 +54,8 @@ class ItemControllerTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         Trip trip = Trip.builder()
                 .tripName("tripName")
@@ -70,9 +65,9 @@ class ItemControllerTest {
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
         user.addTrip(trip);
@@ -81,7 +76,7 @@ class ItemControllerTest {
                 .userName("userName2")
                 .email("email2@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(2L)
                 .build();
         secondaryUser.setEnabled(true);
@@ -166,7 +161,6 @@ class ItemControllerTest {
                 "2",
                 true,
                 null);
-
 
         ItemResponse itemRequest2 = new ItemResponse(
                 2L,

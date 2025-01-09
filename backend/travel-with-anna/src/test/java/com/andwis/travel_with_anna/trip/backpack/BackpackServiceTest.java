@@ -28,10 +28,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -62,17 +60,14 @@ class BackpackServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrievedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         User user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrievedRole)
+                .role(role)
                 .avatarId(1L)
                 .build();
         user.setEnabled(true);
@@ -86,7 +81,7 @@ class BackpackServiceTest {
         tripRepository.save(trip);
 
         backpack = Backpack.builder()
-                .items(new ArrayList<>())
+                .backpackItems(new ArrayList<>())
                 .build();
 
         backpack.setTrip(trip);
@@ -133,8 +128,8 @@ class BackpackServiceTest {
         Backpack updatedBackpack = backpackRepository.findById(backpackId).orElseThrow();
 
         // Then
-        assertEquals(1, updatedBackpack.getItems().size());
-        assertEquals(1, updatedBackpack.getItems().size());
+        assertEquals(1, updatedBackpack.getBackpackItems().size());
+        assertEquals(1, updatedBackpack.getBackpackItems().size());
 
         Item item = itemRepository.findAll().getFirst();
         assertEquals("Water Bottle", item.getItemName());
@@ -153,7 +148,7 @@ class BackpackServiceTest {
         // Then
         assertNotNull(backpackResponse);
         assertEquals(backpackId, backpackResponse.backpackId());
-        assertEquals(isNote, backpackResponse.isNote());
+        assertEquals(isNote, backpackResponse.noteExists());
     }
 
     @Transactional
@@ -173,7 +168,7 @@ class BackpackServiceTest {
         Backpack updatedBackpack = backpackRepository.findById(backpackId).orElseThrow();
 
         // Then
-        assertTrue(updatedBackpack.getItems().isEmpty());
+        assertTrue(updatedBackpack.getBackpackItems().isEmpty());
         assertEquals(0, itemRepository.count());
     }
 

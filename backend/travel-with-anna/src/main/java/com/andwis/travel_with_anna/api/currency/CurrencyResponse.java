@@ -13,6 +13,9 @@ import java.util.Map;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CurrencyResponse {
-    @JsonProperty("data")
-    private Map<String, CurrencyExchangeResponse> data;
+
+    public static final String JSON_PROPERTY_DATA = "data";
+
+    @JsonProperty(JSON_PROPERTY_DATA)
+    private Map<String, CurrencyExchangeResponse> exchangeRates;
 }

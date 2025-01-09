@@ -1,9 +1,6 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
-import com.andwis.travel_with_anna.address.Address;
-import com.andwis.travel_with_anna.address.AddressDetail;
-import com.andwis.travel_with_anna.address.AddressMapper;
-import com.andwis.travel_with_anna.address.AddressService;
+import com.andwis.travel_with_anna.address.*;
 import com.andwis.travel_with_anna.api.country.City;
 import com.andwis.travel_with_anna.api.country.Country;
 import com.andwis.travel_with_anna.handler.exception.ActivityNotFoundException;
@@ -14,9 +11,11 @@ import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseResponse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseService;
 import com.andwis.travel_with_anna.utility.MessageResponse;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,90 +34,103 @@ import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDateTime
 @RequiredArgsConstructor
 @Slf4j
 public class ActivityService {
+
+    private static final String ACTIVITY_NOT_FOUND_MSG = "Activity not found";
+    private static final String TRIP_ID_REQUIRED_MSG = "Trip ID is required";
+    private static final String DATE_TIME_REQUIRED_MSG = "Date and Time is required";
+
     private final ActivityRepository activityRepository;
     private final DayService dayService;
     private final AddressService addressService;
     private final ActivityAuthorizationService activityAuthorizationService;
     private final ExpanseService expanseService;
+    private final EntityManager entityManager;
 
     public Activity getById(Long activityId) {
         return activityRepository.findById(activityId)
-                .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
+                .orElseThrow(() -> new ActivityNotFoundException(ACTIVITY_NOT_FOUND_MSG));
     }
 
     @Transactional
     public Activity createSingleActivity(ActivityRequest request, UserDetails connectedUser) {
-        Address address;
-        Activity activity = createActivity(request, connectedUser);
-        activityAuthorizationService.verifyActivityOwner(activity, connectedUser);
+        Activity activity = createActivityEntity(request, connectedUser);
+        activityAuthorizationService.authorizeSingleActivity(activity, connectedUser);
 
-        if (request.getAddressRequest() != null) {
-            address = AddressMapper.toAddress(request.getAddressRequest());
-            addressService.save(address);
-            address.addActivity(activity);
-        }
+        processAddress(request, activity);
         return activityRepository.save(activity);
+    }
+
+    private void processAddress(@NotNull ActivityRequest request, Activity activity) {
+        if (request.getAddressRequest() != null) {
+            Address address = AddressMapper.toAddress(request.getAddressRequest());
+            addressService.save(address);
+            address.addLinkedActivity(activity);
+        }
+    }
+
+    @Transactional
+    public Activity createActivityEntity(ActivityRequest request, UserDetails connectedUser) {
+        validateRequest(request);
+        Day day = fetchDayForRequest(request, connectedUser);
+        Activity activity = ActivityMapper.toActivity(request);
+        day.addActivity(activity);
+        return activity;
+    }
+
+    private void validateRequest(@NotNull ActivityRequest request) {
+        if (request.getTripId() == null) {
+            throw new TripNotFoundException(TRIP_ID_REQUIRED_MSG);
+        }
+        if (request.getDateTime() == null) {
+            throw new DateTimeException(DATE_TIME_REQUIRED_MSG);
+        }
+    }
+
+    private Day fetchDayForRequest(@NotNull ActivityRequest request, UserDetails connectedUser) {
+        LocalDate requestedDateTime = toLocalDateTime(request.getDateTime()).toLocalDate();
+        return dayService.getByTripIdAndDate(request.getTripId(), requestedDateTime, connectedUser);
     }
 
     @Transactional
     public void createAssociatedActivities(@NotNull ActivityAssociatedRequest request, UserDetails connectedUser) {
-        Activity firstActivity = createActivity(request.getFirstRequest(), connectedUser);
-        Activity secondActivity = createActivity(request.getSecondRequest(), connectedUser);
+        Activity firstActivity = createActivityEntity(request.getFirstRequest(), connectedUser);
+        Activity secondActivity = createActivityEntity(request.getSecondRequest(), connectedUser);
 
+        activityRepository.saveAll(List.of(firstActivity, secondActivity));
+        entityManager.flush();
+
+        Address address;
         if (request.isAddressSeparated()) {
             setActivityAddress(request.getFirstRequest(), firstActivity);
             setActivityAddress(request.getSecondRequest(), secondActivity);
         } else {
-            setActivityAddress(request.getFirstRequest(), firstActivity);
-            secondActivity.addAddress(firstActivity.getAddress());
+            address = setActivityAddress(request.getFirstRequest(), firstActivity); // Use the same address for both
+            secondActivity.addAddress(address);
         }
-
-        List<Activity> activities = List.of(firstActivity, secondActivity);
 
         firstActivity.setAssociatedId(secondActivity.getActivityId());
         secondActivity.setAssociatedId(firstActivity.getActivityId());
-
-        activityRepository.saveAll(activities);
     }
 
-    private void setActivityAddress(@NotNull ActivityRequest request, Activity activity) {
-        Address address;
+    private Address setActivityAddress(@NotNull ActivityRequest request, Activity activity) {
+        Address address = Address.builder().build();
         if (request.getAddressRequest() != null) {
             address = AddressMapper.toAddress(request.getAddressRequest());
-            addressService.save(address);
             activity.setAddress(address);
         }
-    }
-
-    @Transactional
-    public Activity createActivity(@NotNull ActivityRequest request, UserDetails connectedUser) {
-        if (request.getTripId() == null) {
-            throw new TripNotFoundException("Trip ID is required");
-        }
-        if (request.getDateTime() == null) {
-            throw new DateTimeException("Date and Time is required");
-        }
-
-        LocalDate requestedDateTime = toLocalDateTime(request.getDateTime()).toLocalDate();
-        Day day = dayService.getByTripIdAndDate(request.getTripId(), requestedDateTime, connectedUser);
-
-        Activity activity = ActivityMapper.toActivity(request);
-        day.addActivity(activity);
-        activityRepository.save(activity);
-
-        return activity;
+        return address;
     }
 
     @Transactional
     public MessageResponse updateActivity(@NotNull ActivityUpdateRequest request, UserDetails connectedUser) {
         Activity activity = getById(request.getActivityId());
-        activityAuthorizationService.verifyActivityOwner(activity, connectedUser);
+        activityAuthorizationService.authorizeSingleActivity(activity, connectedUser);
         ActivityMapper.updateActivity(activity, request);
         updateActivityExpanseCategoryDescription(activity, connectedUser);
         String message;
-        if (!toLocalDate(request.getOldDate()).equals(toLocalDate(request.getNewDate()))) {
-            updateActivityDate(activity, request.getNewDate(), connectedUser);
-            updateActivityExpanseDate(activity, toLocalDate(request.getNewDate()), connectedUser);
+        if (!toLocalDate(request.getOldActivityDate()).equals(toLocalDate(request.getNewActivityDate()))) {
+            updateActivityDate(activity, request.getNewActivityDate(), connectedUser);
+            updateActivityExpanseDate(activity, toLocalDate(request.getNewActivityDate()), connectedUser);
             message = "Activity date updated";
         } else
         if (activity.getAssociatedId() != null) {
@@ -146,7 +158,7 @@ public class ActivityService {
     protected void updateAssociatedActivity(@NotNull Activity activity, UserDetails connectedUser) {
         try {
             Activity associatedActivity = getById(activity.getAssociatedId());
-            activityAuthorizationService.verifyActivityOwner(associatedActivity, connectedUser);
+            activityAuthorizationService.authorizeSingleActivity(associatedActivity, connectedUser);
             associatedActivity.setType(activity.getType());
             updateActivityExpanseCategoryDescription(activity, connectedUser);
             activityRepository.saveAll(List.of(activity, associatedActivity));
@@ -158,7 +170,7 @@ public class ActivityService {
 
     public List<Activity> getActivitiesByDayId(Long dayId, UserDetails connectedUser) {
         List<Activity> activities = activityRepository.findByDayDayIdOrderByBeginTimeAsc(dayId);
-        activityAuthorizationService.checkActivitiesAuthorization(new HashSet<>(activities), connectedUser);
+        activityAuthorizationService.authorizeActivities(new HashSet<>(activities), connectedUser);
         return activities;
     }
 
@@ -195,15 +207,23 @@ public class ActivityService {
         activityResponses.stream()
                 .map(ActivityResponse::getAddress)
                 .filter(Objects::nonNull)
-                .map(country -> Country.builder()
-                        .name(country.country())
-                        .currency(country.currency())
-                        .iso2(country.countryCode())
-                        .iso3(country.countryCode())
-                        .build())
-                .filter(country -> country.getName() != null && !country.getName().isEmpty())
+                .map(this::buildCountry)
+                .filter(this::countryValidation)
                 .forEach(countries::add);
         return countries;
+    }
+
+    private Country buildCountry(@NotNull AddressResponse addressResponse) {
+        return Country.builder()
+                .name(addressResponse.country())
+                .currency(addressResponse.currency())
+                .iso2(addressResponse.countryCode())
+                .iso3(addressResponse.countryCode())
+                .build();
+    }
+
+    private boolean countryValidation(@NotNull Country country) {
+        return country.getName() != null && !country.getName().isEmpty();
     }
 
     private @NotNull List<City> getActivitiesCitiesFromDay(@NotNull List<ActivityResponse> activityResponses) {
@@ -211,38 +231,39 @@ public class ActivityService {
         activityResponses.stream()
                 .map(activity -> activity.getAddress().city())
                 .filter(Objects::nonNull)
-                .map(city -> City.builder().city(city).build())
+                .filter(city -> !city.isBlank())
+                .map(city -> City.builder().name(city).build())
                 .forEach(cities::add);
         return cities;
     }
 
 
     public AddressDetail buildAddressDetail(@NotNull List<Country> countries, @NotNull List<City> cities) {
-        List<Country> filteredCountries = countries.stream()
-                .collect(Collectors.toMap (
-                        Country::getName,
-                        country -> country,
-                        (existing, _) -> existing,
-                        LinkedHashMap::new
-                ))
-                .values().stream()
-                .toList();
+        List<Country> filteredCountries = filterUniqueByName(countries, Country::getName);
+        List<City> filteredCities = filterUniqueByName(cities, City::getName);
 
-        List<City> filteredCities = cities.stream()
-                .collect(Collectors.toMap(
-                        City::getCity,
-                        city -> city,
-                        (existing, _) -> existing,
-                        LinkedHashMap::new
-                ))
-                .values().stream()
-                .toList();
         return new AddressDetail(
                 filteredCountries,
-                countries.stream().reduce((_, second) -> second).orElse(null),
+                getLastElement(countries),
                 filteredCities,
-                cities.stream().reduce((_, second) -> second).orElse(null)
+                getLastElement(cities)
         );
+    }
+
+    private <T> List<T> filterUniqueByName(@NotNull List<T> items, Function<T, String> getNameFunction) {
+        return items.stream()
+                .collect(Collectors.toMap(
+                        getNameFunction,
+                        item -> item,
+                        (existing, _) -> existing,
+                        LinkedHashMap::new
+                ))
+                .values().stream()
+                .toList();
+    }
+
+    private <T> @Nullable T getLastElement(@NotNull List<T> items) {
+        return items.isEmpty() ? null : items.getLast();
     }
 
     public AddressDetail fetchAddressDetailByDayId(Long dayId, UserDetails connectedUser) {
@@ -270,30 +291,40 @@ public class ActivityService {
     @Transactional
     public void deleteActivityById(@NotNull Long activityId, UserDetails connectedUser) {
         Activity activity = getById(activityId);
-        activityAuthorizationService.verifyActivityOwner(activity, connectedUser);
+        activityAuthorizationService.authorizeSingleActivity(activity, connectedUser);
         deleteActivities(Set.of(activity));
     }
 
     @Transactional
     protected void deleteActivities(@NotNull Set<Activity> activities) {
-        Set<Long> activityIds = activities.stream()
-                .map(Activity::getActivityId)
-                .collect(Collectors.toSet());
-
-        Set<Long> associatedIds = activities.stream()
-                .map(Activity::getAssociatedId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
+        Set<Long> activityIds = collectActivityIds(activities);
+        Set<Long> associatedIds = collectAssociatedIds(activities);
         activityIds.addAll(associatedIds);
 
         Set<Activity> allActivities = activityRepository.findAllByActivityIdIn(activityIds);
-        Set<Long> allAddressIds = allActivities.stream()
+        Set<Long> allAddressIds = collectAddressIds(allActivities);
+        activityRepository.deleteAll(allActivities);
+        addressService.deleteExistingAddressesByIds(allAddressIds);
+    }
+
+    private Set<Long> collectActivityIds(@NotNull Set<Activity> activities) {
+        return  activities.stream()
+                .map(Activity::getActivityId)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Long> collectAssociatedIds(@NotNull Set<Activity> activities) {
+        return activities.stream()
+                .map(Activity::getAssociatedId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Long> collectAddressIds(@NotNull Set<Activity> allActivities) {
+        return allActivities.stream()
                 .filter(activity -> activity.getAddress() != null)
                 .map(activity -> activity.getAddress().getAddressId())
                 .collect(Collectors.toSet());
-        activityRepository.deleteAll(allActivities);
-        addressService.deleteAllByAddressIdIn(allAddressIds);
     }
 
     @Transactional
@@ -322,13 +353,13 @@ public class ActivityService {
             return;
         }
         StringBuilder description = createExpanseCategoryDescription(activity);
-        expanseService.updateExpanseCategory(activity.getExpanse(), description.toString(), connectedUser);
+        expanseService.updateExpanseCategory(activity.getExpanse(), description.toString());
     }
 
     private void updateActivityExpanseDate(@NotNull Activity activity, LocalDate date, UserDetails connectedUser) {
         if(activity.getExpanse() == null) {
             return;
         }
-        expanseService.updateExpanseDate(activity.getExpanse(), date, connectedUser );
+        expanseService.updateExpanseDate(activity.getExpanse(), date );
     }
 }

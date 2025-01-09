@@ -37,10 +37,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -96,27 +94,24 @@ class ActivityServiceTest {
                 .status("Status associated")
                 .build();
 
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole =  existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(encodedPassword)
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
         userRepository.save(user);
 
         Budget budget = Budget.builder()
                 .currency("USD")
-                .toSpend(BigDecimal.valueOf(1000))
+                .budgetAmount(BigDecimal.valueOf(1000))
                 .build();
 
         day = Day.builder()
@@ -144,7 +139,7 @@ class ActivityServiceTest {
                 .address("Address")
                 .city("City")
                 .country("Country")
-                .phone("Phone")
+                .phoneNumber("Phone")
                 .place("Place")
                 .email("Email")
                 .countryCode("PL")
@@ -156,7 +151,7 @@ class ActivityServiceTest {
                 .address("Address")
                 .city("City")
                 .country("Country")
-                .phone("Phone")
+                .phoneNumber("Phone")
                 .place("Place")
                 .email("Email")
                 .countryCode("PL")
@@ -172,7 +167,7 @@ class ActivityServiceTest {
                 .badge("Badge")
                 .type("Type")
                 .status("Status")
-                .isDayTag(true)
+                .dayTag(true)
                 .build();
 
         userDetails = createUserDetails(user);
@@ -241,7 +236,7 @@ class ActivityServiceTest {
                 .badge("Badge1")
                 .type("Type1")
                 .status("Status1")
-                .isDayTag(true)
+                .dayTag(true)
                 .build();
 
         AddressRequest firstAddressRequest = AddressRequest.builder()
@@ -257,7 +252,7 @@ class ActivityServiceTest {
                 .badge("Badge2")
                 .type("Type2")
                 .status("Status2")
-                .isDayTag(true)
+                .dayTag(true)
                 .build();
 
         AddressRequest secondAddressRequest = AddressRequest.builder()
@@ -269,7 +264,7 @@ class ActivityServiceTest {
         ActivityAssociatedRequest request = ActivityAssociatedRequest.builder()
                 .firstRequest(firstRequest)
                 .secondRequest(secondRequest)
-                .isAddressSeparated(true)
+                .addressSeparated(true)
                 .build();
 
         // When
@@ -296,7 +291,7 @@ class ActivityServiceTest {
                 .badge("Badge1")
                 .type("Type1")
                 .status("Status1")
-                .isDayTag(true)
+                .dayTag(true)
                 .build();
 
         AddressRequest firstAddressRequest = AddressRequest.builder()
@@ -312,13 +307,13 @@ class ActivityServiceTest {
                 .badge("Badge2")
                 .type("Type2")
                 .status("Status2")
-                .isDayTag(true)
+                .dayTag(true)
                 .build();
 
         ActivityAssociatedRequest request = ActivityAssociatedRequest.builder()
                 .firstRequest(firstRequest)
                 .secondRequest(secondRequest)
-                .isAddressSeparated(false)
+                .addressSeparated(false)
                 .build();
 
         // When
@@ -359,8 +354,8 @@ class ActivityServiceTest {
 
         ActivityUpdateRequest request = ActivityUpdateRequest.builder()
                 .activityId(activityId)
-                .oldDate("2023-10-10")
-                .newDate("2023-12-12")
+                .oldActivityDate("2023-10-10")
+                .newActivityDate("2023-12-12")
                 .startTime("10:10")
                 .endTime("12:10")
                 .build();
@@ -372,8 +367,8 @@ class ActivityServiceTest {
         Activity updatedActivity = activityService.getById(activityId);
         assertEquals("Activity date updated", result.message());
         assertEquals(LocalDate.of(2023, 12, 12), updatedActivity.getDay().getDate());
-        assertEquals("10:10", updatedActivity.getBeginTime());
-        assertEquals("12:10", updatedActivity.getEndTime());
+        assertEquals("10:10", updatedActivity.getFormattedBeginTime());
+        assertEquals("12:10", updatedActivity.getFormattedEndTime());
     }
 
     @Transactional
@@ -405,8 +400,8 @@ class ActivityServiceTest {
 
         ActivityUpdateRequest request = ActivityUpdateRequest.builder()
                 .activityId(activityId)
-                .oldDate("2023-10-10")
-                .newDate("2023-10-10")
+                .oldActivityDate("2023-10-10")
+                .newActivityDate("2023-10-10")
                 .startTime("10:10")
                 .type("New Type")
                 .addressRequest(addressRequest)
@@ -423,7 +418,7 @@ class ActivityServiceTest {
         assertEquals("Associated activity updated", result.message());
         assertEquals("New Type", updatedActivity.getType());
         assertEquals(expanseDescription, updatedActivity.getExpanse().getExpanseCategory());
-        assertEquals("10:10", updatedActivity.getBeginTime());
+        assertEquals("10:10", updatedActivity.getFormattedBeginTime());
     }
 
     @Transactional
@@ -446,8 +441,8 @@ class ActivityServiceTest {
 
         ActivityUpdateRequest request = ActivityUpdateRequest.builder()
                 .activityId(activityId)
-                .oldDate("2023-10-10")
-                .newDate("2023-10-10")
+                .oldActivityDate("2023-10-10")
+                .newActivityDate("2023-10-10")
                 .startTime("10:10")
                 .endTime("12:10")
                 .type("New Type")
@@ -523,8 +518,8 @@ class ActivityServiceTest {
         assertEquals("Currency", response.addressDetail().lastCountry().getCurrency());
         assertEquals("PL", response.addressDetail().lastCountry().getIso2());
         assertEquals(1, response.addressDetail().cities().size());
-        assertEquals("City", response.addressDetail().cities().getFirst().getCity());
-        assertEquals("City", response.addressDetail().lastCity().getCity());
+        assertEquals("City", response.addressDetail().cities().getFirst().getName());
+        assertEquals("City", response.addressDetail().lastCity().getName());
         assertEquals(2, response.activities().size());
         assertEquals("Title", response.activities().getFirst().getActivityTitle());
         assertEquals("Title associated", response.activities().getLast().getActivityTitle());
@@ -551,7 +546,7 @@ class ActivityServiceTest {
         assertEquals("Currency", response.countries().getFirst().getCurrency());
         assertEquals("PL", response.countries().getFirst().getIso2());
         assertEquals(1, response.cities().size());
-        assertEquals("City", response.cities().getFirst().getCity());
+        assertEquals("City", response.cities().getFirst().getName());
     }
 
     @Test
@@ -574,7 +569,7 @@ class ActivityServiceTest {
         assertEquals("Currency", response.countries().getFirst().getCurrency());
         assertEquals("PL", response.countries().getFirst().getIso2());
         assertEquals(1, response.cities().size());
-        assertEquals("City", response.cities().getFirst().getCity());
+        assertEquals("City", response.cities().getFirst().getName());
     }
 
     @Test

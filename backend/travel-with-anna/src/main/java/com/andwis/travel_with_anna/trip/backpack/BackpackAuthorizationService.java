@@ -13,24 +13,35 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class BackpackAuthorizationService {
-    private final static String BACKPACK_MSG_EXCEPTION =
+
+    private static final String UNAUTHORIZED_ACCESS_MESSAGE =
             "You are not authorized to modify or view this backpack or items";
+    private static final String BACKPACK_NOT_FOUND_MESSAGE = "Backpack not found";
 
     private final BackpackRepository backpackRepository;
     private final UserAuthenticationService userService;
 
-    public void getAllItemsByBackpackIdAuthorization(Long backpackId, UserDetails connectedUser) {
-        Backpack backpack = backpackRepository.findById(backpackId).orElseThrow(
-                () -> new BackpackNotFoundException("Backpack not found"));
-        userService.verifyOwner(backpack, connectedUser, BACKPACK_MSG_EXCEPTION);
+    public void authorizeBackpackAccess(Long backpackId, UserDetails connectedUser) {
+        Backpack backpack = fetchBackpackById(backpackId);
+        verifyOwner(backpack, connectedUser);
     }
 
-    public void saveAllItemAuthorization(@NotNull List<Long> itemIds, UserDetails connectedUser) {
+    public void authorizeItemSave(@NotNull List<Long> itemIds, @NotNull UserDetails connectedUser) {
         Set<Backpack> backpacks = backpackRepository.findBackpacksByItemIds(itemIds);
-        backpacks.forEach(backpack -> userService.verifyOwner(backpack, connectedUser, BACKPACK_MSG_EXCEPTION));
+        backpacks.forEach(backpack -> verifyOwner(backpack, connectedUser));
     }
 
-    public void verifyBackpackOwner(@NotNull Backpack backpack, UserDetails connectedUser) {
-        userService.verifyOwner(backpack, connectedUser, BACKPACK_MSG_EXCEPTION);
+    public void verifyBackpackOwner(@NotNull Backpack backpack, @NotNull UserDetails connectedUser) {
+        verifyOwner(backpack, connectedUser);
+    }
+
+    private Backpack fetchBackpackById(Long backpackId) {
+        return backpackRepository.findById(backpackId).orElseThrow(
+                () -> new BackpackNotFoundException(BACKPACK_NOT_FOUND_MESSAGE)
+        );
+    }
+
+    private void verifyOwner(@NotNull Backpack backpack, @NotNull UserDetails connectedUser) {
+        userService.validateOwnership(backpack, connectedUser, UNAUTHORIZED_ACCESS_MESSAGE);
     }
 }

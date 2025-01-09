@@ -1,16 +1,13 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatCardActions} from "@angular/material/card";
 import {
   MatDatepickerModule,
-  MatDatepickerToggle,
   MatDateRangeInput,
   MatDateRangePicker,
   MatEndDate,
   MatStartDate
 } from "@angular/material/datepicker";
-import {MatDivider} from "@angular/material/divider";
-import {MatFormField, MatFormFieldModule, MatLabel, MatSuffix} from "@angular/material/form-field";
+import {MatFormField, MatFormFieldModule, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
@@ -28,11 +25,8 @@ import {SharedService} from "../../../../../../services/shared/shared.service";
   standalone: true,
   imports: [
     FormsModule,
-    MatCardActions,
     MatDateRangeInput,
     MatDateRangePicker,
-    MatDatepickerToggle,
-    MatDivider,
     MatEndDate,
     MatFormField,
     MatIcon,
@@ -40,7 +34,6 @@ import {SharedService} from "../../../../../../services/shared/shared.service";
     MatInput,
     MatLabel,
     MatStartDate,
-    MatSuffix,
     MatToolbarRow,
     NgForOf,
     NgIf,
@@ -82,7 +75,7 @@ export class EditTripComponent {
     const formattedStartDate = this.formatDateToJson(this.startDate);
     const formattedEndDate = this.formatDateToJson(this.endDate);
     const params: UpdateTrip$Params = { body:{dayGeneratorRequest: {
-          tripId: this.tripId, startDate: formattedStartDate, endDate: formattedEndDate}, tripName: this.tripName }};
+          associatedTripId: this.tripId, startDate: formattedStartDate, endDate: formattedEndDate}, tripName: this.tripName }};
     this.tripService.updateTrip(params).subscribe({next: () => {
         this.sharedService.triggerGetDays();
         this.onClose();

@@ -1,17 +1,101 @@
-<mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">Expanse</div>
-  <button mat-icon-button class="close-button"
-          (click)="onClose()"
-          (keydown.enter)="$event.preventDefault()">
-    <mat-icon class="close-icon">close</mat-icon>
-  </button>
+<mat-toolbar-row class="dialog-top-bar  background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div>Expanse</div>
+    <button mat-icon-button
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
+    </button>
+  </div>
 </mat-toolbar-row>
 
-<div class="dialog-container">
-  <div class="full-width">
-    <div class="main-expanse-container">
-      <div class="expanse-container mat-elevation-z8">
-        <mat-form-field appearance="outline" class="insert-description-size">
+<div class="second-container container-vertical background-color-light">
+
+  <div class="padding-big container-horizontal">
+
+    <div class="container-vertical margin-main padding-main border border-radius align-left information-are-shadow background-color-medium-light">
+      <div class="padding-medium">
+        <mat-form-field appearance="outline" class="input-currency font-size-text">
+          <mat-label>Price</mat-label>
+          <div class="container-horizontal">
+            <input
+              matInput placeholder="0.00"
+              [(ngModel)]="price"
+              (ngModelChange)="calculateLeftToPay(); priceValidation()"
+              (blur)="calculateTripValue()"
+              type="number"
+              name="price"
+              min="0"
+              step="0.01">
+            <label class="font-size-small">{{expanseRequest.currency}}</label>
+          </div>
+          <span matPrefix>$ </span>
+        </mat-form-field>
+      </div>
+
+      <div class="padding-medium">
+        <mat-form-field appearance="outline" class="input-currency font-size-text">
+          <mat-label>Paid</mat-label>
+          <div class="container-horizontal">
+            <input
+              matInput placeholder="0.00"
+              [(ngModel)]="paid"
+              (ngModelChange)="paidValidation()"
+              (blur)="calculateTripValue()"
+              type="number" name="paid"
+              min="0"
+              step="0.01">
+            <label class="font-size-small">{{expanseRequest.currency}}</label>
+          </div>
+          <span matPrefix>$ </span>
+          <button
+            class="button-input puffer"
+            mat-icon-button
+            matSuffix
+            (click)="setAsPaid()"
+            (keydown.enter)="$event.preventDefault()"
+            matTooltip="Paid">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div class="container-vertical full-width balance-padding align-left">
+        <label class="font-size-small">BALANCE: </label>
+        <div class="container-horizontal align-to-baseline">
+          <label [ngClass]="getColorAmount(leftToPay)" class="balance-font-size font-weight">{{formatAmount(leftToPay)}} </label>
+          <label class="font-size-small" style="margin-left: 5px">{{expanseRequest.currency}}</label>
+        </div>
+      </div>
+
+      <div class="padding-medium">
+        <mat-form-field appearance="outline" class="input-currency font-size-text">
+          <mat-label>Exchange Rate</mat-label>
+          <input
+            matInput placeholder="0.00"
+            [(ngModel)]="expanseRequest.exchangeRate"
+            (blur)="calculateTripValue()"
+            type="number"
+            name="exchangeRate"
+            min="0"
+            step="0.01">
+          <button
+            class="button-input puffer"
+            mat-icon-button
+            matSuffix
+            (click)="getExchangeRate()"
+            (keydown.enter)="$event.preventDefault()"
+            matTooltip="Get exchnage">
+            <mat-icon>attach_money</mat-icon>
+          </button>
+          <span matPrefix></span>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="container-vertical margin-main padding-main border border-radius align-left information-are-shadow background-color-medium-light container-height-auto">
+      <div>
+        <mat-form-field appearance="outline" class="input-main font-size-text">
           <mat-label>Description </mat-label>
           <input  type="text"
                   matInput
@@ -21,8 +105,9 @@
                   autocomplete="name"
                   (keydown.enter)="$event.preventDefault()">
         </mat-form-field>
-
-        <mat-form-field appearance="outline" class="insert-size">
+      </div>
+      <div style="margin-bottom: 2vw;">
+        <mat-form-field appearance="outline" class="input-currency font-size-text">
           <mat-select [(ngModel)]="expanseRequest.currency"
                       name="currency"
                       (ngModelChange)="getExchangeRate()">
@@ -31,119 +116,39 @@
             </mat-select-trigger>
             <mat-option *ngFor="let currency of currencyList" [value]="currency.currency">
               {{ currency.currency?.toString() }}
-              <p style="font-size:10px">{{ currency.country?.toUpperCase() }}</p>
+              <p class="font-size-small">{{ currency.country?.toUpperCase() }}</p>
             </mat-option>
           </mat-select>
         </mat-form-field>
-
-      </div>
-      <div class="expanse-container center-align mat-elevation-z8">
-        <form class="full-width">
-          <mat-form-field appearance="outline" class="insert-size">
-            <mat-label>Price</mat-label>
-            <div class="input-with-currency">
-              <input
-                matInput placeholder="0.00"
-                [(ngModel)]="expanseRequest.price"
-                (ngModelChange)="calculateLeftToPay()"
-                (blur)="calculateTripValue()"
-                type="number"
-                name="price"
-                min="0"
-                step="0.01">
-              <label class="currency">{{expanseRequest.currency}}</label>
-            </div>
-            <span matPrefix>$ </span>
-          </mat-form-field>
-        </form>
-
-
-        <form class="full-width">
-          <mat-form-field appearance="outline" class="insert-size-paid">
-            <mat-label>Paid</mat-label>
-            <div class="input-with-currency">
-              <input
-                matInput placeholder="0.00"
-                [(ngModel)]="expanseRequest.paid"
-                (ngModelChange)="calculateLeftToPay()"
-                (blur)="calculateTripValue()"
-                type="number" name="paid"
-                min="0"
-                step="0.01">
-              <label class="currency">{{expanseRequest.currency}}</label>
-            </div>
-            <span matPrefix>$ </span>
-            <button
-              class="button-input"
-              mat-icon-button
-              matSuffix
-              (click)="setAsPaid()"
-              (keydown.enter)="$event.preventDefault()"
-              matTooltip="Paid">
-              <mat-icon>check_circle</mat-icon>
-            </button>
-          </mat-form-field>
-        </form>
-
-        <form class="full-width" style="margin-bottom: 10%">
-          <label style="font-size: 14px">To pay: </label>
-          <label [ngClass]="getColorAmount(leftToPay)" style="font-size: 18px; font-weight: 500;">{{leftToPay}}</label>
-          <label class="currency"> {{expanseRequest.currency}}</label>
-        </form>
-
-        <form class="full-width">
-          <mat-form-field appearance="outline" class="insert-size">
-            <mat-label>Exchange Rate</mat-label>
-            <input
-              matInput placeholder="0.00"
-              [(ngModel)]="expanseRequest.exchangeRate"
-              (blur)="calculateTripValue()"
-              type="number"
-              name="exchangeRate"
-              min="0"
-              step="0.01">
-            <button
-              class="button-input"
-              mat-icon-button
-              matSuffix
-              (click)="getExchangeRate()"
-              (keydown.enter)="$event.preventDefault()"
-              matTooltip="Get exchnage">
-              <mat-icon>attach_money</mat-icon>
-            </button>
-            <span matPrefix></span>
-          </mat-form-field>
-        </form>
       </div>
 
-      <div class="expanse-container center-align mat-elevation-z8">
-        <div class="padding-label mat-elevation-z8">{{ tripCurrency }}</div>
-        <div class="value-container">
-          <label class="title-label">PRICE:</label>
-          <label class="value-label">{{expanseRequest.priceInTripCurrency}}</label>
-          <label class="currency-label">{{ tripCurrency}} </label>
+      <div class="background-color-medium font-color-white padding-small-vertical border-radius font-weight currency-label currency-font-size-large align-center">
+        {{ tripCurrency }}
+      </div>
+      <div class="margin-small">
+        <div class="padding-small">
+          <label class="expanse-font-label font-size-label">PRICE: </label>
+          <label class="font-size-text font-color font-weight">{{formatAmount(expanseRequest.priceInTripCurrency!)}} </label>
+          <label class="expanse-currency-label font-size-small"> {{ tripCurrency}} </label>
         </div>
 
-        <div class="value-container">
-          <label class="title-label">PAID:</label>
-          <label class="value-label" > {{expanseRequest.paidInTripCurrency}}</label>
-          <label class="currency-label"> {{ tripCurrency}} </label>
+        <div class="padding-small">
+          <label class="expanse-font-label font-size-label">PAID:</label>
+          <label class="font-size-text font-color font-weight" > {{formatAmount(expanseRequest.paidInTripCurrency!)}} </label>
+          <label class="expanse-currency-label font-size-small"> {{ tripCurrency}} </label>
         </div>
-
       </div>
     </div>
-
-    <div class="full-width center-align">
-      <button
-        class="custom-button-0 full-width" (click)="saveExpanse()" type="submit">Save</button>
-      <button class="custom-button-1 full-width" (click)="onClose()" type="submit">Close</button>
-    </div>
+  </div>
+  <div class="full-width margin-big center-align">
+    <button
+      class="button button-1 background-color-dark" (click)="saveExpanse()">Save</button>
+    <button class="button button-1 background-color-medium" (click)="onClose()">Close</button>
   </div>
 </div>
 
-<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-  <mat-divider class="padding-bottom"></mat-divider>
-  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+<div class="full-width error-msg border-top error-background" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
 </div>
 
 

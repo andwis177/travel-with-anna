@@ -1,0 +1,103 @@
+<mat-toolbar-row class="dialog-top-bar background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div>Edit User</div>
+    <button mat-icon-button
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
+    </button>
+  </div>
+</mat-toolbar-row>
+
+<div class="second-container background-color-light padding-main">
+
+  <div class="
+        information-are-shadow
+        border
+        border-radius
+        background-color-medium-light
+        align-left
+        margin-big
+        info-area
+">
+    <div class="margin-big">
+      <p class="username-text font-size-label font-color-label">ID: </p>
+      <p class="username-text font-size-text font-color">{{userAdminResponse.userId}}</p>
+    </div>
+
+    <div class="margin-big">
+      <p class="username-text font-size-label font-color-label">Name: </p>
+      <p class="username-text font-size-text font-color">{{userAdminResponse.userName}}</p>
+    </div>
+
+    <div class="margin-big">
+      <p class="username-text font-size-label font-color-label">Email: </p>
+      <p class="username-text font-size-text font-color">{{userAdminResponse.email}}</p>
+    </div>
+  </div>
+
+  <div class = "
+        information-are-shadow
+        border
+        border-radius
+        background-color-medium-light
+        align-center
+        margin-big
+        fields-container
+">
+    <div class="container-horizontal margin-main" style="justify-content: space-evenly">
+      <div class="container-vertical align-left">
+        <div class="container-horizontal align-center">
+          <div class="font-size-label">Locked:</div>
+          <mat-checkbox class="puffer" [(ngModel)]="userAdminResponse.accountLocked" name="locked"></mat-checkbox>
+        </div>
+        <button class="button button-2 background-color-dark font-color-white" (click)="resendCode()">Provide Code</button>
+      </div>
+      <div class="container-vertical align-left" style="margin-left: 50px">
+        <div class="font-size-label">Role: </div>
+        <mat-form-field appearance="outline">
+          <mat-select [(value)] = "userAdminResponse.roleName" [ngClass]="getRoleClass(userAdminResponse.roleName!)" style="font-weight: bold">
+            <mat-option *ngFor="let role of roles" [value]="role" >
+              {{ role }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form class="second-container background-color-light padding-main">
+  <div>
+    <mat-form-field appearance="outline" style="width: 90%">
+      <mat-label>Password: </mat-label>
+      <input type="password"
+             matInput
+             [type]="hide() ? 'password' : 'text'"
+             [(ngModel)]="passwordRequest"
+             [ngModelOptions]="{standalone: true}"
+             placeholder="Password"
+             autocomplete="password"
+             (keydown.enter)="$event.preventDefault()">
+      <button
+        class="puffer"
+        mat-icon-button
+        matSuffix
+        (click)="clickEvent($event)"
+        (keydown.enter)="$event.preventDefault()"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hide()">
+        <mat-icon>{{ hide() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+  <div class="container-horizontal align-center second-container">
+    <button class="button button-1 background-color-dark" (click)="update()" type="submit">Save</button>
+    <button class="button button-1 background-color-medium" (click)="onClose()" type="submit">Close</button>
+  </div>
+</form>
+
+<div class="edit-error-message-width error-msg border-top error-background" role="alert" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
+</div>
+

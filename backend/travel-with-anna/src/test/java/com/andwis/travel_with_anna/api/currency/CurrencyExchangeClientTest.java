@@ -44,7 +44,7 @@ class CurrencyExchangeClientTest {
                 "EUR", CurrencyExchangeResponse.builder().code("EUR").value(BigDecimal.valueOf(2.87)).build()
         );
 
-        CurrencyResponse mockResponse = CurrencyResponse.builder().data(mockData).build();
+        CurrencyResponse mockResponse = CurrencyResponse.builder().exchangeRates(mockData).build();
 
         // When:
         this.server.reset();

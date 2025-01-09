@@ -1,12 +1,12 @@
-<div class="container">
-  <mat-card class="second-container container-size">
-    <mat-card-header class="header-shadow">
-      <h4>Create Account</h4>
-    </mat-card-header>
+<div class="container background-color-dark">
+  <div>
+    <mat-card class="second-container background-color-light border border-radius container-shadow  container-limit">
+      <mat-card-header class="header">
+        <h4>Create Account</h4>
+      </mat-card-header>
 
-    <mat-card-content class="content">
-      <form>
-        <mat-form-field appearance="outline" class="full-width">
+      <form class="padding-big container-vertical">
+        <mat-form-field appearance="outline" class="register-insert-width">
           <mat-label>Name</mat-label>
           <input type="text"
                  matInput
@@ -17,7 +17,7 @@
                  (keydown.enter)="$event.preventDefault()">
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="register-insert-width">
           <mat-label>Email</mat-label>
           <input type="email"
                  matInput
@@ -28,7 +28,7 @@
                  (keydown.enter)="$event.preventDefault()">
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="register-insert-width">
           <mat-label>Password</mat-label>
           <input type="password" matInput
                  [type]="hidePassword ? 'password' : 'text'"
@@ -49,7 +49,7 @@
           </button>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="register-insert-width">
           <mat-label>Confirm password</mat-label>
           <input type="password"
                  matInput
@@ -71,8 +71,10 @@
           </button>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-select [(value)] = "registerRequest.roleName" [ngClass]="getRoleClass(registerRequest.roleName)">
+        <mat-form-field appearance="outline">
+          <mat-select [(value)] = "registerRequest.roleName"
+                      [ngClass]="getRoleClass(registerRequest.roleName)"
+                      style="font-weight: 600">
             <mat-option *ngFor="let role of roles" [value]="role">
               {{ role }}
             </mat-option>
@@ -80,15 +82,13 @@
         </mat-form-field>
 
         <div>
-          <button class="custom-button-0" (click)="register()" type="submit">Sign Up</button>
-          <button class="custom-button-1" (click)="login()">Login</button>
+          <button class="button button-1 background-color-dark" (click)="register()">Sign Up</button>
+          <button class="button button-1 background-color-medium" (click)="login()">Login</button>
         </div>
-
       </form>
-    </mat-card-content>
-    <div class="full-width error-msg error-background " *ngIf="errorMsg.length > 0">
-      <mat-divider class="padding-bottom"></mat-divider>
-      <p *ngFor="let msg of errorMsg">{{msg}}</p>
-    </div>
-  </mat-card>
+      <div class="full-width error-msg border-top error-background" *ngIf="errorMsg.length > 0">
+        <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
+      </div>
+    </mat-card>
+  </div>
 </div>

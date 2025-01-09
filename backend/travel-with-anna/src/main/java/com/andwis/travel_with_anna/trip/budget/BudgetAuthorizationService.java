@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BudgetAuthorizationService {
-    private final static String BUDGET_MSG_EXCEPTION = "You are not authorized to modify or view this budget";
+
+    private static final String UNAUTHORIZED_BUDGET_ACTION_MSG = "You are not authorized to modify or view this budget";
+
     private final UserAuthenticationService userService;
 
-    public void verifyBudgetOwner(@NotNull Budget budget, UserDetails connectedUser) {
-        userService.verifyOwner(budget, connectedUser, BUDGET_MSG_EXCEPTION);
+    public void verifyBudgetOwner(@NotNull UserDetails connectedUser, @NotNull Budget budget) {
+        userService.validateOwnership(budget, connectedUser, UNAUTHORIZED_BUDGET_ACTION_MSG);
     }
 }

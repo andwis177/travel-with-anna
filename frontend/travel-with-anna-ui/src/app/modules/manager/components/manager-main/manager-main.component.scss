@@ -1,0 +1,42 @@
+.small-column{
+  width: 8% !important;
+}
+
+.medium-column{
+  width: 10% !important;
+}
+
+.large-column{
+  width: 20% !important;
+}
+
+.margin-top {
+  margin-top: 12px;
+}
+
+.mdc-data-table__table {
+  background-color: whitesmoke !important;
+}
+
+.mat-mdc-header-row {
+  background-color: #2E3944 !important;
+  color: whitesmoke !important;
+}
+
+:host ::ng-deep .mat-sort-header-arrow{
+  color: whitesmoke !important;
+}
+
+.selected {
+  background-color: #C0D0D8 !important;
+}
+
+th, td {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  word-break: break-word;
+  align-content: center !important;
+}
+

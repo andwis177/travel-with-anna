@@ -1,34 +1,18 @@
-.second-container {
-  width: 50% !important;
-  display: flex;
-  justify-content: center;
-}
-
-.success {
-  color: #61892F;
-}
-
-.failure {
-  color: darkred;
-}
-
 .padding {
-  padding: 30px;
+  padding: 70px !important;
+}
+
+.container-limit {
+  max-width: 50vw;
 }
 
 .char-cells {
   --item-border-radius: 10px;
-  --item-border-: red;
   --item-spacing: 15px;
   --color: #2E3944;
-  --item-border-focused: 2px solid #809070;
-  --item-border-bottom-focused: 2px solid #809070;
   --item-background: whitesmoke;
   font-size: 25px;
   padding: 20px;
 }
 
-.background {
-  background-color: #7B9D9C;
-}
 

@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.trip.backpack.item;
 
+import com.andwis.travel_with_anna.handler.exception.BackpackNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.ItemNotFoundException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
@@ -31,10 +32,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -64,19 +63,16 @@ class ItemServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         User user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
 
@@ -84,7 +80,7 @@ class ItemServiceTest {
                 .userName("userName2")
                 .email("email2@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(2L)
                 .build();
         secondaryUser.setEnabled(true);
@@ -92,7 +88,7 @@ class ItemServiceTest {
 
         Budget budget = Budget.builder()
                 .currency("USD")
-                .toSpend(BigDecimal.valueOf(1000))
+                .budgetAmount(BigDecimal.valueOf(1000))
                 .build();
 
         Trip trip = Trip.builder()
@@ -122,7 +118,7 @@ class ItemServiceTest {
         item.setExpanse(expanse);
 
         Backpack backpack = Backpack.builder()
-                .items(new ArrayList<>())
+                .backpackItems(new ArrayList<>())
                 .build();
         backpack.addItem(item);
         backpack.setTrip(trip);
@@ -185,7 +181,7 @@ class ItemServiceTest {
         // Given
         ItemRequest request = ItemRequest.builder()
                 .itemName("Tent")
-                .qty("1")
+                .quantity("1")
                 .isPacked(true)
                 .build();
 
@@ -205,7 +201,7 @@ class ItemServiceTest {
         // Given
         ItemRequest longNameRequest = ItemRequest.builder()
                 .itemName("A very long item name that exceeds the sixty character limit enforced by validation")
-                .qty("1")
+                .quantity("1")
                 .isPacked(false)
                 .build();
 
@@ -229,6 +225,16 @@ class ItemServiceTest {
 
         // Then
         assertNotNull(itemResponses);
+    }
+
+    @Test
+    @Transactional
+    void testGetAllItemsByBackpackId_BackpackNotFoundException() {
+        // Given
+        Long backpackId = 999L;
+
+        // When & Then
+        assertThrows(BackpackNotFoundException.class, () -> itemService.getAllItemsByBackpackId(backpackId, userDetails));
     }
 
     @Test
@@ -287,8 +293,8 @@ class ItemServiceTest {
         assertEquals(0, updatedItem1.getExpanse().getPrice().compareTo(BigDecimal.valueOf(1000.00)));
         assertEquals(0, updatedItem1.getExpanse().getPaid().compareTo(BigDecimal.valueOf(100.00)));
         assertEquals(0, updatedItem1.getExpanse().getExchangeRate().compareTo(BigDecimal.valueOf(2.00)));
-        assertEquals(0, updatedItem1.getExpanse().getPriceInTripCurrency().compareTo(BigDecimal.valueOf(2000.00)));
-        assertEquals(0, updatedItem1.getExpanse().getPaidInTripCurrency().compareTo(BigDecimal.valueOf(200.00)));
+        assertEquals(0, updatedItem1.getExpanse().calculatePriceInTripCurrency().compareTo(BigDecimal.valueOf(2000.00)));
+        assertEquals(0, updatedItem1.getExpanse().calculatePaidInTripCurrency().compareTo(BigDecimal.valueOf(200.00)));
 
         assertEquals("Passport", updatedItem2.getItemName());
         assertEquals("1", updatedItem2.getQuantity());
@@ -298,8 +304,8 @@ class ItemServiceTest {
         assertEquals(0, updatedItem2.getExpanse().getPrice().compareTo(BigDecimal.valueOf(6000)));
         assertEquals(0, updatedItem2.getExpanse().getPaid().compareTo(BigDecimal.valueOf(600)));
         assertEquals(0, updatedItem2.getExpanse().getExchangeRate().compareTo(BigDecimal.valueOf(0.5)));
-        assertEquals(0, updatedItem2.getExpanse().getPriceInTripCurrency().compareTo(BigDecimal.valueOf(3000)));
-        assertEquals(0, updatedItem2.getExpanse().getPaidInTripCurrency().compareTo(BigDecimal.valueOf(300)));
+        assertEquals(0, updatedItem2.getExpanse().calculatePriceInTripCurrency().compareTo(BigDecimal.valueOf(3000)));
+        assertEquals(0, updatedItem2.getExpanse().calculatePaidInTripCurrency().compareTo(BigDecimal.valueOf(300)));
     }
 
     @Test

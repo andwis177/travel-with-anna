@@ -1,5 +1,5 @@
 import {Component, ElementRef, HostListener, OnInit, signal, ViewChild} from '@angular/core';
-import {MatCardActions, MatCardModule} from "@angular/material/card";
+import {MatCardModule} from "@angular/material/card";
 import {MatButtonModule} from "@angular/material/button";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
@@ -8,7 +8,6 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
-import {MatDivider} from "@angular/material/divider";
 import {Router} from "@angular/router";
 import {MatTooltip} from "@angular/material/tooltip";
 import {PasswordComponent} from "../password/password.component";
@@ -25,7 +24,6 @@ import {DeleteAccountComponent} from "../../../../../pages/delete-account/delete
   selector: 'app-account',
   standalone: true,
   imports: [
-    MatCardActions,
     MatCardModule,
     MatButtonModule,
     MatFormField,
@@ -36,7 +34,6 @@ import {DeleteAccountComponent} from "../../../../../pages/delete-account/delete
     MatToolbarRow,
     NgIf,
     MatIcon,
-    MatDivider,
     NgForOf,
     MatSuffix,
     MatTooltip,
@@ -159,6 +156,7 @@ export class AccountComponent implements OnInit {
           this.userCredentials.password = '';
         },
         error: (err) => {
+          this.userCredentials.password = '';
           this.errorMsg = this.errorService.errorHandler(err);
         }
       })

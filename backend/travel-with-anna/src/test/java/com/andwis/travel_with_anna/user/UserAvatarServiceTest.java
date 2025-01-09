@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.user;
 
-import com.andwis.travel_with_anna.handler.exception.FileNotSaved;
+import com.andwis.travel_with_anna.handler.exception.FileNotSavedException;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.avatar.Avatar;
@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,11 +46,8 @@ class UserAvatarServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole =  existingRole.orElseGet(() -> roleRepository.save(role));
+        Role userRole = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         Avatar avatar = Avatar.builder()
                 .avatar(AvatarDefaultImg.DEFAULT.getImg())
@@ -62,9 +58,9 @@ class UserAvatarServiceTest {
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(userRole)
                 .avatarId(avatarId)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
         userRepository.save(user);
@@ -110,7 +106,7 @@ class UserAvatarServiceTest {
         );
 
         // When & Then
-        FileNotSaved exception = assertThrows(FileNotSaved.class, () ->
+        FileNotSavedException exception = assertThrows(FileNotSavedException.class, () ->
                 userAvatarService.setAvatar(file, createUserDetails(user)));
 
         assertEquals("File is not a JPEG image. Actual type: image/png", exception.getMessage());
@@ -129,7 +125,7 @@ class UserAvatarServiceTest {
         );
 
         // When & Then
-        FileNotSaved exception = assertThrows(FileNotSaved.class, () ->
+        FileNotSavedException exception = assertThrows(FileNotSavedException.class, () ->
                 userAvatarService.setAvatar(file, createUserDetails(user)));
 
         assertEquals("File is too big", exception.getMessage());

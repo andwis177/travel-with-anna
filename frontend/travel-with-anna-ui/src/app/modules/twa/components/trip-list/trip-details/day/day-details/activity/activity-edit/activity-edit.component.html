@@ -1,200 +1,192 @@
-<mat-toolbar-row class="dialog-header">
-  <div class="full-width activity-edit-toolbar">
-    <div class="dialog-title">{{ activity.badge?.toUpperCase() }}
-      <div class="dialog-title"> | {{ day.date }}</div>
+<mat-toolbar-row class="dialog-top-bar background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div class="dialog-title container-horizontal">{{ activity.badge?.toUpperCase() }}
+      <a *ngIf="activity!.type!.length > 0"> {{formatToolbarNote()}}</a>
     </div>
-    <button mat-icon-button class="close-button"
+    <button mat-icon-button
             (click)="onClose()"
             (keydown.enter)="$event.preventDefault()">
-      <mat-icon class="close-icon">close</mat-icon>
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
     </button>
   </div>
 </mat-toolbar-row>
 
-<mat-card-content class="activity-main-container">
-  <form class="activity-sub-container">
-    <div style="display: flex; flex-direction: column">
-      <div>
-        <div class="group-container mat-elevation-z4">
-          <div class="column-container">
-            <mat-label class="label">Description</mat-label>
-            <input type="text"
-                   matInput
-                   class="insert insert-width"
-                   [(ngModel)]="activity.activityTitle"
+<form class="second-container background-color-light padding-main">
+  <div class="container-horizontal">
+    <div class="container-vertical">
+      <div class="container-vertical align-center border border-radius information-are-shadow background-color-medium-light">
+        <div class="container-vertical align-left margin-small-horizontal">
+          <label class="font-size-small">Description</label>
+          <input type="text"
+                 matInput
+                 class="activity-insert-dim font-size-label border border-radius-small activity-insert"
+                 [(ngModel)]="activity.activityTitle"
+                 [ngModelOptions]="{standalone: true}"
+                 placeholder=""
+                 autocomplete="description"
+                 (keydown.enter)="$event.preventDefault()">
+        </div>
+
+        <div class="container-vertical align-left margin-small">
+          <label class="font-size-small">Date</label>
+          <mat-select
+            class="activity-data-time-insert-dim font-size-label border border-radius-small background-color-white activity-insert"
+            [(ngModel)]="date"
+            name="currency">
+            <mat-option *ngFor="let date of dates" [value]="date">
+              {{ date }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <div class="container-horizontal align-center">
+          <div class="container-vertical align-left margin-small">
+            <label class="font-size-small">
+              From
+            </label>
+            <input matInput
+                   type="time"
+                   class="activity-data-time-insert-dim font-size-label border border-radius-small activity-insert"
                    [ngModelOptions]="{standalone: true}"
-                   placeholder=""
-                   autocomplete="description"
-                   (keydown.enter)="$event.preventDefault()">
+                   [(ngModel)]="startTime"
+                   placeholder="HH:mm">
+            <mat-error *ngIf="startTime && !isValidTime(startTime)">
+              Invalid time format. Please use HH:mm.
+            </mat-error>
           </div>
 
-          <div class="-content-container">
-            <div class="column-container">
-              <mat-label class="label">Date</mat-label>
-              <mat-select class="insert"
-                          [(ngModel)]="date"
-                          name="currency"
-                          style="background-color: whitesmoke">
-                <mat-option *ngFor="let date of dates" [value]="date">
-                  {{ date }}
-                </mat-option>
-              </mat-select>
-            </div>
-          </div>
-
-          <div class="time-container">
-            <div class="column-container">
-              <mat-label class="label">
-                From
-              </mat-label>
-              <input matInput
-                     type="time"
-                     class="insert"
-                     style="margin-left: 1%"
-                     [ngModelOptions]="{standalone: true}"
-                     [(ngModel)]="startTime"
-                     placeholder="HH:mm">
-              <mat-error *ngIf="startTime && !isValidTime(startTime)">
-                Invalid time format. Please use HH:mm.
-              </mat-error>
-            </div>
-
-            <div class="column-container" *ngIf="isEndTimeIncluded">
-              <mat-label class="label">Ends</mat-label>
-              <input matInput
-                     type="time"
-                     class="insert"
-                     [ngModelOptions]="{standalone: true}"
-                     [(ngModel)]="endTime"
-                     placeholder="HH:mm">
-              <mat-error *ngIf="endTime && !isValidTime(endTime)">
-                Invalid time format. Please use HH:mm.
-              </mat-error>
-            </div>
+          <div class="container-vertical align-left margin-small" *ngIf="isEndTimeIncluded">
+            <mat-label class="font-size-small">Ends</mat-label>
+            <input matInput
+                   type="time"
+                   class="activity-data-time-insert-dim font-size-label border border-radius-small activity-insert"
+                   [ngModelOptions]="{standalone: true}"
+                   [(ngModel)]="endTime"
+                   placeholder="HH:mm">
+            <mat-error *ngIf="endTime && !isValidTime(endTime)">
+              Invalid time format. Please use HH:mm.
+            </mat-error>
           </div>
         </div>
       </div>
 
-      <div class="group-container mat-elevation-z4">
-        <div class="column-container">
-          <mat-label class="label">Place</mat-label>
+      <div class="container-vertical align-center border border-radius information-are-shadow background-color-medium-light margin-small-vertical">
+        <div class="container-vertical align-left">
+          <label class="font-size-small">Place</label>
           <input type="text"
                  matInput
-                 class="insert insert-width"
+                 class="activity-insert-dim font-size-label border border-radius-small activity-insert"
                  [(ngModel)]="address.place"
                  [ngModelOptions]="{standalone: true}"
                  placeholder=""
                  autocomplete="place"
                  (keydown.enter)="$event.preventDefault()">
         </div>
-        <div class="country-city-container">
-          <div class="insert-column">
-            <div class="column-container">
-              <mat-label class="label">Country</mat-label>
-              <mat-select class="insert country-city-width drop-list-background"
-                          [(ngModel)]="country"
-                          (ngModelChange)="onCountryChange(country!)"
-                          name="country">
-                <mat-option *ngFor="let country of countries" [value]="country">
-                  {{ country.name }}
-                </mat-option>
-              </mat-select>
-            </div>
 
-            <div class="column-container">
-              <input type="text"
-                     matInput
-                     class="insert country-city-width"
-                     [(ngModel)]="country.name"
-                     [ngModelOptions]="{standalone: true}"
-                     (blur)="onCountryChangeInsert(country.name!)">
-            </div>
+        <div class="container-horizontal align-center">
+          <div class="container-vertical align-left margin-small">
+            <label class="font-size-small">Country</label>
+            <mat-select
+              class="activity-country-city-insert-dim font-size-label border border-radius-small background-color-white activity-insert"
+              [(ngModel)]="country"
+              (ngModelChange)="onCountryChange(country!)"
+              name="country">
+              <mat-option *ngFor="let country of countries" [value]="country">
+                {{ country.name }}
+              </mat-option>
+            </mat-select>
+
+            <input type="text"
+                   matInput
+                   class="activity-country-city-insert-dim font-size-label border border-radius-small background-color-white activity-insert"
+                   [(ngModel)]="country.name"
+                   [ngModelOptions]="{standalone: true}"
+                   (blur)="onCountryChangeInsert(country.name!)">
           </div>
 
-          <div class="insert-column">
-            <div class="column-container">
-              <mat-label class="label">City</mat-label>
-              <mat-select class="insert country-city-width drop-list-background"
-                          [(ngModel)]="city"
-                          (ngModelChange)="onCityChange(city!)"
-                          name="city">
+          <div class="container-vertical margin-small">
+            <div class="container-vertical align-left">
+              <label class="font-size-small">City</label>
+              <mat-select
+                class="activity-country-city-insert-dim font-size-label border border-radius-small background-color-white activity-insert"
+                [(ngModel)]="city"
+                (ngModelChange)="onCityChange(city!)"
+                name="city">
                 <mat-option *ngFor="let city of cities" [value]="city">
                   {{ city.city }}
                 </mat-option>
               </mat-select>
-            </div>
 
-            <div class="column-container">
               <input type="text"
                      matInput
-                     class="insert country-city-width"
+                     class="activity-country-city-insert-dim font-size-label border border-radius-small background-color-white activity-insert"
                      [(ngModel)]="city.city"
                      [ngModelOptions]="{standalone: true}"
                      (blur)="onCityChangeInsert(city.city!)">
             </div>
           </div>
         </div>
-        <div>
-          <div class="column-container">
-            <mat-label class="label">Address</mat-label>
-            <input type="text"
-                   matInput
-                   class="insert insert-width"
-                   [(ngModel)]="address.address"
-                   [ngModelOptions]="{standalone: true}"
-                   placeholder=""
-                   autocomplete="address"
-                   (keydown.enter)="$event.preventDefault()">
-          </div>
+        <div class="container-vertical align-left">
+          <label class="font-size-small">Address</label>
+          <input type="text"
+                 matInput
+                 class="activity-insert-dim font-size-label border border-radius-small activity-insert"
+                 [(ngModel)]="address.address"
+                 [ngModelOptions]="{standalone: true}"
+                 placeholder=""
+                 autocomplete="address"
+                 (keydown.enter)="$event.preventDefault()">
+        </div>
 
-          <div class="column-container">
-            <mat-label class="label">Website</mat-label>
+        <div class="container-vertical align-left">
+          <label class="font-size-small">Website</label>
+          <input type="text"
+                 matInput
+                 class="activity-insert-dim font-size-label border border-radius-small activity-insert"
+                 [(ngModel)]="address.website"
+                 [ngModelOptions]="{standalone: true}"
+                 placeholder=""
+                 autocomplete="website"
+                 (keydown.enter)="$event.preventDefault()">
+        </div>
+        <div class="container-horizontal margin-small">
+          <div class="container-vertical align-left activity-margin-small-horizontal">
+            <label class="font-size-small">Phone</label>
             <input type="text"
                    matInput
-                   class="insert insert-width"
-                   [(ngModel)]="address.website"
+                   class="activity-phone-insert-dim font-size-label border border-radius-small activity-insert"
+                   [(ngModel)]="address.phoneNumber"
                    [ngModelOptions]="{standalone: true}"
                    placeholder=""
-                   autocomplete="website"
+                   autocomplete="phone"
                    (keydown.enter)="$event.preventDefault()">
           </div>
-          <div class="phone-email-container">
-            <div class="column-container">
-              <mat-label class="label">Phone</mat-label>
-              <input type="text"
-                     matInput
-                     class="insert "
-                     [(ngModel)]="address.phone"
-                     [ngModelOptions]="{standalone: true}"
-                     placeholder=""
-                     autocomplete="phone"
-                     (keydown.enter)="$event.preventDefault()">
-            </div>
-            <div class="column-container" style="margin-left:5px">
-              <mat-label class="label">Email</mat-label>
-              <input type="email"
-                     matInput
-                     class="insert email-width"
-                     [(ngModel)]="address.email"
-                     [ngModelOptions]="{standalone: true}"
-                     placeholder=""
-                     autocomplete="email"
-                     (keydown.enter)="$event.preventDefault()">
-            </div>
+          <div class="container-vertical align-left activity-margin-small-horizontal">
+            <label class="font-size-small">Email</label>
+            <input type="email"
+                   matInput
+                   class="activity-email-insert-dim font-size-label border border-radius-small activity-insert"
+                   [(ngModel)]="address.email"
+                   [ngModelOptions]="{standalone: true}"
+                   placeholder=""
+                   autocomplete="email"
+                   (keydown.enter)="$event.preventDefault()">
           </div>
         </div>
       </div>
-      <mat-label class="tag mat-elevation-z4"> Tag to day card:
-        <mat-checkbox [(ngModel)]="activity.dayTag" name="dayTag"></mat-checkbox>
-      </mat-label>
+      <div class="container-vertical align-center border border-radius information-are-shadow background-color-medium-light">
+        <mat-label> Tag to day card:
+          <mat-checkbox [(ngModel)]="activity.dayTag" name="dayTag"></mat-checkbox>
+        </mat-label>
+      </div>
 
-      <div class="button-area">
-        <button class="custom-button-0 " (click)="updateActivity()" type="submit">Save</button>
-        <button class="custom-button-1 " (click)="onClose()" type="submit">Cancel</button>
+      <div class="margin-main">
+        <button class="button button-1 background-color-dark" (click)="updateActivity()">Save</button>
+        <button class="button button-1 background-color-medium" (click)="onClose()">Cancel</button>
       </div>
     </div>
 
-    <div style="margin-left:20px">
+    <div>
       <div *ngIf="activity.badge === 'stay'">
         <app-stay
           [_type]="activity.type!"
@@ -244,10 +236,9 @@
         </app-shop>
       </div>
     </div>
-  </form>
-</mat-card-content>
+  </div>
+</form>
 
-<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-  <mat-divider class="padding-bottom"></mat-divider>
-  <p *ngFor="let msg of errorMsg">{{ msg }}</p>
+<div class="full-width error-msg border-top error-background" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
 </div>

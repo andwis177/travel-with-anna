@@ -14,15 +14,31 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ActivityAuthorizationService {
-    private final static String ACTIVITY_MSG_EXCEPTION = "You are not authorized to modify or view this activity";
+
+    private static final String UNAUTHORIZED_ACTIVITY_MESSAGE =
+            "You are not authorized to modify or view this activity";
+
     private final UserAuthenticationService userService;
 
-    public void checkActivitiesAuthorization(@NotNull Set<Activity> activities, UserDetails connectedUser) {
-        Set<Trip> trips = activities.stream().map(Activity::getDay).map(Day::getTrip).collect(Collectors.toSet());
-        trips.forEach(trip -> userService.verifyOwner(trip, connectedUser, ACTIVITY_MSG_EXCEPTION));
+    public void authorizeActivities(@NotNull Set<Activity> activities, UserDetails connectedUser) {
+        Set<Trip> trips = extractTripsFromActivities(activities);
+        verifyAuthorizationWithTrips(trips, connectedUser);
     }
 
-    public void verifyActivityOwner(@NotNull Activity activity, UserDetails connectedUser) {
-        userService.verifyOwner(activity, connectedUser, ACTIVITY_MSG_EXCEPTION);
+    public void authorizeSingleActivity(@NotNull Activity activity, UserDetails connectedUser) {
+        userService.validateOwnership(activity, connectedUser, UNAUTHORIZED_ACTIVITY_MESSAGE);
+    }
+
+    private Set<Trip> extractTripsFromActivities(@NotNull Set<Activity> activities) {
+        return activities.stream()
+                .map(Activity::getDay)
+                .map(Day::getTrip)
+                .collect(Collectors.toSet());
+    }
+
+    private void verifyAuthorizationWithTrips(@NotNull Set<Trip> trips, UserDetails connectedUser) {
+        trips.forEach(trip ->
+                userService.validateOwnership(trip, connectedUser, UNAUTHORIZED_ACTIVITY_MESSAGE)
+        );
     }
 }

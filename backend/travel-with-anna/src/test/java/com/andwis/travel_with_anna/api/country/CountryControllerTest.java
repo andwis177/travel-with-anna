@@ -24,13 +24,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CountryControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
+
     @MockBean
-    private CountryClient countryClient;
+    private ApiCountryFacade facade;
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")
+    @DisplayName("Should return all country names")
     void findAllCountryNames_ShouldReturnCountryNames() throws Exception {
         // Given
         Country country1 = Country.builder()
@@ -48,7 +51,8 @@ class CountryControllerTest {
                 .build();
 
         List<Country> countryNames = List.of(country1, country2);
-        when(countryClient.fetchAllCountries()).thenReturn(countryNames);
+        when(facade.fetchAllCountryNames()).thenReturn(countryNames);
+
         String jsonContent = objectMapper.writeValueAsString(countryNames);
 
         // When & Then
@@ -61,6 +65,7 @@ class CountryControllerTest {
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")
+    @DisplayName("Should return all country currencies")
     void findAllCountryCurrencies_ShouldReturnCountryCurrencies() throws Exception {
         // Given
         CountryCurrency currency1 = CountryCurrency.builder()
@@ -74,7 +79,8 @@ class CountryControllerTest {
                 .build();
 
         List<CountryCurrency> countryCurrencies = List.of(currency1, currency2);
-        when(countryClient.fetchAllCountriesCurrencies()).thenReturn(countryCurrencies);
+        when(facade.fetchAllCountriesCurrencies()).thenReturn(countryCurrencies);
+
         String jsonContent = objectMapper.writeValueAsString(countryCurrencies);
 
         // When & Then
@@ -87,20 +93,22 @@ class CountryControllerTest {
 
     @Test
     @WithMockUser(username = "email@example.com", authorities = "User")
+    @DisplayName("Should return all cities for a given country")
     void findAllCountryCities_ShouldReturnCountryCities() throws Exception {
         // Given
         String countryName = "Afghanistan";
-        City city1 = City.builder().city("Kabul").build();
-        City city2 = City.builder().city("Herat").build();
+        City city1 = City.builder().name("Kabul").build();
+        City city2 = City.builder().name("Herat").build();
 
         List<City> cities = List.of(city1, city2);
-        when(countryClient.fetchAllCountryCities(countryName)).thenReturn(cities);
+        when(facade.fetchAllCountryCities(countryName)).thenReturn(cities);
+
         String jsonContent = objectMapper.writeValueAsString(cities);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/country/cities")
-                        .param("country", countryName)
+                        .param("countryName", countryName)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));

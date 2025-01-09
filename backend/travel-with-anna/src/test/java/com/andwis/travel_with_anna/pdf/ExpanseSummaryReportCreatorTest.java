@@ -83,7 +83,7 @@ class ExpanseSummaryReportCreatorTest {
     void getSummary_returnsFormattedParagraphWithTable() throws IOException {
         // Given
         ExpanseByCurrency expanse = ExpanseByCurrency.builder()
-                .currency("EUR")
+                .currencyCode("EUR")
                 .totalDebt(BigDecimal.valueOf(100))
                 .totalPrice(BigDecimal.valueOf(200))
                 .totalPriceInTripCurrency(BigDecimal.valueOf(210))

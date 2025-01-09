@@ -13,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 
-import static com.andwis.travel_with_anna.role.Role.*;
+import static com.andwis.travel_with_anna.role.RoleType.ADMIN;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -31,13 +32,13 @@ class RoleServiceTest {
     @BeforeEach
     void setUp() {
         Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
         roleRepository.save(role);
 
         Role role2 = new Role();
-        role2.setRoleName(getAdminRole());
-        role2.setAuthority(getAdminAuthority());
+        role2.setRoleName(ADMIN.getRoleName());
+        role2.setRoleAuthority(ADMIN.getAuthority());
         roleRepository.save(role2);
 
         user = User.builder()
@@ -65,8 +66,8 @@ class RoleServiceTest {
         // Then
         assertNotNull(roles);
         assertEquals(2, roles.size());
-        assertEquals(getAdminRole(), roles.get(0));
-        assertEquals(getUserRole(), roles.get(1));
+        assertEquals(ADMIN.getRoleName(), roles.get(0));
+        assertEquals(USER.getRoleName(), roles.get(1));
     }
 
     @Test
@@ -79,20 +80,20 @@ class RoleServiceTest {
         // Then
         assertNotNull(roles);
         assertEquals(1, roles.size());
-        assertEquals(getUserRole(), roles.getFirst());
+        assertEquals(USER.getRoleName(), roles.getFirst());
     }
 
     @Test
     void getRoleByName() throws RoleNotFoundException {
         // Given
-        String roleName = getUserRole();
+        String roleName = USER.getRoleName();
         // When
         Role role = roleService.getRoleByName(roleName);
 
         // Then
         assertNotNull(role);
-        assertEquals(getUserRole(), role.getRoleName());
-        assertEquals(getUserAuthority(), role.getAuthority());
+        assertEquals(USER.getRoleName(), role.getRoleName());
+        assertEquals(USER.getAuthority(), role.getRoleAuthority());
     }
 
     @Test
@@ -100,6 +101,6 @@ class RoleServiceTest {
         // Given
         String roleName = "Role Name Not Exists";
         // When & Then
-       assertThrows(RoleNotFoundException.class, () -> roleService.getRoleByName(roleName));
+        assertThrows(RoleNotFoundException.class, () -> roleService.getRoleByName(roleName));
     }
 }

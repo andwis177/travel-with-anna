@@ -9,31 +9,37 @@ import lombok.Setter;
 
 import java.util.Objects;
 
+import static com.andwis.travel_with_anna.trip.note.Note.NOTE_LENGTH;
+
 @Getter
 @Setter
 @Builder
 public class NoteRequest {
-        @Size(max = 500, message = "Expanse name should be 500 characters or less")
-        private String note;
+
+        private static final String ENTITY_TYPE_REQUIRED_MESSAGE = "Entity type is required.";
+
+        @Size(max = NOTE_LENGTH, message = "Note name should be " + NOTE_LENGTH + " characters or less")
+        private String noteContent;
+
         private Long noteId;
-        private Long entityId;
-        @NotEmpty(message = "Entity type is required")
-        @NotBlank(message = "Entity type is required")
-        private String entityType;
+
+        private Long linkedEntityId;
+
+        @NotEmpty(message = ENTITY_TYPE_REQUIRED_MESSAGE)
+        @NotBlank(message = ENTITY_TYPE_REQUIRED_MESSAGE)
+        private String linkedEntityType;
 
         @Override
         public boolean equals(Object object) {
                 if (this == object) return true;
                 if (object == null || getClass() != object.getClass()) return false;
                 NoteRequest that = (NoteRequest) object;
-                return Objects.equals(note, that.note) &&
-                        Objects.equals(noteId, that.noteId) &&
-                        Objects.equals(entityId, that.entityId) &&
-                        Objects.equals(entityType, that.entityType);
+                return Objects.equals(noteContent, that.noteContent) &&
+                        Objects.equals(noteId, that.noteId);
         }
 
         @Override
         public int hashCode() {
-                return Objects.hash(note, noteId, entityId, entityType);
+                return Objects.hash(noteContent, noteId);
         }
 }

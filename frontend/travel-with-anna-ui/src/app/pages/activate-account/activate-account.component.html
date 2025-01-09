@@ -1,57 +1,56 @@
-<div class="container" *ngIf="submitted else codeForm">
-  <mat-card class="second-container">
-    <div *ngIf="isOkay else activationError">
-      <mat-card-content class="content" *ngIf="isOkay else activationError">
-        <mat-card-header class="header-shadow">
-          <h3 class="success">ACTIVATION SUCCESSFUL</h3>
-        </mat-card-header>
-        <mat-divider class="padding-bottom"></mat-divider>
-        <div>
-          <h6 >Your account is ready to use.</h6>
-        </div>
-        <mat-divider class="padding-bottom"></mat-divider>
-        <div>
-          <button class="custom-button-0 success-button" (click)="redirectToLogin()" type="submit">Login</button>
-        </div>
-      </mat-card-content>
-    </div>
-
-    <ng-template #activationError>
-      <div>
-        <mat-card-content class="content padding">
-          <mat-card-header class="header-shadow">
-            <h3 class="failure">ACTIVATION FAILED</h3>
-          </mat-card-header>
-          <div class="error-msg fa-beat" *ngIf="errorMsg.length > 0">
-            <p *ngFor="let msg of errorMsg">{{ msg }}</p>
+<div class="container background-color-dark" *ngIf="submitted else codeForm">
+  <div>
+    <div class="second-container background-color-light border border-radius container-shadow">
+      <div *ngIf="isOkay else activationError">
+        <div *ngIf="isOkay else activationError" class="padding">
+          <h3 class="positive-color header">ACTIVATION SUCCESSFUL</h3>
+          <div>
+            <h6 >Your account is ready to use.</h6>
           </div>
           <div>
-            <button class="custom-button-0 failure-button" (click)="submitted=false" type="submit">Try Again</button>
+            <button class="button button-1 background-color-dark"
+                    (click)="redirectToLogin()" type="submit">Login</button>
           </div>
-        </mat-card-content>
+        </div>
       </div>
-    </ng-template>
-  </mat-card>
+    </div>
+  </div>
 </div>
 
+<ng-template #activationError>
+  <div class="padding">
+    <h3 class="header warning-color">ACTIVATION FAILED</h3>
+    <div class="error-msg" *ngIf="errorMsg.length > 0">
+      <p *ngFor="let msg of errorMsg">{{ msg }}</p>
+    </div>
+    <div>
+      <button class="button button-1 background-color-dark"
+              (click)="submitted=false">Try Again</button>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template #codeForm>
-  <div class="container">
-    <mat-card class="second-container padding" style="max-width: 700px">
-      <mat-card-header class="header-shadow">
-        <h3>Please enter the activation code sent to your email</h3>
-      </mat-card-header>
-      <mat-card-content class="content">
-        <code-input class="char-cells"
-                    [isCodeHidden]="false"
-                    [codeLength]="6"
-                    [isCharsCode]="true"
-                    (codeCompleted)="onCodeCompleted($event)">
-        </code-input>
-        <div>
-          <button class="custom-button-0 success-button" (click)="redirectToLogin()" type="submit">Login</button>
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <div class="container align-center background-color-dark">
+    <div>
+      <mat-card class="second-container padding-big align-center background-color-light border border-radius container-shadow container-limit">
+        <mat-card-header class="header">
+          <h6>Please enter the activation code sent to your email</h6>
+        </mat-card-header>
+        <mat-card-content>
+          <code-input class="char-cells"
+                      [isCodeHidden]="false"
+                      [codeLength]="6"
+                      [isCharsCode]="true"
+                      (codeCompleted)="onCodeCompleted($event)">
+          </code-input>
+          <div>
+            <button class="button button-1 background-color-dark"
+                    (click)="redirectToLogin()">Login</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
 </ng-template>
 

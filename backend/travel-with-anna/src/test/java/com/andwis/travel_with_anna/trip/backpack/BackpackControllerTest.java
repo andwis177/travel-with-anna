@@ -27,10 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.HashSet;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -58,11 +56,8 @@ class BackpackControllerTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         Trip trip = Trip.builder()
                 .tripName("tripName")
@@ -72,9 +67,9 @@ class BackpackControllerTest {
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
         user.addTrip(trip);
@@ -83,7 +78,7 @@ class BackpackControllerTest {
                 .userName("userName2")
                 .email("email2@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(2L)
                 .build();
         secondaryUser.setEnabled(true);
@@ -105,10 +100,11 @@ class BackpackControllerTest {
         Long backpackId = 1L;
         ItemRequest itemRequest = ItemRequest.builder()
                 .itemName("Tent")
-                .qty("1")
+                .quantity("1")
                 .isPacked(false)
                 .build();
         String requestBody = objectMapper.writeValueAsString(itemRequest);
+
         doNothing().when(backpackFacade).addItemToBackpack(backpackId, itemRequest, userDetails);
 
         // When & Then
@@ -116,8 +112,7 @@ class BackpackControllerTest {
                         .patch("/backpack/{backpackId}/item", backpackId)
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -126,6 +121,7 @@ class BackpackControllerTest {
         // Given
         Long backpackId = 1L;
         BackpackResponse backpackResponse = new BackpackResponse(backpackId, 1L, true);
+
         when(backpackFacade.getBackpackById(eq(backpackId), any())).thenReturn(backpackResponse);
 
         String jsonResponse = objectMapper.writeValueAsString(backpackResponse);
@@ -134,8 +130,6 @@ class BackpackControllerTest {
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/backpack/{backpackId}", backpackId)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(result -> System.out.println(
-                        "Actual Response: " + result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonResponse));
     }
@@ -145,6 +139,7 @@ class BackpackControllerTest {
     void deleteItem_ShouldReturnNoContent() throws Exception {
         // Given
         Long itemId = 2L;
+
         doNothing().when(backpackFacade).deleteItem(itemId, userDetails);
 
         // When & Then

@@ -7,12 +7,15 @@ import {MatDialog} from "@angular/material/dialog";
 
 import {ActivityComponent} from "../activity/activity/activity.component";
 import {AddressDetail} from "../../../../../../../../services/models/address-detail";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-day-details-buttons',
   standalone: true,
   imports: [
-    MatTooltip
+    MatTooltip,
+    FormsModule,
+    ReactiveFormsModule
   ],
   templateUrl: './day-details-buttons.component.html',
   styleUrl: './day-details-buttons.component.scss'
@@ -41,9 +44,9 @@ export class DayDetailsButtonsComponent  {
     event.preventDefault();
     const dialogRef = this.dialog.open(ActivityComponent, {
       panelClass: 'custom-dialog-container',
-      maxWidth: '90vw',
-      maxHeight: '90vw',
-      width: '40vw',
+      maxWidth: '43vw',
+      maxHeight: '110vh',
+      width: 'auto',
       height: 'auto',
       id: 'activity-dialog',
       data: {

@@ -1,74 +1,31 @@
-.item {
-  display: flex;
-  justify-content: start;
-  background-color: #F0F2F2;
-  padding: 10px;
-}
-
-.button {
+.cart {
   display: grid;
-  justify-content: center;
   width: 300px;
   height: 320px;
   background-color: #1C252D;
-  border-radius: 3%;
+  border-radius: 10px;
 }
 
-.button:hover {
-  border: 3px solid #1C252D;
-  opacity: 0.5;
+.cart-border {
+  border: 2px solid goldenrod;
+  box-shadow: 0 0 1px 3px #1C252D;
 }
 
-.display-flag {
-  display: flex !important;
+.cart-border:hover {
+  border: 3px solid goldenrod !important;
+  box-shadow: 0 0 3px 3px #1C252D;
+}
+
+.font-color-gold {
+  color: goldenrod;
+}
+
+.flag-container {
   flex-wrap: wrap !important;
   justify-content: space-evenly !important;
   margin: 1px;
 }
 
-.trip-name {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  width: 240px;
-  font-size: 18px;
-  font-weight: 500;
-  padding: 5px;
-  color: goldenrod;
-}
-
-.days {
-  opacity: 0.8;
-  margin:10px;
-}
-
-.date {
-  margin-bottom: 30px;
-  font-size: 20px;
-  padding: 10px;
-  color: whitesmoke;
-}
-
-.days-text {
-  display: inline-flex;
-  color: whitesmoke;
-  margin-top:3%;
-  font-weight: 400;
-  font-size: 16px
-}
-
-.label-text {
-  color: whitesmoke;
-  font-size: 16px;
-  font-weight: 300;
-}
-
-.margin-form {
-  margin: 3%;
-}
-
-.main-font-size {
-  font-size: 16px;
-}
 
 
 

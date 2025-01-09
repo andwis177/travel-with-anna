@@ -3,6 +3,6 @@
 export interface UserAdminEditRequest {
   accountLocked?: boolean;
   enabled?: boolean;
-  roleName?: string;
-  userId?: number;
+  roleName: string;
+  userId: number;
 }

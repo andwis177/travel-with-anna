@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.trip.budget;
 
-import com.andwis.travel_with_anna.security.OwnableByUser;
+import com.andwis.travel_with_anna.security.OwnByUser;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import com.andwis.travel_with_anna.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,45 +17,37 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "budget")
-public class Budget implements OwnableByUser {
+public class Budget implements OwnByUser {
+
+    private static final int MAX_CURRENCY_LENGTH = 10;
+
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "budget_id")
     private Long budgetId;
 
+    @EqualsAndHashCode.Include
     @NotNull
-    @Size(max = 10)
-    @Column(name = "currency", length = 10)
+    @Size(max = MAX_CURRENCY_LENGTH)
+    @Column(name = "currency", length = MAX_CURRENCY_LENGTH)
     private String currency;
 
+    @EqualsAndHashCode.Include
     @NotNull
-    @Column(name = "to_spend")
-    private BigDecimal toSpend;
+    @Column(name = "budget_amount")
+    private BigDecimal budgetAmount;
 
     @OneToOne(mappedBy = "budget")
     @JsonIgnore
     private Trip trip;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Budget budget = (Budget) o;
-        return Objects.equals(budgetId, budget.budgetId)
-                && Objects.equals(currency, budget.currency)
-                && Objects.equals(toSpend, budget.toSpend)
-                && Objects.equals(trip, budget.trip);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(budgetId, currency, toSpend);
-    }
-
-    @Override
     public User getOwner() {
-        return this.trip.getOwner();
+        return Objects.requireNonNull(this.trip, "Backpack must be linked to a trip to have an owner")
+                .getOwner();
     }
 }

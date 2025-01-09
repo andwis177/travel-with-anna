@@ -8,6 +8,7 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class RestClientConfig {
+    private static final int READ_TIMEOUT = 10_000;
 
     @Bean
     public RestClient restClient(RestClient.Builder builder) {
@@ -16,11 +17,11 @@ public class RestClientConfig {
     }
 
     @Bean
-    public RestClientCustomizer countryClientCustomizer() {
-        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory();
-        requestFactory.setReadTimeout(10000);
-
-        return (restClientBuilder -> restClientBuilder
-                .requestFactory(requestFactory));
+    public RestClientCustomizer customizeRestClient() {
+        return restClientBuilder -> {
+            JdkClientHttpRequestFactory jdkHttpRequestFactory = new JdkClientHttpRequestFactory();
+            jdkHttpRequestFactory.setReadTimeout(READ_TIMEOUT);
+            restClientBuilder.requestFactory(jdkHttpRequestFactory);
+        };
     }
 }

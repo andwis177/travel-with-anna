@@ -181,14 +181,14 @@ public class ExpanseService {
         if (currencyRepository.count() > 0) {
             CurrencyExchange currencyExchange = getCurrencyExchangeByCode(defaultCurrency);
             if(currencyExchange != null &&
-                    currencyExchange.getTimeStamp().isBefore(
-                            LocalDateTime.now().minusHours(6))) {
+                    currencyExchange.getTimestamp().isBefore(
+                            LocalDateTime.now().minusDays(1))) {
                 saveAllCurrencyExchange();
             }
         }
     }
 
-    private void saveAllCurrencyExchange() {
+    public void saveAllCurrencyExchange() {
         currencyRepository.deleteAll();
         List<CurrencyExchangeResponse> currencyApiFetch = currencyExchangeService.fetchAllExchangeRates();
         List<CurrencyExchange> currencyExchangeList = currencyApiFetch.stream()
@@ -222,13 +222,13 @@ public class ExpanseService {
     }
 
     @Transactional
-    public void updateExpanseCategory(Expanse expanse, String categoryDescription, UserDetails connectedUser) {
+    public void updateExpanseCategory(@NotNull Expanse expanse, String categoryDescription) {
         expanse.setExpanseCategory(categoryDescription);
         save(expanse);
     }
 
     @Transactional
-    public void updateExpanseDate(Expanse expanse, LocalDate date, UserDetails connectedUser) {
+    public void updateExpanseDate(@NotNull Expanse expanse, LocalDate date) {
         expanse.setDate(date);
         save(expanse);
     }

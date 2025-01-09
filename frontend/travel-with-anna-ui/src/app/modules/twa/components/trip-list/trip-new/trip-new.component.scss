@@ -1,9 +1,5 @@
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
-  display: none;
-}
-
-mat-form-field {
-  max-width: 100% !important;
+  display: none !important;
 }
 
 ::ng-deep .mat-calendar

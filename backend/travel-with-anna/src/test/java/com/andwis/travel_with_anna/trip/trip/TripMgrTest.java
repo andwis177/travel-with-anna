@@ -33,10 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -72,25 +70,22 @@ class TripMgrTest {
     @BeforeEach
     @Transactional
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrievedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         User testUser = User.builder()
                 .userName("testUser")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrievedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         userService.saveUser(testUser);
 
         Budget budget = Budget.builder()
                 .currency("USD")
-                .toSpend(BigDecimal.valueOf(1000))
+                .budgetAmount(BigDecimal.valueOf(1000))
                 .build();
 
         Day day = Day.builder()
@@ -164,15 +159,15 @@ class TripMgrTest {
     void testDeleteTrip() throws WrongPasswordException {
         // Given
         TripRequest request = new TripRequest(testTrip.getTripId(), "password");
-        doNothing().when(addressService).deleteAllByAddressIdIn(anySet());
+        doNothing().when(addressService).deleteExistingAddressesByIds(anySet());
 
         // When
         tripMgr.deleteTrip(request, userDetails);
 
         // Then
         assertThrows(TripNotFoundException.class, () -> tripService.getTripById(request.tripId()));
-        User updatedUser = userAuthenticationService.getConnectedUser(userDetails);
-        assertFalse(updatedUser.getOwnedTrips().stream().anyMatch(trip -> trip.getTripId().equals(request.tripId())));
+        User updatedUser = userAuthenticationService.retriveConnectedUser(userDetails);
+        assertFalse(updatedUser.getTrips().stream().anyMatch(trip -> trip.getTripId().equals(request.tripId())));
     }
 
     @Test
@@ -194,9 +189,9 @@ class TripMgrTest {
         LocalDate newStartDate = LocalDate.now().plusDays(1);
         LocalDate newEndDate = LocalDate.now().plusDays(5);
         DayGeneratorRequest dayGeneratorRequest = DayGeneratorRequest.builder()
-                .tripId(testTrip.getTripId())
-                .startDate(newStartDate)
-                .endDate(newEndDate)
+                .associatedTripId(testTrip.getTripId())
+                .startDate(newStartDate.toString())
+                .endDate(newEndDate.toString())
                 .build();
         TripEditRequest tripEditRequest = TripEditRequest.builder()
                 .tripName(newTripName)

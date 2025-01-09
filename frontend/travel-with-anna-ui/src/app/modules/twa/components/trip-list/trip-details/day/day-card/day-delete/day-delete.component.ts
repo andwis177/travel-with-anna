@@ -1,7 +1,5 @@
 import {Component, Inject} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
-import {MatDivider} from "@angular/material/divider";
 import {NgForOf, NgIf} from "@angular/common";
 import {DeleteDay$Params} from "../../../../../../../../services/fn/day/delete-day";
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
@@ -13,10 +11,6 @@ import {ErrorService} from "../../../../../../../../services/error/error.service
   standalone: true,
   imports: [
     FormsModule,
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatDivider,
     NgForOf,
     NgIf,
     ReactiveFormsModule
@@ -42,7 +36,7 @@ export class DayDeleteComponent {
   }
 
   deleteDay() {
-    const params: DeleteDay$Params = {body: {tripId: this.tripId!, first: this.isFirst!}};
+    const params: DeleteDay$Params = {tripId: this.tripId, isFirst: this.isFirst};
     this.dayService.deleteDay$Response(params).subscribe({
       next: () => {
         this.dialog.getDialogById('delete-day-dialog')?.close();

@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
 import com.andwis.travel_with_anna.handler.exception.WrongPasswordException;
+import com.andwis.travel_with_anna.role.RoleNameResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +17,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "User")
 public class UserController {
+
     private final UserFacade facade;
 
     @GetMapping("/credentials")
     public ResponseEntity<UserCredentialsResponse> getCredentials(
             @AuthenticationPrincipal UserDetails connectedUser) {
-        UserCredentialsResponse userCredentials = facade.getCredentials(connectedUser.getUsername());
-        return ResponseEntity.ok(userCredentials);
+        return ResponseEntity.ok(facade.getCredentials(connectedUser.getUsername()));
+    }
+
+    @GetMapping("/role")
+    public ResponseEntity<RoleNameResponse> fetchRole(@AuthenticationPrincipal UserDetails connectedUser) {
+        return ResponseEntity.ok(facade.fetchUserRoleName(connectedUser));
     }
 
     @PatchMapping
@@ -30,8 +36,7 @@ public class UserController {
             @RequestBody @Valid UserCredentialsRequest userCredentials,
             @AuthenticationPrincipal UserDetails connectedUser)
             throws WrongPasswordException {
-        AuthenticationResponse response = facade.updateUserExecution(userCredentials, connectedUser);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(facade.updateUserExecution(userCredentials, connectedUser));
     }
 
     @PatchMapping("/change-password")
@@ -39,8 +44,7 @@ public class UserController {
             @RequestBody @Valid ChangePasswordRequest request,
             @AuthenticationPrincipal UserDetails connectedUser)
             throws WrongPasswordException {
-        UserResponse respond = facade.changePassword(request, connectedUser);
-        return ResponseEntity.accepted().body(respond);
+        return ResponseEntity.accepted().body(facade.changePassword(request, connectedUser));
     }
 
     @DeleteMapping
@@ -48,7 +52,6 @@ public class UserController {
             @RequestBody @Valid PasswordRequest request,
             @AuthenticationPrincipal UserDetails connectedUser)
             throws WrongPasswordException {
-        UserResponse respond = facade.deleteConnectedUser(request, connectedUser);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respond);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(facade.deleteConnectedUser(request, connectedUser));
     }
 }

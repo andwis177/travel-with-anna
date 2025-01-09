@@ -2,7 +2,6 @@ package com.andwis.travel_with_anna.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,20 +11,29 @@ import lombok.Setter;
 @Setter
 @Builder
 public class RegistrationRequest {
-    @NotEmpty(message = "User name is required")
-    @NotBlank(message = "User name is required")
-    @Size(max = 30, message = "User name should be 30 characters long maximum")
+
+    private static final String MESSAGE_REQUIRED = "This field is required";
+    private static final String MESSAGE_EMAIL_FORMAT = "Email is not well formatted";
+    private static final String MESSAGE_PASSWORD_LENGTH = "Password should be at least 8 characters long";
+    private static final String MESSAGE_NAME_LENGTH = "User name should be 30 characters long maximum";
+
+    private static final int SIZE_NAME_LENGTH = 30;
+    private static final int SIZE_PASSWORD_MIN_LENGTH = 8;
+
+    @NotBlank(message = MESSAGE_REQUIRED)
+    @Size(max = SIZE_NAME_LENGTH, message = MESSAGE_NAME_LENGTH)
     private String userName;
-    @Email(message = "Email is not well formatted")
-    @NotEmpty(message = "Email is required")
-    @NotBlank(message = "Email is required")
+
+    @NotBlank(message = MESSAGE_REQUIRED)
+    @Email(message = MESSAGE_EMAIL_FORMAT)
     private String email;
-    @Size(min = 8, message = "Password should be 8 characters long minimum")
-    @NotEmpty(message = "Password should be 8 characters long minimum")
-    @NotBlank(message = "Password should be 8 characters long minimum")
+
+    @NotBlank(message = MESSAGE_PASSWORD_LENGTH)
+    @Size(min = SIZE_PASSWORD_MIN_LENGTH, message = MESSAGE_PASSWORD_LENGTH)
     private String password;
+
     private String confirmPassword;
-    @NotEmpty(message = "Role is required")
-    @NotBlank(message = "Role is required")
+
+    @NotBlank(message = MESSAGE_REQUIRED)
     private String roleName;
 }

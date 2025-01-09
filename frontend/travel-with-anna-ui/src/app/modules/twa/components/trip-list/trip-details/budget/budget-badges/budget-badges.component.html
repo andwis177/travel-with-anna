@@ -1,32 +1,47 @@
-<mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">Expanses by Category</div>
-  <button mat-icon-button class="close-button"
-          (click)="onClose()"
-          (keydown.enter)="$event.preventDefault()">
-    <mat-icon class="close-icon">close</mat-icon>
-  </button>
+<mat-toolbar-row class="dialog-top-bar  background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div>Expanses by Category</div>
+    <button mat-icon-button
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
+    </button>
+  </div>
 </mat-toolbar-row>
-<div class="custom-dialog-container">
-  <div class="badge-expanses-container" *ngFor="let badge of totalExpanses">
 
-    <div class="budget-badge-content">
-      <div class="image-frame">
-        <img src="../../../../../assets/images/activity/{{badge.type}}.png"
-             class="image-container"
-             alt="">
-        <div>
-          <a class="badge-name">{{badge.type?.toUpperCase()}}</a>
+<div class="custom-dialog-container background-color-toolbar padding-main">
+  <div class = "full-width background-color-toolbar align-left container-vertical" >
+    <div class="container-horizontal align-center padding-left" *ngFor="let badge of totalExpanses">
+      <div class="budget-badge-content" >
+        <div class="container-vertical badge-image-frame" [ngClass]="badge.badgeType">
+          <div class="badge-image-container" >
+            <img src="../../../../../assets/images/activity/{{badge.badgeType}}.png"
+                 class="budget-badge-image"
+                 alt="">
+          </div>
         </div>
       </div>
-    </div >
 
-    <div class="budget-badge-content">
-      <div class="amount-group">
-        <div style="flex-direction: row">
-          <label class="label-currency">PRICE:</label> <a class="amount"> {{formatAmount(badge.totalPriceInTripCurrency!)}}</a> <a class="label-currency"> {{currency}}</a>
-        </div>
-        <div style="flex-direction: row">
-          <label class="label-currency">PAID:</label> <a class="amount" [ngClass]="getPaidToMuchClass(badge)"> {{formatAmount(badge.totalPaidInTripCurrency!)}}</a> <a class="label-currency"> {{currency}}</a>
+      <div class="budget-badge-content">
+        <div class="amount-group container-vertical font-color-white">
+          <div class="container-horizontal align-to-baseline">
+            <label class="font-size-small">PRICE:</label>
+            <a class="font-size-text font-color-light dual-margin">
+              {{formatAmount(badge.totalPriceInTripCurrency!)}}
+            </a>
+            <a class="font-size-small">
+              {{currency}}
+            </a>
+          </div>
+          <div class="container-horizontal align-to-baseline">
+            <label class="font-size-small">PAID:</label>
+            <a class="font-size-text dual-margin" [ngClass]="getPaidToMuchClass(badge)">
+              {{formatAmount(badge.totalPaidInTripCurrency!)}}
+            </a>
+            <a class="font-size-small">
+              {{currency}}
+            </a>
+          </div>
         </div>
       </div>
     </div>

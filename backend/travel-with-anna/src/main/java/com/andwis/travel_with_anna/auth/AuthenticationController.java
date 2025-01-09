@@ -5,33 +5,40 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.relation.RoleNotFoundException;
+import javax.security.auth.login.AccountLockedException;
 
 @RestController
 @RequestMapping("auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication")
 public class AuthenticationController {
+
     private final AuthenticationService service;
 
+    private static final ResponseEntity<Void> ACCEPTED_RESPONSE = ResponseEntity.accepted().build();
+    private static final ResponseEntity<Void> OK_RESPONSE = ResponseEntity.ok().build();
+
+    private <T> ResponseEntity<T> buildOkResponse(T body) {
+        return ResponseEntity.ok(body);
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<?> register(
+    public ResponseEntity<Void> register(
             @RequestBody @Valid RegistrationRequest request
     ) throws RoleNotFoundException, MessagingException, WrongPasswordException {
         service.register(request);
-        return ResponseEntity.accepted().build();
+        return ACCEPTED_RESPONSE;
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
-    ) throws WrongPasswordException {
-        AuthenticationResponse response = service.authenticationWithCredentials(request);
-        return ResponseEntity.ok(response);
+            @RequestBody @Valid AuthenticationRequest request
+    ) throws WrongPasswordException, AccountLockedException {
+        return buildOkResponse(service.authenticationWithCredentials(request));
     }
 
     @GetMapping("/activate-account")
@@ -39,14 +46,20 @@ public class AuthenticationController {
             @RequestParam String token
     ) throws MessagingException {
         service.activateAccount(token);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ACCEPTED_RESPONSE;
     }
 
     @PatchMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(
+    public ResponseEntity<Void> resetPassword(
             @RequestBody @Valid ResetPasswordRequest request
     ) throws MessagingException {
         service.resetPassword(request);
-        return ResponseEntity.ok().build();
+        return OK_RESPONSE;
+    }
+
+    @PostMapping("/resend-activation-code")
+    public ResponseEntity<Void> resendActivationCode(@RequestParam String email) throws MessagingException {
+        service.sendActivationCodeByRequest(email);
+        return OK_RESPONSE;
     }
 }

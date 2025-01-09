@@ -23,8 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.HashSet;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -50,8 +49,8 @@ class NoteControllerTest {
     @BeforeEach
     void setUp() {
         Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
@@ -60,14 +59,14 @@ class NoteControllerTest {
                 .password(encodedPassword)
                 .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
 
         request = NoteRequest.builder()
-                .entityId(1L)
-                .note("Note content")
-                .entityType("day")
+                .linkedEntityId(1L)
+                .noteContent("Note content")
+                .linkedEntityType("day")
                 .build();
 
         userDetails = createUserDetails(user);

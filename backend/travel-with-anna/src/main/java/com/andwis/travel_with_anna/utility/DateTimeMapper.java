@@ -11,30 +11,38 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class DateTimeMapper {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+
     public static @NotNull LocalDateTime toLocalDateTime(@NotNull String dateTimeString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        try {
-            return LocalDateTime.parse(dateTimeString, formatter);
-        } catch (DateTimeParseException e) {
-            throw new DateTimeException("Date or time is incorrect");
-        }
+        return parseDateTime(dateTimeString, DATE_TIME_FORMATTER, "Invalid date-time format. Expected 'yyyy-MM-dd'T'HH:mm'");
     }
 
     public static @NotNull LocalDate toLocalDate(@NotNull String dateString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        try {
-            return LocalDate.parse(dateString, formatter);
-        } catch (DateTimeParseException e) {
-            throw new DateTimeException("Date is incorrect");
-        }
+        return parseDateTime(dateString, DATE_FORMATTER, "Invalid date format. Expected 'yyyy-MM-dd'");
     }
 
     public static @Nullable LocalTime toTime(@NotNull String timeString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         try {
-            return LocalTime.parse(timeString, formatter);
+            return LocalTime.parse(timeString, TIME_FORMATTER);
         } catch (DateTimeParseException e) {
             return null;
+        }
+    }
+
+    private static <T> @NotNull T parseDateTime(String input, DateTimeFormatter formatter, String errorMessage) {
+        try {
+            if (formatter == DATE_TIME_FORMATTER) {
+                return (T) LocalDateTime.parse(input, formatter);
+            } else if (formatter == DATE_FORMATTER) {
+                return (T) LocalDate.parse(input, formatter);
+            } else {
+                throw new IllegalArgumentException("Unsupported formatter provided");
+            }
+        } catch (DateTimeParseException e) {
+            throw new DateTimeException(errorMessage, e);
         }
     }
 }

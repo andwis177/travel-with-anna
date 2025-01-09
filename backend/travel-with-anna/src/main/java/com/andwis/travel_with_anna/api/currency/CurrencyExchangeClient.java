@@ -1,18 +1,17 @@
 package com.andwis.travel_with_anna.api.currency;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
 public class CurrencyExchangeClient {
+
     @Value("${my_apis.currency.header.apikey}")
     private String apiKey;
     @Value("${my_apis.currency.currency_url}")
@@ -25,28 +24,42 @@ public class CurrencyExchangeClient {
 
     public List<CurrencyExchangeResponse> fetchAllExchangeRates() {
         try {
-        CurrencyResponse response = restClient.get()
-                .uri(baseUrl + "/latest")
-                .header("apikey", apiKey)
-                .retrieve()
-                .body(CurrencyResponse.class);
+            String endpointUrl = baseUrl + "/latest";
+            CurrencyResponse response = fetchCurrencyResponse(endpointUrl);
 
-        if (response == null || response.getData() == null) {
-            return Collections.emptyList();
-        }
+            if (isInvalidResponse(response)) {
+                return Collections.emptyList();
+            }
 
-        List<CurrencyExchangeResponse> currencyExchangeResponses = new ArrayList<>();
-
-        response.getData().forEach((code, dto) -> {
-            dto.setCode(code);
-            currencyExchangeResponses.add(dto);
-        });
-        currencyExchangeResponses.sort(Comparator.comparing(CurrencyExchangeResponse::getCode));
-
-        return currencyExchangeResponses;
+            return mapToCurrencyExchangeResponseList(response.getExchangeRates());
         } catch (Exception e) {
             log.error("Error during fetchAllExchangeRates API call: {}", e.getMessage());
             return Collections.emptyList();
         }
+    }
+
+    private CurrencyResponse fetchCurrencyResponse(String url) {
+        return restClient.get()
+                .uri(url)
+                .header("apikey", apiKey)
+                .retrieve()
+                .body(CurrencyResponse.class);
+    }
+
+    private boolean isInvalidResponse(CurrencyResponse response) {
+        return response == null || response.getExchangeRates() == null;
+    }
+
+    private @NotNull List<CurrencyExchangeResponse> mapToCurrencyExchangeResponseList(
+            @NotNull Map<String, CurrencyExchangeResponse> data) {
+        List<CurrencyExchangeResponse> currencyExchangeResponses = new ArrayList<>();
+
+        data.forEach((currencyCode, responseDto) -> {
+            responseDto.setCode(currencyCode);
+            currencyExchangeResponses.add(responseDto);
+        });
+
+        currencyExchangeResponses.sort(Comparator.comparing(CurrencyExchangeResponse::getCode));
+        return currencyExchangeResponses;
     }
 }

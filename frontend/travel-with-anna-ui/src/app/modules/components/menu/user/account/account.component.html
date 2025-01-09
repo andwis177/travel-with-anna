@@ -1,62 +1,68 @@
-<mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">Account</div>
-  <button mat-icon-button class="close-button"
-          (click)="onClose()"
-          (keydown.enter)="$event.preventDefault()">
-    <mat-icon class="close-icon">close</mat-icon>
-  </button>
-</mat-toolbar-row>
-
-<div class="dialog-container">
-  <div class="image-button-container">
-    <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none;" />
-    <button mat-icon-button class="profile-button" matTooltip="Set Avatar"
-            (click)="triggerFileInput()" type="submit">
-      <img *ngIf="avatarImg" [src]="avatarImg" class="profile-image" alt="User Avatar" fill priority>
+<mat-toolbar-row class="dialog-top-bar background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div>Account</div>
+    <button mat-icon-button
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
     </button>
   </div>
+</mat-toolbar-row>
 
-  <form class="main-form">
-    <div *ngIf="!isEdit else edit_template_input">
-      <div class="full-width center-align">
-        <div class="information-area mat-elevation-z8">
-          <div>
-            <p class="label-text">Name: </p>
-            <p class="custom-header wrap-text">{{userCredentials.userName}}</p>
-          </div>
-          <div>
-            <p class="label-text">Email: </p>
-            <p class="custom-header wrap-text">{{userCredentials.email}}</p>
-          </div>
-        </div>
+<div class="
+dialog-container
+second-container
+background-color-light
+container-vertical
+padding-main-horizontal
+padding-main-vertical
+full-width">
+  <div class="container-vertical second-container margin-small-vertical">
+    <button mat-icon-button class="logo-button puffer avatar-button-radius " matTooltip="Account settings"
+            (click)="triggerFileInput()" type="button">
+      <img *ngIf="avatarImg" [src]="avatarImg" class="button-image avatar-button-radius button-border-dark" alt="User Avatar" fill priority>
+    </button>
+    <input
+      type="file"
+      #fileInput
+      (change)="onFileSelected($event)"
+      accept="image/jpeg, image/jpg"
+      style="display: none;">
+  </div>
+
+  <div *ngIf="!isEdit else edit_template_input">
+    <div class="information-are-shadow border background-color-white center-align-left margin-big align-left border-radius">
+      <div class="margin-big">
+        <p class="username-text font-size-label font-color-label">Name: </p>
+        <p class="username-text font-size-text font-color">{{userCredentials.userName}}</p>
+      </div>
+      <div class="margin-big">
+        <p class="username-text font-size-label font-color-label">Email: </p>
+        <p class="username-text font-size-text font-color">{{userCredentials.email}}</p>
       </div>
     </div>
-    <mat-card-actions class="button-area">
-      <div *ngIf="!isEdit else edit_template_button">
-        <button class="custom-button-0" (click)="edit()" type="submit">Edit</button>
-      </div>
-    </mat-card-actions>
-
-    <div class="end-align" *ngIf="isEdit">
-      <mat-divider></mat-divider>
-      <button class="delete-button"
-              (click)="deleteAccount()"
-              type="submit"
-              matTooltip="Delete Account">
-        <img src="../../../../../assets/images/delete-button.png" class="delete-button-image" style="opacity: 0.8" alt="">
-      </button>
-    </div>
-  </form>
+  </div>
+  <div *ngIf="!isEdit else edit_template_button" class="margin-main-horizontal container-horizontal">
+    <button class="button dim button-1 background-color-dark" (click)="edit()">Edit</button>
+    <button class="button dim button-1 background-color-medium" (click)="onClose()">Close</button>
+  </div>
 </div>
 
 <ng-template #edit_template_button>
-  <button class="custom-button-0 full-width" (click)="saveUserCredentials()" type="submit">Save</button>
-  <button class="custom-button-1 full-width" (click)="managePassword()" type="submit">Password</button>
+  <div class="margin-main container-horizontal second-container">
+    <button class="button dim button-1 background-color-medium" (click)="saveUserCredentials()">Save</button>
+    <button class="button dim button-1 background-color-dark wrap-text" (click)="managePassword()">Edit Password</button>
+  </div>
+  <button class="small-button puffer"
+          (click)="deleteAccount()"
+          matTooltip="Delete Account">
+    <img src="../../../../../assets/images/delete-button.png" class="button-image" alt="">
+  </button>
 </ng-template>
 
 <ng-template #edit_template_input>
-  <div class = "full-width" >
-    <mat-form-field appearance="outline" class="full-width">
+  <div class="container-vertical margin-main-horizontal">
+    <mat-form-field appearance="outline" class="insert-width" >
       <mat-label>Name: </mat-label>
       <input  type="text"
               matInput
@@ -67,7 +73,7 @@
               (keydown.enter)="$event.preventDefault()">
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
+    <mat-form-field appearance="outline" >
       <mat-label>Email: </mat-label>
       <input type="email"
              matInput
@@ -78,7 +84,7 @@
              (keydown.enter)="$event.preventDefault()">
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
+    <mat-form-field appearance="outline" >
       <mat-label>Password:</mat-label>
       <input type="password"
              matInput [type]="hide() ? 'password' : 'text'"
@@ -88,6 +94,7 @@
              autocomplete="password"
              (keydown.enter)="$event.preventDefault()">
       <button
+        class="puffer"
         mat-icon-button
         matSuffix
         (click)="clickEvent($event)"
@@ -100,7 +107,7 @@
   </div>
 </ng-template>
 
-<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-  <mat-divider class="padding-bottom"></mat-divider>
-  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+<div class="full-width border-top error-msg error-background" role="alert" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
 </div>
+

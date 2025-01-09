@@ -21,15 +21,14 @@ public class ItemController {
     public ResponseEntity<List<ItemResponse>> getAllItemsByBackpackId(
             @PathVariable("backpackId") Long backpackId,
             @AuthenticationPrincipal UserDetails connectedUser) {
-        List<ItemResponse> items = itemFacade.getAllItemsByBackpackId(backpackId, connectedUser);
-        return ResponseEntity.status(HttpStatus.OK).body(items);
+        return ResponseEntity.ok(itemFacade.getAllItemsByBackpackId(backpackId, connectedUser));
     }
 
     @PatchMapping("/save-list")
-    public ResponseEntity<Void> saveAllItemsFromTheList(
+    @ResponseStatus(HttpStatus.OK)
+    public void saveAllItemsFromTheList(
             @RequestBody List<ItemResponse> items,
             @AuthenticationPrincipal UserDetails connectedUser) {
         itemFacade.saveAllItems(items, connectedUser);
-        return ResponseEntity.ok().build();
     }
 }

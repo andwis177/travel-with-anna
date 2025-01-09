@@ -4,6 +4,8 @@ import {DayResponse} from "../models/day-response";
 import {TripResponse} from "../models/trip-response";
 import {ActivityResponse} from "../models/activity-response";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {Country} from "../models/country";
+import {City} from "../models/city";
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +34,10 @@ export class SharedService {
   private getActivityTrigger = new Subject<void>();
   public getActivityTriggerEvent$ = this.getActivityTrigger.asObservable();
 
-
+  private lastCountry = new BehaviorSubject<Country>({currency: '', name: '', iso2: '', iso3: ''});
+  private lastCountry$ = this.lastCountry.asObservable();
+  private lastCity = new BehaviorSubject<City>({city:''});
+  private lastCity$ = this.lastCity.asObservable();
 
   private userNameKey: string = 'userName';
   private imageKey: string = 'image';
@@ -125,6 +130,24 @@ export class SharedService {
   getActivity(): Observable<ActivityResponse> {
     return this.activity$;
   }
+
+  getLastACountry(): Observable<Country> {
+    return this.lastCountry$;
+  }
+
+  setLastCountry(country: Country): void {
+    this.lastCountry.next(country);
+  }
+
+  getLastCity(): Observable<City> {
+    return this.lastCity$;
+  }
+
+  setLastCity(city: City): void {
+    this.lastCity.next(city);
+  }
+
+
 
   triggerGetDays() {
     this.getDayTrigger.next();

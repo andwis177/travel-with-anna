@@ -1,47 +1,46 @@
-<mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">Edit Budget</div>
-  <button mat-icon-button class="close-button"
-          (click)="onClose()"
-          (keydown.enter)="$event.preventDefault()">
-    <mat-icon class="close-icon">close</mat-icon>
-  </button>
+<mat-toolbar-row class="dialog-top-bar  background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div>Edit Budget</div>
+    <button mat-icon-button
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
+    </button>
+  </div>
 </mat-toolbar-row>
 
-<div class="dialog-container">
-  <form class="main-form">
-    <div>
-      <div>
-        <form class="full-width">
-          <mat-form-field appearance="outline">
-            <mat-label>Enter Amount</mat-label>
-            <input matInput placeholder="0.00" [(ngModel)]="budget.toSpend" type="number" name="amount" min="0" step="0.01">
-            <span matPrefix>$&nbsp;</span>
-          </mat-form-field>
+<div class="background-color-light second-container container-vertical full-width">
+  <form class="margin-big container-vertical">
+    <mat-form-field appearance="outline" class="input-main font-size-text">
+      <mat-label>Enter Amount</mat-label>
+      <input matInput placeholder="0.00"
+             [(ngModel)]="budget.budgetAmount"
+             type="number"
+             name="amount"
+             min="0"
+             step="0.01">
+      <span matPrefix>$&nbsp;</span>
+    </mat-form-field>
 
-          <mat-form-field appearance="outline" class="insert-size">
-            <mat-select [(ngModel)]="budget.currency" name="currency">
-              <mat-select-trigger>
-                {{ budget.currency }}
-              </mat-select-trigger>
-              <mat-option *ngFor="let currency of currency" [value]="currency.currency">
-                {{ currency.currency?.toString() }}
-                <p style="font-size:10px">{{ currency.country?.toUpperCase() }}</p>
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+    <mat-form-field appearance="outline" class="budget-edit-input-width">
+      <mat-select [(ngModel)]="budget.currency" name="currency">
+        <mat-select-trigger>
+          {{ budget.currency }}
+        </mat-select-trigger>
+        <mat-option *ngFor="let currency of currency" [value]="currency.currency">
+          {{ currency.currency?.toString() }}
+          <p class="font-size-small">{{ currency.country?.toUpperCase() }}</p>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-        </form>
-        <div class="buttons-container" >
-          <button class="custom-button-0 full-width" (click)="saveBudget()" type="submit">Save</button>
-          <button class="custom-button-1 full-width" (click)="onClose()" type="submit">Close</button>
-        </div>
-      </div>
+    <div class="container-vertical full-width align-center" >
+      <button class="button button-1 background-color-dark" (click)="saveBudget()">Save</button>
+      <button class="button button-1 background-color-medium" (click)="onClose()">Close</button>
     </div>
   </form>
 </div>
-<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-  <mat-divider class="padding-bottom"></mat-divider>
-  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+<div class="full-width error-msg border-top error-background" role="alert" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
 </div>
-
 

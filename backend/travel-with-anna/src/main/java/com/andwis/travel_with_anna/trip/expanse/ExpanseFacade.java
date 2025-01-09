@@ -18,46 +18,31 @@ import static com.andwis.travel_with_anna.trip.expanse.ExpanseMapper.toExpanseRe
 @Service
 @RequiredArgsConstructor
 public class ExpanseFacade {
+
+    private static final ExpanseResponse DEFAULT_EXPANSE_RESPONSE = new ExpanseResponse(
+            -1L, "", "", "", "",
+            BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO
+    );
+
     private final ExpanseService expanseService;
     private final ItemService itemService;
     private final ActivityService activityService;
 
-    public ExpanseResponse createOrUpdateExpanse(@NotNull ExpanseRequest expanseRequest, UserDetails connectedUser) {
+    public ExpanseResponse createOrUpdateExpanse(
+            @NotNull @NotEmpty @NotBlank ExpanseRequest expanseRequest, UserDetails connectedUser) {
         ExpanseType expanseType = ExpanseType.fromString(expanseRequest.getEntityType());
-
         if (expanseType == null) {
             return updateExpanse(expanseRequest, connectedUser);
-        } else {
-            return switch (expanseType) {
-                case ITEM -> createOrUpdateExpanseForItem(expanseRequest, connectedUser);
-                case ACTIVITY -> createOrUpdateExpanseForActivity(expanseRequest, connectedUser);
-            };
         }
+        return
+                createOrUpdateForSpecificEntity(expanseRequest, expanseType, connectedUser);
     }
 
-    public ExpanseResponse getExpanseByEntityId(
-            Long entityId,
-            @NotNull @NotEmpty @NotBlank String entityType,
-            UserDetails connectedUser) {
-        ExpanseType expanseType = ExpanseType.fromString(entityType);
-
-        if (expanseType == null) {
-            return new ExpanseResponse(
-                    -1L,
-                    "",
-                    "",
-                    "",
-                    "",
-                    BigDecimal.ZERO,
-                    BigDecimal.ZERO,
-                    BigDecimal.ONE,
-                    BigDecimal.ZERO,
-                    BigDecimal.ZERO
-            );
-        }
+    private ExpanseResponse createOrUpdateForSpecificEntity(
+            @NotNull ExpanseRequest expanseRequest, @NotNull @NotEmpty @NotBlank ExpanseType expanseType, UserDetails connectedUser) {
         return switch (expanseType) {
-            case ITEM -> getExpanseByItemId(entityId, connectedUser);
-            case ACTIVITY -> getExpanseByActivityId(entityId, connectedUser);
+            case ITEM -> createOrUpdateExpanseForItem(expanseRequest, connectedUser);
+            case ACTIVITY -> createOrUpdateExpanseForActivity(expanseRequest, connectedUser);
         };
     }
 
@@ -87,6 +72,25 @@ public class ExpanseFacade {
 
     private @NotNull ExpanseResponse updateExpanse(@NotNull ExpanseRequest expanseRequest, UserDetails connectedUser) {
         return toExpanseResponse(expanseService.updateExpanse(expanseRequest, connectedUser));
+    }
+
+    public ExpanseResponse getExpanseByEntityId(Long entityId, @NotNull @NotEmpty @NotBlank String entityType,
+                                                UserDetails connectedUser) {
+        ExpanseType expanseType = ExpanseType.fromString(entityType);
+
+        if (expanseType == null) {
+            return DEFAULT_EXPANSE_RESPONSE;
+        }
+        return fetchExpanseForSpecificEntity(entityId, expanseType, connectedUser);
+    }
+
+    private ExpanseResponse fetchExpanseForSpecificEntity(
+            Long entityId, @NotNull @NotEmpty @NotBlank ExpanseType expanseType,
+            @NotNull @NotEmpty @NotBlank UserDetails connectedUser) {
+        return switch (expanseType) {
+            case ITEM -> getExpanseByItemId(entityId, connectedUser);
+            case ACTIVITY -> getExpanseByActivityId(entityId, connectedUser);
+        };
     }
 
     public ExpanseResponse getExpanseById(Long expanseId, UserDetails connectedUser) {

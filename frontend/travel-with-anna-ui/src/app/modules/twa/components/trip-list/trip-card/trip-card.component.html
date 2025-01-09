@@ -1,23 +1,29 @@
-<div class="item ">
-  <button class="button mat-elevation-z8" (click)="selectTrip()">
+<div class="second-container">
+  <button class="cursor margin-main puffer-small cart cart-border container-vertical align-center"
+          (click)="selectTrip()">
 
-    <div class="display-flag">
-      <img *ngFor="let country of addressDetail.countries"
+    <div class="align-center">
+      <div class="trip-font font-color-gray">
+        - {{trip.amountOfDays}} {{dayOrDays}} -
+      </div>
+    </div>
+
+    <div class="flag-container">
+      <img *ngFor="let country of addressDetail.countries" class="padding-small"
            src="https://flagsapi.com/{{country.iso2}}/shiny/32.png"  alt="">
     </div>
 
-    <div class="trip-name trip-font">
-      <div>{{trip.tripName}}</div>
-    </div>
-    <div class="days trip-font">
-      <div class="days-text main-font">{{trip.amountOfDays}} {{dayOrDays}} </div>
+    <div>
+      <div class="font-size-text trip-font font-color-gold">
+        {{trip.tripName}}
+      </div>
     </div>
 
-    <div class="date main-font ">
-      <div class="label-text trip-font"> from </div>
-      <div class="main-font margin-form main-font-size">{{trip.startDate}}</div>
-      <div class="label-text trip-font"> to </div>
-      <div class="main-font margin-form main-font-size">{{trip.endDate}}</div>
+    <div class="container-vertical align-center font-color-white">
+      <div class="font-size-label font-color-gray"> from </div>
+      <div class="font-size-text ">{{trip.startDate}}</div>
+      <div class="font-size-label font-color-gray"> to </div>
+      <div class="font-size-text">{{trip.endDate}}</div>
     </div>
   </button>
 </div>

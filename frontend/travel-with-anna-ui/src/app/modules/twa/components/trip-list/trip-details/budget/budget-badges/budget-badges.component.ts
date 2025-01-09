@@ -54,9 +54,9 @@ export class BudgetBadgesComponent implements OnInit {
     let isPaidToMuch: boolean = totalExpanse.totalPriceInTripCurrency! < totalExpanse.totalPaidInTripCurrency!;
     switch(isPaidToMuch) {
       case true:
-        return 'paid-to-much';
+        return 'negative-color';
       case false:
-        return '';
+        return 'font-color-light';
     }
   }
 

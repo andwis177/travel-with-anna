@@ -1,0 +1,44 @@
+<div class="container background-color-light">
+  <div class="second-container container-vertical align-center">
+    <h4 class="margin-main-vertical header">DELETE ACCOUNT</h4>
+
+    <div class="warning-font warning-color padding-big">
+      If you press 'DELETE,' your will permanently deleted selected user with ID# {{userId}}.
+    </div>
+
+    <form>
+      <mat-form-field appearance="outline" class="input-main">
+        <mat-label>Password: </mat-label>
+        <input type="password"
+               matInput
+               [type]="hide() ? 'password' : 'text'"
+               [(ngModel)]="passwordRequest.password"
+               [ngModelOptions]="{standalone: true}"
+               placeholder="Password"
+               autocomplete="password"
+               (keydown.enter)="$event.preventDefault()">
+        <button
+          class="puffer"
+          mat-icon-button
+          matSuffix
+          (click)="clickEvent($event)"
+          (keydown.enter)="$event.preventDefault()"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hide()">
+          <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+    </form>
+
+    <div class="margin-big">
+      <button class="button button-1 background-color-warning font-color"  (click)="deleteAccount()">DELETE</button>
+      <button class="button button-1 background-color-dark" (click)="cancel()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+<div class="full-width error-msg border-top error-background" role="alert" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
+</div>
+
+

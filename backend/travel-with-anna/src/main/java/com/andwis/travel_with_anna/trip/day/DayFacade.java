@@ -10,18 +10,19 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DayFacade {
+
     private final DayService dayService;
     private final ActivityService activityService;
 
-    public void addDay(DayAddDeleteRequest request, UserDetails connectedUser) {
-        dayService.addDay(request, connectedUser);
+    public void addDay(Long tripId, boolean isFirst, UserDetails connectedUser) {
+        dayService.addDay(tripId, isFirst, connectedUser);
     }
 
-    public DayResponse getDayById(Long dayId, UserDetails connectedUser) {
+    public DayResponse fetchDayById(Long dayId, UserDetails connectedUser) {
         return dayService.getDayById(dayId, connectedUser);
     }
 
-    public List<DayResponse> getDays(Long tripId, UserDetails connectedUser) {
+    public List<DayResponse> fetchAllDaysByTripId(Long tripId, UserDetails connectedUser) {
         return dayService.getDays(tripId, connectedUser);
     }
 
@@ -29,7 +30,7 @@ public class DayFacade {
         dayService.generateDays(request,connectedUser);
     }
 
-    public void deleteDay(DayAddDeleteRequest request, UserDetails connectedUser) {
-        dayService.deleteFirstOrLastDay(request, activityService::deleteDayActivities, connectedUser);
+    public void deleteDayWithActivities(Long tripId, boolean isFirst, UserDetails connectedUser) {
+        dayService.deleteFirstOrLastDay(tripId, isFirst, activityService::deleteDayActivities, connectedUser);
     }
 }

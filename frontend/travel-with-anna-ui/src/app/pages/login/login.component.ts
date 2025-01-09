@@ -9,7 +9,6 @@ import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../../services/services/authentication.service";
-import {MatDivider} from "@angular/material/divider";
 import {AuthService} from "../../services/auth/auth.service";
 import {SharedService} from "../../services/shared/shared.service";
 import {ImageFileService} from "../../services/image-file-service/image-file-service";
@@ -23,7 +22,7 @@ import {ErrorService} from "../../services/error/error.service";
   selector: 'app-login',
   standalone: true,
   imports: [
-    MatCardModule, FormsModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, NgIf, NgForOf, MatIcon, MatIconButton, MatDivider
+    MatCardModule, FormsModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, NgIf, NgForOf, MatIcon, MatIconButton
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -63,11 +62,11 @@ export class LoginComponent implements OnInit {
   }
 
   register() {
-    this.router.navigate(['register']).then(r => console.log('Register'));
+    this.router.navigate(['register']).then(() => console.log('Register'));
   }
 
   resetPassword() {
-    this.router.navigate(['reset-password']).then(r => console.log('Reset password'));
+    this.router.navigate(['reset-password']).then(() => console.log('Reset password'));
   }
 
   activateAccount() {
@@ -95,10 +94,10 @@ export class LoginComponent implements OnInit {
     try {
       await this.loadAvatar(response.userName as string);
       if (response.role === 'ADMIN') {
-        this.router.navigate(['admin']).then(r => this.sharedService.updateUserName(<string>response.userName));
+        this.router.navigate(['manager']).then(() => this.sharedService.updateUserName(<string>response.userName));
       }
       if (response.role === 'USER') {
-        this.router.navigate(['twa']).then(r => this.sharedService.updateUserName(<string>response.userName));
+        this.router.navigate(['twa']).then(() => this.sharedService.updateUserName(<string>response.userName));
       }
     } catch (error) {
       console.error('Failed to load avatar:', error);
@@ -114,5 +113,9 @@ export class LoginComponent implements OnInit {
     } catch (error) {
       console.error('Error loading avatar:', error);
     }
+  }
+
+  resentActivationCode() {
+    this.router.navigate(['resend-code']).then(() => console.log('Send new activation code'));
   }
 }

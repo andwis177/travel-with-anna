@@ -1,20 +1,29 @@
-<mat-toolbar-row class="dialog-header">
-  <div class="dialog-title">Contact Information</div>
-  <button mat-icon-button class="close-button"
-          (click)="onClose()"
-          (keydown.enter)="$event.preventDefault()">
-    <mat-icon class="close-icon">close</mat-icon>
-  </button>
+<mat-toolbar-row class="dialog-top-bar background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div>Contact Information</div>
+    <button mat-icon-button
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
+    </button>
+  </div>
 </mat-toolbar-row>
 
-<mat-card-content class="dialog-container">
-  <form>
-    <div class="title">PHONE: </div> <label class="information">{{phone}}</label>
-    <div class="title">EMAIL: </div> <label class="information">{{email}}</label>
-    <div class="title">WEBSITE: </div> <a class="information" href="https://{{website}}" target="_blank">{{ website }}</a>
-    <div class="full-width" style="align-items: center; margin-top: 30px">
-      <button class="custom-button-1" (click)="onClose()" type="button">Close</button>
+<div class="second-container background-color-light container-vertical padding-main-horizontal
+padding-main-vertical full-width padding-big">
+  <div class="margin-big">
+    <div class="font-size-label font-color-label wrap-text align-center">PHONE:</div>
+    <div class="max-width font-size-text font-color align-center">{{phone}}</div>
+
+    <div class="font-size-label font-color-label wrap-text align-center">EMAIL:</div>
+    <div class="max-width font-size-text font-color align-center">{{email}}</div>
+
+    <div class="font-size-label font-color-label wrap-text align-center">WEBSITE:</div>
+    <a class="font-size-text font-color align-center" href="https://{{website}}" target="_blank">{{website}}</a>
+  </div>
+    <div class="full-width margin-main-vertical">
+      <button class="button button-1 background-color-medium" (click)="onClose()" type="button">Close</button>
     </div>
-  </form>
-</mat-card-content>
+  </div>
+
 

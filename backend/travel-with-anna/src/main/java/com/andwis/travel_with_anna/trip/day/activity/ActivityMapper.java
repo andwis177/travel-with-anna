@@ -1,5 +1,6 @@
 package com.andwis.travel_with_anna.trip.day.activity;
 
+import com.andwis.travel_with_anna.address.Address;
 import com.andwis.travel_with_anna.address.AddressMapper;
 import com.andwis.travel_with_anna.address.AddressResponse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseMapper;
@@ -13,57 +14,48 @@ import static com.andwis.travel_with_anna.utility.DateTimeMapper.toTime;
 
 public class ActivityMapper {
 
+    private static final AddressResponse DEFAULT_ADDRESS = new AddressResponse(
+            -1L, "", "", "", "", "", "", "", "", ""
+    );
+
     public static @NotNull ActivityResponse toActivityResponse(@NotNull Activity activity) {
-        ActivityResponse response =  ActivityResponse.builder()
+        ActivityResponse activityResponse = ActivityResponse.builder()
                 .activityId(activity.getActivityId())
                 .activityTitle(activity.getActivityTitle())
-                .startTime(activity.getBeginTime())
-                .endTime(activity.getEndTime())
+                .startTime(activity.getFormattedBeginTime())
+                .endTime(activity.getFormattedEndTime())
                 .badge(activity.getBadge())
                 .type(activity.getType())
                 .status(activity.getStatus())
                 .associatedId(activity.getAssociatedId())
-                .isDayTag(activity.isDayTag())
+                .dayTag(activity.isDayTag())
                 .build();
-        if (activity.getNote() != null) {
-            response.setNote(NoteMapper.toNoteResponse(activity.getNote()));
-        }
-        if (activity.getExpanse() != null) {
-            response.setExpanse(ExpanseMapper.toExpanseResponse(activity.getExpanse()));
-        }
-        if (activity.getAddress() != null) {
-            response.setAddress(AddressMapper.toAddressResponse(activity.getAddress()));
-        } else {
-            response.setAddress(new AddressResponse(
-                    -1L,
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    ""
-            ));
-        }
-        return response;
+
+        activityResponse.setNote(activity.getNote() != null
+                ? NoteMapper.toNoteResponse(activity.getNote())
+                : null);
+
+        activityResponse.setExpanse(activity.getExpanse() != null
+                ? ExpanseMapper.toExpanseResponse(activity.getExpanse())
+                : null);
+
+        activityResponse.setAddress(resolveDefaultAddress(activity.getAddress()));
+
+        return  activityResponse;
     }
 
     public static Activity toActivity(@NotNull ActivityRequest request) {
-        Activity activity = Activity.builder()
+        return Activity.builder()
                 .beginTime(toLocalDateTime(request.getDateTime()).toLocalTime())
                 .badge(request.getBadge())
                 .type(request.getType())
                 .status(request.getStatus())
                 .activityTitle(request.getActivityTitle())
-                .isDayTag(request.isDayTag())
+                .dayTag(request.isDayTag())
+                .endTime(request.getEndTime() != null && !request.getEndTime().isEmpty()
+                        ? toTime(request.getEndTime())
+                        : null)
                 .build();
-
-        if (request.getEndTime() != null && !request.getEndTime().isEmpty()) {
-            activity.setEndTime(toTime(request.getEndTime()));
-        }
-        return activity;
     }
 
     public static List<ActivityResponse> toActivityResponseList(@NotNull List<Activity> activities) {
@@ -75,13 +67,14 @@ public class ActivityMapper {
         activity.setBeginTime(toTime(request.getStartTime()));
         activity.setType(request.getType());
         activity.setDayTag(request.isDayTag());
-
-        if (request.getEndTime() != null) {
-            activity.setEndTime(toTime(request.getEndTime()));
-        }
+        activity.setEndTime(request.getEndTime() != null ? toTime(request.getEndTime()) : null);
 
         if (request.getAddressRequest() != null) {
-            AddressMapper.updateAddress(activity.getAddress(),request.getAddressRequest());
+            AddressMapper.updateExistingAddress(activity.getAddress(), request.getAddressRequest());
         }
+    }
+
+    private static AddressResponse resolveDefaultAddress(Address address) {
+        return address != null ? AddressMapper.toAddressResponse(address) : DEFAULT_ADDRESS;
     }
 }

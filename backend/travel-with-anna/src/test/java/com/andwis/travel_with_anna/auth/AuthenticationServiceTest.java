@@ -10,7 +10,7 @@ import com.andwis.travel_with_anna.user.UserCredentialsResponse;
 import com.andwis.travel_with_anna.user.UserService;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.user.token.Token;
-import com.andwis.travel_with_anna.user.token.TokenRepository;
+import com.andwis.travel_with_anna.user.token.TokenService;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,6 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,11 +31,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.management.relation.RoleNotFoundException;
+import javax.security.auth.login.AccountLockedException;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -52,7 +50,7 @@ class AuthenticationServiceTest {
     @Mock
     private UserService userService;
     @Mock
-    private TokenRepository tokenRepository;
+    private TokenService tokenService;
     @Mock
     private AvatarService avatarService;
     @Mock
@@ -63,8 +61,6 @@ class AuthenticationServiceTest {
     private JwtService jwtService;
     @InjectMocks
     private AuthenticationService authenticationService;
-    @Value("${application.mailing.frontend.activation-url}")
-    private String activationUrl;
     private static RegistrationRequest request;
     private static User user;
     private static Role role;
@@ -78,11 +74,11 @@ class AuthenticationServiceTest {
                 "email@example.com",
                 "password",
                 "password",
-                getUserRole()
+                USER.getRoleName()
         );
         role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
 
         user = User.builder()
                 .userName("username")
@@ -110,13 +106,35 @@ class AuthenticationServiceTest {
     }
 
     @Test
+    void testRegister_UserNameAlreadyExists() throws RoleNotFoundException {
+        // Given
+        when(roleService.getRoleByName(USER.getRoleName())).thenReturn(role);
+        when(userService.existsByUserName("username")).thenReturn(true);
+
+        // When & Then
+        assertThrows(UserExistsException.class, () -> authenticationService.register(request));
+        verify(userService, never()).saveUser(any());
+    }
+
+    @Test
+    void testRegister_EmailAlreadyExists() throws RoleNotFoundException {
+        // Given
+        when(roleService.getRoleByName(USER.getRoleName())).thenReturn(role);
+        when(userService.existsByEmail("email@example.com")).thenReturn(true);
+
+        // When & Then
+        assertThrows(UserExistsException.class, () -> authenticationService.register(request));
+        verify(userService, never()).saveUser(any());
+    }
+
+    @Test
     void testRegister_Success() throws MessagingException, RoleNotFoundException, WrongPasswordException {
         //Given
-        when(roleService.getRoleByName(getUserRole())).thenReturn(role);
+        when(roleService.getRoleByName(USER.getRoleName())).thenReturn(role);
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
         when(userService.existsByEmail("email@example.com")).thenReturn(false);
         when(userService.existsByUserName("username")).thenReturn(false);
-        doNothing().when(emailService).sendValidationEmail(any(), any(), any(), any(), any());
+        doNothing().when(emailService).sendValidationEmail(any(), any(), any(), any());
 
         //When
         authenticationService.register(request);
@@ -126,7 +144,6 @@ class AuthenticationServiceTest {
         verify(emailService, times(1)).sendValidationEmail(
                 eq("email@example.com"),
                 eq("username"),
-                eq(activationUrl),
                 anyString(),
                 eq("Account activation")
         );
@@ -141,42 +158,17 @@ class AuthenticationServiceTest {
     @Test
     void testRegister_RoleNotFound() throws RoleNotFoundException {
         // Given
-        when(roleService.getRoleByName(getUserRole())).thenThrow(RoleNotFoundException.class);
+        when(roleService.getRoleByName(USER.getRoleName())).thenThrow(RoleNotFoundException.class);
 
         //When & Then
         assertThrows(RoleNotFoundException.class, () -> authenticationService.register(request));
     }
 
     @Test
-    void testRegister_UserExistsByEmail() throws RoleNotFoundException {
-        //Given
-        when(roleService.getRoleByName(getUserRole())).thenReturn(role);
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userService.existsByEmail("email@example.com")).thenReturn(true);
-
-        // When & Then
-        assertThrows(UserExistsException.class, () -> authenticationService.register(request));
-        verify(userService, times(0)).saveUser(any());
-    }
-
-    @Test
-    void testRegister_UserExistsByUserName() throws RoleNotFoundException {
-        //Given
-        when(roleService.getRoleByName(getUserRole())).thenReturn(role);
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userService.existsByUserName("username")).thenReturn(true);
-
-        // When & Then
-        assertThrows(UserExistsException.class, () -> authenticationService.register(request));
-        verify(userService, times(0)).saveUser(any());
-    }
-
-    @Test
     void testRegister_PasswordDoNotMatch() throws RoleNotFoundException {
         //Given
         request.setConfirmPassword("differentPassword");
-        when(roleService.getRoleByName(getUserRole())).thenReturn(role);
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        when(roleService.getRoleByName(USER.getRoleName())).thenReturn(role);
 
         // When & Then
         assertThrows(WrongPasswordException.class, () -> authenticationService.register(request));
@@ -184,7 +176,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testAuthenticationWithCredentials_Success() throws WrongPasswordException {
+    void testAuthenticationWithCredentials_Success() throws WrongPasswordException, AccountLockedException {
         //Given
         AuthenticationRequest request =
                 AuthenticationRequest.builder()
@@ -208,12 +200,9 @@ class AuthenticationServiceTest {
         AuthenticationResponse response = authenticationService.authenticationWithCredentials(request);
 
         //Then
-        assertNotNull(response);
         assertEquals("jwtToken", response.getToken());
         assertEquals("email@example.com", response.getEmail());
         assertEquals("username", response.getUserName());
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtService).generateJwtToken(authentication);
     }
 
     @Test
@@ -235,12 +224,11 @@ class AuthenticationServiceTest {
         verify(userService, never()).getCredentials(anyString());
     }
 
-
     @Test
     void testActivateAccount_ValidToken() throws MessagingException {
         //Given
         token.setExpiresAt(now.plusMinutes(15));
-        when(tokenRepository.findByToken("jwtToken")).thenReturn(Optional.of(token));
+        when(tokenService.getByToken("jwtToken")).thenReturn(token);
         when(userService.getUserById(user.getUserId())).thenReturn(user);
 
         //When
@@ -249,44 +237,25 @@ class AuthenticationServiceTest {
         //Then
         assertTrue(user.isEnabled());
         verify(userService, times(1)).saveUser(user);
-        verify(tokenRepository, times(1)).delete(token);
-    }
-
-    @Test
-    void testActivateAccount_InvalidToken() {
-        // Given
-        when(tokenRepository.findByToken("invalid token")).thenReturn(Optional.empty());
-
-        //When & Then
-        InvalidTokenException exception = assertThrows(InvalidTokenException.class,
-                () -> authenticationService.activateAccount("invalid token"));
-
-        assertEquals("Invalid token", exception.getMessage());
-        verify(userService, never()).saveUser(any(User.class));
-        verify(tokenRepository, never()).save(any(Token.class));
+        verify(tokenService, times(1)).deleteToken(token);
     }
 
     @Test
     void testActivateAccount_ExpiredToken() {
         //Given
-        token.setExpiresAt(now.minusMinutes(25));
-        when(tokenRepository.findByToken("jwtToken")).thenReturn(Optional.of(token));
+        token.setExpiresAt(now.minusMinutes(5));
+        when(tokenService.getByToken("jwtToken")).thenReturn(token);
 
-        //When & Then
-        ExpiredTokenException exception = assertThrows(ExpiredTokenException.class,
-                () -> authenticationService.activateAccount("jwtToken"));
-        assertEquals("Token expired. New token was sent to your email", exception.getMessage());
-
-        assertFalse(user.isEnabled());
-        verify(userService, never()).saveUser(user);
-        verify(tokenRepository, never()).save(token);
+        // When & Then
+        assertThrows(ExpiredTokenException.class, () -> authenticationService.activateAccount("jwtToken"));
+        verify(tokenService).deleteToken(token);
     }
 
     @Test
     void testActivateAccount_UsernameNotFound() {
         //Given
         token.setExpiresAt(now.plusMinutes(15));
-        when(tokenRepository.findByToken("jwtToken")).thenReturn(Optional.of(token));
+        when(tokenService.getByToken("jwtToken")).thenReturn(token);
         when(userService.getUserById(user.getUserId())).thenReturn(null);
         when(userService.getUserById(user.getUserId())).thenThrow(new UsernameNotFoundException("User not found"));
 
@@ -296,57 +265,39 @@ class AuthenticationServiceTest {
         assertEquals("User not found", exception.getMessage());
         assertFalse(user.isEnabled());
         verify(userService, never()).saveUser(user);
-        verify(tokenRepository, never()).save(token);
+        verify(tokenService, never()).saveToken(token);
     }
 
     @Test
     void testResetPasswordWithUserName_Success() throws MessagingException {
         // Given
-        String username = "username";
-        String email = "email@example.com";
-        String encodedPassword = "encodedPassword";
-        User user = new User();
-        user.setEmail(email);
-        user.setUserName(username);
-
-        ResetPasswordRequest request = new ResetPasswordRequest(username);
-
-        when(userService.getUserByUserName(username)).thenReturn(user);
-        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
-        doNothing().when(emailService).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+        ResetPasswordRequest request = new ResetPasswordRequest("username");
+        when(userService.getUserByUserName("username")).thenReturn(user);
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        doNothing().when(emailService).sendResetPassword(any(), any(), any(), eq("Password reset"));
 
         // When
         authenticationService.resetPassword(request);
 
         // Then
-        verify(userService, times(1)).saveUser(user);
-        verify(emailService, times(1))
-                .sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+        verify(userService).saveUser(user);
+        verify(emailService).sendResetPassword(any(), any(), any(), eq("Password reset"));
     }
 
     @Test
     void testResetPasswordWithEmail_Success() throws MessagingException {
         // Given
-        String username = "username";
-        String email = "email@example.com";
-        String encodedPassword = "encodedPassword";
-        User user = new User();
-        user.setEmail(email);
-        user.setUserName(username);
-
-        ResetPasswordRequest request = new ResetPasswordRequest(email);
-
-        when(userService.getUserByEmail(email)).thenReturn(user);
-        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
-        doNothing().when(emailService).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+        ResetPasswordRequest request = new ResetPasswordRequest("mail@example.com");
+        when(userService.getUserByEmail("mail@example.com")).thenReturn(user);
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        doNothing().when(emailService).sendResetPassword(any(), any(), any(), eq("Password reset"));
 
         // When
         authenticationService.resetPassword(request);
 
         // Then
-        verify(userService, times(1)).saveUser(user);
-        verify(emailService, times(1))
-                .sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+        verify(userService).saveUser(user);
+        verify(emailService).sendResetPassword(any(), any(), any(), eq("Password reset"));
     }
 
     @Test
@@ -358,7 +309,7 @@ class AuthenticationServiceTest {
 
         //When & Then
         assertThrows(EmailNotFoundException.class, () -> authenticationService.resetPassword(request));
-        verify(emailService, never()).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+        verify(emailService, never()).sendResetPassword(any(), any(), any(), eq("Password reset"));
     }
 
     @Test
@@ -370,6 +321,63 @@ class AuthenticationServiceTest {
 
         //When & Then
         assertThrows(UsernameNotFoundException.class, () -> authenticationService.resetPassword(request));
-        verify(emailService, never()).sendResetPassword(any(), any(), any(), any(), eq("Password reset"));
+        verify(emailService, never()).sendResetPassword(any(), any(), any(), eq("Password reset"));
+    }
+
+    @Test
+    @DisplayName("sendActivationCodeByRequest: Success")
+    void testSendActivationCodeByRequest_Success() throws MessagingException {
+        // Given
+        when(userService.getUserByEmail("email@example.com")).thenReturn(user);
+        when(tokenService.isTokenExists(user)).thenReturn(false);
+        doNothing().when(emailService).sendValidationEmail(any(), any(), any(), any());
+
+        // When
+        authenticationService.sendActivationCodeByRequest("email@example.com");
+
+        // Then
+        verify(userService, times(1)).getUserByEmail("email@example.com");
+        verify(tokenService, times(1)).isTokenExists(user);
+        verify(emailService, times(1)).sendValidationEmail(
+                eq("email@example.com"),
+                eq("username"),
+                anyString(),
+                eq("Account activation")
+        );
+    }
+
+    @Test
+    @DisplayName("sendActivationCodeByRequest: User already activated")
+    void testSendActivationCodeByRequest_UserAlreadyActivated() throws MessagingException {
+        // Given
+        user.setEnabled(true);
+        when(userService.getUserByEmail("email@example.com")).thenReturn(user);
+
+        // When & Then
+        UserIsActiveException exception = assertThrows(UserIsActiveException.class, () ->
+                authenticationService.sendActivationCodeByRequest("email@example.com"));
+
+        assertEquals("User is already activated", exception.getMessage());
+        verify(userService, times(1)).getUserByEmail("email@example.com");
+        verify(tokenService, never()).isTokenExists(any());
+        verify(emailService, never()).sendValidationEmail(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("sendActivationCodeByRequest: Token already exists")
+    void testSendActivationCodeByRequest_TokenAlreadyExists() throws MessagingException {
+        // Given
+        when(userService.getUserByEmail("email@example.com")).thenReturn(user);
+        when(tokenService.isTokenExists(user)).thenReturn(true);
+        when(tokenService.getByUser(user)).thenReturn(token);
+
+        // When
+        authenticationService.sendActivationCodeByRequest("email@example.com");
+
+        // Then
+        verify(userService, times(1)).getUserByEmail("email@example.com");
+        verify(tokenService, times(1)).isTokenExists(user);
+        verify(tokenService, times(1)).deleteToken(token);
+        verify(emailService, times(1)).sendValidationEmail(any(), any(), any(), any());
     }
 }

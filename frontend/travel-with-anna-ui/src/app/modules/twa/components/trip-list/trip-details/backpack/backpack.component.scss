@@ -1,80 +1,70 @@
-.table-container {
-  max-width: 200vw;
-  max-height: 50vh;
-  width: 100%;
-  height: auto;
-  overflow-y: auto;
-  overflow-x: hidden;
-  table-layout: fixed;
+.add-item-button {
+  width: 45px !important;
+  height: 45px !important;
+  padding: 3px !important;
+}
+
+.add-item-button-border {
+  border: 1px solid whitesmoke;
+  border-radius: 5px !important;
+  box-shadow: 0 0 3px 1px whitesmoke !important;
+}
+
+textarea {
+  width: 95% !important;
+  border: 1px solid #A6ACB1 !important;
+  border-radius: 5px !important;
+  height: 32px !important;
+  resize: none !important;
+  padding: 5px !important;
+  margin: 8px 5px 5px 5px !important;
+}
+
+textarea:focus {
+  outline: none !important;
+}
+
+.packed-column {
+  width: 11% !important;
+}
+
+.description-column {
+  width: 40% !important;
+}
+
+.qty-column {
+  width: 19% !important;
+}
+
+.action-column {
+  width: 30% !important;
+}
+
+::ng-deep .mdc-checkbox__background {
+  background-color: whitesmoke !important;
+  border: 1px solid #2E3944 !important;
+  border-radius: 3px !important;
+}
+
+::ng-deep .mdc-checkbox__checkmark {
+  background-color: #2E3944 !important;
+}
+
+.font-weight {
+  font-weight: 550 !important;
 }
 
 .mdc-data-table__table {
   background-color: whitesmoke !important;
 }
 
-th, td {
-  white-space: nowrap;
-  text-overflow: unset;
-  overflow: visible;
-  word-wrap: break-word;
+.mat-mdc-header-row {
+  background-color: #2E3944 !important;
+  color: whitesmoke !important;
 }
 
-.backpack-button-area {
-  display: flex !important;
-  justify-content: start !important;
-  width: 100% !important;
-  text-align: center !important;
-  align-items: center !important;
-  margin-top: 20px;
-}
-
-.user-button-area {
-  display: flex;
-  width: 100% !important;
-  justify-content: end;
-  margin-right: 5%;
-}
-
-.user-button{
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-}
-
-.user-button-image {
-  background-color: #2E3944;
-  border-radius: 50% !important;
-  border: 3px solid lightsteelblue;
-  box-shadow: 0 0 0 1px #1C252D;
-}
-
-.item-button {
-  width: 25px;
-  height: 25px;
-  padding: 0;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  cursor: pointer;
-}
-
-.item-button-image{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background-color: transparent;
-  cursor: pointer;
-}
-
-.user-button-image:hover {
-  opacity: 0.5;
-}
-
-.item-button-image:hover {
-  width: 120% !important;
-  height: 120% !important;
+:host ::ng-deep .mat-sort-header-arrow{
+  color: whitesmoke !important;
 }
 
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
@@ -82,102 +72,34 @@ th, td {
 }
 
 .selected {
-  background-color: #EDEDED !important;
+  background-color: #C0D0D8 !important;
 }
 
-th.mat-sort-header-sorted {
-  color: black;
+th, td {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  word-break: break-word;
+  align-content: center !important;
 }
 
-.input-field {
-  width: 100% !important;
-  border: 1px solid #A6ACB1 !important;
-  border-radius: 5px !important;
-  background-color: whitesmoke !important;
-  font-family: 'Montserrat', sans-serif;
- }
-
-.input-field:focus {
-  outline: none !important;
+.backpack-table-container {
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: auto;
+  max-width: 90%;
+  height: 100% !important;
+  scrollbar-color: whitesmoke transparent;
 }
 
-textarea {
-  height: 32px !important;
-  resize: none !important;
-  padding: 5px !important;
+.backpack-action-button-container {
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: space-between !important;
 }
 
-.packed-column {
-  width: 15% !important;
-}
-
-.description-column {
-  width: 45% !important;
-}
-
-.qty-column {
-  width: 20% !important;
-}
-
-.action-column {
-  width: 20% !important;
-
-}
-
-.delete-button {
-  background-color: #EDEAE5;
-  border: 1px solid #A23232;
-  border-radius: 15%;
-  color: #D46A6A;
-  cursor: pointer;
-  padding: 3px;
-}
-
-.expanse-button {
-  background-color: #EDEAE5;
-  border: 1px solid forestgreen;
-  border-radius: 15%;
-  color: forestgreen;
-  cursor: pointer;
-  padding: 3px;
-  font-size: 1.2vw;
-}
-
-.margin {
-  margin: 15px !important;
-}
-
-.action-container {
-  display: flex;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-::ng-deep .mdc-checkbox__background {
-  background-color: #D6E6E9 !important;
-  border: 2px solid #2E3944 !important;
-  border-radius: 5px !important;
-}
-
-::ng-deep .mdc-checkbox__checkmark {
-  background-color: #2E3944 !important;
-}
-
-.expanse-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.label-font {
-  font-size: 10px;
-}
-
-.amount-font {
-  font-size: 14px;
-}
-
-.currency-font {
-  font-size: 10px;
+.backpack-container-full-height {
+  height: 100% !important;
 }

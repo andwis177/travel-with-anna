@@ -21,7 +21,7 @@ class CurrencyExchangeMapperTest {
 
         // Then
         assertThat(currencyExchange.getCode()).isEqualTo("USD");
-        assertThat(currencyExchange.getExchangeValue()).isEqualByComparingTo(BigDecimal.valueOf(1.234567891235));
-        assertThat(currencyExchange.getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(currencyExchange.getExchangeValue()).isEqualByComparingTo(BigDecimal.valueOf(1.2345678912345));
+        assertThat(currencyExchange.getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now());
     }
 }

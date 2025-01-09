@@ -26,9 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.management.relation.RoleNotFoundException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.*;
+import static com.andwis.travel_with_anna.role.RoleType.ADMIN;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,17 +57,11 @@ class AdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role userRole = new Role();
-        userRole.setRoleName(getUserRole());
-        userRole.setAuthority(getUserAuthority());
-        Optional<Role> existingUserRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedUserRole = existingUserRole.orElseGet(() -> roleRepository.save(userRole));
+        Role userRole = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
-        Role adminRole = new Role();
-        adminRole.setRoleName(getAdminRole());
-        adminRole.setAuthority(getAdminAuthority());
-        Optional<Role> existingAdminRole = roleRepository.findByRoleName(getAdminRole());
-        Role retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
+        Role adminRole = roleRepository.findByRoleName(ADMIN.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(2, ADMIN.getRoleName(), ADMIN.getAuthority())));
 
         avatar = Avatar.builder()
                 .avatar(AvatarDefaultImg.DEFAULT.getImg())
@@ -87,7 +81,7 @@ class AdminServiceTest {
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedAdminRole)
+                .role(adminRole)
                 .avatarId(avatarId)
                 .build();
         user.setAccountLocked(false);
@@ -98,9 +92,9 @@ class AdminServiceTest {
                 .userName("userName2")
                 .email("email2@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedUserRole)
+                .role(userRole)
                 .avatarId(avatar2Id)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         secondaryUser.addTrip(trip);
         secondaryUser.setAccountLocked(false);
@@ -132,7 +126,7 @@ class AdminServiceTest {
     void testGetUserAdminViewByIdentifier_UserId() {
         // Getter
         // When
-        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(
+        UserAdminResponse userAdminView = adminService.getUserByIdentifier(
                 secondaryUserId.toString(), createUserDetails(user));
 
         // Then
@@ -144,7 +138,7 @@ class AdminServiceTest {
     void testGetUserAdminViewByIdentifier_UserName() {
         // Getter
         // When
-        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(
+        UserAdminResponse userAdminView = adminService.getUserByIdentifier(
                 secondaryUser.getUserName(), createUserDetails(user));
 
         // Then
@@ -158,7 +152,7 @@ class AdminServiceTest {
     void testUpdateUser() throws RoleNotFoundException, WrongPasswordException {
         // Getter
         UserAdminEditRequest userAdminEdit = new UserAdminEditRequest(
-                secondaryUserId, true, false, getAdminRole());
+                secondaryUserId, true, false, ADMIN.getRoleName());
 
         UserAdminUpdateRequest request = UserAdminUpdateRequest.builder()
                 .userAdminEditRequest(userAdminEdit)
@@ -171,14 +165,14 @@ class AdminServiceTest {
         // Then
         assertTrue(secondaryUser.isAccountLocked());
         assertFalse(secondaryUser.isEnabled());
-        assertEquals(getAdminRole(), secondaryUser.getRole().getRoleName());
+        assertEquals(ADMIN.getRoleName(), secondaryUser.getRole().getRoleName());
     }
 
     @Test
     void getUserAdminViewByIdentifier_Email() {
         // Getter
         // When
-        UserAdminResponse userAdminView = adminService.getUserAdminViewByIdentifier(
+        UserAdminResponse userAdminView = adminService.getUserByIdentifier(
                 user.getEmail(), createUserDetails(secondaryUser));
 
         // Then
@@ -192,7 +186,7 @@ class AdminServiceTest {
         // Getter
         // When & Then
         assertThrows(UserNotFoundException.class,
-                () -> adminService.getUserAdminViewByIdentifier(user.getEmail(), createUserDetails(user)));
+                () -> adminService.getUserByIdentifier(user.getEmail(), createUserDetails(user)));
     }
 
     @Test
@@ -214,8 +208,8 @@ class AdminServiceTest {
 
         // When & Then
         assertNotNull(roles);
-        assertTrue(roles.contains(getUserRole()));
-        assertTrue(roles.contains(getAdminRole()));
+        assertTrue(roles.contains(USER.getRoleName()));
+        assertTrue(roles.contains(ADMIN.getRoleName()));
     }
 
     private @NotNull UserDetails createUserDetails(User user) {

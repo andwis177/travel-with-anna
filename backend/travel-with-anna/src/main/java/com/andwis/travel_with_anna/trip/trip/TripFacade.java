@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class TripFacade {
+
     private final TripMgr tripMgr;
 
     public Long createTrip(TripCreatorRequest request, UserDetails connectedUser) {

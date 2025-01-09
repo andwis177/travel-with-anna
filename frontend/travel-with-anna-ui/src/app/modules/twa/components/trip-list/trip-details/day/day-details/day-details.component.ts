@@ -126,9 +126,9 @@ export class DayDetailsComponent implements OnInit {
   getToPayClass(firstAmount: number, secondAmount: number): string {
     switch (firstAmount >= secondAmount) {
       case false:
-        return 'negative';
+        return 'negative-color';
       default:
-        return 'default-color';
+        return 'font-color-light';
     }
   }
 }

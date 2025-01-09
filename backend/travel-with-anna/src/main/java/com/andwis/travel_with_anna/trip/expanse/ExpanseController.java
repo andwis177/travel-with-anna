@@ -14,22 +14,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("expanse")
 @Tag(name = "Expanse")
 public class ExpanseController {
+
     private final ExpanseFacade facade;
 
     @PostMapping
     public ResponseEntity<ExpanseResponse> createOrUpdateExpanse(
             @RequestBody @Valid ExpanseRequest request,
             @AuthenticationPrincipal UserDetails connectedUser) {
-        ExpanseResponse response = facade.createOrUpdateExpanse(request, connectedUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                facade.createOrUpdateExpanse(request, connectedUser));
     }
 
     @GetMapping("/{expanseId}")
     public ResponseEntity<ExpanseResponse> getExpanseById(
             @PathVariable("expanseId") Long expanseId,
             @AuthenticationPrincipal UserDetails connectedUser) {
-        ExpanseResponse expanse = facade.getExpanseById(expanseId, connectedUser);
-        return ResponseEntity.ok(expanse);
+        return ResponseEntity.ok(facade.getExpanseById(expanseId, connectedUser));
     }
 
     @GetMapping("{entityId}/type/{entityType}")
@@ -37,22 +37,19 @@ public class ExpanseController {
             @PathVariable("entityId") Long entityId,
             @PathVariable("entityType") String entityType,
             @AuthenticationPrincipal UserDetails connectedUser) {
-        ExpanseResponse expanse = facade.getExpanseByEntityId(entityId, entityType, connectedUser);
-        return ResponseEntity.ok(expanse);
+        return ResponseEntity.ok(facade.getExpanseByEntityId(entityId, entityType, connectedUser));
     }
 
     @GetMapping("/exchange")
     public ResponseEntity<ExchangeResponse> getExchangeRate(
             @RequestParam String currencyFrom,
             @RequestParam String currencyTo) {
-        ExchangeResponse exchangeResponse = facade.getExchangeRate(currencyFrom, currencyTo);
-        return ResponseEntity.ok(exchangeResponse);
+        return ResponseEntity.ok(facade.getExchangeRate(currencyFrom, currencyTo));
     }
 
     @PostMapping("/trip-currency-values")
     public ResponseEntity<ExpanseInTripCurrency> getTripCurrencyValues(
             @RequestBody @Valid TripCurrencyValuesRequest request) {
-        ExpanseInTripCurrency expanseInTripCurrency = facade.getExpanseInTripCurrency(request);
-        return ResponseEntity.ok(expanseInTripCurrency);
+        return ResponseEntity.ok(facade.getExpanseInTripCurrency(request));
     }
 }

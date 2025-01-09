@@ -34,10 +34,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -57,6 +55,7 @@ class PdfReportControllerTest {
     @Autowired
     private TripRepository tripRepository;
     private Long tripId;
+    private UserDetails userDetails;
 
     @BeforeEach
     void setup() {
@@ -64,7 +63,7 @@ class PdfReportControllerTest {
                 .address("Address")
                 .city("City")
                 .country("Country")
-                .phone("Phone")
+                .phoneNumber("Phone")
                 .place("Place")
                 .email("Email")
                 .countryCode("PL")
@@ -80,29 +79,26 @@ class PdfReportControllerTest {
                 .type("Type")
                 .status("Status")
                 .build();
-        address.addActivity(activity);
+        address.addLinkedActivity(activity);
 
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole =  existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(encodedPassword)
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
         user = userRepository.save(user);
 
         Budget budget = Budget.builder()
                 .currency("USD")
-                .toSpend(BigDecimal.valueOf(1000))
+                .budgetAmount(BigDecimal.valueOf(1000))
                 .build();
 
         Day day = Day.builder()
@@ -123,7 +119,7 @@ class PdfReportControllerTest {
         user.addTrip(trip);
         tripId = tripRepository.save(trip).getTripId();
 
-        UserDetails userDetails = createUserDetails(user);
+        userDetails = createUserDetails(user);
     }
 
     @AfterEach
@@ -139,9 +135,10 @@ class PdfReportControllerTest {
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/pdf/reports/trip/{tripId}", tripId)
+                        .principal(() -> userDetails.getUsername())
                         .contentType(MediaType.APPLICATION_PDF))
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=report.pdf"))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=trip-report.pdf"))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF))
                 .andExpect(result -> {
                     byte[] content = result.getResponse().getContentAsByteArray();
@@ -170,9 +167,10 @@ class PdfReportControllerTest {
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/pdf/reports/expanse/{tripId}", tripId)
+                        .principal(() -> userDetails.getUsername())
                         .contentType(MediaType.APPLICATION_PDF))
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=report.pdf"))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=expanse-report.pdf"))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PDF))
                 .andExpect(result -> {
                     byte[] content = result.getResponse().getContentAsByteArray();

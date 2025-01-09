@@ -8,12 +8,14 @@ import {ExpanseByCurrency} from "../../../../../../../services/models/expanse-by
 import {BudgetCurrenciesComponent} from "../budget-currencies/budget-currencies.component";
 import {BudgetBadgesComponent} from "../budget-badges/budget-badges.component";
 import {PdfReportComponent} from "../../pdf-report/pdf-report.component";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-budget-buttons',
   standalone: true,
   imports: [
-    MatTooltip
+    MatTooltip,
+    FormsModule
   ],
   templateUrl: './budget-buttons.component.html',
   styleUrl: './budget-buttons.component.scss'
@@ -72,7 +74,7 @@ export class BudgetButtonsComponent {
     const dialogRef = this.dialog.open(BudgetBadgesComponent, {
       maxWidth: '90vw',
       maxHeight: '90vh',
-      minHeight: '15vh',
+      minHeight: '40vh',
       width: '25vw',
       height: 'auto',
       id: 'budget-badges',
@@ -90,8 +92,8 @@ export class BudgetButtonsComponent {
     const dialogRef = this.dialog.open(PdfReportComponent, {
       maxWidth: '100%',
       maxHeight: '100%',
-      width: '97vw',
-      height: '97vh',
+      width: '98vw',
+      height: '98vh',
       id: 'pdf-report-dialog',
       data: {
         tripId: this._tripId,

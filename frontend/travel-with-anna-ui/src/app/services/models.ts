@@ -2,6 +2,7 @@
 /* eslint-disable */
 export { ActivityAssociatedRequest } from './models/activity-associated-request';
 export { ActivityDetailedResponse } from './models/activity-detailed-response';
+export { ActivityListResponse } from './models/activity-list-response';
 export { ActivityRequest } from './models/activity-request';
 export { ActivityResponse } from './models/activity-response';
 export { ActivityUpdateRequest } from './models/activity-update-request';
@@ -20,7 +21,6 @@ export { City } from './models/city';
 export { Country } from './models/country';
 export { CountryCurrency } from './models/country-currency';
 export { CurrencyExchangeResponse } from './models/currency-exchange-response';
-export { DayAddDeleteRequest } from './models/day-add-delete-request';
 export { DayGeneratorRequest } from './models/day-generator-request';
 export { DayResponse } from './models/day-response';
 export { ExchangeResponse } from './models/exchange-response';
@@ -39,6 +39,7 @@ export { PageResponseUserAdminResponse } from './models/page-response-user-admin
 export { PasswordRequest } from './models/password-request';
 export { RegistrationRequest } from './models/registration-request';
 export { ResetPasswordRequest } from './models/reset-password-request';
+export { RoleNameResponse } from './models/role-name-response';
 export { TripCreatorRequest } from './models/trip-creator-request';
 export { TripCurrencyValuesRequest } from './models/trip-currency-values-request';
 export { TripEditRequest } from './models/trip-edit-request';

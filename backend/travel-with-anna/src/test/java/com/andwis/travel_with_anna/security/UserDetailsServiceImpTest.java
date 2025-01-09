@@ -54,6 +54,6 @@ class UserDetailsServiceImpTest {
 
         //When & Then
         assertThrows(UsernameNotFoundException.class, () ->
-            userService.loadUserByUsername("nonexisting@example.com"));
+                userService.loadUserByUsername("nonexisting@example.com"));
     }
 }

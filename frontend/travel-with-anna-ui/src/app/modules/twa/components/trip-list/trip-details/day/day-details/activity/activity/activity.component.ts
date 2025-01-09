@@ -1,7 +1,5 @@
-import {Component, EventEmitter, Inject, NgModule, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatCardContent} from "@angular/material/card";
-import {MatDivider} from "@angular/material/divider";
 import {MatError, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
@@ -38,8 +36,6 @@ import {MatCheckbox} from "@angular/material/checkbox";
   standalone: true,
   imports: [
     FormsModule,
-    MatCardContent,
-    MatDivider,
     MatError,
     MatIcon,
     MatIconButton,
@@ -94,6 +90,7 @@ export class ActivityComponent implements OnInit{
   isAddressSeparated: boolean = false;
   activity: ActivityRequest = {type: "", tripId: -1, activityTitle: '', dateTime:''};
   secondActivity: ActivityRequest = {type: "", tripId:-1 , activityTitle: '', dateTime:''};
+  beginTimeSet: boolean = false;
   @Output() provideType: EventEmitter<string> = new EventEmitter<string>();
 
   constructor(public dialog: MatDialog,
@@ -131,12 +128,10 @@ export class ActivityComponent implements OnInit{
     this.associated = this.data.associated;
     this.activity.dayTag = this.data.dayTag;
     this.isAddressSeparated = this.data.isAddressSeparated;
-    this.country = {name: this.data.lastCountry,currency: this.data.lastCountryCurrency, iso2: this.data.lastCountryCode};
-    this.city = {city: this.data.lastCity};
-    this.addressRequest.country = this.country.name;
-    this.addressRequest.countryCode = this.country.iso2;
-    this.addressRequest.currency = this.country.currency;
-    this.addressRequest.city = this.city.city;
+
+    this.setInitialCountry();
+    this.setInitialCity();
+
     this.secondActivity.type = this.activity.type;
 
     this.generateDatesBetween();
@@ -149,6 +144,53 @@ export class ActivityComponent implements OnInit{
 
   onClose() {
     this.dialog.getDialogById('activity-dialog')?.close();
+  }
+
+  setInitialCountry(): void {
+    if (this.data.lastCountry && this.data.lastCountryCurrency && this.data.lastCountryCode) {
+      this.country = {
+        name: this.data.lastCountry,
+        currency: this.data.lastCountryCurrency,
+        iso2: this.data.lastCountryCode
+      };
+    } else {
+      this.sharedService.getLastACountry().subscribe( {
+        next: (lastCountry) => {
+          this.country = lastCountry;
+          this.setCountryDetails();
+        },
+        error: (error) => {
+          this.errorMsg = this.errorService.errorHandlerWithJson(error);
+        }
+      })
+    }
+    this.setCountryDetails();
+  }
+
+  setInitialCity(): void {
+    if (this.data.lastCity) {
+      this.city = {city: this.data.lastCity}
+    } else {
+      this.sharedService.getLastCity().subscribe( {
+        next: (lastCountry) => {
+          this.city = lastCountry;
+        },
+        error: (error) => {
+          this.errorMsg = this.errorService.errorHandlerWithJson(error);
+        }
+      })
+    }
+    this.setCityDetails()
+  }
+
+  setCountryDetails(): void {
+    this.addressRequest.country = this.country.name;
+    this.addressRequest.countryCode = this.country.iso2;
+    this.addressRequest.currency = this.country.currency;
+  }
+
+  setCityDetails():void {
+    this.addressRequest.city = this.city.city;
   }
 
   receiveBadge(badge: string) {
@@ -175,6 +217,8 @@ export class ActivityComponent implements OnInit{
     } else {
       this.executeSingleActivity();
     }
+    this.setLastCountry(this.country);
+    this.setLastCity(this.city)
   }
 
   executeSingleActivity() {
@@ -202,6 +246,7 @@ export class ActivityComponent implements OnInit{
     this.activity.endTime = this.endTime;
     this.activity.tripId = this.trip.tripId!;
     this.activity.addressRequest = this.addressRequest;
+
   }
 
   buildAssociatedActivity() {
@@ -249,8 +294,11 @@ export class ActivityComponent implements OnInit{
   }
 
   isValidTime(time: string): boolean {
-    const regex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
-    return regex.test(time);
+    if (!time) {
+      return false;
+    }
+    const timeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+    return timeRegex.test(time);
   }
 
   generateDatesBetween() {
@@ -285,11 +333,11 @@ export class ActivityComponent implements OnInit{
     this.addressRequest.city = '';
     if (this.cities.length == 0) {
       this.errorMsg = [];
-      this.countryService.getCountryCities({country: country}).subscribe({
+      this.countryService.getCountryCities({countryName: country}).subscribe({
         next: (response) => {
           this.cities = response;
           if (response.length > 0) {
-            this.addressRequest.city = response[0].city!;
+            this.addressRequest.city = this.city.city;
           } else {
             this.addressRequest.city = '';
           }
@@ -368,6 +416,21 @@ export class ActivityComponent implements OnInit{
         this.city = {city: cityName};
         this.addressRequest.city = cityName;
       }
+    }
+  }
+
+  setLastCountry(country: Country) {
+    this.sharedService.setLastCountry(country);
+  }
+
+  setLastCity(city: City) {
+    this.sharedService.setLastCity(city);
+  }
+
+  fetchBeginTimeToEndTime(){
+    if (!this.beginTimeSet) {
+    this.endTime = this.startTime;
+    this.beginTimeSet = true;
     }
   }
 }

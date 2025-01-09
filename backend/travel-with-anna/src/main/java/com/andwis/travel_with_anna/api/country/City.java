@@ -5,33 +5,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import java.util.Comparator;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class City implements Comparable<City> {
-    @JsonProperty("city")
-    private String city;
+    private static final String CITY_PROPERTY_NAME = "city";
+
+    @JsonProperty(CITY_PROPERTY_NAME)
+    @EqualsAndHashCode.Include
+    private String name;
+
+    public static final Comparator<City> NAME_COMPARATOR =
+            Comparator.comparing(City::getName);
 
     @Override
     public int compareTo(@NotNull City o) {
-        return this.city.compareTo(o.city);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        City city1 = (City) object;
-        return Objects.equals(city, city1.city);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(city);
+        return NAME_COMPARATOR.compare(this, o);
     }
 }

@@ -22,6 +22,7 @@ import static com.andwis.travel_with_anna.utility.DateTimeMapper.toLocalDate;
 @Service
 @RequiredArgsConstructor
 public class DayService {
+
     private final DayRepository dayRepository;
     private final TripService tripService;
     private final DayAuthorizationService dayAuthorizationService;
@@ -69,29 +70,30 @@ public class DayService {
     }
 
     @Transactional
-    public void addDay (@NotNull DayAddDeleteRequest request, UserDetails connectedUser) {
-        Trip trip = tripService.getTripById(request.getTripId());
+    public void addDay (Long tripId, boolean isFirst, UserDetails connectedUser) {
+        Trip trip = tripService.getTripById(tripId);
         dayAuthorizationService.verifyTripOwner(trip, connectedUser);
-        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(request.getTripId());
-        LocalDate dayToAdd = getDayToAdd(days, request.isFirst());
-        DayRequest dayRequest = DayRequest.builder()
-                .date(dayToAdd)
-                .trip(trip)
-                .build();
-        createDay(dayRequest);
+
+        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(tripId);
+        LocalDate selectedDate = determineDayToAdd(days, isFirst);
+        createAndSaveDay(trip, selectedDate);
     }
 
-    private LocalDate getDayToAdd(@NotNull List<Day> days, boolean isFirst) {
-        LocalDate dayToAdd;
+    private LocalDate determineDayToAdd(@NotNull List<Day> days, boolean isFirst) {
+        final int ADJUSTMENT_DAY = 1;
         if (!days.isEmpty()) {
-            if (isFirst) {
-                dayToAdd = days.getFirst().getDate().minusDays(1);
-            } else {
-                dayToAdd = days.getLast().getDate().plusDays(1);
-            }
-            return dayToAdd;
+            return isFirst ? days.getFirst().getDate().minusDays(ADJUSTMENT_DAY)
+                    : days.getLast().getDate().plusDays(ADJUSTMENT_DAY);
         }
         return LocalDate.now();
+    }
+
+    private void createAndSaveDay(@NotNull Trip trip, LocalDate date) {
+        Day day = Day.builder()
+                .date(date)
+                .build();
+        trip.addDay(day);
+        saveDay(day);
     }
 
     public Set<Day> getDaysByTripIds(Set<Long> tripIds) {
@@ -124,11 +126,11 @@ public class DayService {
     @Transactional
     public void generateDays(@NotNull DayGeneratorRequest request, UserDetails connectedUser) {
         validateDates(toLocalDate(request.getStartDate()), toLocalDate(request.getEndDate()));
-        Trip trip = tripService.getTripById(request.getTripId());
+        Trip trip = tripService.getTripById(request.getAssociatedTripId());
         dayAuthorizationService.verifyTripOwner(trip, connectedUser);
 
         List<Day> days = createDays(toLocalDate(request.getStartDate()), toLocalDate(request.getEndDate()));
-        trip.addDays(days);
+        trip.replaceDays(days);
         tripService.saveTrip(trip);
     }
 
@@ -143,20 +145,46 @@ public class DayService {
         validateDates(startDate, endDate);
 
         List<Day> existingDays  = dayRepository.findByTripTripIdOrderByDateAsc(trip.getTripId());
-
         long totalNewDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
-        long existingDaysSize = existingDays.size();
+        adjustExistingDays(existingDays, startDate, totalNewDays);
 
-        for (int i = 0; i < Math.min(existingDaysSize, totalNewDays); i++) {
+        manageNotExistingDays(trip, totalNewDays, existingDays);
+    }
+
+    @Transactional
+    protected void manageNotExistingDays(Trip trip, long totalNewDays, @NotNull List<Day> existingDays ) {
+        if (totalNewDays > existingDays.size()) {
+            whenMoreNewDays(trip, totalNewDays, existingDays);
+        }
+        if (totalNewDays < existingDays.size()) {
+            adjustRemainingDays(existingDays, (int)totalNewDays);
+        }
+    }
+
+    @Transactional
+    protected void whenMoreNewDays(Trip trip, long totalNewDays, @NotNull List<Day> existingDays) {
+        int daysToAdd = (int) (totalNewDays - existingDays.size()) - 1;
+        LocalDate startDateAfterAdjustment = existingDays.getLast().getDate().plusDays(1);
+        addNewDaysToTrip(trip, daysToAdd, startDateAfterAdjustment);
+    }
+
+    private void adjustExistingDays(@NotNull List<Day> existingDays, LocalDate startDate, long totalDays) {
+        for (int i = 0; i < Math.min(existingDays.size(), totalDays); i++) {
             existingDays.get(i).setDate(startDate.plusDays(i));
         }
+    }
 
-        if (totalNewDays > existingDaysSize) {
-            List<Day> newDays = new ArrayList<>(existingDays);
-            newDays.addAll(createDays(startDate.plusDays((int) existingDaysSize), endDate));
-
-            trip.addDays(newDays);
+    private void adjustRemainingDays(@NotNull List<Day> existingDays, int startingIndex) {
+        LocalDate startDate = existingDays.getFirst().getDate();
+        for (int i = startingIndex; i < existingDays.size(); i++ ) {
+            existingDays.get(i).setDate(startDate.plusDays(i));
         }
+    }
+
+    @Transactional
+    protected void addNewDaysToTrip(@NotNull Trip trip, int startOffset, @NotNull LocalDate startDate) {
+        List<Day> newDays = createDays(startDate, startDate.plusDays(startOffset));
+        trip.addDays(newDays);
     }
 
     public void deleteDay(@NotNull Day day, @NotNull Consumer<Day> deleteFunction) {
@@ -167,12 +195,13 @@ public class DayService {
 
     @Transactional
     public void deleteFirstOrLastDay (
-            @NotNull DayAddDeleteRequest request,
+            Long tripId,
+            boolean isFirst,
             Consumer<Day> deleteFunction,
             UserDetails connectedUser) {
-        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(request.getTripId());
+        List<Day> days = dayRepository.findByTripTripIdOrderByDateAsc(tripId);
         dayAuthorizationService.checkDaysAuthorization(Set.copyOf(days), connectedUser);
-        if (request.isFirst()) {
+        if (isFirst) {
             deleteDay(days.getFirst(), deleteFunction);
         } else {
             deleteDay(days.getLast(), deleteFunction);

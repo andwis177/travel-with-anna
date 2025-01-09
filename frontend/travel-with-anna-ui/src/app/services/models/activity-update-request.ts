@@ -8,8 +8,8 @@ export interface ActivityUpdateRequest {
   dayId: number;
   dayTag?: boolean;
   endTime?: string;
-  newDate: string;
-  oldDate: string;
+  newActivityDate: string;
+  oldActivityDate: string;
   startTime: string;
   type?: string;
 }

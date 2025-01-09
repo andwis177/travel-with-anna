@@ -1,7 +1,5 @@
 import {Component, Inject} from '@angular/core';
 import {FormsModule} from "@angular/forms";
-import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
-import {MatDivider} from "@angular/material/divider";
 import {NgForOf, NgIf} from "@angular/common";
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {ActivityService} from "../../../../../../../../../services/services/activity.service";
@@ -12,10 +10,6 @@ import {ErrorService} from "../../../../../../../../../services/error/error.serv
   standalone: true,
   imports: [
     FormsModule,
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatDivider,
     NgForOf,
     NgIf
   ],

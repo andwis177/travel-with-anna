@@ -12,5 +12,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
    List<Item> findAllById(@Param("idList")List<Long> idList);
 
    @Query("SELECT i FROM Item i WHERE i.backpack.backpackId = :backpackId ORDER BY i.itemName ASC")
-   List<Item> findAllByBackpackId(@Param("backpackId")Long backpackId);
+   List<Item> findAllByBackpackId(@Param("backpackId") Long backpackId);
 }

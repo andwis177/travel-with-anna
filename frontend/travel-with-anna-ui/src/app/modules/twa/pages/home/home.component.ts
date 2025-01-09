@@ -1,17 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {Router, RouterOutlet} from "@angular/router";
-import {TripListComponent} from "../../components/trip-list/trip-list.component";
-import {NgIf} from "@angular/common";
-import {LogoComponent} from "../../../components/menu/logo/logo.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     RouterOutlet,
-    TripListComponent,
-    NgIf,
-    LogoComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

@@ -1,5 +1,4 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MatDivider} from "@angular/material/divider";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatToolbarRow} from "@angular/material/toolbar";
 import {MatIcon} from "@angular/material/icon";
@@ -26,7 +25,6 @@ import {TripCurrencyValuesRequest} from "../../../../../../services/models/trip-
   selector: 'app-expanse',
   standalone: true,
   imports: [
-    MatDivider,
     NgIf,
     NgForOf,
     MatToolbarRow,
@@ -60,10 +58,11 @@ export class ExpanseComponent implements OnInit {
     expanseName: '',
     currency: '',
     price: 0,
-    paid: 0,
+    paid: 0 ,
     exchangeRate: 1,
     priceInTripCurrency:0,
-    paidInTripCurrency: 0
+    paidInTripCurrency: 0,
+    expanseCategory:''
   };
 
   expanseResponse: ExpanseResponse = {
@@ -76,6 +75,8 @@ export class ExpanseComponent implements OnInit {
     priceInTripCurrency:0,
     paidInTripCurrency: 0
   };
+  price: any = '';
+  paid: any =''
   leftToPay: number = 0;
 
   constructor(public dialog: MatDialog,
@@ -96,6 +97,11 @@ export class ExpanseComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.expanseRequest.entityId = this.data.entityId;
+    this.expanseRequest.tripId = this.data.tripId;
+    this.expanseRequest.entityType = this.data.entityType;
+    this.expanseRequest.expanseCategory = this.data.expanseCategory;
+    this.expanseRequest.date = this.data.date
     if (this.data.expanse) {
       this.expanseResponse = this.data.expanse;
       this.expanseRequest.currency = this.data.expanse.currency!;
@@ -107,15 +113,11 @@ export class ExpanseComponent implements OnInit {
       this.expanseRequest.price = this.data.expanse.price!;
       this.expanseRequest.priceInTripCurrency = this.data.expanse.priceInTripCurrency!;
       this.expanseRequest.expanseId = this.data.expanse.expanseId! as number;
+      this.expanseRequest.expanseCategory = this.data.expanse.expanseCategory!;
+      this.expanseRequest.date = this.data.expanse.date
     } else {
       this.expanseRequest.currency = this.data.currency;
     }
-    this.expanseRequest.entityId = this.data.entityId;
-    this.expanseRequest.tripId = this.data.tripId;
-    this.expanseRequest.entityType = this.data.entityType;
-    this.expanseRequest.expanseCategory = this.data.expanseCategory;
-    this.expanseRequest.date = this.data.date
-
     this.getCurrency()
     this.getTripCurrency();
     this.calculateLeftToPay()
@@ -124,6 +126,12 @@ export class ExpanseComponent implements OnInit {
     }
     if (this.expanseRequest.exchangeRate === 1) {
       this.getExchangeRate();
+    }
+    if (this.expanseRequest.price > 0) {
+      this.price = this.expanseRequest.price;
+    }
+    if (this.expanseRequest.paid > 0) {
+      this.paid = this.expanseRequest.paid;
     }
   }
 
@@ -141,7 +149,8 @@ export class ExpanseComponent implements OnInit {
   }
 
   calculateLeftToPay() {
-    this.leftToPay = this.expanseRequest.price - this.expanseRequest.paid!;
+      this.errorMsg = []
+      this.leftToPay = this.expanseRequest.price - this.expanseRequest.paid!;
   }
 
   getCurrency() {
@@ -182,11 +191,16 @@ export class ExpanseComponent implements OnInit {
   }
 
   setAsPaid() {
-    this.expanseRequest.paid = this.expanseRequest.price;
-    this.calculateLeftToPay();
+    this.errorMsg = [];
+  this.priceValidation();
+  this.paid = this.price;
+  this.paidValidation();
+  this.calculateLeftToPay();
+
   }
 
   calculateTripValue() {
+    this.errorMsg = [];
     const tripCurrencyValuesRequest: TripCurrencyValuesRequest = {
       exchangeRate: this.expanseRequest.exchangeRate!,
       paid: this.expanseRequest.paid!,
@@ -207,6 +221,7 @@ export class ExpanseComponent implements OnInit {
 
   saveExpanse() {
     this.errorMsg = [];
+    console.log(this.expanseRequest);
     const params: CreateOrUpdateExpanse$Params = {
       body:  this.expanseRequest }
     this.expanseService.createOrUpdateExpanse(params)
@@ -231,9 +246,37 @@ export class ExpanseComponent implements OnInit {
 
   getColorAmount(amount: number): string {
     if (amount < 0) {
-      return 'negative';
+      return 'negative-color';
     } else {
-      return 'positive';
+      return 'positive-color';
     }
   }
+
+  formatAmount(amount: number): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount)
+  }
+
+  priceValidation() {
+    if (this.price == null || this.price < 0) {
+      this.expanseRequest.price = 0;
+    } else {
+      this.expanseRequest.price = this.price;
+    }
+    this.calculateLeftToPay();
+  }
+
+  paidValidation() {
+    if (this.paid == null || this.paid < 0) {
+      this.expanseRequest.paid = 0;
+    } else {
+      this.expanseRequest.paid = this.paid;
+    }
+    this.calculateLeftToPay();
+  }
 }
+
+

@@ -2,7 +2,6 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatToolbarRow} from "@angular/material/toolbar";
-import {MatDivider} from "@angular/material/divider";
 import {NgForOf, NgIf} from "@angular/common";
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {ErrorService} from "../../../../../../services/error/error.service";
@@ -19,7 +18,6 @@ import {SaveNote$Params} from "../../../../../../services/fn/note/save-note";
     MatIcon,
     MatIconButton,
     MatToolbarRow,
-    MatDivider,
     NgForOf,
     NgIf,
     FormsModule
@@ -29,7 +27,7 @@ import {SaveNote$Params} from "../../../../../../services/fn/note/save-note";
 })
 export class NoteComponent implements OnInit {
   errorMsg: Array<string> = [];
-  noteRequest: NoteRequest = {entityType: ""};
+  noteRequest: NoteRequest = {linkedEntityType: ""};
   noteResponse: NoteResponse = {};
 
   constructor(private noteService: NoteService,
@@ -39,20 +37,20 @@ export class NoteComponent implements OnInit {
                 entityId: number,
                 entityType: string
               }) {
-    this.noteRequest.entityId = data.entityId;
-    this.noteRequest.entityType = data.entityType;
+    this.noteRequest.linkedEntityId = data.entityId;
+    this.noteRequest.linkedEntityType = data.entityType;
   }
 
   ngOnInit() {
-    if (this.noteRequest.entityId && this.noteRequest.entityType) {
+    if (this.noteRequest.linkedEntityId && this.noteRequest.linkedEntityType) {
       this.getNote();
     }
   }
 
   getNote() {
     this.noteService.getNote({
-      entityId: this.noteRequest.entityId!,
-      entityType: this.noteRequest.entityType})
+      entityId: this.noteRequest.linkedEntityId!,
+      entityType: this.noteRequest.linkedEntityType})
       .subscribe({
         next: (note) => {
           this.noteResponse = note;
@@ -65,7 +63,7 @@ export class NoteComponent implements OnInit {
 
   setNote() {
     this.noteRequest.noteId = this.noteResponse.noteId;
-    this.noteRequest.note = this.noteResponse.note;
+    this.noteRequest.noteContent = this.noteResponse.note;
   }
 
   onClose() {
@@ -79,14 +77,14 @@ export class NoteComponent implements OnInit {
   saveNote() {
     this.errorMsg = [];
     this.setNote();
-    if (this.noteRequest.entityId && this.noteRequest.entityType) {
+    if (this.noteRequest.linkedEntityId && this.noteRequest.linkedEntityType) {
       const params: SaveNote$Params = {body: this.noteRequest};
       this.noteService.saveNote(params).subscribe({
         next: () => {
           this.closeAfterSave()
         },
         error: (err) => {
-          this.errorMsg = this.errorService.errorHandler(err);
+          this.errorMsg = this.errorService.errorHandlerWithJson(err);
         }
       });
     }

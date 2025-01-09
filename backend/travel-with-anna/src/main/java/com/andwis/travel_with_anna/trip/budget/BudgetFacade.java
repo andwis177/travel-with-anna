@@ -10,6 +10,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BudgetFacade {
+
     private final BudgetService budgetService;
 
     public BudgetResponse getBudgetById(Long budgetId, UserDetails connectedUser) {

@@ -18,8 +18,8 @@ import { getAllUsers } from '../fn/admin/get-all-users';
 import { GetAllUsers$Params } from '../fn/admin/get-all-users';
 import { getAvatar } from '../fn/admin/get-avatar';
 import { GetAvatar$Params } from '../fn/admin/get-avatar';
-import { getUserAdminViewByIdentifier } from '../fn/admin/get-user-admin-view-by-identifier';
-import { GetUserAdminViewByIdentifier$Params } from '../fn/admin/get-user-admin-view-by-identifier';
+import { getUserByIdentifier } from '../fn/admin/get-user-by-identifier';
+import { GetUserByIdentifier$Params } from '../fn/admin/get-user-by-identifier';
 import { PageResponseUserAdminResponse } from '../models/page-response-user-admin-response';
 import { updateUser } from '../fn/admin/update-user';
 import { UpdateUser$Params } from '../fn/admin/update-user';
@@ -82,27 +82,27 @@ export class AdminService extends BaseService {
     );
   }
 
-  /** Path part for operation `getUserAdminViewByIdentifier()` */
-  static readonly GetUserAdminViewByIdentifierPath = '/admin/user/{identifier}';
+  /** Path part for operation `getUserByIdentifier()` */
+  static readonly GetUserByIdentifierPath = '/admin/user/{identifier}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getUserAdminViewByIdentifier()` instead.
+   * To access only the response body, use `getUserByIdentifier()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getUserAdminViewByIdentifier$Response(params: GetUserAdminViewByIdentifier$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAdminResponse>> {
-    return getUserAdminViewByIdentifier(this.http, this.rootUrl, params, context);
+  getUserByIdentifier$Response(params: GetUserByIdentifier$Params, context?: HttpContext): Observable<StrictHttpResponse<UserAdminResponse>> {
+    return getUserByIdentifier(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getUserAdminViewByIdentifier$Response()` instead.
+   * To access the full response (for headers, for example), `getUserByIdentifier$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getUserAdminViewByIdentifier(params: GetUserAdminViewByIdentifier$Params, context?: HttpContext): Observable<UserAdminResponse> {
-    return this.getUserAdminViewByIdentifier$Response(params, context).pipe(
+  getUserByIdentifier(params: GetUserByIdentifier$Params, context?: HttpContext): Observable<UserAdminResponse> {
+    return this.getUserByIdentifier$Response(params, context).pipe(
       map((r: StrictHttpResponse<UserAdminResponse>): UserAdminResponse => r.body)
     );
   }

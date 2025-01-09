@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class ExpanseResponse implements Comparable<ExpanseResponse> {
+
     private Long expanseId;
     private String expanseName;
     private String expanseCategory;

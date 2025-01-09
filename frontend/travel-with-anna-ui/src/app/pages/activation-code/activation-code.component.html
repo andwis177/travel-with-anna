@@ -1,0 +1,37 @@
+<div class="container background-color-dark">
+  <div>
+    <mat-card class="second-container background-color-light border border-radius container-shadow" appearance="outlined">
+      <mat-card-header class="header">
+        <h5 class="warning-color warning-font">New activation code request</h5>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form class="padding-main-horizontal">
+          <mat-form-field appearance="outline" class="insert-width">
+            <mat-label>Email</mat-label>
+            <input type="text"
+                   matInput
+                   [(ngModel)]="email"
+                   [ngModelOptions]="{standalone: true}"
+                   placeholder="Ex. pat@example.com"
+                   autocomplete="credential">
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+
+      <div class="padding-main-vertical">
+        <button class="button button-1 background-color-dark"
+                (click)=requestActivationCode() type="submit">Ok</button>
+        <div class="padding-main-vertical">
+          <button class="button button-1 background-color-medium"
+                  (click)=onClose() type="submit">Login</button>
+        </div>
+      </div>
+      <div class="activation-code-error-width error-msg border-top error-background" role="alert" *ngIf="errorMsg.length > 0">
+        <p *ngFor="let msg of errorMsg" class="padding-main-horizontal wrap-text">- {{msg}} -</p>
+      </div>
+    </mat-card>
+  </div>
+</div>
+
+

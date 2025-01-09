@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.andwis.travel_with_anna.role.Role.getAdminRole;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.ADMIN;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("User Mapper tests")
@@ -28,7 +28,7 @@ class UserMapperTest {
     void toUserForAdminResponse_withValidData() {
         // Given
         Role role = new Role();
-        role.setRoleName(getAdminRole());
+        role.setRoleName(ADMIN.getRoleName());
 
         User user = User.builder()
                 .userId(1L)
@@ -57,7 +57,7 @@ class UserMapperTest {
         assertTrue(response.enabled());
         assertEquals("2023-01-01", response.createdDate().toString());
         assertEquals("2023-01-02", response.lastModifiedDate().toString());
-        assertEquals(getAdminRole(), response.roleName());
+        assertEquals(ADMIN.getRoleName(), response.roleName());
         assertArrayEquals("avatarImage".getBytes(), response.avatar());
     }
 
@@ -65,7 +65,7 @@ class UserMapperTest {
     void toUserForAdminResponse_withMissingAvatar() {
         // Given
         Role role = new Role();
-        role.setRoleName(getUserRole());
+        role.setRoleName(USER.getRoleName());
 
         User user = User.builder()
                 .userId(2L)
@@ -93,7 +93,7 @@ class UserMapperTest {
         assertFalse(response.enabled());
         assertEquals("2023-01-05", response.createdDate().toString());
         assertEquals("2023-01-06", response.lastModifiedDate().toString());
-        assertEquals(getUserRole(), response.roleName());
+        assertEquals(USER.getRoleName(), response.roleName());
         assertNull(response.avatar());
     }
 }

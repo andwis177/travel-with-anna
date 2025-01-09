@@ -31,8 +31,6 @@ public class EmailServiceTest {
     private EmailService emailService;
     private final String to = "test@example.com";
     private final String userName = "John Doe";
-    private final String confirmationUrl = "https://example.com/activate-account";
-    private final String loginUrl ="http://localhost:4200/login";
     private final String activationCode = "12345";
     private final String resetPassword = "ResetPassword1234567890";
     private final String subject = "Account Activation";
@@ -63,7 +61,7 @@ public class EmailServiceTest {
                 .thenReturn("Processed Template");
 
         // When
-        emailService.sendValidationEmail(to, userName, confirmationUrl, activationCode, subject);
+        emailService.sendValidationEmail(to, userName, activationCode, subject);
 
         // Then
         verify(mailSender, times(1)).send(mimeMessage);
@@ -73,7 +71,6 @@ public class EmailServiceTest {
         Context capturedContext = contextCaptor.getValue();
 
         assertEquals(userName, capturedContext.getVariable("userName"));
-        assertEquals(confirmationUrl, capturedContext.getVariable("url"));
         assertEquals(activationCode, capturedContext.getVariable("code"));
     }
 
@@ -85,7 +82,7 @@ public class EmailServiceTest {
                 .thenReturn("Processed Template");
 
         // When
-        emailService.sendResetPassword(to, userName, loginUrl, resetPassword, subject);
+        emailService.sendResetPassword(to, userName, resetPassword, subject);
 
         // Then
         verify(mailSender, times(1)).send(mimeMessage);
@@ -95,7 +92,6 @@ public class EmailServiceTest {
         Context capturedContext = contextCaptor.getValue();
 
         assertEquals(userName, capturedContext.getVariable("userName"));
-        assertEquals(loginUrl, capturedContext.getVariable("url"));
         assertEquals(resetPassword, capturedContext.getVariable("code"));
     }
 
@@ -108,7 +104,7 @@ public class EmailServiceTest {
 
         // When
         MessagingException exception = assertThrows(MessagingException.class, () ->
-                emailService.sendValidationEmail(to, userName, confirmationUrl, activationCode, subject));
+                emailService.sendValidationEmail(to, userName, activationCode, subject));
 
         // Then
         assertEquals("Failed to send validation email", exception.getMessage());
@@ -123,7 +119,7 @@ public class EmailServiceTest {
 
         // When
         MessagingException exception = assertThrows(MessagingException.class, () ->
-                emailService.sendResetPassword(to, userName, loginUrl, resetPassword, subject));
+                emailService.sendResetPassword(to, userName, resetPassword, subject));
 
         // Then
         assertEquals("Failed to send email with new password", exception.getMessage());

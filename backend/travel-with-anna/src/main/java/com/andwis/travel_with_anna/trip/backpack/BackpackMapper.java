@@ -4,11 +4,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class BackpackMapper {
 
-    public static @NotNull BackpackResponse toBackpackResponse(@NotNull Backpack backpack, boolean isNote) {
+    public static @NotNull BackpackResponse toBackpackResponse(@NotNull Backpack backpack, boolean hasNote) {
         return new BackpackResponse(
                 backpack.getBackpackId(),
                 backpack.getTrip().getTripId(),
-                isNote
+                hasNote
         );
     }
 }

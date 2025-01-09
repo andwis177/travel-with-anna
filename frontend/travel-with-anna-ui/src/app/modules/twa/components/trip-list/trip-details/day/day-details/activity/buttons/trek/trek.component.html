@@ -1,27 +1,29 @@
-<form class="buttons-container full-width" >
+<form class="container-vertical align-center full-width">
 
-  <button class="user-button margin" (click)="provideBadgeToParent('trek');
+  <button class="user-button puffer user-button-radius information-are-shadow button-background-white button-border-dark"
+          (click)="provideBadgeToParent('trek');
                                               provideTypeToParent('walking');
                                               createTrekking()"
           [ngClass]="buttonClasses['walking']"
           matTooltip="Hiking">
-    <img src="../../../../../assets/images/activity/walking.png" class="user-button-image mat-elevation-z4" alt="">
+    <img src="../../../../../assets/images/activity/walking.png" class="button-image" alt="">
   </button>
 
-  <button class="user-button margin" (click)="provideBadgeToParent('trek');
+  <button class="user-button puffer user-button-radius information-are-shadow button-background-white button-border-dark"
+          (click)="provideBadgeToParent('trek');
                                               provideTypeToParent('hiking');
                                               createTrekking()"
           [ngClass]="buttonClasses['hiking']"
           matTooltip="Hiking">
-    <img src="../../../../../assets/images/activity/hiking.png" class="user-button-image mat-elevation-z4" alt="">
+    <img src="../../../../../assets/images/activity/hiking.png" class="button-image" alt="">
   </button>
 
-  <button class="user-button margin" (click)="provideBadgeToParent('trek');
+  <button class="user-button puffer user-button-radius information-are-shadow button-background-white button-border-dark"
+          (click)="provideBadgeToParent('trek');
                                               provideTypeToParent('climbing');
                                               createTrekking()"
           [ngClass]="buttonClasses['climbing']"
           matTooltip="Climbing">
-    <img src="../../../../../assets/images/activity/climbing.png" class="user-button-image mat-elevation-z4" alt="">
+    <img src="../../../../../assets/images/activity/climbing.png" class="button-image" alt="">
   </button>
-
 </form>

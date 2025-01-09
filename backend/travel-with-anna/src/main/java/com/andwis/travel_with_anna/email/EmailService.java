@@ -3,6 +3,7 @@ package com.andwis.travel_with_anna.email;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,68 +25,58 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
 
-    private void mimeMessageCreator(
-            String to, String userName, String url, String code, String subject, String templateName)
-            throws MessagingException {
+    private record EmailDetails(String to, String userName, String code, String subject,
+                                EmailTemplateName templateName) {
+    }
+
+    private void sendEmail(@NotNull EmailDetails emailDetails) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(
                 mimeMessage,
                 MimeMessageHelper.MULTIPART_MODE_MIXED,
                 UTF_8.name()
         );
+        helper.setFrom(senderEmail);
+        helper.setTo(emailDetails.to);
+        helper.setSubject(emailDetails.subject);
+        String emailContent = generateEmailContent(emailDetails);
+        helper.setText(emailContent, true);
+
+        mailSender.send(mimeMessage);
+    }
+
+    private String generateEmailContent(@NotNull EmailDetails emailDetails) throws MessagingException {
         Map<String, Object> properties = new HashMap<>();
-        properties.put("userName", userName);
-        properties.put("url", url);
-        properties.put("code", code);
+        properties.put("userName", emailDetails.userName);
+        properties.put("code", emailDetails.code);
 
         Context context = new Context();
         context.setVariables(properties);
 
-        helper.setFrom(senderEmail);
-        helper.setTo(to);
-        helper.setSubject(subject);
-
-        String template;
         try {
-            template = templateEngine.process(templateName, context);
+            return templateEngine.process(emailDetails.templateName.getTemplateName(), context);
         } catch (RuntimeException e) {
             throw new MessagingException("Failed to process template", e);
         }
-
-        helper.setText(template, true);
-        mailSender.send(mimeMessage);
     }
 
     @Async
     public void sendValidationEmail(
-            String to,
-            String userName,
-            String confirmationUrl,
-            String activationCode,
-            String subject
+            String to, String userName, String activationCode, String subject
     ) throws MessagingException {
         try {
-            String templateName =
-                    EmailTemplateName.ACTIVATE_ACCOUNT.getTemplateName();
-            mimeMessageCreator(to, userName, confirmationUrl, activationCode, subject, templateName);
-
+            sendEmail(new EmailDetails(
+                    to, userName, activationCode, subject, EmailTemplateName.ACTIVATE_ACCOUNT)
+            );
         } catch (MessagingException exp) {
             throw new MessagingException("Failed to send validation email", exp);
         }
     }
 
     @Async
-    public void sendResetPassword(
-            String to,
-            String userName,
-            String loginUrl,
-            String newPassword,
-            String subject
-    ) throws MessagingException {
+    public void sendResetPassword(String to, String userName, String newPassword, String subject) throws MessagingException {
         try {
-            String templateName =
-                    EmailTemplateName.RESET_PASSWORD.getTemplateName();
-            mimeMessageCreator(to, userName, loginUrl, newPassword, subject, templateName);
+            sendEmail(new EmailDetails(to, userName, newPassword, subject, EmailTemplateName.RESET_PASSWORD));
         } catch (MessagingException exp) {
             throw new MessagingException("Failed to send email with new password", exp);
         }

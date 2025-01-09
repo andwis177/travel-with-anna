@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ItemService {
+
     private final ItemRepository itemRepository;
     private final BackpackAuthorizationService backpackAuthorizationService;
 
@@ -27,13 +29,13 @@ public class ItemService {
     public Item createItem(@NotNull ItemRequest itemRequest) {
         return Item.builder()
                 .itemName(itemRequest.getItemName())
-                .quantity(itemRequest.getQty())
+                .quantity(itemRequest.getQuantity())
                 .isPacked(itemRequest.isPacked())
                 .build();
     }
 
     public List<ItemResponse> getAllItemsByBackpackId(Long backpackId, UserDetails connectedUser) {
-        backpackAuthorizationService.getAllItemsByBackpackIdAuthorization(backpackId, connectedUser);
+        backpackAuthorizationService.authorizeBackpackAccess(backpackId, connectedUser);
         return itemRepository.findAllByBackpackId(backpackId).stream()
                 .map(ItemMapper::toItemResponse)
                 .toList();
@@ -44,28 +46,27 @@ public class ItemService {
         List<Long> idList = items.stream()
                 .map(ItemResponse::itemId)
                 .toList();
-        backpackAuthorizationService.saveAllItemAuthorization(idList, connectedUser);
+
+        backpackAuthorizationService.authorizeItemSave(idList, connectedUser);
+
         List<Item> itemsToSave = itemRepository.findAllById(idList);
-        itemsToSave
-                .forEach(item -> {
-                    ItemResponse itemRequest = items.stream()
-                            .filter(i -> i.itemId().equals(item.getItemId()))
-                            .findFirst()
-                            .orElseThrow();
-                    item.setPacked(itemRequest.isPacked());
-                    item.setQuantity(
-                            validateLength(itemRequest.qty(), 40));
-                    item.setItemName(
-                            validateLength(itemRequest.itemName(), 60));
-                });
+
+        var responseMap = items.stream()
+                .collect(Collectors.toMap(ItemResponse::itemId, response -> response));
+
+        itemsToSave.forEach(item -> updateItemFromResponse(item, responseMap.get(item.getItemId())));
         itemRepository.saveAll(itemsToSave);
     }
 
-    private @NotNull String validateLength(@NotNull String string, int length) {
-        if (string.length() > length) {
-            return string.substring(0, length);
-        }
-        return string;
+    private void updateItemFromResponse(Item item, ItemResponse itemResponse) {
+        if (itemResponse == null) return;
+        item.setPacked(itemResponse.isPacked());
+        item.setQuantity(truncateStringToMaxLength(itemResponse.qty(), Item.QUANTITY_MAX_LENGTH));
+        item.setItemName(truncateStringToMaxLength(itemResponse.itemName(), Item.ITEM_NAME_MAX_LENGTH));
+    }
+
+    private @NotNull String truncateStringToMaxLength(@NotNull String input, int maxLength) {
+        return input.length() > maxLength ? input.substring(0, maxLength) : input;
     }
 
     public void deleteItem(Long itemId) {

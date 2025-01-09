@@ -20,7 +20,7 @@ class AddressMapperTest {
                 .city("Some City")
                 .address("123 Main St")
                 .website("www.example.com")
-                .phone("123-456-7890")
+                .phoneNumber("123-456-7890")
                 .email("example@example.com")
                 .currency("USD")
                 .build();
@@ -33,7 +33,7 @@ class AddressMapperTest {
                 .city("Old City")
                 .address("Old Address")
                 .website("www.old-example.com")
-                .phone("098-765-4321")
+                .phoneNumber("098-765-4321")
                 .email("old@example.com")
                 .currency("EUR")
                 .build();
@@ -51,7 +51,7 @@ class AddressMapperTest {
         assertEquals(addressRequest.getCity(), result.getCity());
         assertEquals(addressRequest.getAddress(), result.getAddress());
         assertEquals(addressRequest.getWebsite(), result.getWebsite());
-        assertEquals(addressRequest.getPhone(), result.getPhone());
+        assertEquals(addressRequest.getPhoneNumber(), result.getPhoneNumber());
         assertEquals(addressRequest.getEmail(), result.getEmail());
         assertEquals(addressRequest.getCurrency(), result.getCurrency());
     }
@@ -67,7 +67,7 @@ class AddressMapperTest {
                 .city("Some City")
                 .address("123 Main St")
                 .website("www.example.com")
-                .phone("123-456-7890")
+                .phoneNumber("123-456-7890")
                 .email("example@example.com")
                 .currency("USD")
                 .build();
@@ -83,7 +83,7 @@ class AddressMapperTest {
         assertEquals(addressToConvert.getCity(), result.city());
         assertEquals(addressToConvert.getAddress(), result.address());
         assertEquals(addressToConvert.getWebsite(), result.website());
-        assertEquals(addressToConvert.getPhone(), result.phone());
+        assertEquals(addressToConvert.getPhoneNumber(), result.phoneNumber());
         assertEquals(addressToConvert.getEmail(), result.email());
         assertEquals(addressToConvert.getCurrency(), result.currency());
     }
@@ -98,13 +98,13 @@ class AddressMapperTest {
                 .city("New City")
                 .address("456 New St")
                 .website("www.new-example.com")
-                .phone("321-654-0987")
+                .phoneNumber("321-654-0987")
                 .email("new@example.com")
                 .currency("EUR")
                 .build();
 
         // When
-        AddressMapper.updateAddress(address, updateRequest);
+        AddressMapper.updateExistingAddress(address, updateRequest);
 
         // Then
         assertEquals(updateRequest.getPlace(), address.getPlace());
@@ -113,7 +113,7 @@ class AddressMapperTest {
         assertEquals(updateRequest.getCity(), address.getCity());
         assertEquals(updateRequest.getAddress(), address.getAddress());
         assertEquals(updateRequest.getWebsite(), address.getWebsite());
-        assertEquals(updateRequest.getPhone(), address.getPhone());
+        assertEquals(updateRequest.getPhoneNumber(), address.getPhoneNumber());
         assertEquals(updateRequest.getEmail(), address.getEmail());
         assertEquals(updateRequest.getCurrency(), address.getCurrency());
     }

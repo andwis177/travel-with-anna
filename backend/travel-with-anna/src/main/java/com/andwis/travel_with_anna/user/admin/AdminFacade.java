@@ -14,14 +14,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AdminFacade {
+
     private final AdminService adminService;
 
     public PageResponse<UserAdminResponse> getAllUsers(int page, int size, UserDetails connectedUser) {
         return adminService.getAllUsers(page, size, connectedUser);
     }
 
-    public UserAdminResponse getUserAdminViewByIdentifier(String identifier, UserDetails connectedUser) {
-        return adminService.getUserAdminViewByIdentifier(identifier, connectedUser);
+    public UserAdminResponse getUserAdminDetails(String identifier, UserDetails connectedUser) {
+        return adminService.getUserByIdentifier(identifier, connectedUser);
     }
 
     public AvatarImg getAvatar(Long userId) {

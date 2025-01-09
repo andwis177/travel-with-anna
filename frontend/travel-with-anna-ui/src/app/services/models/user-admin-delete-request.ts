@@ -2,5 +2,5 @@
 /* eslint-disable */
 export interface UserAdminDeleteRequest {
   password?: string;
-  userId?: number;
+  userId: number;
 }

@@ -10,28 +10,32 @@ import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "OpenApi specification for Travel with Anna API",
-                description = "OpenApi documentation for Travel with Anna API",
-                version = "v1"
+                title = OpenApiDocumentationConfig.API_TITLE,
+                description = OpenApiDocumentationConfig.API_DESCRIPTION,
+                version = OpenApiDocumentationConfig.API_VERSION
         ),
-        servers = {
-                @Server(
-                        description = "Local server",
-                        url = "http://localhost:8080/twa/v1"
-                )
-        },
-        security = {
-                @SecurityRequirement(
-                        name = "bearerAuth"
-                )
-        }
+        servers = @Server(
+                description = OpenApiDocumentationConfig.SERVER_DESCRIPTION,
+                url = OpenApiDocumentationConfig.SERVER_URL
+        ),
+        security = @SecurityRequirement(name = OpenApiDocumentationConfig.SECURITY_SCHEME_NAME)
 )
 @SecurityScheme(
-        name = "bearerAuth",
-        scheme = "bearer",
+        name = OpenApiDocumentationConfig.SECURITY_SCHEME_NAME,
+        scheme = OpenApiDocumentationConfig.SECURITY_SCHEME_TYPE,
         type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
+        bearerFormat = OpenApiDocumentationConfig.BEARER_FORMAT,
         in = SecuritySchemeIn.HEADER
 )
-public class OpenApiConfig {
+public class OpenApiDocumentationConfig {
+        public static final String API_TITLE = "OpenApi specification for Travel with Anna API";
+        public static final String API_DESCRIPTION = "OpenApi documentation for Travel with Anna API";
+        public static final String API_VERSION = "v1";
+
+        public static final String SERVER_DESCRIPTION = "Local server";
+        public static final String SERVER_URL = "http://localhost:8080/twa/v1";
+
+        public static final String SECURITY_SCHEME_NAME = "bearerAuth";
+        public static final String SECURITY_SCHEME_TYPE = "bearer";
+        public static final String BEARER_FORMAT = "JWT";
 }

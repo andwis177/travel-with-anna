@@ -1,69 +1,70 @@
-<div class="component-background">
-  <div class="menu-components-background toolbar-menu">
-    <div class="logo">
-      <app-logo></app-logo>
-    </div>
-    <div class="menu-buttons full-width">
-      <app-day-details-buttons
-        *ngIf="trip && trip.tripId && days && activities"
-        [_trip]="trip"
-        [_day]="day"
-        [_addressDetail]="activities.addressDetail!"
-        [_dayOfWeek]="day.dayOfWeek!"
-        [_date]="day.date!"
-        [_dayNumber]="day.dayNumber!"
-        [_amountOfDays]="amountOfDays!"
-        (_afterActivityClosed)="getActivities()">
-        ></app-day-details-buttons>
-    </div>
-    <div class="day-details trip-font">
-      <label class="">{{day.dayOfWeek}}</label>
-      <label class="">{{day.date}}</label>
-      <label class="">{{day.dayNumber}} of {{amountOfDays}} </label>
-    </div>
-    <div class="day-details trip-font" *ngIf="activities">
-      <label>Total Price:</label>
-      <label><label style="font-weight: 550">{{formatAmount(activities.totalPrice!)}}</label> {{tripCurrency}}</label>
-      <label>Total Pay:</label>
-      <label><label style="font-weight: 550;" [ngClass]="getToPayClass(activities.totalPrice!, activities.totalPayment!)">{{formatAmount(activities.totalPayment!)}}</label> {{tripCurrency}}</label>
-    </div>
-    <div class="user">
-      <app-user></app-user>
-    </div>
+<div class="container-horizontal align-center background-color-toolbar toolbar-menu">
+  <div class="logo">
+    <app-logo></app-logo>
   </div>
-
-  <div class="main-form">
-    <div class="top-container">
-
-      <h4 class="trip-name trip-font">
-        <button class="pagination-button"
-                (click)="getPreviousDay()"
-                type="submit"
-                [class.disabled]="dayNumber === 1"
-                matTooltip="Previous day"> << </button>
-
-        <label class="trip-name-padding">{{ trip.tripName }} </label>
-
-        <button class="pagination-button"
-                (click)="getNextDay()"
-                type="submit"
-                [class.disabled]="dayNumber >= amountOfDays"
-                matTooltip="Next day"> >> </button>
-      </h4>
-
-      <div class="center-align">
-        <img *ngFor="let country of activities.addressDetail?.countries"
-             src="https://flagsapi.com/{{country.iso2}}/shiny/32.png" class="flag" alt="">
-      </div>
-
-      <div *ngFor="let activity of activities.activities" class="center-align" >
-        <app-activity-details
-          *ngIf="activity && activity.activityId"
-          [_activity]="activity"
-          [_date]="day.date!"
-          (_afterActivityEditClosed)="getActivities()">
-        </app-activity-details>
-      </div>
-    </div>
+  <div class="menu-buttons full-width">
+    <app-day-details-buttons
+      *ngIf="trip && trip.tripId && days && activities"
+      [_trip]="trip"
+      [_day]="day"
+      [_addressDetail]="activities.addressDetail!"
+      [_dayOfWeek]="day.dayOfWeek!"
+      [_date]="day.date!"
+      [_dayNumber]="day.dayNumber!"
+      [_amountOfDays]="amountOfDays!"
+      (_afterActivityClosed)="getActivities()">
+      </app-day-details-buttons>
+  </div>
+  <div class="full-width container-vertical align-center font-size-label font-color-white">
+    <label class="font-size-text trip-font">{{day.date}}</label>
+    <label class="trip-font font-size-text font-color-light">- {{day.dayOfWeek}} -</label>
+    <label class="trip-font font-size-text">{{day.dayNumber}} <label class="font-size-small">of</label> {{amountOfDays}} </label>
+  </div>
+  <div class="full-width container-vertical align-center font-size-label font-color-white" *ngIf="activities">
+    <label class="">Price:</label>
+    <label>
+      <label class="trip-font font-size-text font-color-light">{{formatAmount(activities.totalPrice!)}}</label>
+      <label class="font-size-small trip-font"> {{tripCurrency}} </label>
+    </label>
+    <label>Paid:</label>
+    <label>
+      <label class="trip-font font-size-text" [ngClass]="getToPayClass(activities.totalPrice!,
+        activities.totalPayment!)">{{formatAmount(activities.totalPayment!)}}</label>
+      <label class="font-size-small trip-font"> {{tripCurrency}} </label>
+    </label>
+  </div>
+  <div class="user">
+    <app-user></app-user>
   </div>
 </div>
+
+<div class="main-form background-color-light">
+  <h4 class="paginator-container align-center align-to-baseline day-details-margin">
+    <button class="pagination-button puffer"
+            (click)="getPreviousDay()"
+            type="submit"
+            [class.disabled]="dayNumber === 1"
+            matTooltip="Previous day"> << </button>
+
+    <label class="trip-font day-details-text-size-large align-center">{{trip.tripName}}</label>
+
+    <button class="pagination-button puffer"
+            (click)="getNextDay()"
+            type="submit"
+            [class.disabled]="dayNumber >= amountOfDays"
+            matTooltip="Next day"> >> </button>
+  </h4>
+  <div class="align-center">
+    <img *ngFor="let country of activities.addressDetail?.countries"
+         src="https://flagsapi.com/{{country.iso2}}/shiny/32.png" class="day-details-margin" alt="">
+  </div>
+  <div *ngFor="let activity of activities.activities" class="align-center" >
+    <app-activity-details
+      *ngIf="activity && activity.activityId"
+      [_activity]="activity"
+      [_date]="day.date!"
+      (_afterActivityEditClosed)="getActivities()">
+    </app-activity-details>
+  </div>
+</div>
+

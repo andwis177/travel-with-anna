@@ -9,16 +9,17 @@ import {AddDay$Params} from "../../../../../../services/fn/day/add-day";
 import {DayService} from "../../../../../../services/services/day.service";
 import {EditTripComponent} from "../edit-trip/edit-trip.component";
 import {SharedService} from "../../../../../../services/shared/shared.service";
-import {MatIcon} from "@angular/material/icon";
 import {DayDeleteComponent} from "../day/day-card/day-delete/day-delete.component";
 import {PdfReportComponent} from "../pdf-report/pdf-report.component";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-trip-details-buttons',
   standalone: true,
   imports: [
     MatTooltip,
-    MatIcon
+    FormsModule,
+    ReactiveFormsModule
   ],
   templateUrl: './trip-details-buttons.component.html',
   styleUrl: './trip-details-buttons.component.scss'
@@ -62,9 +63,9 @@ export class TripDetailsButtonsComponent implements OnInit {
     event.preventDefault();
     const dialogRef = this.dialog.open(BackpackComponent, {
       maxWidth: '90vw',
-      maxHeight: '90vh',
+      maxHeight: '85vh',
       width: '70%',
-      height: 'auto',
+      height: '85vh',
       id: 'backpack-dialog',
       data: {
         backpackId: this._trip.backpackId,
@@ -99,7 +100,7 @@ export class TripDetailsButtonsComponent implements OnInit {
 
   addDay(isFirst: boolean, event: Event) {
     event.preventDefault();
-    const params: AddDay$Params = {body: {tripId: this._trip.tripId!, first: isFirst}};
+    const params: AddDay$Params = {tripId: this._trip.tripId!, isFirst: isFirst};
     this.dayService.addDay(params).subscribe({
       next: () => {
         this.afterAddDay.emit();

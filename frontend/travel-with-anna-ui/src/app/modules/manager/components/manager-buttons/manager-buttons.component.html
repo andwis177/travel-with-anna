@@ -1,0 +1,26 @@
+<form class="second-container container-horizontal">
+  <div class="second-container container-horizontal">
+    <input type="text"
+           class="input-main padding-main"
+           matInput
+           [(ngModel)]="identifier"
+           [ngModelOptions]="{standalone: true}"
+           placeholder="Search by ID, Name or Email"
+           autocomplete="Identifier"
+           (keydown.enter)="$event.preventDefault()">
+    <div class="container-horizontal padding-small-horizontal">
+      <button class="user-button puffer button-border button-background user-button-radius"
+              (click)="findUser()" matTooltip="Find specific user">
+        <img src="../../../../../assets/images/user.png" class="button-image user-button-radius" alt="">
+      </button>
+      <button class="user-button puffer button-border button-background user-button-radius"
+              (click)="AllUsers()" matTooltip="Get all users">
+        <img src="../../../../../assets/images/users.png" class="button-image user-button-radius" alt="">
+      </button>
+      <button class="user-button puffer button-border background-color-toolbar user-button-radius"
+              (click)="goToTrips()" matTooltip="Go to Trips">
+        <img src="../../../../../assets/images/twa.png" class="button-image user-button-radius" alt="">
+      </button>
+    </div>
+  </div>
+</form>

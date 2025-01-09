@@ -1,30 +1,23 @@
-<mat-card class="second-container" appearance="outlined">
-  <mat-card-header class="header-shadow">
-    <h4>DELETE DAY</h4>
-  </mat-card-header>
+<div class="container background-color-light">
+  <div class="second-container container-vertical align-center">
+    <h4 class="header">DELETE DAY</h4>
 
-  <div class="label-padding">
-    <i class="fas fa-circle-exclamation fa-fade fa-1x warning-icon"></i>
-    <div *ngIf="isFirst">
-      <p class="error-msg full-width text-size">You will delete FIRST day! </p>
+    <div class="warning-font warning-color padding-big">
+      <div *ngIf="isFirst">
+        <p class="font-size-text">You will delete FIRST day! </p>
+      </div>
+      <div *ngIf="!isFirst">
+        <p class="font-size-text">You will delete LAST day! </p>
+      </div>
     </div>
-    <div *ngIf="!isFirst">
-      <p class="error-msg full-width text-size">You will delete LAST day! </p>
+
+    <div class="margin-big">
+      <button class="button button-1 background-color-warning font-color" (click)="deleteDay()" type="submit">DELETE</button>
+      <button class="button button-1 background-color-dark" (click)="onClose()" type="submit">Cancel</button>
     </div>
   </div>
+</div>
 
-  <mat-card-content class="content">
-    <form>
-      <div>
-        <button class="custom-button-4 button-font" (click)="deleteDay()" type="submit">DELETE</button>
-      </div>
-      <div>
-        <button class="custom-button-0 button-font" (click)="onClose()" type="submit">Cancel</button>
-      </div>
-    </form>
-  </mat-card-content>
-</mat-card>
-<div class="full-width error-msg" role="alert" *ngIf="errorMsg.length > 0">
-  <mat-divider class="padding-bottom"></mat-divider>
-  <p *ngFor="let msg of errorMsg">{{msg}}</p>
+<div class="full-width error-msg border-top error-background" role="alert" *ngIf="errorMsg.length > 0">
+  <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
 </div>

@@ -1,36 +1,9 @@
 .amount-column {
-  width: 25vh !important;
-}
-
-.header-column{
-  display: flex;
-  flex-direction: column;
-  align-items: start;
+  width: 12vw !important;
 }
 
 .currency-column {
-  width: 5vh !important;
-}
-
-body, html {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
-.table-container {
-  width: 100% !important;
-  height: 80% !important;
-  background-color: whitesmoke;
-  color: #2E3944 !important;
-  display: block;
-  min-width: 30% !important;
-  margin: auto;
-}
-
-.mat-mdc-form-field {
-  font-size: 14px !important;
-  width: 100% !important;
+  width: 8vw !important;
 }
 
 .mdc-data-table__table {
@@ -56,35 +29,20 @@ body, html {
   width: auto;
 }
 
-th, td {
-  align-content: center !important;
-  text-align: start !important;
-}
-
 .selected {
-  background-color: snow !important;
-}
-
-th.mat-sort-header-sorted {
-  color: black;
+  background-color: #C0D0D8 !important;
 }
 
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
   display: none;
 }
 
-.positive {
-  color: #1C252D !important;
+th, td {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  word-break: break-word;
+  align-content: center !important;
 }
 
-.negative {
-  color: palevioletred !important;
-}
-
-.activity-button-image{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background-color: transparent;
-  cursor: pointer;
-}

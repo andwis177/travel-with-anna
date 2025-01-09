@@ -16,7 +16,7 @@ export function getCurrentUserAvatar(http: HttpClient, rootUrl: string, params?:
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'application/json', context })
+    rb.build({ responseType: 'blob', accept: 'image/jpeg', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {

@@ -7,7 +7,7 @@ public class NoteMapper {
     public static @NotNull NoteResponse toNoteResponse(@NotNull Note note) {
         return new NoteResponse(
                 note.getNoteId(),
-                note.getNote()
+                note.getContent()
         );
     }
 }

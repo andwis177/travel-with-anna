@@ -1,7 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatCardContent} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatToolbarRow} from "@angular/material/toolbar";
@@ -11,7 +10,6 @@ import {MatToolbarRow} from "@angular/material/toolbar";
   standalone: true,
   imports: [
     FormsModule,
-    MatCardContent,
     MatIcon,
     MatIconButton,
     MatToolbarRow,
@@ -24,7 +22,6 @@ export class ContactInformationComponent {
   phone: string = '';
   email: string = '';
   website: string = '';
-
 
   constructor(public dialog: MatDialog,
               @Inject(MAT_DIALOG_DATA) public data: {

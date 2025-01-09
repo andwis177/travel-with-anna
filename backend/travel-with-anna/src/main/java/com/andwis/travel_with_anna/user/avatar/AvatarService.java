@@ -16,13 +16,16 @@ import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
+
+    private static final String DEFAULT_AVATAR_IMAGE = AvatarDefaultImg.DEFAULT.getImg();
+
     private final AvatarRepository avatarRepository;
 
     public Avatar saveAvatar(Avatar avatar) {
         return avatarRepository.save(avatar);
     }
 
-    public boolean existsById(Long id) {
+    public boolean isAvatarExistsById(Long id) {
         return avatarRepository.existsById(id);
     }
 
@@ -42,20 +45,15 @@ public class AvatarService {
     @Transactional
     public void deleteAvatar(@NotNull User user) {
         if (user.getAvatarId() != null) {
-            avatarRepository.deleteById(user.getAvatarId());
+            Long avatarId = user.getAvatarId();
             user.setAvatarId(null);
+            avatarRepository.deleteById(avatarId);
         }
     }
 
     public AvatarImg getAvatar(@NotNull User user) {
         Avatar avatar = findById(user.getAvatarId());
-        String avatarHex = (
-                avatar != null &&
-                        avatar.getAvatar() != null &&
-                        !avatar.getAvatar().isEmpty()
-        )
-                ? avatar.getAvatar()
-                : AvatarDefaultImg.DEFAULT.getImg();
+        String avatarHex = resolveAvatarHex(avatar);
         return new AvatarImg(
                 hexToBytes(avatarHex)
         );
@@ -63,20 +61,17 @@ public class AvatarService {
 
     public Map<Long, byte[]> getAvatars(@NotNull List<Long> avatarsId) {
         return avatarsId.stream()
-                .filter(this::existsById)
+                .filter(this::isAvatarExistsById)
                 .collect(Collectors.toMap(
                         avatarId -> avatarId,
-                        avatarId -> {
-                            Avatar avatar = findById(avatarId);
-                            String avatarHex = (
-                                    avatar != null &&
-                                            avatar.getAvatar() != null &&
-                                            !avatar.getAvatar().isEmpty()
-                            )
-                                    ? avatar.getAvatar()
-                                    : AvatarDefaultImg.DEFAULT.getImg();
-                            return hexToBytes(avatarHex);
-                        }
+                        avatarId -> hexToBytes(resolveAvatarHex(findById(avatarId)))
                 ));
+    }
+
+    private String resolveAvatarHex(Avatar avatar) {
+        if (avatar != null && avatar.getAvatar() != null && !avatar.getAvatar().isEmpty()) {
+            return avatar.getAvatar();
+        }
+        return DEFAULT_AVATAR_IMAGE;
     }
 }

@@ -1,0 +1,22 @@
+<mat-toolbar-row class="dialog-top-bar background-color-white">
+  <div class="container-horizontal second-container padding-main-horizontal toolbar-spacing">
+    <div>Avatar</div>
+    <button mat-icon-button
+            (click)="onClose()"
+            (keydown.enter)="$event.preventDefault()">
+      <mat-icon class="toolbar-close-button puffer">close</mat-icon>
+    </button>
+  </div>
+</mat-toolbar-row>
+
+<div class="second-container background-color-light padding-main" >
+  <div class="margin-main">
+    <img [src]="'data:image/jpeg;base64,' + userAvatar?.avatar"
+         alt="/"
+         class="profile-image mat-elevation-z8" />
+  </div>
+
+  <div>
+    <button class="button button-1 background-color-medium" (click)="onClose()" type="submit">Close</button>
+  </div>
+</div>

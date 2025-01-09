@@ -1,35 +1,6 @@
-.error-msg {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-.text-size {
-  font-size: 24px;
-}
-
-.warning-icon {
-  font-size: 32px;
-  width: 100%;
-  margin-bottom: 20px;
-  color: darkred;
-  text-align: center;
-}
-
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
-  display: none;
+  display: none !important;
 }
-
-.button-font {
-  font-weight: bold;
-}
-
-.second-container {
-  width: 100% !important;
-  height: 100% !important;
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-}
-
 
 
 

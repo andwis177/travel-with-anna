@@ -1,62 +1,66 @@
-<div class="container">
-  <mat-card class="second-container">
-    <mat-card-header class="header-shadow">
-      <h3>Login</h3>
-    </mat-card-header>
+<div class="container background-color-dark">
+  <div>
+    <mat-card class="second-container background-color-light border border-radius container-shadow ">
+      <mat-card-header class="header">
+        <h4>Login</h4>
+      </mat-card-header>
 
-    <mat-card-content class="content">
-      <form>
-        <mat-form-field appearance="outline" class="full-width" >
-          <mat-label>Email</mat-label>
-          <input type="email"
-                 matInput
-                 [(ngModel)]="authRequest.email"
-                 [ngModelOptions]="{standalone: true}"
-                 placeholder="Ex. pat@example.com"
-                 autocomplete="email"
-                 (keydown.enter)="$event.preventDefault()">
-        </mat-form-field>
+      <mat-card-content>
+        <form class="padding-main-horizontal">
+          <mat-form-field appearance="outline" class="full-width" >
+            <mat-label>Email</mat-label>
+            <input type="email"
+                   matInput
+                   [(ngModel)]="authRequest.email"
+                   [ngModelOptions]="{standalone: true}"
+                   placeholder="Ex. pat@example.com"
+                   autocomplete="email"
+                   (keydown.enter)="$event.preventDefault()">
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width" >
-          <mat-label>Password: </mat-label>
-          <input type="password"
-                 matInput [type]="hide() ? 'password' : 'text'"
-                 [(ngModel)]="authRequest.password"
-                 [ngModelOptions]="{standalone: true}"
-                 placeholder="Password"
-                 autocomplete="new-password"
-                 (keydown.enter)="$event.preventDefault()">
-          <button
-            mat-icon-button
-            matSuffix
-            (click)="clickEvent($event)"
-            (keydown.enter)="$event.preventDefault()"
-            [attr.aria-label]="'Hide password'"
-            [attr.aria-pressed]="hide()">
-            <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
-          </button>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width" >
+            <mat-label>Password: </mat-label>
+            <input type="password"
+                   matInput [type]="hide() ? 'password' : 'text'"
+                   [(ngModel)]="authRequest.password"
+                   [ngModelOptions]="{standalone: true}"
+                   placeholder="Password"
+                   autocomplete="new-password"
+                   (keydown.enter)="$event.preventDefault()">
+            <button
+              mat-icon-button
+              matSuffix
+              (click)="clickEvent($event)"
+              (keydown.enter)="$event.preventDefault()"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hide()">
+              <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </mat-form-field>
 
-        <div>
-          <button class="custom-button-0" (click)="signIn()" type="submit">Sign In</button>
           <div>
-            <button class="custom-button-1" style="margin-top: 5px" (click)="register()">Register</button>
+            <button class="button button-1 background-color-dark" (click)="signIn()">Sign In</button>
+            <div>
+              <button class=" button button-1 background-color-medium" (click)="register()">Register</button>
+            </div>
           </div>
-        </div>
-        <div style="padding-top: 20px">
-          <mat-divider></mat-divider>
-          <div>
-            <button class="custom-button-2 activate-button right-align" (click)=activateAccount()>Activate account</button>
+          <div style="margin-top:20px; margin-bottom:10px">
+            <div>
+              <button class="button button-2" (click)=activateAccount()>Activate account</button>
+            </div>
+            <div>
+              <button class="button button-2 background-color-dark font-color-white" (click)=resentActivationCode()>Code Request</button>
+            </div>
+            <button class="button button-3 warning-color" (click)=resetPassword()>Reset password</button>
           </div>
-          <button class="custom-button-2 right-align" (click)=resetPassword()>Reset password</button>
-        </div>
-      </form>
-    </mat-card-content>
-    <div class="full-width error-msg error-background" role="alert" *ngIf="errorMsg.length > 0">
-      <mat-divider class="padding-bottom"></mat-divider>
-      <p *ngFor="let msg of errorMsg">{{msg}}</p>
-    </div>
-  </mat-card>
+        </form>
+      </mat-card-content>
+
+      <div class="full-width error-msg border-top error-background" role="alert" *ngIf="errorMsg.length > 0">
+        <p *ngFor="let msg of errorMsg" class="padding-main-horizontal">- {{msg}} -</p>
+      </div>
+    </mat-card>
+  </div>
 </div>
 
 

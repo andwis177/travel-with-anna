@@ -1,9 +1,10 @@
 package com.andwis.travel_with_anna.auth;
 
+import com.andwis.travel_with_anna.handler.ErrorCodes;
+import com.andwis.travel_with_anna.handler.ExceptionResponse;
 import com.andwis.travel_with_anna.handler.exception.EmailNotFoundException;
+import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.mail.MessagingException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +14,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Objects;
+import java.util.List;
 
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,48 +46,39 @@ class AuthenticationControllerTest {
                 "test@example.com",
                 "password123",
                 "password123",
-                getUserRole()
+                USER.getRoleName()
         );
 
-        String jsonContent = objectMapper.writeValueAsString(request);
-
         // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                                .content(jsonContent))
-                        .andExpect(status().isAccepted());
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isAccepted());
 
         // Then
-        assertEquals(202, result.andReturn().getResponse().getStatus());
+        verify(service, times(1)).register(any(RegistrationRequest.class));
     }
 
     @Test
     void register_ShouldReturnBadRequest() throws Exception {
         // Given
-        RegistrationRequest request = new RegistrationRequest("test",
-                "test.com",
+        RegistrationRequest request = new RegistrationRequest(
+                "test",
+                "invalidEmail",
                 "password123",
                 "password123",
-                getUserRole()
+                USER.getRoleName()
         );
-        String jsonContent = objectMapper.writeValueAsString(request);
 
-        // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .post("/auth/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                                .content(jsonContent))
-                        .andExpect(status().isBadRequest());
-
-        // Then
-        assertEquals(400, result.andReturn().getResponse().getStatus());
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -99,159 +88,145 @@ class AuthenticationControllerTest {
                 "test@example.com",
                 "password123"
         );
-        String jsonContent = objectMapper.writeValueAsString(request);
+
         AuthenticationResponse response = new AuthenticationResponse(
                 "token value",
                 "",
                 "",
                 ""
         );
+
         when(service.authenticationWithCredentials(request)).thenReturn(response);
 
-        // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .post("/auth/authenticate")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                                .content(jsonContent))
-                        .andExpect(status().isOk())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.token").exists());
-
-        // Then
-        assertEquals(200, result.andReturn().getResponse().getStatus());
-        JSONObject jsonResponse = new JSONObject(result.andReturn().getResponse().getContentAsString());
-        assertEquals("token value", jsonResponse.getString("token"));
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/auth/authenticate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.token").value("token value"));
     }
 
     @Test
     void authenticationWithCredentials_ShouldReturnBadRequest() throws Exception {
         // Given
         AuthenticationRequest request = new AuthenticationRequest("test@example.com", "passwor");
-        String jsonContent = objectMapper.writeValueAsString(request);
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("Bad credentials"));
 
         when(service.authenticationWithCredentials(any(AuthenticationRequest.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
-        // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .post("/auth/authenticate")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                                .content(jsonContent))
-                        .andExpect(status().isUnauthorized());
-
-        // Then
-        assertEquals(401, result.andReturn().getResponse().getStatus());
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/auth/authenticate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void confirm_ShouldActivateAccount() throws Exception {
         // Given
-        String token = "12345";
-        doNothing().when(service).activateAccount(token);
+        String token = "validToken";
 
         // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .get("/auth/activate-account")
-                                .param("token", token))
-                        .andExpect(status().isAccepted());
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/auth/activate-account")
+                        .param("token", token))
+                .andExpect(status().isAccepted());
 
         // Then
-        assertEquals(202, result.andReturn().getResponse().getStatus());
+        verify(service, times(1)).activateAccount(token);
     }
 
     @Test
     void confirm_ShouldReturnMessagingException() throws Exception {
         // Given
-        String token = "12345";
+        String token = "invalidToken";
 
-        doThrow(new MessagingException("Test messaging exception"))
+        doThrow(new InvalidTokenException("Test messaging exception"))
                 .when(service).activateAccount(token);
 
-        // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .get("/auth/activate-account")
-                                .param("token", token))
-                        .andExpect(status().isInternalServerError());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCodes.INVALID_TOKEN.getCode(),
+                List.of("Test messaging exception"));
 
-        // Then
-        assertEquals(500, result.andReturn().getResponse().getStatus());
-        assertEquals("Test messaging exception", Objects.requireNonNull(result.andReturn().getResolvedException()).getMessage());
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/auth/activate-account")
+                        .param("token", token))
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.content().string(objectMapper.writeValueAsString(exceptionResponse)));
     }
 
     @Test
     void restPassword_ShouldResetPassword() throws Exception {
         // Given
         ResetPasswordRequest request = new ResetPasswordRequest("username");
-        String jsonContent = objectMapper.writeValueAsString(request);
-        doNothing().when(service).resetPassword(request);
 
-        // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .patch("/auth/reset-password")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                                .content(jsonContent))
-                        .andExpect(status().isOk());
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .patch("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
 
         // Then
-        assertEquals(200, result.andReturn().getResponse().getStatus());
+        verify(service, times(1)).resetPassword(any(ResetPasswordRequest.class));
     }
 
     @Test
     void restPasswordWithEmail_ShouldReturnEmailNotFoundException() throws Exception {
         // Given
         ResetPasswordRequest request = new ResetPasswordRequest("email@example.com");
-        String jsonContent = objectMapper.writeValueAsString(request);
 
-        doThrow(new EmailNotFoundException("User with this email not found")).when(service).resetPassword(any(ResetPasswordRequest.class));
+        doThrow(new EmailNotFoundException("User with this email not found"))
+                .when(service).resetPassword(any(ResetPasswordRequest.class));
 
-        // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .patch("/auth/reset-password")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                                .content(jsonContent))
-                        .andExpect(status().isNotFound());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCodes.USER_NOT_FOUND.getCode(),
+                List.of("User with this email not found"));
 
-        // Then
-        assertEquals(404, result.andReturn().getResponse().getStatus());
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .patch("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string(objectMapper.writeValueAsString(exceptionResponse)));
     }
 
     @Test
     void restPasswordWithUserName_ShouldReturnUserNameNotFoundException() throws Exception {
         // Given
         ResetPasswordRequest request = new ResetPasswordRequest("username");
-        String jsonContent = objectMapper.writeValueAsString(request);
 
-        doThrow(new UsernameNotFoundException("User with this user name not found")).when(service).resetPassword(any(ResetPasswordRequest.class));
+        doThrow(new UsernameNotFoundException("User with this user name not found"))
+                .when(service).resetPassword(any(ResetPasswordRequest.class));
 
-        // When
-        ResultActions result =
-                mockMvc
-                        .perform(MockMvcRequestBuilders
-                                .patch("/auth/reset-password")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                                .content(jsonContent))
-                        .andExpect(status().isNotFound());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCodes.USER_NOT_FOUND.getCode(),
+                List.of("User with this user name not found"));
 
-        // Then
-        assertEquals(404, result.andReturn().getResponse().getStatus());
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .patch("/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string(objectMapper.writeValueAsString(exceptionResponse)));
     }
+
+    @Test
+    void resendActivationCode_ShouldReturnOk() throws Exception {
+        // Given
+        String email = "test@example.com";
+
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/auth/resend-activation-code")
+                        .param("email", email))
+                .andExpect(status().isOk());
+
+        verify(service, times(1)).sendActivationCodeByRequest(email);
+    }
+
 }

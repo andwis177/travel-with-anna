@@ -16,53 +16,60 @@ import java.util.Set;
 @Entity
 @Table(name = "addresses")
 public class Address {
+    protected static final int MAX_NAME_LENGTH = 100;
+    protected static final int MAX_CODE_LENGTH = 3;
+    protected static final int MAX_PHONE_LENGTH = 30;
+    protected static final int MAX_EMAIL_LENGTH = 150;
+    protected static final int MAX_CURRENCY_LENGTH = 10;
+    protected static final int MAX_LENGTH = 255;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id")
     private Long addressId;
 
-    @Size(max = 100)
-    @Column(name = "place", length = 100)
+    @Size(max = MAX_NAME_LENGTH)
+    @Column(name = "place", length = MAX_NAME_LENGTH)
     private String place;
 
-    @Size(max = 100)
-    @Column(name = "country", length = 100)
+    @Size(max = MAX_NAME_LENGTH)
+    @Column(name = "country", length = MAX_NAME_LENGTH)
     private String country;
 
-    @Size(max = 3)
-    @Column(name = "country_code", length = 3)
+    @Size(max = MAX_CODE_LENGTH)
+    @Column(name = "country_code", length = MAX_CODE_LENGTH)
     private String countryCode;
 
-    @Size(max = 100)
-    @Column(name = "city", length = 100)
+    @Size(max = MAX_NAME_LENGTH)
+    @Column(name = "city", length = MAX_NAME_LENGTH)
     private String city;
 
+    @Size(max = MAX_LENGTH)
     @Column(name = "address")
     private String address;
 
+    @Size(max = MAX_LENGTH)
     @Column(name = "website")
     private String website;
 
-    @Size(max = 30)
-    @Column(name = "phone", length = 30)
-    private String phone;
+    @Size(max = MAX_PHONE_LENGTH)
+    @Column(name = "phone", length = MAX_PHONE_LENGTH)
+    private String phoneNumber;
 
-    @Size(max = 150)
-    @Column(name = "email", length = 150)
+    @Size(max = MAX_EMAIL_LENGTH)
+    @Column(name = "email", length = MAX_EMAIL_LENGTH)
     private String email;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "address", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Activity> activities;
+    private Set<Activity> activities = new HashSet<>();
 
-    @Size(max = 10)
-    @Column(name ="currency", length = 10)
+    @Size(max = MAX_CURRENCY_LENGTH)
+    @Column(name = "currency", length = MAX_CURRENCY_LENGTH)
     private String currency;
 
-    public void addActivity(Activity activity) {
-        if (this.activities == null) {
-            this.activities = new HashSet<>();
-        }
-        activities.add(activity);
+    public void addLinkedActivity(Activity activity) {
+        this.activities.add(activity);
         activity.setAddress(this);
     }
 }

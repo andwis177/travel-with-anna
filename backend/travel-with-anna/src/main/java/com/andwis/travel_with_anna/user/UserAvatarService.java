@@ -1,6 +1,6 @@
 package com.andwis.travel_with_anna.user;
 
-import com.andwis.travel_with_anna.handler.exception.FileNotSaved;
+import com.andwis.travel_with_anna.handler.exception.FileNotSavedException;
 import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarService;
@@ -18,6 +18,11 @@ import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 @Service
 @RequiredArgsConstructor
 public class UserAvatarService {
+
+    private static final String JPEG_CONTENT_TYPE = "image/jpeg";
+    private static final String JPG_CONTENT_TYPE = "image/jpg";
+    private static final int MAX_FILE_SIZE = 1024 * 1024; // 1MB
+
     private final UserService userService;
     private final UserAuthenticationService userAuthenticationService;
     private final AvatarService avatarService;
@@ -26,15 +31,13 @@ public class UserAvatarService {
             throws IOException {
         String contentType = file.getContentType();
 
-        if (!"image/jpeg".equals(contentType) && !"image/jpg".equals(contentType)) {
-            throw new FileNotSaved("File is not a JPEG image. Actual type: " + contentType);
-        }
+        validateFileType(contentType);
 
         byte[] fileBytes = file.getBytes();
-        User user = userAuthenticationService.getConnectedUser(connectedUser);
+        User user = userAuthenticationService.retriveConnectedUser(connectedUser);
 
-        if (fileBytes.length > 1024 * 1024) {
-            throw new FileNotSaved("File is too big");
+        if (fileBytes.length > MAX_FILE_SIZE) {
+            throw new FileNotSavedException("File is too big");
         }
 
         if (user.getAvatarId() == null) {
@@ -48,11 +51,17 @@ public class UserAvatarService {
         avatarService.saveAvatar(userAvatar);
     }
 
+    private void validateFileType(String contentType) throws FileNotSavedException {
+        if (!JPEG_CONTENT_TYPE.equals(contentType) && !JPG_CONTENT_TYPE.equals(contentType)) {
+            throw new FileNotSavedException("File is not a JPEG image. Actual type: " + contentType);
+        }
+    }
+
     public byte[] getAvatar(UserDetails connectedUser) {
-        User user = userAuthenticationService.getConnectedUser(connectedUser);
+        User user = userAuthenticationService.retriveConnectedUser(connectedUser);
 
         if (user.getAvatarId() != null) {
-            if (avatarService.existsById(user.getAvatarId())) {
+            if (avatarService.isAvatarExistsById(user.getAvatarId())) {
                 Avatar avatar = avatarService.findById(user.getAvatarId());
                 if (avatar != null && avatar.getAvatar() != null) {
                     if (!avatar.getAvatar().isEmpty()) {

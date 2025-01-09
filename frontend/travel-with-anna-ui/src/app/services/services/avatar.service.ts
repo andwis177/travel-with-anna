@@ -52,10 +52,9 @@ export class AvatarService extends BaseService {
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `uploadAvatar()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
    */
-  uploadAvatar$Response(params?: UploadAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<{
-}>> {
+  uploadAvatar$Response(params?: UploadAvatar$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     return uploadAvatar(this.http, this.rootUrl, params, context);
   }
 
@@ -63,14 +62,11 @@ export class AvatarService extends BaseService {
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `uploadAvatar$Response()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
    */
-  uploadAvatar(params?: UploadAvatar$Params, context?: HttpContext): Observable<{
-}> {
+  uploadAvatar(params?: UploadAvatar$Params, context?: HttpContext): Observable<void> {
     return this.uploadAvatar$Response(params, context).pipe(
-      map((r: StrictHttpResponse<{
-}>): {
-} => r.body)
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 

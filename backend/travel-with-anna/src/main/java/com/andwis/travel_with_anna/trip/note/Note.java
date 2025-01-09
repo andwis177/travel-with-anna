@@ -1,13 +1,12 @@
 package com.andwis.travel_with_anna.trip.note;
 
-import com.andwis.travel_with_anna.security.OwnableByUser;
+import com.andwis.travel_with_anna.security.OwnByUser;
 import com.andwis.travel_with_anna.trip.day.Day;
 import com.andwis.travel_with_anna.trip.day.activity.Activity;
 import com.andwis.travel_with_anna.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -16,17 +15,23 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "notes")
-public class Note implements OwnableByUser {
+public class Note implements OwnByUser {
+
+    protected static final int NOTE_LENGTH = 500;
+
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "note_id")
     private Long noteId;
 
-    @Size(max = 500)
-    @Column(name = "note", length = 500)
-    private String note;
+    @Size(max = NOTE_LENGTH)
+    @EqualsAndHashCode.Include
+    @Column(name = "note", length = NOTE_LENGTH)
+    private String content;
 
     @OneToOne(mappedBy = "note")
     private Day day;
@@ -34,34 +39,19 @@ public class Note implements OwnableByUser {
     @OneToOne(mappedBy = "note")
     private Activity activity;
 
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Note objectNote = (Note) object;
-        return Objects.equals(noteId, objectNote.noteId)
-                && Objects.equals(note, objectNote.note)
-                && Objects.equals(day, objectNote.day)
-                && Objects.equals(activity, objectNote.activity);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(noteId, note);
-    }
-
     public void removeActivity() {
         this.activity = null;
     }
 
-    public void removeDay(@NotNull Day day) {
+    public void removeDay(@NonNull Day day) {
         if (day.getNote() == this) {
-            day.setNote(null);
+            this.day = null;
         }
     }
 
     @Override
     public User getOwner() {
-        return this.day.getOwner();
+        return Objects.requireNonNull(this.day, "Note must be linked to a Day to determine an owner.")
+                .getOwner();
     }
 }

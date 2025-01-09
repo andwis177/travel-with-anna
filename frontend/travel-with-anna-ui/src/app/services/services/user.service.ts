@@ -14,8 +14,11 @@ import { changePassword } from '../fn/user/change-password';
 import { ChangePassword$Params } from '../fn/user/change-password';
 import { delete$ } from '../fn/user/delete';
 import { Delete$Params } from '../fn/user/delete';
+import { fetchRole } from '../fn/user/fetch-role';
+import { FetchRole$Params } from '../fn/user/fetch-role';
 import { getCredentials } from '../fn/user/get-credentials';
 import { GetCredentials$Params } from '../fn/user/get-credentials';
+import { RoleNameResponse } from '../models/role-name-response';
 import { update } from '../fn/user/update';
 import { Update$Params } from '../fn/user/update';
 import { UserCredentialsResponse } from '../models/user-credentials-response';
@@ -99,6 +102,31 @@ export class UserService extends BaseService {
   changePassword(params: ChangePassword$Params, context?: HttpContext): Observable<UserResponse> {
     return this.changePassword$Response(params, context).pipe(
       map((r: StrictHttpResponse<UserResponse>): UserResponse => r.body)
+    );
+  }
+
+  /** Path part for operation `fetchRole()` */
+  static readonly FetchRolePath = '/user/role';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `fetchRole()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  fetchRole$Response(params?: FetchRole$Params, context?: HttpContext): Observable<StrictHttpResponse<RoleNameResponse>> {
+    return fetchRole(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `fetchRole$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  fetchRole(params?: FetchRole$Params, context?: HttpContext): Observable<RoleNameResponse> {
+    return this.fetchRole$Response(params, context).pipe(
+      map((r: StrictHttpResponse<RoleNameResponse>): RoleNameResponse => r.body)
     );
   }
 

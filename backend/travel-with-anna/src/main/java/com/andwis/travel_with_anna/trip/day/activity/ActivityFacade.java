@@ -2,6 +2,7 @@ package com.andwis.travel_with_anna.trip.day.activity;
 
 import com.andwis.travel_with_anna.address.AddressDetail;
 import com.andwis.travel_with_anna.utility.MessageResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +18,7 @@ public class ActivityFacade {
         service.createAssociatedActivities(request, connectedUser);
     }
 
-    public void createSingleActivity(ActivityRequest request, UserDetails connectedUser) {
+    public void createSingleActivity(@Valid ActivityRequest request, UserDetails connectedUser) {
         service.createSingleActivity(request, connectedUser);
     }
 

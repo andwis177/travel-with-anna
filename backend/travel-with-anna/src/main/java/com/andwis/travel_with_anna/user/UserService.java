@@ -33,6 +33,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @EnableJpaAuditing
 public class UserService {
+
+    private static final String EMAIL_EXISTS_ERROR = "Email already exists";
+    private static final String USERNAME_EXISTS_ERROR = "User with this name already exists";
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserAuthenticationService userAuthenticationService;
@@ -45,6 +49,7 @@ public class UserService {
     public Long saveUser(User user) {
         return userRepository.save(user).getUserId();
     }
+
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -95,12 +100,12 @@ public class UserService {
     }
 
     @Transactional
-    public AuthenticationResponse updateUserExecution(
+    public AuthenticationResponse updateUserDetails(
             @NotNull UserCredentialsRequest userCredentials, UserDetails connectedUser)
             throws WrongPasswordException {
-        var user = userAuthenticationService.getSecurityUser(connectedUser).getUser();
+        var user = userAuthenticationService.retriveConnectedUser(connectedUser);
         userAuthenticationService.verifyPassword(user, userCredentials.getPassword());
-        updateUser(userCredentials, user);
+        processUserUpdates(userCredentials, user);
         userAuthenticationService.updateSecurityContext(userCredentials.getEmail());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String newJwtToken = jwtService.generateJwtToken(authentication);
@@ -111,40 +116,40 @@ public class UserService {
                 .build();
     }
 
-    private void updateUser(@NotNull UserCredentialsRequest userCredentials, User user) {
-        boolean isChanged = false;
-        String newUserName = userCredentials.getUserName();
-        String newEmail = userCredentials.getEmail();
+    private void processUserUpdates(@NotNull UserCredentialsRequest userCredentials, User user) {
+        boolean emailUpdated = updateEmail(userCredentials.getEmail(), user);
+        boolean usernameUpdated = updateUsername(userCredentials.getUserName(), user);
 
-        if (newEmail != null
-                && !newEmail.isBlank()
-                && !newEmail.equals(user.getEmail())) {
-            if (userRepository.existsByEmail(newEmail)) {
-                throw new UserExistsException("Email already exists");
-            } else {
-                user.setEmail(newEmail);
-                isChanged = true;
-            }
-        }
-        if (newUserName != null
-                && !newUserName.isBlank()
-                && !newUserName.equals(user.getUserName())) {
-            if (userRepository.existsByUserName(newUserName)) {
-                throw new UserExistsException("User with this name already exists");
-            } else {
-                user.setUserName(newUserName);
-                isChanged = true;
-            }
-        }
-        if (isChanged) {
+        if (emailUpdated || usernameUpdated) {
             userRepository.save(user);
         }
     }
 
+    private boolean updateEmail(String newEmail, User user) {
+        if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(user.getEmail())) {
+            if (userRepository.existsByEmail(newEmail)) {
+                throw new UserExistsException(EMAIL_EXISTS_ERROR);
+            }
+            user.setEmail(newEmail);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean updateUsername(String newUserName, User user) {
+        if (newUserName != null && !newUserName.isBlank() && !newUserName.equals(user.getUserName())) {
+            if (userRepository.existsByUserName(newUserName)) {
+                throw new UserExistsException(USERNAME_EXISTS_ERROR);
+            }
+            user.setUserName(newUserName);
+            return true;
+        }
+        return false;
+    }
+
     @Transactional
     public UserResponse changePassword(@NotNull ChangePasswordRequest request, UserDetails connectedUser) throws WrongPasswordException {
-        var user = userAuthenticationService.getSecurityUser(connectedUser);
-        var currentUser = user.getUser();
+        var currentUser = userAuthenticationService.retriveConnectedUser(connectedUser);
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new WrongPasswordException("Passwords do not match");
         }
@@ -160,8 +165,7 @@ public class UserService {
     @Transactional
     public UserResponse deleteConnectedUser(@NotNull PasswordRequest request, UserDetails connectedUser)
             throws UsernameNotFoundException, WrongPasswordException {
-        var securityUser = userAuthenticationService.getSecurityUser(connectedUser);
-        var currentUser = securityUser.getUser();
+        var currentUser = userAuthenticationService.retriveConnectedUser(connectedUser);
         String userName = currentUser.getUserName();
         userAuthenticationService.verifyPassword(currentUser, request.password());
         deleteUser(currentUser);
@@ -173,15 +177,15 @@ public class UserService {
     @Transactional
     public void deleteUser(User user) {
         Set<Day> days = getAllUserTripDays(user);
-        Set<Long> addressIds = addressService.getAddressFromDays(days);
+        Set<Long> addressIds = addressService.extractAddressIdsFromDays(days);
 
         avatarService.deleteAvatar(user);
         userRepository.delete(user);
-        addressService.deleteAllByAddressIdIn(addressIds);
+        addressService.deleteExistingAddressesByIds(addressIds);
     }
 
     private Set<Day> getAllUserTripDays(@NotNull User user) {
-        Set<Trip> trips = user.getOwnedTrips();
+        Set<Trip> trips = user.getTrips();
         Set<Long> tripIds = trips.stream().map(Trip::getTripId).collect(Collectors.toSet());
         return dayService.getDaysByTripIds(tripIds);
     }

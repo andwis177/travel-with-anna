@@ -1,7 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
 import {FormsModule} from "@angular/forms";
-import {MatDivider} from "@angular/material/divider";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
@@ -22,7 +21,6 @@ import {SharedService} from "../../../../../../../services/shared/shared.service
   standalone: true,
   imports: [
     FormsModule,
-    MatDivider,
     MatFormField,
     MatIcon,
     MatIconButton,
@@ -41,14 +39,14 @@ import {SharedService} from "../../../../../../../services/shared/shared.service
 export class BudgetEditComponent {
   errorMsg: Array<string> = [];
   currency: CountryCurrency[] = [];
-  budget: BudgetRequest = {currency: "", toSpend: 0};
+  budget: BudgetRequest = {currency: "", budgetAmount: 0};
 
   constructor(public dialog: MatDialog,
               private budgetService: BudgetService,
               private countryControllerService: CountryControllerService,
               private sharedService: SharedService,
               private errorService: ErrorService,
-              @Inject(MAT_DIALOG_DATA) public data: {budget: {currency: "", toSpend: 0}}) {
+              @Inject(MAT_DIALOG_DATA) public data: {budget: {currency: "", budgetAmount: 0}}) {
     this.budget = data.budget;
     this.getCurrency();
   }
@@ -75,8 +73,21 @@ export class BudgetEditComponent {
 
   getCurrency() {
     this.countryControllerService.getAllCountryCurrencies().subscribe({
-      next: (currency) => this.currency = currency,
+      next: (currency) => {
+        this.currency = currency;
+        this.replaceCurrencyListIfEmpty();
+      },
       error: (error) => this.errorMsg = this.errorService.errorHandlerWithJson(error)
     });
+  }
+
+  replaceCurrencyListIfEmpty(): void {
+    if (!this.currency || this.currency.length === 0) {
+      {
+        this.currency = [{currency: 'USD', country: 'United States'},
+          {currency: 'EUR', country: 'European Union'},
+          {currency: 'PLN', country: 'Poland'}]
+      }
+    }
   }
 }

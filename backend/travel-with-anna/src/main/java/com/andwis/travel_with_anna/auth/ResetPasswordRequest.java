@@ -10,7 +10,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResetPasswordRequest {
-    @NotEmpty(message = "User email or user name is required")
-    @NotBlank(message = "User email or user name is required")
+
+    private static final String MESSAGE_REQUIRED = "User email or user name is required";
+
+    @NotEmpty(message = MESSAGE_REQUIRED)
+    @NotBlank(message = MESSAGE_REQUIRED)
     private String credential;
 }

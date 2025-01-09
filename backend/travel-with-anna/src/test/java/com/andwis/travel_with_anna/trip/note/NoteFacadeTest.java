@@ -29,10 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -60,30 +58,27 @@ class NoteFacadeTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole =  existingRole.orElseGet(() -> roleRepository.save(role));
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         String encodedPassword = passwordEncoder.encode("password");
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(encodedPassword)
-                .role(retrivedRole)
+                .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
 
         Budget budget = Budget.builder()
                 .currency("USD")
-                .toSpend(BigDecimal.valueOf(1000))
+                .budgetAmount(BigDecimal.valueOf(1000))
                 .build();
 
         note = Note.builder()
-                .note("Sample note")
+                .content("Sample note")
                 .build();
 
         Activity activity = Activity.builder()
@@ -111,7 +106,7 @@ class NoteFacadeTest {
         user.addTrip(trip);
         userRepository.save(user);
 
-        Trip retrivedTrip = user.getOwnedTrips().stream().findFirst().orElse(null);
+        Trip retrivedTrip = user.getTrips().stream().findFirst().orElse(null);
         assert retrivedTrip != null;
         retrivedDay = retrivedTrip.getDays().stream().findFirst().orElse(null);
         assert retrivedDay != null;
@@ -134,9 +129,9 @@ class NoteFacadeTest {
         UserDetails connectedUser = createUserDetails(user);
         NoteRequest noteRequest = NoteRequest.builder()
                 .noteId(dayNoteId)
-                .entityId(retrivedDay.getDayId())
-                .note("Request day note")
-                .entityType("day")
+                .linkedEntityId(retrivedDay.getDayId())
+                .noteContent("Request day note")
+                .linkedEntityType("day")
                 .build();
 
         // When
@@ -145,7 +140,7 @@ class NoteFacadeTest {
         // Then
         Note retrivedNote = retrivedDay.getNote();
         assertNotNull(retrivedNote);
-        assertEquals("Request day note", retrivedNote.getNote());
+        assertEquals("Request day note", retrivedNote.getContent());
         assertEquals(retrivedDay.getDayId(), retrivedNote.getDay().getDayId());
     }
 
@@ -156,9 +151,9 @@ class NoteFacadeTest {
         UserDetails connectedUser = createUserDetails(user);
         NoteRequest noteRequest = NoteRequest.builder()
                 .noteId(activityNoteId)
-                .entityId(retrivedDay.getDayId())
-                .note("Request activity note")
-                .entityType("activity")
+                .linkedEntityId(retrivedDay.getDayId())
+                .noteContent("Request activity note")
+                .linkedEntityType("activity")
                 .build();
 
         // When
@@ -167,7 +162,7 @@ class NoteFacadeTest {
         // Then
         Note retrivedNote = retrivedDay.getNote();
         assertNotNull(retrivedNote);
-        assertEquals("Request activity note", retrivedNote.getNote());
+        assertEquals("Request activity note", retrivedNote.getContent());
         assertEquals(retrivedDay.getDayId(), retrivedNote.getDay().getDayId());
     }
 
@@ -176,8 +171,8 @@ class NoteFacadeTest {
     void testSaveNoteWithInvalidType() {
         // Given
         NoteRequest noteRequest = NoteRequest.builder()
-                .note("Request note")
-                .entityType("invalid_type")
+                .noteContent("Request note")
+                .linkedEntityType("invalid_type")
                 .build();
 
         // When
@@ -198,7 +193,7 @@ class NoteFacadeTest {
         // Then
         assertNotNull(actualResponse);
         assertEquals(note.getNoteId(), actualResponse.noteId());
-        assertEquals(note.getNote(), actualResponse.note());
+        assertEquals(note.getContent(), actualResponse.note());
     }
 
     @Test
@@ -211,7 +206,7 @@ class NoteFacadeTest {
         // Then
         assertNotNull(actualResponse);
         assertEquals(note.getNoteId(), actualResponse.noteId());
-        assertEquals(note.getNote(), actualResponse.note());
+        assertEquals(note.getContent(), actualResponse.note());
     }
 
     @Test

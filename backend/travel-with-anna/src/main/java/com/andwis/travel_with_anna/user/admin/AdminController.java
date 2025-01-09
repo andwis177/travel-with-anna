@@ -21,45 +21,47 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Admin")
 public class AdminController {
+
+    private static final String DEFAULT_PAGE = "0";
+    private static final String DEFAULT_SIZE = "10";
+
     private final AdminFacade facade;
 
     @GetMapping("/users")
     public PageResponse<UserAdminResponse> getAllUsers(
-            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) int size,
+            @RequestParam(name = "page", defaultValue = DEFAULT_PAGE, required = false) int page,
+            @RequestParam(name = "size", defaultValue = DEFAULT_SIZE, required = false) int size,
             @AuthenticationPrincipal UserDetails connectedUser) {
         return facade.getAllUsers(page, size, connectedUser);
     }
 
     @GetMapping("/user/{identifier}")
-    public ResponseEntity<UserAdminResponse> getUserAdminViewByIdentifier(
+    public ResponseEntity<UserAdminResponse> getUserByIdentifier(
             @PathVariable String identifier,
             @AuthenticationPrincipal UserDetails connectedUser) {
-        UserAdminResponse user = facade.getUserAdminViewByIdentifier(identifier, connectedUser);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(facade.getUserAdminDetails(identifier, connectedUser));
     }
 
     @GetMapping("/avatar/{userId}")
     public ResponseEntity<AvatarImg> getAvatar(@PathVariable Long userId) {
-        AvatarImg userAvatar = facade.getAvatar(userId);
-        return ResponseEntity.ok(userAvatar);
+        return ResponseEntity.ok(facade.getAvatar(userId));
     }
 
     @PatchMapping
-    public ResponseEntity<Void> updateUser(
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void updateUser(
             @RequestBody @Valid UserAdminUpdateRequest request,
             @AuthenticationPrincipal UserDetails connectedUser)
             throws RoleNotFoundException, WrongPasswordException {
         facade.updateUser(request, connectedUser);
-        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<UserResponse> deleteUser(
             @RequestBody @Valid UserAdminDeleteRequest request,
             @AuthenticationPrincipal UserDetails connectedUser) {
-        UserResponse respond = facade.deleteUser(request, connectedUser);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respond);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                facade.deleteUser(request, connectedUser));
     }
 
     @GetMapping("/roles")

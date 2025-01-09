@@ -16,7 +16,7 @@ import {TripListButtonsComponent} from "./trip-list-buttons/trip-list-buttons.co
     TripCardComponent,
     LogoComponent,
     UserComponent,
-    TripListButtonsComponent
+    TripListButtonsComponent,
   ],
   templateUrl: './trip-list.component.html',
   styleUrl: './trip-list.component.scss'

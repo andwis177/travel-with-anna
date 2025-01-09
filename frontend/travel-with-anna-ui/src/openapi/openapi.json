@@ -103,8 +103,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           }
         }
       },
@@ -184,8 +184,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -267,31 +267,40 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           }
         }
       }
     },
-    "/day/add": {
+    "/day/add/{tripId}": {
       "post": {
         "tags": [
           "Day"
         ],
         "operationId": "addDay",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DayAddDeleteRequest"
-              }
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
             }
           },
-          "required": true
-        },
+          {
+            "name": "isFirst",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           }
         }
       }
@@ -306,7 +315,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
+              "image/jpeg": {
                 "schema": {
                   "type": "string",
                   "format": "byte"
@@ -323,7 +332,7 @@
         "operationId": "uploadAvatar",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "required": [
                   "file"
@@ -341,14 +350,30 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth/resend-activation-code": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "resendActivationCode",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -414,7 +439,7 @@
         "operationId": "getCountryCities",
         "parameters": [
           {
-            "name": "country",
+            "name": "countryName",
             "in": "query",
             "required": true,
             "schema": {
@@ -456,8 +481,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           }
         }
       }
@@ -479,8 +504,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           }
         }
       }
@@ -696,8 +721,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -725,6 +750,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/role": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "fetchRole",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleNameResponse"
                 }
               }
             }
@@ -1352,7 +1397,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "getUserAdminViewByIdentifier",
+        "operationId": "getUserByIdentifier",
         "parameters": [
           {
             "name": "identifier",
@@ -1524,25 +1569,34 @@
         }
       }
     },
-    "/day": {
+    "/day/{tripId}": {
       "delete": {
         "tags": [
           "Day"
         ],
         "operationId": "deleteDay",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DayAddDeleteRequest"
-              }
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
             }
           },
-          "required": true
-        },
+          {
+            "name": "isFirst",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -1619,8 +1673,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -1652,11 +1706,11 @@
       },
       "NoteRequest": {
         "required": [
-          "entityType"
+          "linkedEntityType"
         ],
         "type": "object",
         "properties": {
-          "note": {
+          "noteContent": {
             "maxLength": 500,
             "minLength": 0,
             "type": "string"
@@ -1665,11 +1719,11 @@
             "type": "integer",
             "format": "int64"
           },
-          "entityId": {
+          "linkedEntityId": {
             "type": "integer",
             "format": "int64"
           },
-          "entityType": {
+          "linkedEntityType": {
             "type": "string"
           }
         }
@@ -1678,6 +1732,7 @@
         "required": [
           "currency",
           "exchangeRate",
+          "expanseCategory",
           "paid",
           "price"
         ],
@@ -1816,7 +1871,7 @@
         ],
         "type": "object",
         "properties": {
-          "tripId": {
+          "associatedTripId": {
             "type": "integer",
             "format": "int64"
           },
@@ -1825,18 +1880,6 @@
           },
           "endDate": {
             "type": "string"
-          }
-        }
-      },
-      "DayAddDeleteRequest": {
-        "type": "object",
-        "properties": {
-          "tripId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "first": {
-            "type": "boolean"
           }
         }
       },
@@ -1929,7 +1972,7 @@
             "type": "string"
           },
           "activityTitle": {
-            "maxLength": 60,
+            "maxLength": 59,
             "minLength": 0,
             "type": "string"
           },
@@ -2041,14 +2084,11 @@
       },
       "ChangePasswordRequest": {
         "required": [
-          "currentPassword",
           "newPassword"
         ],
         "type": "object",
         "properties": {
           "currentPassword": {
-            "maxLength": 2147483647,
-            "minLength": 8,
             "type": "string"
           },
           "newPassword": {
@@ -2160,6 +2200,10 @@
         }
       },
       "UserAdminEditRequest": {
+        "required": [
+          "roleName",
+          "userId"
+        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -2178,6 +2222,9 @@
         }
       },
       "UserAdminUpdateRequest": {
+        "required": [
+          "userAdminEditRequest"
+        ],
         "type": "object",
         "properties": {
           "userAdminEditRequest": {
@@ -2192,8 +2239,8 @@
         "required": [
           "activityId",
           "dayId",
-          "newDate",
-          "oldDate",
+          "newActivityDate",
+          "oldActivityDate",
           "startTime"
         ],
         "type": "object",
@@ -2206,10 +2253,10 @@
             "type": "integer",
             "format": "int64"
           },
-          "oldDate": {
+          "oldActivityDate": {
             "type": "string"
           },
-          "newDate": {
+          "newActivityDate": {
             "type": "string"
           },
           "startTime": {
@@ -2219,7 +2266,7 @@
             "type": "string"
           },
           "activityTitle": {
-            "maxLength": 60,
+            "maxLength": 59,
             "minLength": 0,
             "type": "string"
           },
@@ -2240,6 +2287,14 @@
         "type": "object",
         "properties": {
           "message": {
+            "type": "string"
+          }
+        }
+      },
+      "RoleNameResponse": {
+        "type": "object",
+        "properties": {
+          "roleName": {
             "type": "string"
           }
         }
@@ -2346,6 +2401,17 @@
           }
         }
       },
+      "ActivityListResponse": {
+        "type": "object",
+        "properties": {
+          "activity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityResponse"
+            }
+          }
+        }
+      },
       "ActivityResponse": {
         "type": "object",
         "properties": {
@@ -2414,7 +2480,7 @@
           "website": {
             "type": "string"
           },
-          "phone": {
+          "phoneNumber": {
             "type": "string"
           },
           "email": {
@@ -2453,11 +2519,8 @@
             "type": "integer",
             "format": "int64"
           },
-          "activity": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ActivityResponse"
-            }
+          "activities": {
+            "$ref": "#/components/schemas/ActivityListResponse"
           }
         }
       },
@@ -2541,7 +2604,7 @@
       "ExpanseTotalByBadge": {
         "type": "object",
         "properties": {
-          "type": {
+          "badgeType": {
             "type": "string"
           },
           "totalPriceInTripCurrency": {
@@ -2653,6 +2716,10 @@
           "email": {
             "type": "string"
           },
+          "avatar": {
+            "type": "string",
+            "format": "byte"
+          },
           "accountLocked": {
             "type": "boolean"
           },
@@ -2669,10 +2736,6 @@
           },
           "roleName": {
             "type": "string"
-          },
-          "avatar": {
-            "type": "string",
-            "format": "byte"
           }
         }
       },
@@ -2729,14 +2792,22 @@
         }
       },
       "PasswordRequest": {
+        "required": [
+          "password"
+        ],
         "type": "object",
         "properties": {
           "password": {
+            "maxLength": 2147483647,
+            "minLength": 8,
             "type": "string"
           }
         }
       },
       "TripRequest": {
+        "required": [
+          "tripId"
+        ],
         "type": "object",
         "properties": {
           "tripId": {
@@ -2749,6 +2820,9 @@
         }
       },
       "UserAdminDeleteRequest": {
+        "required": [
+          "userId"
+        ],
         "type": "object",
         "properties": {
           "userId": {

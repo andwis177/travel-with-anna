@@ -1,20 +1,20 @@
-<div class="toolbar-row-end">
-  <div>
-    <div class="avatar-button-container">
-      <button mat-icon-button class="profile-button" matTooltip="Account settings"
+<div class="container-horizontal second-container">
+  <div style="margin-right: 30px">
+    <div class="container-vertical second-container">
+      <button mat-icon-button class="avatar-button puffer avatar-button-radius " matTooltip="Account settings"
               (click)="openAccountDetails()" type="submit">
-        <img *ngIf="avatarImg" [src]="avatarImg" class="profile-image" alt="User Avatar" fill priority>
+        <img *ngIf="avatarImg" [src]="avatarImg" class="button-image avatar-button-radius button-border" alt="User Avatar" fill priority>
       </button>
     </div>
     <div>
-      <mat-label class="profile-label">
+      <p class="text-color-light username-text font-size-medium">
         {{this.userName}}
-      </mat-label>
+      </p>
     </div>
   </div>
-  <div>
-    <button class="logout-button" matTooltip="Logout" (click)=logout()>
-      <i class="fas fa-sign-out fa-2x"></i>
+  <div class="padding-small-horizontal">
+    <button class="avatar-button puffer" mat-icon-button matTooltip="Logout" (click)=logout()>
+      <img src="../../../../../assets/images/logout.png" class="button-image"  alt="">
     </button>
   </div>
 </div>

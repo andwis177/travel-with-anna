@@ -15,12 +15,13 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImp implements UserDetailsService {
 
     private final UserRepository repository;
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found with email: ";
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        User user = repository.findByEmail(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + userName));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = repository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_MESSAGE + username));
         return new SecurityUser(user);
     }
 }

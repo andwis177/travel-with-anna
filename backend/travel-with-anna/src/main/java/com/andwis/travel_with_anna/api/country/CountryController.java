@@ -7,27 +7,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/country")
+@RequestMapping( "api/country")
 @RequiredArgsConstructor
 public class CountryController {
 
-    private final CountryClient countryClient;
+    private final ApiCountryFacade facade;
 
     @GetMapping("/names")
-    public ResponseEntity<List<Country>> findAllCountryNames() {
-        List<Country> countryNames = countryClient.fetchAllCountries();
-        return ResponseEntity.ok(countryNames);
+    public ResponseEntity<List<Country>> getAllCountryNames() {
+        return ResponseEntity.ok(facade.fetchAllCountryNames());
     }
 
     @GetMapping("/currencies")
-    public ResponseEntity<List<CountryCurrency>> findAllCountryCurrencies() {
-        List<CountryCurrency> currencies = countryClient.fetchAllCountriesCurrencies();
-        return  ResponseEntity.ok(currencies);
+    public ResponseEntity<List<CountryCurrency>> getAllCountryCurrencies() {
+        return ResponseEntity.ok(facade.fetchAllCountriesCurrencies());
     }
 
     @PostMapping("/cities")
-    public ResponseEntity<List<City>> findAllCountryCities(@RequestParam String country) {
-        List<City> countryCities = countryClient.fetchAllCountryCities(country);
-        return ResponseEntity.ok(countryCities);
+    public ResponseEntity<List<City>> getCountryCities(@RequestParam String countryName) {
+        return ResponseEntity.ok(facade.fetchAllCountryCities(countryName));
     }
 }

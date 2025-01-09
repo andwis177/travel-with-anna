@@ -13,8 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -39,8 +38,8 @@ class TokenRepositoryTest {
     void testFindByToken() {
         // Given
         Role role = Role.builder()
-                .roleName(getUserRole())
-                .authority(getUserAuthority())
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
                 .build();
 
         roleRepository.save(role);

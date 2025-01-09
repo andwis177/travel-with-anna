@@ -28,8 +28,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -54,8 +53,8 @@ class BudgetControllerTest {
     @BeforeEach
     void setUp() {
         Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
@@ -64,7 +63,7 @@ class BudgetControllerTest {
                 .password(encodedPassword)
                 .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
 
@@ -176,7 +175,7 @@ class BudgetControllerTest {
             BudgetResponse budgetResponse, List<ExpanseResponse> expanses) {
         List<ExpanseByCurrency> sumsByCurrency = List.of(
                 ExpanseByCurrency.builder().
-                        currency("USD").
+                        currencyCode("USD").
                         totalPrice(BigDecimal.valueOf(300)).
                         totalPaid(BigDecimal.valueOf(150)).
                         totalPriceInTripCurrency(BigDecimal.valueOf(300)).
@@ -184,7 +183,6 @@ class BudgetControllerTest {
                         totalDebt(BigDecimal.valueOf(150)).
                         build()
         );
-
 
         return new BudgetExpensesRespond(
                 budgetResponse,

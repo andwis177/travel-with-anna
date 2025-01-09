@@ -21,6 +21,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.management.relation.RoleNotFoundException;
+import javax.security.auth.login.AccountLockedException;
 import java.time.DateTimeException;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +34,19 @@ import static org.springframework.http.HttpStatus.*;
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(AccountLockedException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull AccountLockedException exp) {
+        return ResponseEntity
+                .status(FORBIDDEN)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(ACCOUNT_LOCKED.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(ACCOUNT_LOCKED.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
 
     @ExceptionHandler(ActivityNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull ActivityNotFoundException exp) {
@@ -157,7 +171,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull DisabledException exp) {
         return ResponseEntity
-                .status(UNAUTHORIZED)
+                .status(FORBIDDEN)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(ACCOUNT_DISABLED.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(ACCOUNT_DISABLED.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(DisabledAccountException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull DisabledAccountException exp) {
+        return ResponseEntity
+                .status(FORBIDDEN)
                 .body(
                         ExceptionResponse.builder()
                                 .errorCode(ACCOUNT_DISABLED.getCode())
@@ -232,8 +259,8 @@ public class GlobalExceptionHandler {
                 );
     }
 
-       @ExceptionHandler(FileNotSaved.class)
-    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(@NotNull FileNotSaved exp) {
+    @ExceptionHandler(FileNotSavedException.class)
+    public ResponseEntity<ExceptionResponse> handleSaveAvatarException(@NotNull FileNotSavedException exp) {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .body(
@@ -302,7 +329,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(JwtParsingException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull JwtParsingException exp) {
-         return ResponseEntity
+        return ResponseEntity
                 .status(UNAUTHORIZED)
                 .body(
                         ExceptionResponse.builder()
@@ -398,19 +425,6 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(PdfReportCreationException.class)
-    public ResponseEntity<ExceptionResponse> handleException(@NotNull PdfReportCreationException exp) {
-        return ResponseEntity
-                .status(INTERNAL_SERVER_ERROR)
-                .body(
-                        ExceptionResponse.builder()
-                                .errorCode(PDF_REPORT_ERROR.getCode())
-                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
-                                        ? List.of(PDF_REPORT_ERROR.getMessage()) : List.of(exp.getMessage()))
-                                .build()
-                );
-    }
-
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull RoleNotFoundException exp) {
         return ResponseEntity
@@ -420,6 +434,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(ROLE_NOT_FOUND.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(ROLE_NOT_FOUND.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(TokenExistsException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull TokenExistsException exp) {
+        return ResponseEntity
+                .status(CONFLICT)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(TOKEN_EXISTS.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(TOKEN_EXISTS.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }
@@ -459,6 +486,19 @@ public class GlobalExceptionHandler {
                                 .errorCode(USER_EXISTS.getCode())
                                 .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
                                         ? List.of(USER_EXISTS.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(UserIsActiveException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull UserIsActiveException exp) {
+        return ResponseEntity
+                .status(CONFLICT)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(USER_IS_ACTIVE.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(USER_IS_ACTIVE.getMessage()) : List.of(exp.getMessage()))
                                 .build()
                 );
     }

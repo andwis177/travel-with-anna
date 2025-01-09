@@ -5,6 +5,7 @@ import {ActivateAccountComponent} from "./pages/activate-account/activate-accoun
 import {ResetPasswordComponent} from "./pages/reset-password/reset-password.component";
 import {AuthGuard} from "./services/auth/auth.guard";
 import {DeleteAccountComponent} from "./pages/delete-account/delete-account.component";
+import {ActivationCodeComponent} from "./pages/activation-code/activation-code.component";
 
 export const routes: Routes = [
   {
@@ -24,6 +25,10 @@ export const routes: Routes = [
     component: ResetPasswordComponent
   },
   {
+    path: 'resend-code',
+    component: ActivationCodeComponent
+  },
+  {
     path:'delete-account',
     component: DeleteAccountComponent
   },
@@ -33,8 +38,8 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'admin',
-    loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule),
+    path: 'manager',
+    loadChildren: () => import('./modules/manager/manager.module').then(m => m.ManagerModule),
     canActivate: [AuthGuard]
   },
   {

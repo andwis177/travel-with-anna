@@ -1,7 +1,9 @@
 package com.andwis.travel_with_anna.trip.budget;
 
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
@@ -9,14 +11,21 @@ import java.math.BigDecimal;
 @Setter
 @Builder
 public class BudgetRequest {
+
+    private static final String REQUIRED_CURRENCY_MESSAGE = "Currency is required";
+    private static final int MAX_CURRENCY_LENGTH = 3;
+
     private Long budgetId;
-    @Size(max = 3, message = "Currency description should be 3 characters or less")
-    @NotNull(message = "Currency is required")
-    @NotBlank(message = "Currency is required")
-    @NotEmpty(message = "Currency is required")
+
+    @NotNull(message = REQUIRED_CURRENCY_MESSAGE)
+    @NotBlank(message = REQUIRED_CURRENCY_MESSAGE)
+    @NotEmpty(message = REQUIRED_CURRENCY_MESSAGE)
+    @Size(max = MAX_CURRENCY_LENGTH, message = "Currency description should be " + MAX_CURRENCY_LENGTH + " characters or less")
     private String currency;
+
     @NotNull(message = "Budget amount is required")
     @DecimalMin(value = "0.0", message = "Budget amount must be greater than or equal to 0")
-    private BigDecimal toSpend;
+    private BigDecimal budgetAmount;
+
     private Long tripId;
 }

@@ -17,6 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RestClientTest(CountryClient.class)
@@ -39,44 +40,19 @@ class CountryClientTest {
                 Country.builder().name("Albania").iso2("AL").iso3("ALB").build()
         );
 
-        CountryResponse mockResponse = CountryResponse.builder().data(data).build();
+        CountryResponse mockResponse = CountryResponse.builder().countries(data).build();
 
-        this.server
-                .expect(requestTo(baseUrl + "/api/v0.1/countries/currency"))
+        this.server.expect(requestTo(baseUrl + "/api/v0.1/countries/currency"))
                 .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(mockResponse), MediaType.APPLICATION_JSON));
 
         // When
-        List<Country> countryNames = countryClient.fetchAllCountries();
+        CountryResponse response = countryClient.getAllCountries();
 
         // Then
-        assertThat(countryNames).hasSize(2);
-        assertThat(countryNames.get(0).getName()).isEqualTo("Afghanistan");
-        assertThat(countryNames.get(1).getName()).isEqualTo("Albania");
-    }
-
-    @Test
-    void testFetchAllCountriesCurrencies() throws JsonProcessingException {
-        // Given
-        List<Country> countriesData = List.of(
-                Country.builder().name("Afghanistan").currency("AFN").build(),
-                Country.builder().name("Albania").currency("ALL").build()
-        );
-
-        CountryResponse countryResponse = CountryResponse.builder().data(countriesData).build();
-
-        this.server
-                .expect(requestTo(baseUrl + "/api/v0.1/countries/currency"))
-                .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(countryResponse), MediaType.APPLICATION_JSON));
-
-        // When
-        List<CountryCurrency> countryCurrencies = countryClient.fetchAllCountriesCurrencies();
-
-        // Then
-        assertThat(countryCurrencies).hasSize(2);
-        assertThat(countryCurrencies.get(0).getCurrency()).isEqualTo("AFN");
-        assertThat(countryCurrencies.get(1).getCurrency()).isEqualTo("ALL");
+        assertThat(response.getCountries()).hasSize(2);
+        assertThat(response.getCountries().get(0).getName()).isEqualTo("Afghanistan");
+        assertThat(response.getCountries().get(1).getName()).isEqualTo("Albania");
     }
 
     @Test
@@ -84,53 +60,52 @@ class CountryClientTest {
         // Given
         String country = "USA";
         List<City> citiesData = List.of(
-                City.builder().city("New York").build(),
-                City.builder().city("Los Angeles").build()
+                City.builder().name("New York").build(),
+                City.builder().name("Los Angeles").build()
         );
 
         CountryCitiesResponse mockCityResponse = CountryCitiesResponse.builder()
-                .data(citiesData)
+                .cities(citiesData)
                 .build();
 
-        this.server
-                .expect(requestTo(baseUrl + "/api/v0.1/countries/cities/q?country=" + country.toLowerCase()))
+        this.server.expect(requestTo(baseUrl + "/api/v0.1/countries/cities/q?country=" + country.toLowerCase()))
                 .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(mockCityResponse), MediaType.APPLICATION_JSON));
 
         // When
-        List<City> cities = countryClient.fetchAllCountryCities(country);
+        CountryCitiesResponse response = countryClient.getAllCountryCities(country);
 
         // Then
-        assertThat(cities).hasSize(2);
-        assertThat(cities.get(0).getCity()).isEqualTo("Los Angeles");
-        assertThat(cities.get(1).getCity()).isEqualTo("New York");
+        assertThat(response.getCities()).hasSize(2);
+        assertThat(response.getCities().get(0).getName()).isEqualTo("New York");
+        assertThat(response.getCities().get(1).getName()).isEqualTo("Los Angeles");
     }
 
     @Test
     void testFetchAllCountryCities_NullCountry() {
         // When
-        List<City> cities = countryClient.fetchAllCountryCities(null);
+        CountryCitiesResponse response = countryClient.getAllCountryCities(null);
 
         // Then
-        assertThat(cities).isEmpty();
+        assertThat(response.getCities()).isEmpty();
     }
 
     @Test
     void testFetchAllCountryCities_BlankCountry() {
         // When
-        List<City> cities = countryClient.fetchAllCountryCities(" ");
+        CountryCitiesResponse response = countryClient.getAllCountryCities(" ");
 
         // Then
-        assertThat(cities).isEmpty();
+        assertThat(response.getCities()).isEmpty();
     }
 
     @Test
     void testFetchAllCountryCities_EmptyCountry() {
         // When
-        List<City> cities = countryClient.fetchAllCountryCities("");
+        CountryCitiesResponse response = countryClient.getAllCountryCities("");
 
         // Then
-        assertThat(cities).isEmpty();
+        assertThat(response.getCities()).isEmpty();
     }
 
     @Test
@@ -138,15 +113,14 @@ class CountryClientTest {
         // Given
         String country = "Afghanistan";
 
-        this.server
-                .expect(requestTo(baseUrl + "/api/v0.1/countries/cities/q?country=" + country.toLowerCase()))
+        this.server.expect(requestTo(baseUrl + "/api/v0.1/countries/cities/q?country=" + country.toLowerCase()))
                 .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andRespond(withSuccess("{\"error\":true,\"msg\":\"Error occurred\"}", MediaType.APPLICATION_JSON));
+                .andRespond(withServerError());
 
         // When
-        List<City> cities = countryClient.fetchAllCountryCities(country);
+        CountryCitiesResponse response = countryClient.getAllCountryCities(country);
 
         // Then
-        assertThat(cities).isEmpty();
+        assertThat(response.getCities()).isEmpty();
     }
 }

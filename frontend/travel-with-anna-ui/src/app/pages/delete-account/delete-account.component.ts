@@ -1,7 +1,5 @@
 import {ChangeDetectorRef, Component, HostListener, signal, ViewEncapsulation} from '@angular/core';
 import {FormsModule} from "@angular/forms";
-import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
-import {MatDivider} from "@angular/material/divider";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
@@ -21,10 +19,6 @@ import {MatDialog} from "@angular/material/dialog";
   standalone: true,
   imports: [
     FormsModule,
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatDivider,
     MatFormField,
     MatIcon,
     MatIconButton,

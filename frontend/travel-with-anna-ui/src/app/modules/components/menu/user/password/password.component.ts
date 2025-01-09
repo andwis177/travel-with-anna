@@ -7,7 +7,6 @@ import {MatToolbarRow} from "@angular/material/toolbar";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
-import {MatDivider} from "@angular/material/divider";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ChangePasswordRequest} from "../../../../../services/models/change-password-request";
 import {UserService} from "../../../../../services/services/user.service";
@@ -28,7 +27,6 @@ import {ErrorService} from "../../../../../services/error/error.service";
     NgIf,
     MatIcon,
     MatIconButton,
-    MatDivider,
     NgForOf,
     MatSuffix
   ],

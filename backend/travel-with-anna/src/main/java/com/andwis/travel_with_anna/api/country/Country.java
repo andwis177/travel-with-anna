@@ -5,39 +5,37 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Country implements Comparable<Country> {
-        @JsonProperty("name")
+
+        private static final String NAME_PROPERTY = "name";
+        private static final String CURRENCY_PROPERTY = "currency";
+        private static final String ISO2_PROPERTY = "iso2";
+        private static final String ISO3_PROPERTY = "iso3";
+
+        @JsonProperty(NAME_PROPERTY)
+        @EqualsAndHashCode.Include
         private String name;
-        @JsonProperty("currency")
+
+        @JsonProperty(CURRENCY_PROPERTY)
         private String currency;
-        @JsonProperty("iso2")
+
+        @JsonProperty(ISO2_PROPERTY)
+        @EqualsAndHashCode.Include
         private String iso2;
-        @JsonProperty("iso3")
+
+        @JsonProperty(ISO3_PROPERTY)
+        @EqualsAndHashCode.Include
         private String iso3;
 
         @Override
-        public int compareTo(@NotNull Country obj) {
-                return this.name.compareTo(obj.name);
-        }
-
-        @Override
-        public boolean equals(Object object) {
-                if (this == object) return true;
-                if (object == null || getClass() != object.getClass()) return false;
-                Country country = (Country) object;
-                return Objects.equals(name, country.name) && Objects.equals(iso2, country.iso2) && Objects.equals(iso3, country.iso3);
-        }
-
-        @Override
-        public int hashCode() {
-                return Objects.hash(name, iso2, iso3);
+        public int compareTo(@NotNull Country o) {
+                return this.name.compareTo(o.name);
         }
 }

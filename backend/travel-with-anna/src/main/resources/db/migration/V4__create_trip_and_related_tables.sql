@@ -38,11 +38,11 @@ CREATE TABLE IF NOT EXISTS backpack (
 
 CREATE TABLE IF NOT EXISTS addresses (
                                          address_id BIGSERIAL PRIMARY KEY,
-                                         place VARCHAR(60),
-                                         country VARCHAR(40),
+                                         place VARCHAR(100),
+                                         country VARCHAR(100),
                                          country_code VARCHAR(3),
-                                         city VARCHAR(40),
-                                         address VARCHAR(200),
+                                         city VARCHAR(100),
+                                         address VARCHAR(255),
                                          website VARCHAR(255),
                                          phone VARCHAR(30),
                                          email VARCHAR(150),
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS activities (
 CREATE TABLE IF NOT EXISTS budget (
                                       budget_id BIGSERIAL PRIMARY KEY,
                                       currency VARCHAR(10) NOT NULL,
-                                      to_spend DECIMAL(19, 2) NOT NULL
+                                      budget_amount DECIMAL(19, 2) NOT NULL
 );
 
 
@@ -92,8 +92,8 @@ CREATE TABLE IF NOT EXISTS expanses (
 
 CREATE TABLE IF NOT EXISTS items (
                                      item_id BIGSERIAL PRIMARY KEY,
-                                     item_name VARCHAR(60),
-                                     quantity VARCHAR(40),
+                                     item_name VARCHAR(100),
+                                     quantity VARCHAR(70),
                                      is_packed BOOLEAN DEFAULT FALSE,
                                      backpack_id BIGINT,
                                      CONSTRAINT fk_backpack FOREIGN KEY (backpack_id) REFERENCES backpack(backpack_id)

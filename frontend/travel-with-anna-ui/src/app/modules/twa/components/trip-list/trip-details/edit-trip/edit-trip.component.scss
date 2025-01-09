@@ -1,17 +1,9 @@
-.name-button-area {
-  text-align: center;
-}
-
 .mat-mdc-icon-button ::ng-deep .mat-mdc-button-persistent-ripple {
   display: none;
 }
 
 mat-form-field {
   max-width: 100% !important;
-}
-
-.margin-form {
-  margin: 3%;
 }
 
 ::ng-deep .mat-calendar

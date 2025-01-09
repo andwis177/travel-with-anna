@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -47,7 +46,7 @@ class ExpanseServiceTest {
     private ExpanseRepository expanseRepository;
     @Mock
     private CurrencyRepository currencyRepository;
-        @Mock
+    @Mock
     private CurrencyExchangeClient currencyExchangeService;
     @Mock
     private TripService tripService;
@@ -62,8 +61,8 @@ class ExpanseServiceTest {
     @BeforeEach
     void setUp() {
         Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
 
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
         User user = User.builder()
@@ -72,7 +71,7 @@ class ExpanseServiceTest {
                 .password(passwordEncoder.encode("password"))
                 .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
 
@@ -143,7 +142,7 @@ class ExpanseServiceTest {
         CurrencyExchange currencyExchange =  CurrencyExchange.builder()
                 .code("USD")
                 .exchangeValue(BigDecimal.valueOf(1.0))
-                .timeStamp(LocalDateTime.of(
+                .timestamp(LocalDateTime.of(
                         2024, 1, 1, 0, 0))
                 .build();
         when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(currencyExchange));
@@ -308,38 +307,38 @@ class ExpanseServiceTest {
     }
 
     @Test
-    void testGetExchangeRate_WhenCurrencyFromOrToIsNullOrBlank() {
+    void testGetExchangeRate_WhenCurrencyFromIsNullOrBlank() {
         // Given
         // When
         ExchangeResponse response = expanseService.getExchangeRate(null, "USD");
+        ExchangeResponse response2 = expanseService.getExchangeRate("", "USD");
 
         // Then
         assertNotNull(response);
         assertEquals("Currency not provided", response.errorMsg());
         assertEquals(BigDecimal.ZERO, response.exchangeRate());
 
+        assertNotNull(response2);
+        assertEquals("Currency not provided", response2.errorMsg());
+        assertEquals(BigDecimal.ZERO, response2.exchangeRate());
+    }
+
+
+    @Test
+    void testGetExchangeRate_WhenCurrencyToIsNullOrBlank() {
+        // Given
         // When
-        response = expanseService.getExchangeRate("USD", null);
+        ExchangeResponse response = expanseService.getExchangeRate("USD", null);
+        ExchangeResponse response2 = expanseService.getExchangeRate("USD", "");
 
         // Then
         assertNotNull(response);
         assertEquals("Currency not provided", response.errorMsg());
         assertEquals(BigDecimal.ZERO, response.exchangeRate());
 
-        // When
-        response = expanseService.getExchangeRate("", "USD");
-
-        // Then
-        assertNotNull(response);
-        assertEquals("Currency not provided", response.errorMsg());
-        assertEquals(BigDecimal.ZERO, response.exchangeRate());
-
-        // When
-        response = expanseService.getExchangeRate("USD", "");
-        // Then
-        assertNotNull(response);
-        assertEquals("Currency not provided", response.errorMsg());
-        assertEquals(BigDecimal.ZERO, response.exchangeRate());
+        assertNotNull(response2);
+        assertEquals("Currency not provided", response2.errorMsg());
+        assertEquals(BigDecimal.ZERO, response2.exchangeRate());
     }
 
     @Test
@@ -360,12 +359,12 @@ class ExpanseServiceTest {
         CurrencyExchange usdExchange = CurrencyExchange.builder()
                 .code("USD")
                 .exchangeValue(BigDecimal.valueOf(1.0))
-                .timeStamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.now())
                 .build();
         CurrencyExchange eurExchange = CurrencyExchange.builder()
                 .code("EUR")
                 .exchangeValue(BigDecimal.valueOf(0.85))
-                .timeStamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.now())
                 .build();
         when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(usdExchange));
         when(currencyRepository.findByCode("EUR")).thenReturn(Optional.of(eurExchange));
@@ -397,12 +396,12 @@ class ExpanseServiceTest {
         CurrencyExchange usdExchange = CurrencyExchange.builder()
                 .code("USD")
                 .exchangeValue(BigDecimal.valueOf(1.0))
-                .timeStamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.now())
                 .build();
         CurrencyExchange eurExchange = CurrencyExchange.builder()
                 .code("EUR")
                 .exchangeValue(BigDecimal.valueOf(0.85))
-                .timeStamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.now())
                 .build();
 
         when(currencyRepository.count()).thenReturn(1L);
@@ -426,13 +425,13 @@ class ExpanseServiceTest {
         when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(CurrencyExchange.builder()
                 .code("USD")
                 .exchangeValue(BigDecimal.valueOf(1.0))
-                .timeStamp(LocalDateTime.now().minusHours(1))
+                .timestamp(LocalDateTime.now().minusHours(1))
                 .build()));
 
         when(currencyRepository.findByCode("EUR")).thenReturn(Optional.of(CurrencyExchange.builder()
                 .code("EUR")
                 .exchangeValue(BigDecimal.valueOf(0.85))
-                .timeStamp(LocalDateTime.now().minusHours(1))
+                .timestamp(LocalDateTime.now().minusHours(1))
                 .build()));
 
         // When

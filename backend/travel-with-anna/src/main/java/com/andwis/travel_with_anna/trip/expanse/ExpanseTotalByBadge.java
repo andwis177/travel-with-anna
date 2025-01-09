@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 public class ExpanseTotalByBadge {
-   private String type;
+   private String badgeType;
    private BigDecimal totalPriceInTripCurrency;
    private BigDecimal totalPaidInTripCurrency;
 }

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public record BudgetResponse(
         Long budgetId,
         String currency,
-        BigDecimal toSpend,
+        BigDecimal budgetAmount,
         Long tripId
 ) {
 }

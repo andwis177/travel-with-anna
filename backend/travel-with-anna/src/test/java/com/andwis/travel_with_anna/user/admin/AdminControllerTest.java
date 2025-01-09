@@ -30,9 +30,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.*;
+import static com.andwis.travel_with_anna.role.RoleType.ADMIN;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -59,39 +59,33 @@ class AdminControllerTest {
     @MockBean
     private AdminService adminService;
     private User user;
-    private Role retrivedAdminRole;
     private User adminUser;
+    private Role adminRole;
     private UserDetails userDetails;
 
     @BeforeEach
     void setup() {
-        Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
-        Optional<Role> existingRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedRole = existingRole.orElseGet(() -> roleRepository.save(role));
+        Role userRole = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedRole)
+                .role(userRole)
                 .avatarId(1L)
                 .build();
         user.setAccountLocked(false);
         user.setEnabled(true);
 
-        Role adminRole = new Role();
-        adminRole.setRoleName(getAdminRole());
-        adminRole.setAuthority(getAdminAuthority());
-        Optional<Role> existingAdminRole = roleRepository.findByRoleName(getAdminRole());
-        retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
+        adminRole = roleRepository.findByRoleName(ADMIN.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(2, ADMIN.getRoleName(), ADMIN.getAuthority())));
 
         adminUser = User.builder()
                 .userName("adminUserName")
                 .email("adminEmail@example.com")
                 .password(passwordEncoder.encode("adminPassword"))
-                .role(retrivedAdminRole)
+                .role(adminRole)
                 .avatarId(2L)
 
                 .build();
@@ -115,20 +109,18 @@ class AdminControllerTest {
                 1L,
                 "TestUser",
                 "testuser@example.com",
+                new byte[1],
                 false,
                 true,
                 LocalDate.of(2024, 8, 19),
                 LocalDate.of(2024, 8, 19),
-                "USER",
-                null
+                "USER"
         );
 
         PageResponse<UserAdminResponse> response = new PageResponse<>(
                 List.of(userResponse),
                 0, 10, 1, 1, true, true
         );
-
-        String jsonContent = objectMapper.writeValueAsString(response);
 
         when(adminService.getAllUsers(anyInt(), anyInt(), any()))
                 .thenReturn(response);
@@ -139,7 +131,7 @@ class AdminControllerTest {
                         .param("size", "10")
                         .principal(createAuthentication(user)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(jsonContent));
+                .andExpect(content().json(objectMapper.writeValueAsString(response)));
     }
 
     @Test
@@ -174,18 +166,18 @@ class AdminControllerTest {
                 1L,
                 "TestUser",
                 "email@example.com",
+                new byte[1],
                 false,
                 true,
                 LocalDate.of(2024, 8, 19),
                 LocalDate.of(2024, 9, 19),
-                getUserRole(),
-                new byte[0]
+                USER.getRoleName()
         );
 
         String identifier = "TestUser";
         String jsonContent = objectMapper.writeValueAsString(userResponse);
 
-        when(adminService.getUserAdminViewByIdentifier(eq(identifier), any()))
+        when(adminService.getUserByIdentifier(eq(identifier), any()))
                 .thenReturn(userResponse);
 
         // When & Then
@@ -218,7 +210,7 @@ class AdminControllerTest {
     void shouldUpdateUser() throws Exception {
         // Given
         UserAdminEditRequest userAdminEdit = new UserAdminEditRequest(
-                1L ,true, false, getUserRole());
+                1L ,true, false, USER.getRoleName());
 
         UserAdminUpdateRequest request = UserAdminUpdateRequest.builder()
                 .password("adminPassword")
@@ -232,7 +224,7 @@ class AdminControllerTest {
                 .password(passwordEncoder.encode("password"))
                 .accountLocked(true)
                 .enabled(false)
-                .role(retrivedAdminRole)
+                .role(adminRole)
                 .avatarId(user.getAvatarId())
                 .build();
 
@@ -247,7 +239,7 @@ class AdminControllerTest {
         mockMvc.perform(patch("/admin")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -279,7 +271,7 @@ class AdminControllerTest {
     @WithMockUser(username = "email@example.com", authorities = "Admin")
     void shouldGetAllRoleNamesWithAdmin() throws Exception {
         // Given
-        List<String> roleNames = List.of(getUserRole(), getAdminRole());
+        List<String> roleNames = List.of(USER.getRoleName(), USER.getAuthority());
         String jsonContent = objectMapper.writeValueAsString(roleNames);
 
         when(adminService.getAllRoleNamesWithAdmin()).thenReturn(roleNames);

@@ -26,9 +26,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static com.andwis.travel_with_anna.role.Role.*;
+import static com.andwis.travel_with_anna.role.RoleType.ADMIN;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static com.andwis.travel_with_anna.utility.ByteConverter.hexToBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,17 +57,11 @@ class AvatarServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role userRole = new Role();
-        userRole.setRoleName(getUserRole());
-        userRole.setAuthority(getUserAuthority());
-        Optional<Role> existingUserRole = roleRepository.findByRoleName(getUserRole());
-        Role retrivedUserRole = existingUserRole.orElseGet(() -> roleRepository.save(userRole));
+        Role userRole = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
 
-        Role adminRole = new Role();
-        adminRole.setRoleName(getAdminRole());
-        adminRole.setAuthority(getAdminAuthority());
-        Optional<Role> existingAdminRole = roleRepository.findByRoleName(getAdminRole());
-        Role retrivedAdminRole = existingAdminRole.orElseGet(() -> roleRepository.save(adminRole));
+        Role adminRole = roleRepository.findByRoleName(ADMIN.getRoleName())
+                .orElseGet(() -> roleRepository.save(new Role(2, ADMIN.getRoleName(), ADMIN.getAuthority())));
 
         avatar = Avatar.builder()
                 .avatar(AvatarDefaultImg.DEFAULT.getImg())
@@ -83,9 +77,9 @@ class AvatarServiceTest {
                 .userName("userName")
                 .email("email@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedAdminRole)
+                .role(adminRole)
                 .avatarId(avatarId)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setAccountLocked(false);
         user.setEnabled(true);
@@ -96,9 +90,9 @@ class AvatarServiceTest {
                 .userName("userName2")
                 .email("email2@example.com")
                 .password(passwordEncoder.encode("password"))
-                .role(retrivedUserRole)
+                .role(userRole)
                 .avatarId(avatar2Id)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         secondaryUser.setAccountLocked(false);
         secondaryUser.setEnabled(true);
@@ -133,7 +127,7 @@ class AvatarServiceTest {
         Avatar savedAvatar = avatarService.saveAvatar(avatar);
 
         // When
-        boolean result = avatarService.existsById(savedAvatar.getAvatarId());
+        boolean result = avatarService.isAvatarExistsById(savedAvatar.getAvatarId());
 
         // Then
         assertTrue(result);
@@ -143,7 +137,7 @@ class AvatarServiceTest {
     void existsById_ShouldReturnFalse_WhenAvatarDoesNotExist() {
         // Given
         // When
-        boolean result = avatarService.existsById(999L);
+        boolean result = avatarService.isAvatarExistsById(999L);
         // Then
         assertFalse(result);
     }

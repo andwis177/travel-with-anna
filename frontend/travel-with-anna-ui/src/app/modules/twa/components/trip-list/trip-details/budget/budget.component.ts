@@ -14,9 +14,7 @@ import {
   MatTableDataSource
 } from "@angular/material/table";
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// import {NgClass, NgIf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {LiveAnnouncer} from "@angular/cdk/a11y";
 import {SelectionModel} from "@angular/cdk/collections";
@@ -49,11 +47,9 @@ import {firstValueFrom} from "rxjs";
     MatSort,
     MatSortHeader,
     MatTable,
-    // NgIf,
     ReactiveFormsModule,
     FormsModule,
     MatHeaderCellDef,
-    // NgClass,
     LogoComponent,
     UserComponent,
     BudgetButtonsComponent,
@@ -182,7 +178,7 @@ export class BudgetComponent implements OnInit, AfterViewInit {
     }
     const dialogRef = this.dialog.open(ExpanseComponent, {
       maxWidth: '90vw',
-      maxHeight: '90vh',
+      maxHeight: '100vh',
       width: 'auto',
       height: 'auto',
       id: 'expanse-dialog',
@@ -197,9 +193,9 @@ export class BudgetComponent implements OnInit, AfterViewInit {
 
   getColorAmount(amount: number): string {
     if (amount < 0) {
-      return 'negative';
+      return 'negative-color';
     } else {
-      return 'positive';
+      return 'positive-color';
     }
   }
 

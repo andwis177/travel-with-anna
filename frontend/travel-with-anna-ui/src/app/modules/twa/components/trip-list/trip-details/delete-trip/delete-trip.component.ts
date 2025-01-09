@@ -1,5 +1,4 @@
 import {Component, HostListener, Inject, signal} from '@angular/core';
-import {MatDivider} from "@angular/material/divider";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {NgForOf, NgIf} from "@angular/common";
@@ -10,7 +9,6 @@ import {TripService} from "../../../../../../services/services/trip.service";
 import {DeleteTrip$Params} from "../../../../../../services/fn/trip/delete-trip";
 import {Router} from "@angular/router";
 import {TripRequest} from "../../../../../../services/models/trip-request";
-import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 
@@ -18,27 +16,23 @@ import {MatInput} from "@angular/material/input";
   selector: 'app-delete-trip',
   standalone: true,
   imports: [
-    MatDivider,
     MatIcon,
     MatIconButton,
     NgForOf,
     NgIf,
     ReactiveFormsModule,
     FormsModule,
-    MatCardContent,
     MatSuffix,
     MatFormField,
     MatInput,
     MatLabel,
-    MatCard,
-    MatCardHeader,
   ],
   templateUrl: './delete-trip.component.html',
   styleUrl: './delete-trip.component.scss'
 })
 export class DeleteTripComponent {
   errorMsg: Array<string> = [];
-  tripRequest: TripRequest = {};
+  tripRequest: TripRequest = {password: "", tripId: -1};
 
   constructor(private tripService: TripService,
               public dialog: MatDialog,

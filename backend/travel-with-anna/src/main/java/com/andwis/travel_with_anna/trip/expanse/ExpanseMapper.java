@@ -50,18 +50,18 @@ public class ExpanseMapper {
                 expanse.getPrice(),
                 expanse.getPaid(),
                 expanse.getExchangeRate(),
-                expanse.getPriceInTripCurrency(),
-                expanse.getPaidInTripCurrency()
+                expanse.calculatePriceInTripCurrency(),
+                expanse.calculatePaidInTripCurrency()
         );
     }
 
     public static void updateExpanse(@NotNull Expanse expanse, @NotNull ExpanseRequest expanseRequest) {
-        expanse.setExpanseName(expanseRequest.getExpanseName());
-        expanse.setExpanseCategory(expanseRequest.getExpanseCategory());
-        expanse.setCurrency(expanseRequest.getCurrency());
-        expanse.setPrice(expanseRequest.getPrice());
-        expanse.setPaid(expanseRequest.getPaid());
-        expanse.setExchangeRate(expanseRequest.getExchangeRate());
+        expanse.setExpanseName(expanseRequest.getExpanseName() != null ? expanseRequest.getExpanseName() : expanse.getExpanseName() );
+        expanse.setExpanseCategory(expanseRequest.getExpanseCategory() !=null ? expanseRequest.getExpanseCategory() : "");
+        expanse.setCurrency(expanseRequest.getCurrency() !=null ? expanseRequest.getCurrency() : "");
+        expanse.setPrice(expanseRequest.getPrice() != null ? expanseRequest.getPrice() : BigDecimal.ZERO);
+        expanse.setPaid(expanseRequest.getPaid() != null ? expanseRequest.getPaid() : BigDecimal.ZERO);
+        expanse.setExchangeRate(expanseRequest.getExchangeRate() !=null ? expanseRequest.getExchangeRate() : BigDecimal.ONE);
 
         if (expanseRequest.getDate() != null && !expanseRequest.getDate().isBlank()) {
             expanse.setDate(toLocalDate(expanseRequest.getDate()));

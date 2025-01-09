@@ -1,6 +1,7 @@
 package com.andwis.travel_with_anna.user;
 
 import com.andwis.travel_with_anna.auth.AuthenticationResponse;
+import com.andwis.travel_with_anna.role.RoleNameResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,22 @@ class UserControllerTest {
 
         // When & Then
         mockMvc.perform(get("/user/credentials")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonResponse));
+    }
+
+    @Test
+    @WithMockUser(username = "email@example.com", authorities = "User")
+    void fetchRole_ShouldReturnOkWithRoleName() throws Exception {
+        // Given
+        RoleNameResponse roleResponse = new RoleNameResponse("User");
+        String jsonResponse = objectMapper.writeValueAsString(roleResponse);
+
+        when(facade.fetchUserRoleName(any())).thenReturn(roleResponse);
+
+        // When & Then
+        mockMvc.perform(get("/user/role")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonResponse));

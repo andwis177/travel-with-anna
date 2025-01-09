@@ -4,20 +4,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 @Getter
 @AllArgsConstructor
 public enum NoteType {
+
     DAY("day"),
     ACTIVITY("activity");
 
-    private final String type;
+    private final String noteType;
 
     public static @Nullable NoteType fromString(String type) {
-        for (NoteType noteType : NoteType.values()) {
-            if (noteType.type.equalsIgnoreCase(type)) {
-                return noteType;
-            }
-        }
-        return null;
+        return Arrays.stream(NoteType.values())
+                .filter(noteType -> noteType.matchesType(type))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private boolean matchesType(String type) {
+        return noteType.equalsIgnoreCase(type);
     }
 }

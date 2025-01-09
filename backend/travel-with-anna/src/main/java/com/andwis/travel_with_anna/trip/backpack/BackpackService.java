@@ -13,37 +13,53 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BackpackService {
+
+    private static final String BACKPACK_NOT_FOUND_MESSAGE = "Backpack not found";
+
     private final BackpackRepository backpackRepository;
     private final ItemService itemService;
     private final NoteService noteService;
     private final BackpackAuthorizationService backpackAuthorizationService;
 
     public Backpack findById(Long backpackId) {
-        return backpackRepository.findById(backpackId).orElseThrow(() -> new BackpackNotFoundException("Backpack not found"));
+        return backpackRepository.findById(backpackId)
+                .orElseThrow(() -> new BackpackNotFoundException(BACKPACK_NOT_FOUND_MESSAGE));
     }
 
     @Transactional
     public void addItemToBackpack(Long backpackId, ItemRequest itemRequest, UserDetails connectedUser) {
-        Backpack backpack = findById(backpackId);
-        backpackAuthorizationService.verifyBackpackOwner(backpack, connectedUser);
+        Backpack backpack = getBackpackAndVerifyOwnership(backpackId, connectedUser);
         Item item = itemService.createItem(itemRequest);
+
         backpack.addItem(item);
         itemService.saveItem(item);
     }
 
     public BackpackResponse getBackpackById(Long backpackId, UserDetails connectedUser) {
-        Backpack backpack = findById(backpackId);
-        backpackAuthorizationService.verifyBackpackOwner(backpack, connectedUser);
-        boolean isNote = noteService.isNoteExists(backpackId);
-        return BackpackMapper.toBackpackResponse(backpack, isNote);
+        Backpack backpack = getBackpackAndVerifyOwnership(backpackId, connectedUser);
+        boolean isNotePresent = noteService.isNoteExists(backpackId);
+
+        return BackpackMapper.toBackpackResponse(backpack, isNotePresent);
     }
 
     @Transactional
     public void deleteItem(Long itemId, UserDetails connectedUser) {
         Item item = itemService.findById(itemId);
         Backpack backpack = item.getBackpack();
-        backpackAuthorizationService.verifyBackpackOwner(backpack, connectedUser);
+
+        verifyOwnership(backpack, connectedUser);
+
         backpack.removeItem(item);
         itemService.deleteItem(itemId);
+    }
+
+    private void verifyOwnership(Backpack backpack, UserDetails userDetails) {
+        backpackAuthorizationService.verifyBackpackOwner(backpack, userDetails);
+    }
+
+    private Backpack getBackpackAndVerifyOwnership(Long backpackId, UserDetails userDetails) {
+        Backpack backpack = findById(backpackId);
+        verifyOwnership(backpack, userDetails);
+        return backpack;
     }
 }

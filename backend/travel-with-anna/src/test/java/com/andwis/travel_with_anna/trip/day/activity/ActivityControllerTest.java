@@ -24,8 +24,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.andwis.travel_with_anna.role.Role.getUserAuthority;
-import static com.andwis.travel_with_anna.role.Role.getUserRole;
+import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -52,8 +51,8 @@ class ActivityControllerTest {
     @BeforeEach
     void setUp() {
         Role role = new Role();
-        role.setRoleName(getUserRole());
-        role.setAuthority(getUserAuthority());
+        role.setRoleName(USER.getRoleName());
+        role.setRoleAuthority(USER.getAuthority());
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
@@ -62,7 +61,7 @@ class ActivityControllerTest {
                 .password(encodedPassword)
                 .role(role)
                 .avatarId(1L)
-                .ownedTrips(new HashSet<>())
+                .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
 
@@ -75,7 +74,7 @@ class ActivityControllerTest {
                 .type("Test Type")
                 .status("Test Status")
                 .addressRequest(null)
-                .isDayTag(true)
+                .dayTag(true)
                 .build();
 
         Country country = Country.builder().build();
@@ -97,7 +96,7 @@ class ActivityControllerTest {
         mockMvc.perform(post("/activity")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -113,13 +112,13 @@ class ActivityControllerTest {
                 .type("Test Type 2")
                 .status("Test Status 2")
                 .addressRequest(null)
-                .isDayTag(true)
+                .dayTag(true)
                 .build();
 
         ActivityAssociatedRequest associatedRequest = ActivityAssociatedRequest.builder()
                 .firstRequest(activityRequest)
                 .secondRequest(activityRequest2)
-                .isAddressSeparated(false)
+                .addressSeparated(false)
                 .build();
 
         doNothing().when(facade).createAssociatedActivities(eq(associatedRequest), any());
@@ -129,7 +128,7 @@ class ActivityControllerTest {
         mockMvc.perform(post("/activity/associated")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -139,16 +138,16 @@ class ActivityControllerTest {
         ActivityUpdateRequest updateRequest = ActivityUpdateRequest.builder()
                 .activityId(1L)
                 .dayId(1L)
-                .oldDate("2023-12-12")
-                .newDate("2023-12-14")
+                .oldActivityDate("2023-12-12")
+                .newActivityDate("2023-12-14")
                 .startTime("12:00")
                 .build();
 
         when(facade.updateActivity(argThat(argument ->
                 argument.getActivityId().equals(updateRequest.getActivityId()) &&
                         argument.getDayId().equals(updateRequest.getDayId()) &&
-                        argument.getOldDate().equals(updateRequest.getOldDate()) &&
-                        argument.getNewDate().equals(updateRequest.getNewDate()) &&
+                        argument.getOldActivityDate().equals(updateRequest.getOldActivityDate()) &&
+                        argument.getNewActivityDate().equals(updateRequest.getNewActivityDate()) &&
                         argument.getStartTime().equals(updateRequest.getStartTime())
         ), any()))
                 .thenReturn(new MessageResponse("Activity updated successfully"));

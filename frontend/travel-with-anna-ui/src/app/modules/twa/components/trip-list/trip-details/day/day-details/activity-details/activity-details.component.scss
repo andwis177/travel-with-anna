@@ -6,25 +6,7 @@
 .event,
 .shop,
 .default{
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: start !important;
-  align-items: start;
-  height: 8vw;
   border: #1C252D 2px solid;
-  border-radius: 20px;
-  background-color: whitesmoke;
-}
-
-.button {
-  flex-direction: column !important;
-  background-color: transparent;
-  width: 80vw;
-  height: 100%;
-  margin:0 !important;
-  border: none;
-  display: flex;
-  align-items: start;
   border-radius: 20px;
 }
 
@@ -36,144 +18,20 @@
 .event:hover,
 .default:hover,
 .button:hover {
-  cursor: pointer;
-  background-color: #E5E5E5;
-  box-shadow: 0 0 20px 1px gray;
+  box-shadow: 0 0 5px 2px gray;
 }
 
-.activities-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  flex-direction: row !important;
-  justify-content: space-evenly !important;
-  align-items: center !important;
-  font-family: 'Montserrat', sans-serif;
+.badge-status-icon-margin {
+  margin: 5px 50px 5px 50px
 }
 
-.activity-content{
-  display: flex;
-  flex:1 !important;
-  margin: 10px;
-  text-align: center !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.activity-content:first-child{
-  flex-direction: column !important;
-  flex:1 !important;
-}
-
-.activity-content:nth-child(2){
-  margin-left: 5vw;
-  align-items: start !important;
-  flex-direction: column !important;
-  flex:5 !important;
-}
-
-.activity-content:nth-child(3){
-  flex-direction: row !important;
-  justify-content: space-between !important;
-  flex:2 !important;
-}
-
-.image-container {
-  width: 2.5vw;
-  height: 2.5vw;
+.activity-icon {
+  width: 3.8vw !important;
+  height: 8.0vh !important;
   object-fit: cover;
   background-color: transparent;
   cursor: default;
   border: none  ;
-}
-
-.data-container{
-  width: 80vw !important;
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 0;
-  text-align: start !important;
-}
-
-.activity-button-container {
-  display: flex;
-  justify-content: space-between !important;
-  flex-direction: row;
-}
-
-.contact-info {
-  text-align: center;
-}
-
-.title {
-  font-size: 16px !important;
-  margin: 1vw 5vw 0 5vw  !important;
-  display: block;
-  width: 100%;
-}
-
-.time {
-  font-weight: 550 !important;
-  font-size: 14px !important;
-}
-.place{
-  font-size: 16px !important;
-  font-weight: 500 !important;
-}
-
-.city-country {
-  font-size: 12px !important;
-}
-
-.address {
-  font-size: 12px !important;
-}
-
-.activity-button {
-  width: 25px;
-  height: 25px;
-  padding: 0;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  cursor: pointer;
-}
-
-.activity-button:hover {
-  width: 35px;
-  height: 35px;
-}
-
-.activities-container > div {
-  flex: 1;
-}
-
-.delete-button {
-  font-size: 1.5em;
-  color: #D36767 !important;
-  border-radius: 5px;
-}
-
-.activity-button-image{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background-color: transparent;
-  cursor: pointer;
-}
-
-.expanse-display{
-  width: 78vw !important;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between !important;
-  text-align: center !important;
-  align-items: center !important;
-  border-top: #1C252D 1px solid;
-  margin: 10px !important;
-  padding-top: 5px !important;
 }
 
 .amount{
@@ -186,14 +44,6 @@
   font-weight: 400;
 }
 
-.negative{
-  color: indianred !important;
-}
-
-.default-activity {
-  color: black !important;
-}
-
 ::ng-deep .mat-badge-content,
 ::ng-deep .mat-badge-active {
   background-color: goldenrod !important;
@@ -201,3 +51,52 @@
   border: 1px solid #1C252D;
 }
 
+.activity-details-main-button {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.action-button {
+  width: 35px !important;
+  height: 35px !important;
+  padding: 2px !important;
+  background-color: transparent !important;
+  border: none;
+}
+
+.badge-container {
+  max-width: 2.5vw !important;
+}
+
+.address-container {
+  width: 35vw !important;
+}
+
+.action-buttons-container {
+  width: 25vw !important;
+}
+
+.activity-details-expanse-container {
+  border-bottom-right-radius: 18px !important;
+  border-bottom-left-radius: 18px !important  ;
+}
+
+.activity-details-expanse-amount-spread {
+  display: flex !important;
+  justify-content: space-around !important;
+}
+
+.activity-details-padding {
+  padding: 10px 0 0 0 !important;
+}
+
+::ng-deep .mat-badge-content,
+::ng-deep .mat-badge-active {
+  background-color: limegreen !important;
+  border: 1px solid #1C252D;
+  color: #1C252D !important;
+}
+
+.expanse-name-padding {
+  padding: 2px 0 2px 0 !important;
+}

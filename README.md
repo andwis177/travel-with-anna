@@ -34,7 +34,7 @@
 
 Ensure you have the following installed on your system:
 
-<div align="left">
+<div align="left" style="display: flex; flex-direction: row">
   <div style="display: inline-block; text-align: center; margin: 0 20px;">
     <img src="/backend/travel-with-anna/src/test/resources/images/Java.png" alt="Java" width="100" height="auto">
     <p><strong>Java 17</strong> or higher</p>

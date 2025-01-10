@@ -1,5 +1,5 @@
 <div align="center">
-  <div style="display: inline-block; text-align: center;">
+  <div style="display: inline-block; text-align: center; background-color: #1C252D">
     <img src="/frontend/travel-with-anna-ui/src/assets/images/twa.png" alt="Java" width="125" height="auto">
   </div>
 </div>
@@ -34,21 +34,21 @@
 
 Ensure you have the following installed on your system:
 
-<div align="left" style="display: flex; flex-direction: row">
-  <div style="display: inline-block; text-align: center; margin: 0 20px;">
-    <img src="/backend/travel-with-anna/src/test/resources/images/Java.png" alt="Java" width="100" height="auto">
-    <p><strong>Java 17</strong> or higher</p>
+<div align="left" style="display: flex; flex-direction: row; width: 100%">
+  <div style="display: inline-block; text-align: center; margin: 0 15px;">
+    <img src="/backend/travel-with-anna/src/test/resources/images/Java.png" alt="Java" width="40" height="auto">
+    <p><strong>Java 17</strong></p>
   </div>
-  <div style="display: inline-block; text-align: center; margin: 0 20px;">
-    <img src="/backend/travel-with-anna/src/test/resources/images/Angular.png" alt="Angular" width="50" height="auto">
-    <p><strong>Angular 19.0.4</strong> or higher</p>
+  <div style="display: inline-block; text-align: center; margin: 0 15px;">
+    <img src="/backend/travel-with-anna/src/test/resources/images/Angular.png" alt="Angular" width="40" height="auto">
+    <p><strong>Angular 19.0.4</strong></p>
   </div>
-  <div style="display: inline-block; text-align: center; margin: 0 20px;">
-    <img src="/backend/travel-with-anna/src/test/resources/images/NodeJs.png" alt="Angular" width="50" height="auto">
+  <div style="display: inline-block; text-align: center; margin: 0 15px;">
+    <img src="/backend/travel-with-anna/src/test/resources/images/NodeJs.png" alt="Angular" width="40" height="auto">
     <p><strong>Node.js and npm</strong></p>
   </div>
-  <div style="display: inline-block; text-align: center; margin: 0 20px;">
-    <img src="/backend/travel-with-anna/src/test/resources/images/Docker.png" alt="Angular" width="50" height="auto">
+  <div style="display: inline-block; text-align: center; margin: 0 15px;">
+    <img src="/backend/travel-with-anna/src/test/resources/images/Docker.png" alt="Angular" width="40" height="auto">
     <p><strong>Docker (optional)</strong></p>
   </div>
 </div>

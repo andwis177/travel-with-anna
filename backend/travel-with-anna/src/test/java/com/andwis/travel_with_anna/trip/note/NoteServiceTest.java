@@ -102,12 +102,12 @@ class NoteServiceTest {
         Note note = new Note();
         note.setNoteId(entityId);
         note.setContent("Test Note");
-        Function<Long, Note> getByIdFunction = _ -> note;
+        Function<Long, Note> getByIdFunction = id -> note;
         Function<Note, Note> getNoteFunction = Function.identity();
 
         // When
         NoteResponse response = noteService.getNoteById(
-                entityId, getByIdFunction, getNoteFunction, (_, _) -> {}, userDetails);
+                entityId, getByIdFunction, getNoteFunction, (id, userDetails) -> {}, userDetails);
 
         // Then
         assertEquals(entityId, response.noteId());
@@ -118,12 +118,12 @@ class NoteServiceTest {
     void testGetNoteById_ReturnsDefaultNoteResponse_WhenNoteIsNull() {
         // Given
         Long entityId = 1L;
-        Function<Long, Note> getByIdFunction = _ -> null;
+        Function<Long, Note> getByIdFunction = id -> null;
         Function<Note, Note> getNoteFunction = Function.identity();
 
         // When
         NoteResponse response = noteService.getNoteById(
-                entityId, getByIdFunction, getNoteFunction, (_, _) -> {}, userDetails);
+                entityId, getByIdFunction, getNoteFunction, (id, userDetails) -> {}, userDetails);
 
         // Then
         assertEquals(-1L, response.noteId());
@@ -134,14 +134,14 @@ class NoteServiceTest {
     @Transactional
     void testSaveNoteWithNoteRequest_NewNote() {
         // Given
-        Function<Long, Day> getByIdFunction = _ -> new Day();
-        Function<Day, Note> getNoteFunction = _ -> null;
-        BiConsumer<Day, Note> addNoteFunction = (_, _) -> {};
-        Consumer<Day> removeNoteFunction = _ -> {};
+        Function<Long, Day> getByIdFunction = id -> new Day();
+        Function<Day, Note> getNoteFunction = dayId -> null;
+        BiConsumer<Day, Note> addNoteFunction = (dayId, noteId) -> {};
+        Consumer<Day> removeNoteFunction = dayId -> {};
 
         // When
         noteService.saveNote(noteRequest, getByIdFunction, getNoteFunction, addNoteFunction, removeNoteFunction,
-                (_, _) -> {}, userDetails);
+                (dayId, userDetails) -> {}, userDetails);
 
         // Then
         ArgumentCaptor<Note> noteCaptor = ArgumentCaptor.forClass(Note.class);
@@ -159,14 +159,14 @@ class NoteServiceTest {
         existingNote.setNoteId(noteId);
         existingNote.setContent("Existing Note");
 
-        Function<Long, Day> getByIdFunction = _ -> new Day();
-        Function<Day, Note> getNoteFunction = _ -> existingNote;
-        BiConsumer<Day, Note> addNoteFunction = (_, _) -> {};
-        Consumer<Day> removeNoteFunction = _ -> {};
+        Function<Long, Day> getByIdFunction = id -> new Day();
+        Function<Day, Note> getNoteFunction = dayId -> existingNote;
+        BiConsumer<Day, Note> addNoteFunction = (dayId, note_Id) -> {};
+        Consumer<Day> removeNoteFunction = dayId -> {};
 
         // When
         noteService.saveNote(noteRequest, getByIdFunction, getNoteFunction, addNoteFunction, removeNoteFunction,
-                (_, _) -> {}, userDetails);
+                (dayId, userDetails) -> {}, userDetails);
 
         // Then
         verify(noteRepository, times(1)).save(existingNote);
@@ -182,16 +182,16 @@ class NoteServiceTest {
         existingNote.setNoteId(noteId);
         existingNote.setContent("Existing Note");
 
-        Function<Long, Day> getByIdFunction = _ -> new Day();
-        Function<Day, Note> getNoteFunction = _ -> existingNote;
-        BiConsumer<Day, Note> addNoteFunction = (_, _) -> {};
-        Consumer<Day> removeNoteFunction = _ -> {};
+        Function<Long, Day> getByIdFunction = id -> new Day();
+        Function<Day, Note> getNoteFunction = dayId -> existingNote;
+        BiConsumer<Day, Note> addNoteFunction = (dayId, note_Id) -> {};
+        Consumer<Day> removeNoteFunction = dayId -> {};
 
         noteRequest.setNoteContent("");
 
         // When
         noteService.saveNote(noteRequest, getByIdFunction, getNoteFunction, addNoteFunction, removeNoteFunction,
-                (_, _) -> {}, userDetails);
+                (dayId, userDetails) -> {}, userDetails);
 
         // Then
         verify(noteRepository, times(1)).delete(existingNote);

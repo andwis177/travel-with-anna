@@ -10,10 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,9 +46,18 @@ class DayControllerTest {
     private ObjectMapper objectMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @MockBean
-    private DayFacade facade;
     private UserDetails userDetails;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public DayFacade dayFacade() {
+            return Mockito.mock(DayFacade.class);
+        }
+    }
+
+    @Autowired
+    private DayFacade facade;
 
     @BeforeEach
     void setUp() {

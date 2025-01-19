@@ -11,14 +11,15 @@ import com.andwis.travel_with_anna.user.avatar.AvatarImg;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -56,17 +57,33 @@ class AdminControllerTest {
     private ObjectMapper objectMapper;
     @Autowired
     private AdminFacade adminFacade;
-    @MockBean
-    private AdminService adminService;
+
     private User user;
     private User adminUser;
     private Role adminRole;
     private UserDetails userDetails;
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public AdminService adminService() {
+            return Mockito.mock(AdminService.class);
+        }
+    }
+
+    @Autowired
+    private AdminService adminService;
+
     @BeforeEach
     void setup() {
-        Role userRole = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        Role userRole = Role.builder()
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
+                .build();
+        roleRepository.save(userRole);
 
         user = User.builder()
                 .userName("userName")
@@ -78,8 +95,11 @@ class AdminControllerTest {
         user.setAccountLocked(false);
         user.setEnabled(true);
 
-        adminRole = roleRepository.findByRoleName(ADMIN.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(2, ADMIN.getRoleName(), ADMIN.getAuthority())));
+        adminRole = Role.builder()
+                .roleName(ADMIN.getRoleName())
+                .roleAuthority(ADMIN.getAuthority())
+                .build();
+        roleRepository.save(adminRole);
 
         adminUser = User.builder()
                 .userName("adminUserName")
@@ -93,12 +113,6 @@ class AdminControllerTest {
         adminUser.setEnabled(true);
 
         userDetails = createUserDetails(adminUser);
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

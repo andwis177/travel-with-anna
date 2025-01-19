@@ -5,12 +5,6 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: ${HIKARI_MAX_POOL_SIZE}
-      minimum-idle: ${HIKARI_MIN_IDLE}
-      idle-timeout: ${HIKARI_IDLE_TIMEOUT}
-      max-lifetime: ${HIKARI_MAX_LIFETIME}
-      connection-timeout: ${HIKARI_CONNECTION_TIMEOUT}
 
   jpa:
     hibernate:
@@ -21,9 +15,11 @@ spring:
         format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
+
   flyway:
     baseline-on-migrate: true
     enabled: true
+
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -41,10 +37,10 @@ application:
   security:
     jwt:
       expiration: ${TOKEN_EXPIRATION}
-    cors: ${CORS_ORIGIN_URL}
+    cors: ${CORS_ORIGIN}
   mailing:
     frontend:
-      activation-url: ${ACTIVATION_URL}}
+      activation-url: ${ACTIVATION_URL}
       login-url: ${LOGIN_URL}
 
 my_apis:
@@ -56,7 +52,7 @@ my_apis:
       apikey: ${API_CURRENCY_KEY}
 
 server:
-  port: ${SERVER_PORT}
+  port: ${PORT:8080}
   servlet:
     session:
       timeout: 30m

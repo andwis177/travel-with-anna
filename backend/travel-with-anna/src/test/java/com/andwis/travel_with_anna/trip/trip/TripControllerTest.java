@@ -8,14 +8,15 @@ import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,15 +49,31 @@ class TripControllerTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
-    private TripMgr tripFacade;
+
     private UserDetails userDetails;
     private User user;
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public TripMgr tripMgr() {
+            return Mockito.mock(TripMgr.class);
+        }
+    }
+
+    @Autowired
+    private TripMgr tripFacade;
+
     @BeforeEach
     void setup() {
-        Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        Role role = Role.builder()
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
+                .build();
+        roleRepository.save(role);
 
         user = User.builder()
                 .userName("adminUserName")
@@ -68,12 +85,6 @@ class TripControllerTest {
         user.setAccountLocked(false);
         user.setEnabled(true);
         userDetails = createUserDetails(user);
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

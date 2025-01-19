@@ -188,9 +188,9 @@ class ExpanseServiceTest {
 
         // When
         ExpanseResponse response = expanseService.createOrUpdateExpanse(expanseRequest,
-                _ -> new Object(),
+                id -> new Object(),
                 () -> expanse,
-                (_, _) -> {},
+                (object, expanse) -> {},
                 userDetails);
 
         // Then
@@ -206,9 +206,9 @@ class ExpanseServiceTest {
 
         // When
         ExpanseResponse response = expanseService.createOrUpdateExpanse(expanseRequest,
-                _ -> new Object(),
+                id -> new Object(),
                 Expanse::new,
-                (_, _) -> {},
+                (object, expanse) -> {},
                 userDetails);
 
         // Then
@@ -226,9 +226,9 @@ class ExpanseServiceTest {
         // When
         Exception exception = assertThrows(ExpanseNotSaveException.class, () ->
                 expanseService.createOrUpdateExpanse(expanseRequest,
-                        _ -> new Object(),
+                        id -> new Object(),
                         Expanse::new,
-                        (_, _) -> {},
+                        (object, expanse) -> {},
                         userDetails));
 
         // Then
@@ -280,8 +280,8 @@ class ExpanseServiceTest {
     void testGetExpanseByEntityId_EntityWithExpanse() {
         // Given
         Long entityId = 2L;
-        Function<Long, Object> getByIdFunction = _ -> new Object();
-        Function<Object, Expanse> getExpanseFunction = _ -> expanse;
+        Function<Long, Object> getByIdFunction = id -> new Object();
+        Function<Object, Expanse> getExpanseFunction = object -> expanse;
 
         // When
         ExpanseResponse response = expanseService.getExpanseByEntityId(entityId, getByIdFunction, getExpanseFunction, userDetails);
@@ -295,8 +295,8 @@ class ExpanseServiceTest {
     void testGetExpanseByEntityId_EntityWithoutExpanse() {
         // Given
         Long entityId = 2L;
-        Function<Long, Object> getByIdFunction = _ -> new Object();
-        Function<Object, Expanse> getExpanseFunction = _ -> null;
+        Function<Long, Object> getByIdFunction = id -> new Object();
+        Function<Object, Expanse> getExpanseFunction = object -> null;
 
         // When
         ExpanseResponse response = expanseService.getExpanseByEntityId(

@@ -10,7 +10,6 @@ import com.andwis.travel_with_anna.role.RoleNameResponse;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.trip.Trip;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,8 +47,14 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userRole = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        userRole = roleRepository.findByRoleName(USER.getRoleName()).orElse(
+                roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         Trip trip = Trip.builder()
                 .tripName("tripName")
@@ -76,12 +81,6 @@ class UserServiceTest {
                 .build();
         secondaryUser.setEnabled(true);
         userRepository.save(secondaryUser);
-    }
-
-    @AfterEach()
-    void cleanUp() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

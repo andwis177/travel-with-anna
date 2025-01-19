@@ -4,7 +4,6 @@ import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,8 +36,14 @@ class TripServiceTest {
 
     @BeforeEach
     void setUp() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
         Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         user = User.builder()
                 .userName("userName")
@@ -49,12 +54,6 @@ class TripServiceTest {
                 .build();
         user.setEnabled(true);
         userRepository.save(user);
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test
@@ -68,7 +67,6 @@ class TripServiceTest {
         // When
         Long savedTripId = tripService.saveTrip(trip);
         Trip savedTrip = tripRepository.findById(savedTripId).orElse(null);
-
 
         // Then
         assertNotNull(savedTripId);

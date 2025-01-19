@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -12,11 +12,12 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
+  main:
+    allow-bean-definition-overriding: true
 
   flyway:
     cleanDisabled: false
     locations: classpath:db/migration/test
-    cleanOnValidationError: true
 
 
   mail:
@@ -31,7 +32,9 @@ spring:
             required: true
           ssl:
             trust: smtp.mailtrap.io
-
+  mvc:
+    converters:
+      preferred-json-mapper: jackson
 
 application:
   security:
@@ -49,7 +52,7 @@ my_apis:
   currency:
     currency_url: ${API_CURRENCY}
     header:
-      apikey: "test-api-key"
+      apikey: ${API_CURRENCY_KEY}
 
 server:
   port: 8080

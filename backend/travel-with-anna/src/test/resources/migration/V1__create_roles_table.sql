@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS roles (
-    role_id SERIAL PRIMARY KEY,
-    role_name VARCHAR(50) UNIQUE NOT NULL,
+                                     role_id SERIAL PRIMARY KEY,
+                                     role_name VARCHAR(50) UNIQUE NOT NULL,
     authority VARCHAR(50) NOT NULL
     );
 
 CREATE TABLE IF NOT EXISTS users (
-    user_id BIGSERIAL PRIMARY KEY,
-    user_name VARCHAR(30) UNIQUE NOT NULL,
+                                     user_id BIGSERIAL PRIMARY KEY,
+                                     user_name VARCHAR(30) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     account_locked BOOLEAN DEFAULT FALSE,
@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 CREATE TABLE IF NOT EXISTS tokens (
-    token_id BIGSERIAL PRIMARY KEY,
-    token VARCHAR(255),
+                                      token_id BIGSERIAL PRIMARY KEY,
+                                      token VARCHAR(255),
     created_at TIMESTAMP,
     expires_at TIMESTAMP,
     user_id BIGINT NOT NULL,

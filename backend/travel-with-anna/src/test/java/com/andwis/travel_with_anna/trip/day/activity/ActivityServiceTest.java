@@ -20,7 +20,6 @@ import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import com.andwis.travel_with_anna.utility.MessageResponse;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -76,6 +75,9 @@ class ActivityServiceTest {
 
     @BeforeEach
     void setUp() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
         activity = Activity.builder()
                 .activityTitle("Title")
                 .beginTime(LocalTime.of(10, 10))
@@ -95,7 +97,10 @@ class ActivityServiceTest {
                 .build();
 
         Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
@@ -171,12 +176,6 @@ class ActivityServiceTest {
                 .build();
 
         userDetails = createUserDetails(user);
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

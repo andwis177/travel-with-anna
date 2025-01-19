@@ -275,7 +275,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull HandlerMethodValidationException exp) {
         Set<String> errors = new HashSet<>();
-        exp.getAllValidationResults().forEach(violation -> errors.add(violation.toString()));
+        exp.getParameterValidationResults().forEach(violation -> errors.add(violation.toString()));
         List<String> errorsSorted = errors.stream().sorted().toList();
         return ResponseEntity
                 .status(BAD_REQUEST)

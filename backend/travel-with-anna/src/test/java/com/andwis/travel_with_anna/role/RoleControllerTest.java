@@ -2,10 +2,12 @@ package com.andwis.travel_with_anna.role;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,9 +27,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RoleControllerTest {
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public RoleService roleService() {
+            return Mockito.mock(RoleService.class);
+        }
+        @Bean
+        public Authentication connectedUser() {
+            return Mockito.mock(Authentication.class);
+        }
+    }
+
+    @Autowired
     private RoleService service;
-    @MockBean
+    @Autowired
     private Authentication connectedUser;
 
     @Test

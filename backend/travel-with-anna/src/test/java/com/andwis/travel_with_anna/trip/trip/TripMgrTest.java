@@ -14,17 +14,19 @@ import com.andwis.travel_with_anna.trip.day.DayService;
 import com.andwis.travel_with_anna.user.*;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,16 +64,33 @@ class TripMgrTest {
     private AddressService addressService;
     @Mock
     private DayService dayService;
-    @MockBean
-    private AuthenticationManager authenticationManager;
+
     private UserDetails userDetails;
     private Trip testTrip;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public AuthenticationManager authenticationManager() {
+            return Mockito.mock(AuthenticationManager.class);
+        }
+    }
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @BeforeEach
     @Transactional
     void setUp() {
-        Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        Role role = roleRepository.findByRoleName(USER.getRoleName()).orElse(
+                roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
+
 
         User testUser = User.builder()
                 .userName("testUser")
@@ -106,12 +125,6 @@ class TripMgrTest {
         userService.saveUser(testUser);
 
         userDetails = createUserDetails(testUser);
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test
@@ -159,6 +172,14 @@ class TripMgrTest {
     void testDeleteTrip() throws WrongPasswordException {
         // Given
         TripRequest request = new TripRequest(testTrip.getTripId(), "password");
+
+        UsernamePasswordAuthenticationToken token =
+                new UsernamePasswordAuthenticationToken("testUser", "password");
+        Authentication authentication = new UsernamePasswordAuthenticationToken("testUser", "password");
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+
         doNothing().when(addressService).deleteExistingAddressesByIds(anySet());
 
         // When

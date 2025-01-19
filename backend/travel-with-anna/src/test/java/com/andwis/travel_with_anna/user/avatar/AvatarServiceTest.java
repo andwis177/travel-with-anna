@@ -10,7 +10,6 @@ import com.andwis.travel_with_anna.user.admin.AdminService;
 import com.andwis.travel_with_anna.user.admin.UserAdminResponse;
 import com.andwis.travel_with_anna.utility.PageResponse;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashSet;
@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DisplayName("Avatar Service tests")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AvatarServiceTest {
     @Autowired
     private AvatarRepository avatarRepository;
@@ -57,11 +58,21 @@ class AvatarServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role userRole = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        avatarRepository.deleteAll();
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
 
-        Role adminRole = roleRepository.findByRoleName(ADMIN.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(2, ADMIN.getRoleName(), ADMIN.getAuthority())));
+        Role userRole = Role.builder()
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
+                .build();
+        roleRepository.save(userRole);
+
+        Role adminRole = Role.builder()
+                .roleName(ADMIN.getRoleName())
+                .roleAuthority(ADMIN.getAuthority())
+                .build();
+        roleRepository.save(adminRole);
 
         avatar = Avatar.builder()
                 .avatar(AvatarDefaultImg.DEFAULT.getImg())
@@ -96,15 +107,7 @@ class AvatarServiceTest {
                 .build();
         secondaryUser.setAccountLocked(false);
         secondaryUser.setEnabled(true);
-        userRepository.save(secondaryUser);
         secondaryUserId = userRepository.save(secondaryUser).getUserId();
-    }
-
-    @AfterEach
-    void cleanUp() {
-        avatarRepository.deleteAll();
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

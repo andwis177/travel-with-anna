@@ -9,14 +9,15 @@ import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -39,8 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Item Controller tests")
 class ItemControllerTest {
-    @MockBean
-    private ItemFacade itemFacade;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -52,10 +51,26 @@ class ItemControllerTest {
     @Autowired
     private RoleRepository roleRepository;
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public ItemFacade itemFacade() {
+            return Mockito.mock(ItemFacade.class);
+        }
+    }
+
+    @Autowired
+    private ItemFacade itemFacade;
+
     @BeforeEach
     void setUp() {
-        Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+        Role role = Role.builder()
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
+                .build();
+        roleRepository.save(role);
 
         Trip trip = Trip.builder()
                 .tripName("tripName")
@@ -81,12 +96,6 @@ class ItemControllerTest {
                 .build();
         secondaryUser.setEnabled(true);
         userRepository.save(secondaryUser);
-    }
-
-    @AfterEach()
-    void cleanUp() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

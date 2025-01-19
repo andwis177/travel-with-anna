@@ -3,10 +3,12 @@ package com.andwis.travel_with_anna.api.country;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,7 +30,15 @@ class CountryControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public ApiCountryFacade apiCountryFacade() {
+            return Mockito.mock(ApiCountryFacade.class);
+        }
+    }
+
+    @Autowired
     private ApiCountryFacade facade;
 
     @Test

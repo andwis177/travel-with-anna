@@ -11,7 +11,6 @@ import com.andwis.travel_with_anna.user.UserRepository;
 import com.andwis.travel_with_anna.user.UserService;
 import com.andwis.travel_with_anna.user.avatar.*;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,11 +56,21 @@ class AdminServiceTest {
 
     @BeforeEach
     void setUp() {
+        avatarRepository.deleteAll();
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
         Role userRole = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         Role adminRole = roleRepository.findByRoleName(ADMIN.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(2, ADMIN.getRoleName(), ADMIN.getAuthority())));
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .roleName(ADMIN.getRoleName())
+                        .roleAuthority(ADMIN.getAuthority())
+                        .build()));
 
         avatar = Avatar.builder()
                 .avatar(AvatarDefaultImg.DEFAULT.getImg())
@@ -100,13 +109,6 @@ class AdminServiceTest {
         secondaryUser.setAccountLocked(false);
         secondaryUser.setEnabled(true);
         secondaryUserId = userRepository.save(secondaryUser).getUserId();
-    }
-
-    @AfterEach
-    void cleanUp() {
-        avatarRepository.deleteAll();
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

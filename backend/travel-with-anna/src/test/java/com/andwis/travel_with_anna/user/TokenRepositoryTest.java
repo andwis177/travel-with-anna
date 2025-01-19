@@ -4,11 +4,12 @@ import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.user.token.Token;
 import com.andwis.travel_with_anna.user.token.TokenRepository;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DisplayName("Token Repository tests")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class TokenRepositoryTest {
     @Autowired
     private TokenRepository tokenRepository;
@@ -26,7 +28,7 @@ class TokenRepositoryTest {
     @Autowired
     private RoleRepository roleRepository;
 
-    @AfterEach
+    @BeforeEach
     void tearDown() {
         tokenRepository.deleteAll();
         userRepository.deleteAll();
@@ -37,12 +39,11 @@ class TokenRepositoryTest {
     @Transactional
     void testFindByToken() {
         // Given
-        Role role = Role.builder()
-                .roleName(USER.getRoleName())
-                .roleAuthority(USER.getAuthority())
-                .build();
-
-        roleRepository.save(role);
+        Role role = roleRepository.findByRoleName(USER.getRoleName())
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         User user = User.builder()
                 .userName("user")

@@ -1,5 +1,5 @@
 <div align="center">
-  <div style="display: inline-block; text-align: center; background-color: #1C252D">
+  <div style="display: inline-block; text-align: center;">
     <img src="/frontend/travel-with-anna-ui/src/assets/images/twa.png" alt="Java" width="125" height="auto">
   </div>
 </div>

@@ -4,21 +4,30 @@ import com.andwis.travel_with_anna.handler.ErrorCodes;
 import com.andwis.travel_with_anna.handler.ExceptionResponse;
 import com.andwis.travel_with_anna.handler.exception.EmailNotFoundException;
 import com.andwis.travel_with_anna.handler.exception.InvalidTokenException;
+import com.andwis.travel_with_anna.role.Role;
+import com.andwis.travel_with_anna.role.RoleRepository;
+import com.andwis.travel_with_anna.user.User;
+import com.andwis.travel_with_anna.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.HashSet;
 import java.util.List;
 
 import static com.andwis.travel_with_anna.role.RoleType.USER;
@@ -28,15 +37,58 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("Authentication Controller tests")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class AuthenticationControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public AuthenticationService service() {
+            return Mockito.mock(AuthenticationService.class);
+        }
+        @Bean
+        public AuthenticationManager authenticationManager() {
+            return Mockito.mock(AuthenticationManager.class);
+        }
+    }
+
+    @Autowired
     private AuthenticationService service;
-    @MockBean
+    @Autowired
     private AuthenticationManager authenticationManager;
+
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        Role role = Role.builder()
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
+                .build();
+        roleRepository.save(role);
+
+        User user = User.builder()
+                .userName("username")
+                .email("email@example.com")
+                .password(passwordEncoder.encode("password"))
+                .role(role)
+                .avatarId(1L)
+                .trips(new HashSet<>())
+                .enabled(true)
+                .build();
+        userRepository.save(user);
+    }
 
     @Test
     void register_ShouldReturnAccepted() throws Exception {
@@ -82,6 +134,7 @@ class AuthenticationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "email@example.com", authorities = "User")
     void authenticationWithCredentials_ShouldReturnOk() throws Exception {
         // Given
         AuthenticationRequest request = new AuthenticationRequest(
@@ -96,7 +149,7 @@ class AuthenticationControllerTest {
                 ""
         );
 
-        when(service.authenticationWithCredentials(request)).thenReturn(response);
+        when(service.authenticationWithCredentials(eq(request))).thenReturn(response);
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -160,9 +213,10 @@ class AuthenticationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "email@example.com", authorities = "User")
     void restPassword_ShouldResetPassword() throws Exception {
         // Given
-        ResetPasswordRequest request = new ResetPasswordRequest("username");
+        ResetPasswordRequest request = new ResetPasswordRequest("email@example.com");
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders
@@ -228,5 +282,4 @@ class AuthenticationControllerTest {
 
         verify(service, times(1)).sendActivationCodeByRequest(email);
     }
-
 }

@@ -14,7 +14,6 @@ import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,8 +57,14 @@ class NoteFacadeTest {
 
     @BeforeEach
     void setUp() {
-        Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        Role role = roleRepository.findByRoleName(USER.getRoleName()).orElse(
+                roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         String encodedPassword = passwordEncoder.encode("password");
         user = User.builder()
@@ -114,12 +119,6 @@ class NoteFacadeTest {
         Activity retrivedActivity = retrivedDay.getActivities().stream().findFirst().orElse(null);
         assert retrivedActivity != null;
         activityNoteId = retrivedActivity.getNote().getNoteId();
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test
@@ -177,7 +176,7 @@ class NoteFacadeTest {
 
         // When
         NoteTypeException exception = assertThrows(NoteTypeException.class, () ->
-            noteFacade.saveNote(noteRequest, createUserDetails(user)));
+                noteFacade.saveNote(noteRequest, createUserDetails(user)));
 
         // Then
         assertTrue(exception.getMessage().contains("Invalid note type"));

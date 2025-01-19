@@ -5,5 +5,9 @@
     <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/main/resources/db/migration/V1__create_roles_table.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/main/resources/db/migration/V2__add_roles.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/main/resources/db/migration/V4__create_trip_and_related_tables.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/test/java/com/andwis/travel_with_anna/user/avatar/AvatarServiceTest.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/test/resources/migration/V1__create_roles_table.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/test/resources/migration/V2__add_roles.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/backend/travel-with-anna/src/test/resources/migration/V4__create_trip_and_related_tables.sql" dialect="GenericSQL" />
   </component>
 </project>

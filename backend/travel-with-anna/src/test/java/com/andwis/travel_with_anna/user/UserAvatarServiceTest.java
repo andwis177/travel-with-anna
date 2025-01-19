@@ -7,7 +7,6 @@ import com.andwis.travel_with_anna.user.avatar.Avatar;
 import com.andwis.travel_with_anna.user.avatar.AvatarDefaultImg;
 import com.andwis.travel_with_anna.user.avatar.AvatarRepository;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,8 +45,15 @@ class UserAvatarServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role userRole = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+        avatarRepository.deleteAll();
+
+        Role userRole = roleRepository.findByRoleName(USER.getRoleName()).orElse(
+                roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         Avatar avatar = Avatar.builder()
                 .avatar(AvatarDefaultImg.DEFAULT.getImg())
@@ -64,13 +70,6 @@ class UserAvatarServiceTest {
                 .build();
         user.setEnabled(true);
         userRepository.save(user);
-    }
-
-    @AfterEach()
-    void cleanUp() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
-        avatarRepository.deleteAll();
     }
 
     @Test

@@ -13,7 +13,6 @@ import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,6 +58,9 @@ class PdfReportControllerTest {
 
     @BeforeEach
     void setup() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
         Address address = Address.builder()
                 .address("Address")
                 .city("City")
@@ -81,8 +83,11 @@ class PdfReportControllerTest {
                 .build();
         address.addLinkedActivity(activity);
 
-        Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        Role role = Role.builder()
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
+                .build();
+        roleRepository.save(role);
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
@@ -120,12 +125,6 @@ class PdfReportControllerTest {
         tripId = tripRepository.save(trip).getTripId();
 
         userDetails = createUserDetails(user);
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

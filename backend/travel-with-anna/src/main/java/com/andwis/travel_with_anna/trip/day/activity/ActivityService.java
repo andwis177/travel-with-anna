@@ -126,11 +126,11 @@ public class ActivityService {
         Activity activity = getById(request.getActivityId());
         activityAuthorizationService.authorizeSingleActivity(activity, connectedUser);
         ActivityMapper.updateActivity(activity, request);
-        updateActivityExpanseCategoryDescription(activity, connectedUser);
+        updateActivityExpanseCategoryDescription(activity);
         String message;
         if (!toLocalDate(request.getOldActivityDate()).equals(toLocalDate(request.getNewActivityDate()))) {
             updateActivityDate(activity, request.getNewActivityDate(), connectedUser);
-            updateActivityExpanseDate(activity, toLocalDate(request.getNewActivityDate()), connectedUser);
+            updateActivityExpanseDate(activity, toLocalDate(request.getNewActivityDate()));
             message = "Activity date updated";
         } else
         if (activity.getAssociatedId() != null) {
@@ -160,9 +160,9 @@ public class ActivityService {
             Activity associatedActivity = getById(activity.getAssociatedId());
             activityAuthorizationService.authorizeSingleActivity(associatedActivity, connectedUser);
             associatedActivity.setType(activity.getType());
-            updateActivityExpanseCategoryDescription(activity, connectedUser);
+            updateActivityExpanseCategoryDescription(activity);
             activityRepository.saveAll(List.of(activity, associatedActivity));
-        } catch (ActivityNotFoundException _) {
+        } catch (ActivityNotFoundException e) {
             activityRepository.save(activity);
             log.error("Associated activity not found");
         }
@@ -255,7 +255,7 @@ public class ActivityService {
                 .collect(Collectors.toMap(
                         getNameFunction,
                         item -> item,
-                        (existing, _) -> existing,
+                        (existing, e) -> existing,
                         LinkedHashMap::new
                 ))
                 .values().stream()
@@ -263,7 +263,8 @@ public class ActivityService {
     }
 
     private <T> @Nullable T getLastElement(@NotNull List<T> items) {
-        return items.isEmpty() ? null : items.getLast();
+        int listSize = items.size();
+        return items.isEmpty() ? null : items.get(listSize - 1);
     }
 
     public AddressDetail fetchAddressDetailByDayId(Long dayId, UserDetails connectedUser) {
@@ -348,7 +349,7 @@ public class ActivityService {
         return description;
     }
 
-    private void updateActivityExpanseCategoryDescription(@NotNull Activity activity, UserDetails connectedUser) {
+    private void updateActivityExpanseCategoryDescription(@NotNull Activity activity) {
         if(activity.getExpanse() == null) {
             return;
         }
@@ -356,7 +357,7 @@ public class ActivityService {
         expanseService.updateExpanseCategory(activity.getExpanse(), description.toString());
     }
 
-    private void updateActivityExpanseDate(@NotNull Activity activity, LocalDate date, UserDetails connectedUser) {
+    private void updateActivityExpanseDate(@NotNull Activity activity, LocalDate date) {
         if(activity.getExpanse() == null) {
             return;
         }

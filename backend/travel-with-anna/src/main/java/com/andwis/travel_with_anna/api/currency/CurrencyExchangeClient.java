@@ -26,7 +26,7 @@ public class CurrencyExchangeClient {
         try {
             String endpointUrl = baseUrl + "/latest";
             CurrencyResponse response = fetchCurrencyResponse(endpointUrl);
-
+            log.debug("CurrencyResponse: {}", response);
             if (isInvalidResponse(response)) {
                 return Collections.emptyList();
             }
@@ -39,6 +39,7 @@ public class CurrencyExchangeClient {
     }
 
     private CurrencyResponse fetchCurrencyResponse(String url) {
+        log.info("Making request to URL: {}", url);
         return restClient.get()
                 .uri(url)
                 .header("apikey", apiKey)

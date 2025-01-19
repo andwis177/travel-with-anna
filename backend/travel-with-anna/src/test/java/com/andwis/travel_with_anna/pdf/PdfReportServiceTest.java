@@ -14,7 +14,6 @@ import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +52,9 @@ class PdfReportServiceTest {
 
     @BeforeEach
     void setup() {
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
         Address address = Address.builder()
                 .address("Address")
                 .city("City")
@@ -76,7 +78,10 @@ class PdfReportServiceTest {
         address.addLinkedActivity(activity);
 
         Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         String encodedPassword = passwordEncoder.encode("password");
         User user = User.builder()
@@ -124,12 +129,6 @@ class PdfReportServiceTest {
         user.addTrip(trip);
         tripId = tripRepository.save(trip).getTripId();
         userDetails = createUserDetails(user);
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

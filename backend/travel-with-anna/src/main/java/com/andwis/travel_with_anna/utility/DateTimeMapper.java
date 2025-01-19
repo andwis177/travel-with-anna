@@ -17,11 +17,11 @@ public class DateTimeMapper {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     public static @NotNull LocalDateTime toLocalDateTime(@NotNull String dateTimeString) {
-        return parseDateTime(dateTimeString, DATE_TIME_FORMATTER, "Invalid date-time format. Expected 'yyyy-MM-dd'T'HH:mm'");
+        return parseToLocalDateTime(dateTimeString);
     }
 
     public static @NotNull LocalDate toLocalDate(@NotNull String dateString) {
-        return parseDateTime(dateString, DATE_FORMATTER, "Invalid date format. Expected 'yyyy-MM-dd'");
+        return parseToLocalDate(dateString);
     }
 
     public static @Nullable LocalTime toTime(@NotNull String timeString) {
@@ -32,17 +32,19 @@ public class DateTimeMapper {
         }
     }
 
-    private static <T> @NotNull T parseDateTime(String input, DateTimeFormatter formatter, String errorMessage) {
+    private static @NotNull LocalDateTime parseToLocalDateTime(String input) {
         try {
-            if (formatter == DATE_TIME_FORMATTER) {
-                return (T) LocalDateTime.parse(input, formatter);
-            } else if (formatter == DATE_FORMATTER) {
-                return (T) LocalDate.parse(input, formatter);
-            } else {
-                throw new IllegalArgumentException("Unsupported formatter provided");
-            }
+            return LocalDateTime.parse(input, DateTimeMapper.DATE_TIME_FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new DateTimeException(errorMessage, e);
+            throw new DateTimeException("Invalid date-time format. Expected 'yyyy-MM-dd'T'HH:mm'", e);
+        }
+    }
+
+    private static @NotNull LocalDate parseToLocalDate(String input) {
+        try {
+            return LocalDate.parse(input, DateTimeMapper.DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            throw new DateTimeException("Invalid date format. Expected 'yyyy-MM-dd'", e);
         }
     }
 }

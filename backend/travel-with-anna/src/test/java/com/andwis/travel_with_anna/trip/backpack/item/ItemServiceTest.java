@@ -7,6 +7,7 @@ import com.andwis.travel_with_anna.role.RoleRepository;
 import com.andwis.travel_with_anna.trip.backpack.Backpack;
 import com.andwis.travel_with_anna.trip.backpack.BackpackRepository;
 import com.andwis.travel_with_anna.trip.budget.Budget;
+import com.andwis.travel_with_anna.trip.budget.BudgetRepository;
 import com.andwis.travel_with_anna.trip.expanse.Expanse;
 import com.andwis.travel_with_anna.trip.expanse.ExpanseRepository;
 import com.andwis.travel_with_anna.trip.trip.Trip;
@@ -16,7 +17,6 @@ import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,11 +60,19 @@ class ItemServiceTest {
     private Item item;
     private Long backpackId;
     private UserDetails userDetails;
+    @Autowired
+    private BudgetRepository budgetRepository;
 
     @BeforeEach
     void setUp() {
-        Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        Role role = Role.builder()
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
+                .build();
+        roleRepository.save(role);
 
         User user = User.builder()
                 .userName("userName")
@@ -75,6 +83,7 @@ class ItemServiceTest {
                 .trips(new HashSet<>())
                 .build();
         user.setEnabled(true);
+        userRepository.save(user);
 
         User secondaryUser = User.builder()
                 .userName("userName2")
@@ -90,6 +99,7 @@ class ItemServiceTest {
                 .currency("USD")
                 .budgetAmount(BigDecimal.valueOf(1000))
                 .build();
+        budgetRepository.save(budget);
 
         Trip trip = Trip.builder()
                 .tripName("Test Trip")
@@ -98,14 +108,14 @@ class ItemServiceTest {
                 .build();
         trip.addBackpack(new Backpack());
         trip.addBudget(budget);
-        tripRepository.save(trip);
         user.addTrip(trip);
-        userRepository.save(user);
+        tripRepository.save(trip);
 
         item = Item.builder()
                 .itemName("Flight Ticket")
                 .quantity("1")
                 .build();
+        itemRepository.save(item);
 
         Expanse expanse = Expanse.builder()
                 .expanseName("Flight")
@@ -121,16 +131,10 @@ class ItemServiceTest {
                 .backpackItems(new ArrayList<>())
                 .build();
         backpack.addItem(item);
-        backpack.setTrip(trip);
-        backpackId = backpackRepository.save(backpack).getBackpackId();
+        trip.addBackpack(backpack);
+        backpackId =  backpackRepository.save(backpack).getBackpackId();
 
         userDetails = createUserDetails(user);
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

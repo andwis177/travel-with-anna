@@ -14,13 +14,14 @@ import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -52,16 +53,39 @@ class BackpackServiceTest {
     private TripRepository tripRepository;
     @Autowired
     private EntityManager entityManager;
-    @MockBean
-    private NoteService noteService;
+
     private UserDetails userDetails;
     private Backpack backpack;
     private Long backpackId;
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public NoteService noteService() {
+            return Mockito.mock(NoteService.class);
+        }
+    }
+
+    @Autowired
+    private NoteService noteService;
+
+
     @BeforeEach
     void setUp() {
-        Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+        backpackRepository.deleteAll();
+        tripRepository.deleteAll();
+
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Role role = Role.builder()
+                .roleName(USER.getRoleName())
+                .roleAuthority(USER.getAuthority())
+                .build();
+        roleRepository.save(role);
 
         User user = User.builder()
                 .userName("userName")
@@ -84,19 +108,14 @@ class BackpackServiceTest {
                 .backpackItems(new ArrayList<>())
                 .build();
 
-        backpack.setTrip(trip);
+        trip.addBackpack(backpack);
         backpackId = backpackRepository.save(backpack).getBackpackId();
 
         userDetails = createUserDetails(user);
     }
 
-    @AfterEach
-    void clean() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
-    }
-
     @Test
+    @Transactional
     void testFindBackpackById() {
         // When
         Backpack foundBackpack = backpackService.findById(backpackId);
@@ -107,6 +126,7 @@ class BackpackServiceTest {
     }
 
     @Test
+    @Transactional
     void testThrowExceptionWhenBackpackNotFound() {
         // Given
         Long nonExistentId = 999L;

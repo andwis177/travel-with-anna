@@ -52,7 +52,7 @@ public class ExpanseFacade {
         Item item = itemService.findById(expanseRequest.getEntityId());
         return expanseService.createOrUpdateExpanse(
                 expanseRequest,
-                _ -> item,
+                itemId -> item,
                 item::getExpanse,
                 Item::addExpanse,
                 connectedUser);
@@ -64,7 +64,7 @@ public class ExpanseFacade {
         Activity activity = activityService.getById(expanseRequest.getEntityId());
         return expanseService.createOrUpdateExpanse(
                 expanseRequest,
-                _ -> activity,
+                itemId -> activity,
                 activity::getExpanse,
                 Activity::addExpanse,
                 connectedUser);
@@ -101,7 +101,7 @@ public class ExpanseFacade {
         Item item = itemService.findById(itemId);
         return expanseService.getExpanseByEntityId(
                 itemId,
-                _ -> item,
+                id -> item,
                 Item::getExpanse,
                 connectedUser
         );
@@ -111,7 +111,7 @@ public class ExpanseFacade {
         Activity activity = activityService.getById(activityId);
         return expanseService.getExpanseByEntityId(
                 activityId,
-                _ -> activity,
+                itemId -> activity,
                 Activity::getExpanse,
                 connectedUser
         );

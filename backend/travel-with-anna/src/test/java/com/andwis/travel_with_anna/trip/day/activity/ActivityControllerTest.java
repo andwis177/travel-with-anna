@@ -10,10 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -42,11 +44,20 @@ class ActivityControllerTest {
     private ObjectMapper objectMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @MockBean
-    private ActivityFacade facade;
     private AddressDetail addressDetail;
     private ActivityDetailedResponse activityDetailedResponse;
     private ActivityRequest activityRequest;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public ActivityFacade activityFacade() {
+            return Mockito.mock(ActivityFacade.class);
+        }
+    }
+
+    @Autowired
+    private ActivityFacade facade;
 
     @BeforeEach
     void setUp() {

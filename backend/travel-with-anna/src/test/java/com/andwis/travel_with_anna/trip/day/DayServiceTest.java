@@ -9,7 +9,6 @@ import com.andwis.travel_with_anna.user.SecurityUser;
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,8 +50,16 @@ class DayServiceTest {
 
     @BeforeEach
     void setUp() {
+        dayRepository.deleteAll();
+        tripRepository.deleteAll();
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
         Role role = roleRepository.findByRoleName(USER.getRoleName())
-                .orElseGet(() -> roleRepository.save(new Role(1, USER.getRoleName(), USER.getAuthority())));
+                .orElseGet(() -> roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         User user = User.builder()
                 .userName("userName")
@@ -78,14 +85,6 @@ class DayServiceTest {
         userRepository.save(user);
 
         userDetails = createUserDetails(user);
-    }
-
-    @AfterEach
-    void tearDown() {
-        dayRepository.deleteAll();
-        tripRepository.deleteAll();
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test
@@ -228,7 +227,7 @@ class DayServiceTest {
         Long dayId = day.getDayId();
 
         // When
-        dayService.deleteDay(day, _ -> {});
+        dayService.deleteDay(day, deleteFunction  -> {});
 
         // Then
         assertFalse(dayRepository.existsById(dayId));

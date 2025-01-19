@@ -2,7 +2,6 @@ package com.andwis.travel_with_anna.role;
 
 import com.andwis.travel_with_anna.user.User;
 import com.andwis.travel_with_anna.user.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,30 +30,29 @@ class RoleServiceTest {
 
     @BeforeEach
     void setUp() {
-        Role role = new Role();
-        role.setRoleName(USER.getRoleName());
-        role.setRoleAuthority(USER.getAuthority());
-        roleRepository.save(role);
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
 
-        Role role2 = new Role();
-        role2.setRoleName(ADMIN.getRoleName());
-        role2.setRoleAuthority(ADMIN.getAuthority());
-        roleRepository.save(role2);
+        Role userRole = roleRepository.findByRoleName(USER.getRoleName()).orElse(
+                roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
+
+        Role adminRole = roleRepository.findByRoleName(ADMIN.getRoleName()).orElse(
+                roleRepository.save(Role.builder()
+                        .roleName(ADMIN.getRoleName())
+                        .roleAuthority(ADMIN.getAuthority())
+                        .build()));
 
         user = User.builder()
                 .userName("userName")
                 .email("email@example.com")
                 .password("password")
-                .role(role2)
+                .role(adminRole)
                 .avatarId(1L)
                 .build();
         user.setEnabled(true);
-    }
-
-    @AfterEach()
-    void cleanUp() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test

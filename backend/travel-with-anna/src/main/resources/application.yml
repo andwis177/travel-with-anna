@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: oauth2-dev
+    active: oauth2-prod
   servlet:
     multipart:
       max-file-size: 50MB

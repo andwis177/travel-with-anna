@@ -31,7 +31,7 @@ class CurrencyExchangeClientTest {
         // Given
         // When
         List<CurrencyExchangeResponse> currencies = currencyExchangeClient.fetchAllExchangeRates();
-        currencies.stream().map(CurrencyExchangeResponse::getCode).forEach(System.out::println);
+
         // Then
         Assertions.assertFalse(currencies.isEmpty());
         List<String> currenciesNames = currencies.stream().map(CurrencyExchangeResponse::getCode).toList();

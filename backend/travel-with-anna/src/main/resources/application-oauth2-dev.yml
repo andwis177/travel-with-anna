@@ -1,0 +1,68 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/travel_with_anna
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql
+
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    sender_email: ${GMAIL_USER}
+    protocol: smtp
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
+
+gmail:
+  oauth2:
+    client-id: ${OAUTH2_CLIENT_ID}
+    token_uri: https://oauth2.googleapis.com/token
+    send_scope: https://www.googleapis.com/auth/gmail.send
+    api_endpoint_send: https://gmail.googleapis.com/gmail/v1/users/me/messages/send
+    client_secret: ${OAUTH2_CLIENT_SECRET}
+    refresh_token: ${OAUTH2_REFRESH_TOKEN}
+    local_receiver_port: ${OAUTH2_LOCAL_RECEIVER_PORT:8888}
+
+application:
+  security:
+    jwt:
+      expiration: 86400000 # a day
+    cors: http://localhost:4200,https://twa-frontend-721629605210.europe-north1.run.app", "http://localhost:8080
+  mailing:
+    frontend:
+      activation-url: http://localhost:4200/activate-account
+      login-url: http://localhost:4200/login
+
+my_apis:
+  country:
+    country_url: ${API_COUNTRY}
+  currency:
+    currency_url: ${API_CURRENCY}
+    header:
+      apikey: ${API_CURRENCY_KEY}
+
+server:
+  port: 8080
+  shutdown: graceful
+

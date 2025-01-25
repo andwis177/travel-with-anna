@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ApiConfiguration {
-  rootUrl: string = 'https://twa-backend-793077004948.europe-north1.run.app//twa/v1';
+  rootUrl: string = 'https://twa-backend-793077004948.europe-north1.run.app/twa/v1';
 }
 
 /**

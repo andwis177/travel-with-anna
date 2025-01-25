@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -25,6 +25,7 @@ spring:
     port: 2525
     username: email@example.com
     password: password
+    sender_email: email@example.com
     properties:
           auth: true
           starttls:

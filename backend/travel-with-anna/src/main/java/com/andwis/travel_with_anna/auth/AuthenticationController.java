@@ -8,8 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.relation.RoleNotFoundException;
 import javax.security.auth.login.AccountLockedException;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 @RestController
 @RequestMapping("auth")
@@ -29,7 +30,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<Void> register(
             @RequestBody @Valid RegistrationRequest request
-    ) throws RoleNotFoundException, MessagingException, WrongPasswordException {
+    ) throws Exception {
         service.register(request);
         return ACCEPTED_RESPONSE;
     }
@@ -44,7 +45,7 @@ public class AuthenticationController {
     @GetMapping("/activate-account")
     public ResponseEntity<Void> confirm(
             @RequestParam String token
-    ) throws MessagingException {
+    ) throws Exception {
         service.activateAccount(token);
         return ACCEPTED_RESPONSE;
     }
@@ -52,13 +53,13 @@ public class AuthenticationController {
     @PatchMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(
             @RequestBody @Valid ResetPasswordRequest request
-    ) throws MessagingException {
+    ) throws MessagingException, GeneralSecurityException, IOException, InterruptedException {
         service.resetPassword(request);
         return OK_RESPONSE;
     }
 
     @PostMapping("/resend-activation-code")
-    public ResponseEntity<Void> resendActivationCode(@RequestParam String email) throws MessagingException {
+    public ResponseEntity<Void> resendActivationCode(@RequestParam String email) throws Exception {
         service.sendActivationCodeByRequest(email);
         return OK_RESPONSE;
     }

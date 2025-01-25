@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
-                                     user_id BIGSERIAL PRIMARY KEY,
-                                     user_name VARCHAR(30) UNIQUE NOT NULL,
+    user_id BIGSERIAL PRIMARY KEY,
+    user_name VARCHAR(30) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     account_locked BOOLEAN DEFAULT FALSE,
@@ -13,32 +13,32 @@ CREATE TABLE IF NOT EXISTS users (
     );
 
 CREATE TABLE IF NOT EXISTS trips  (
-                                      trip_id BIGSERIAL PRIMARY KEY,
-                                      trip_name VARCHAR(60),
+    trip_id BIGSERIAL PRIMARY KEY,
+    trip_name VARCHAR(60),
     owner_id BIGINT,
     CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES users(user_id)
     );
 
 CREATE TABLE IF NOT EXISTS notes (
-                                     note_id BIGSERIAL PRIMARY KEY,
-                                     note VARCHAR(500)
+    note_id BIGSERIAL PRIMARY KEY,
+    note VARCHAR(500)
     );
 
 CREATE TABLE IF NOT EXISTS days (
-                                    day_id BIGSERIAL PRIMARY KEY,
-                                    date DATE NOT NULL,
-                                    note_id BIGINT,
-                                    CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id)
+    day_id BIGSERIAL PRIMARY KEY,
+    date DATE NOT NULL,
+    note_id BIGINT,
+    CONSTRAINT fk_note FOREIGN KEY (note_id) REFERENCES notes(note_id)
     );
 
 CREATE TABLE IF NOT EXISTS backpack (
-                                        backpack_id BIGSERIAL PRIMARY KEY
+    backpack_id BIGSERIAL PRIMARY KEY
 );
 
 
 CREATE TABLE IF NOT EXISTS addresses (
-                                         address_id BIGSERIAL PRIMARY KEY,
-                                         place VARCHAR(100),
+    address_id BIGSERIAL PRIMARY KEY,
+    place VARCHAR(100),
     country VARCHAR(100),
     country_code VARCHAR(3),
     city VARCHAR(100),
@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS addresses (
 
 
 CREATE TABLE IF NOT EXISTS activities (
-                                          activity_id BIGSERIAL PRIMARY KEY,
-                                          activity_title VARCHAR(60),
+    activity_id BIGSERIAL PRIMARY KEY,
+    activity_title VARCHAR(60),
     begin_time TIME,
     end_time TIME,
     badge VARCHAR(20),
@@ -71,15 +71,15 @@ CREATE TABLE IF NOT EXISTS activities (
 
 
 CREATE TABLE IF NOT EXISTS budget (
-                                      budget_id BIGSERIAL PRIMARY KEY,
-                                      currency VARCHAR(10) NOT NULL,
+    budget_id BIGSERIAL PRIMARY KEY,
+    currency VARCHAR(10) NOT NULL,
     budget_amount DECIMAL(19, 2) NOT NULL
     );
 
 
 CREATE TABLE IF NOT EXISTS expanses (
-                                        expanse_id BIGSERIAL PRIMARY KEY,
-                                        expanse_name VARCHAR(60),
+    expanse_id BIGSERIAL PRIMARY KEY,
+    expanse_name VARCHAR(60),
     expanse_category VARCHAR(255),
     date DATE,
     currency VARCHAR(10) NOT NULL ,
@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS expanses (
     );
 
 CREATE TABLE IF NOT EXISTS items (
-                                     item_id BIGSERIAL PRIMARY KEY,
-                                     item_name VARCHAR(100),
+    item_id BIGSERIAL PRIMARY KEY,
+    item_name VARCHAR(100),
     quantity VARCHAR(70),
     is_packed BOOLEAN DEFAULT FALSE,
     backpack_id BIGINT,

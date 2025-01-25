@@ -26,6 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -37,6 +38,8 @@ import static com.andwis.travel_with_anna.role.RoleType.USER;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @DisplayName("Item Service tests")
 class ItemServiceTest {
     @Autowired
@@ -65,14 +68,18 @@ class ItemServiceTest {
 
     @BeforeEach
     void setUp() {
+        expanseRepository.deleteAll();
+        tripRepository.deleteAll();
+        backpackRepository.deleteAll();
+        itemRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
 
-        Role role = Role.builder()
-                .roleName(USER.getRoleName())
-                .roleAuthority(USER.getAuthority())
-                .build();
-        roleRepository.save(role);
+        Role role = roleRepository.findByRoleName(USER.getRoleName()).orElse(
+                roleRepository.save(Role.builder()
+                        .roleName(USER.getRoleName())
+                        .roleAuthority(USER.getAuthority())
+                        .build()));
 
         User user = User.builder()
                 .userName("userName")

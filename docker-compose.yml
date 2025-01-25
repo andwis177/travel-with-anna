@@ -1,60 +1,113 @@
 services:
   postgres:
-    container_name: travel-with-anna-postgres
+    container_name: travel-with-anna-postgres-docker
     restart: unless-stopped
     image: postgres:16.3-alpine
     environment:
-      POSTGRES_DB: travel_with_anna
+      POSTGRES_DB: travel_with_anna_docker
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data
-      SERVICE_TAGS: prod
-      SERVICE_NAME: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
       - twa-network
-
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d travel_with_anna_docker" ]
+      interval: 5s
+      timeout: 10s
+      retries: 3
 
   backend:
     container_name: travel-with-anna-backend
+    restart: unless-stopped
     build:
       context: ./backend/travel-with-anna
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+
+    # Database configuration
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/travel_with_anna
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: travel_with_anna_docker
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # Spring configuration
+      SPRING_PROFILES_ACTIVE: oauth2-docker-dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/travel_with_anna_docker
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_MAIL_HOST: sandbox.smtp.mailtrap.io
-      SPRING_MAIL_PORT: 2525
-      SPRING_MAIL_USERNAME: ${MAILTRAP_USER}
-      SPRING_MAIL_PASSWORD: ${MAILTRAP_PASSWORD}
-      SPRING_MAIL_PROPERTIES_AUTH: 'true'
-      SPRING_MAIL_PROPERTIES_STARTTLS_ENABLE: 'true'
-      SPRING_MAIL_PROPERTIES_SSL_TRUST: smtp.mailtrap.io
+
+      # Gmail OAuth2 Configuration
+      GMAIL_HOST: smtp.gmail.com
+      GMAIL_PORT: 587
+      GMAIL_USER: ${GMAIL_USER}
+      GMAIL_PROTOCOL: smtp
+      GMAIL_OAUTH2_CLIENT_ID: ${OAUTH2_CLIENT_ID}
+      GMAIL_OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET}
+      GMAIL_OAUTH2_REFRESH_TOKEN: ${OAUTH2_REFRESH_TOKEN}
+      GMAIL_OAUTH2_TOKEN_URI: https://oauth2.googleapis.com/token
+      GMAIL_OAUTH2_SEND_SCOPE: https://www.googleapis.com/auth/gmail.send
+      GMAIL_OAUTH2_API_ENDPOINT_SEND: https://www.googleapis.com/upload/gmail/v1/users/me/messages/send
+
+      # Application-specific environment variables
+      CORS_ORIGIN: http://localhost:80
+      TOKEN_EXPIRATION: ${TOKEN_EXPIRATION}
+      ACTIVATION_URL: http://localhost:80/activate-account
+      LOGIN_URL: http://localhost:80/login
+
+      # APIs
+      API_COUNTRY: ${API_COUNTRY}
+      API_CURRENCY: ${API_CURRENCY}
+      API_CURRENCY_KEY: ${API_CURRENCY_KEY}
+
+      # Service tags and restart policy
       SERVICE_TAGS: prod
       SERVICE_NAME: app
     depends_on:
-      - postgres
-      - mailtrap
+      postgres:
+        condition: service_healthy
     networks:
       - twa-network
-    restart: unless-stopped
 
-  mailtrap:
-    container_name: travel-with-anna-mailtrap
-    restart: unless-stopped
-    image: eaudeweb/mailtrap
-    ports:
-      - "2525:2525"
-    expose:
-      - "2525"
-    networks:
-      - twa-network
+
+       # MAILTRAP
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/travel_with_anna
+#      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+#      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+#      SPRING_MAIL_HOST: sandbox.smtp.mailtrap.io
+#      SPRING_MAIL_PORT: 2525
+#      SPRING_MAIL_USERNAME: ${MAILTRAP_USER}
+#      SPRING_MAIL_PASSWORD: ${MAILTRAP_PASSWORD}
+#      SPRING_MAIL_PROPERTIES_AUTH: 'true'
+#      SPRING_MAIL_PROPERTIES_STARTTLS_ENABLE: 'true'
+#      SPRING_MAIL_PROPERTIES_SSL_TRUST: smtp.mailtrap.io
+#      SERVICE_TAGS: prod
+#      SERVICE_NAME: app
+#    depends_on:
+#      - postgres
+#      - mailtrap
+#    networks:
+#      - twa-network
+#    restart: unless-stopped
+#
+#  mailtrap:
+#    container_name: travel-with-anna-mailtrap
+#    restart: unless-stopped
+#    image: eaudeweb/mailtrap
+#    ports:
+#      - "2525:2525"
+#    expose:
+#      - "2525"
+#    networks:
+#      - twa-network
 
   frontend:
     container_name: travel-with-anna-frontend
@@ -64,10 +117,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-    expose:
-      - "80"
     depends_on:
       - backend
+    environment:
+      REACT_APP_API_URL: http://backend:8080
     networks:
       - twa-network
 

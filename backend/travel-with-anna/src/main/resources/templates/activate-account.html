@@ -16,9 +16,10 @@
             padding: 20px;
             background-color: #EDEAE5;
             color: #2E3944;
-            font-family: "Verdana", sans-serif;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-family: "Montserrat", sans-serif;
+            border: 1px solid #1C252D;
+            border-radius: 10px;
+            box-shadow: 0 0 10px 2px rgba(0,0,0,0.1);
             text-align: center;
         }
         .hello {
@@ -27,9 +28,9 @@
             color: #2E3944;
         }
         .text {
-            font-size: 18px;
+            font-size: 14px;
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #2E3944;
         }
 
@@ -41,21 +42,6 @@
             font-weight: bold;
 
         }
-        .activation-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .activation-link a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #2E3944;
-            color: whitesmoke;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
         .travel-with-anna {
             font-weight: bold;
             color: #2E3944;
@@ -65,10 +51,10 @@
 </head>
 <body>
 <div class="container">
-    <h1>Account Activation</h1>
+    <h1>Activation Code</h1>
     <p class="hello" th:text="'Hello ' + ${userName} + ','"></p>
-    <p class="text">Thank you for signing up to <span class="travel-with-anna"> TRAVEL WITH ANNA </span>! Please use the following activation code to activate your account:</p>
-    <div class="activation-code"><span th:text="${code}"></span></div>
+    <p class="text">Thank you for signing up to <span class="travel-with-anna"> TRAVEL WITH ANNA </span>! Please use the following activation code to activate your account.</p>
+    <div class="activation-code"><span th:text="${content}"></span></div>
 </div>
 </body>
 </html>

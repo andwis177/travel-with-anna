@@ -17,6 +17,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.net.http.HttpClient;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -59,10 +61,12 @@ public class BeansConfig {
 
         List<String> allowedMethods = List.of("GET", "POST", "DELETE", "PUT", "PATCH");
 
+        List<String> allowedOrigins = Arrays.asList(corsValue.split(","));
+
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of(corsValue));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedHeaders(allowedHeaders);
         config.setAllowedMethods(allowedMethods);
         source.registerCorsConfiguration("/**", config);
@@ -73,4 +77,10 @@ public class BeansConfig {
     public CustomLogoutSuccessHandler customLogoutSuccessHandler() {
         return new CustomLogoutSuccessHandler();
     }
+
+    @Bean
+    public HttpClient httpClient() {
+        return HttpClient.newHttpClient();
+    }
+
 }

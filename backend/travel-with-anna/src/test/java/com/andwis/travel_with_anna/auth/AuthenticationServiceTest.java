@@ -1,6 +1,8 @@
 package com.andwis.travel_with_anna.auth;
 
-import com.andwis.travel_with_anna.email.EmailService;
+import com.andwis.travel_with_anna.email.EmailDetails;
+import com.andwis.travel_with_anna.email.EmailTemplateName;
+import com.andwis.travel_with_anna.email.SmtpEmailSender;
 import com.andwis.travel_with_anna.handler.exception.*;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleService;
@@ -32,6 +34,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.management.relation.RoleNotFoundException;
 import javax.security.auth.login.AccountLockedException;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 
 import static com.andwis.travel_with_anna.role.RoleType.USER;
@@ -54,7 +58,7 @@ class AuthenticationServiceTest {
     @Mock
     private AvatarService avatarService;
     @Mock
-    private EmailService emailService;
+    private SmtpEmailSender emailService;
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
@@ -128,31 +132,47 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testRegister_Success() throws MessagingException, RoleNotFoundException, WrongPasswordException {
-        //Given
+    void testRegister_Success() throws Exception {
+        // Given
         when(roleService.getRoleByName(USER.getRoleName())).thenReturn(role);
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
         when(userService.existsByEmail("email@example.com")).thenReturn(false);
         when(userService.existsByUserName("username")).thenReturn(false);
-        doNothing().when(emailService).sendValidationEmail(any(), any(), any(), any());
+        doNothing().when(emailService).sendEmail(any(EmailDetails.class));
 
-        //When
+        // When
         authenticationService.register(request);
 
-        //Then
+        // Then
         verify(avatarService, times(1)).createAvatar(userCaptor.capture());
-        verify(emailService, times(1)).sendValidationEmail(
-                eq("email@example.com"),
-                eq("username"),
-                anyString(),
-                eq("Account activation")
-        );
+        verify(emailService, times(1)).sendEmail(any(EmailDetails.class));
         User savedUser = userCaptor.getValue();
 
         assertNotNull(savedUser);
         assertEquals(request.getEmail(), savedUser.getEmail());
         assertEquals(request.getUserName(), savedUser.getUserName());
         assertEquals("encodedPassword", savedUser.getPassword());
+    }
+
+    @Test
+    void testRegister_EmailDetailsVerification() throws Exception {
+        // Given
+        when(roleService.getRoleByName(USER.getRoleName())).thenReturn(role);
+        when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
+        when(userService.existsByEmail("email@example.com")).thenReturn(false);
+        when(userService.existsByUserName("username")).thenReturn(false);
+        ArgumentCaptor<EmailDetails> emailDetailsCaptor = ArgumentCaptor.forClass(EmailDetails.class);
+        doNothing().when(emailService).sendEmail(emailDetailsCaptor.capture());
+
+        // When
+        authenticationService.register(request);
+
+        // Then
+        EmailDetails capturedEmailDetails = emailDetailsCaptor.getValue();
+        assertNotNull(capturedEmailDetails);
+        assertEquals("email@example.com", capturedEmailDetails.sendTo());
+        assertEquals("Activation Code", capturedEmailDetails.subject());
+        assertNotNull(capturedEmailDetails.content());
     }
 
     @Test
@@ -225,16 +245,16 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testActivateAccount_ValidToken() throws MessagingException {
-        //Given
+    void testActivateAccount_ValidToken() throws Exception {
+        // Given
         token.setExpiresAt(now.plusMinutes(15));
         when(tokenService.getByToken("jwtToken")).thenReturn(token);
         when(userService.getUserById(user.getUserId())).thenReturn(user);
 
-        //When
+        // When
         authenticationService.activateAccount("jwtToken");
 
-        //Then
+        // Then
         assertTrue(user.isEnabled());
         verify(userService, times(1)).saveUser(user);
         verify(tokenService, times(1)).deleteToken(token);
@@ -269,47 +289,59 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void testResetPasswordWithUserName_Success() throws MessagingException {
+    void testResetPasswordWithUserName_Success() throws MessagingException, GeneralSecurityException, IOException, InterruptedException {
         // Given
         ResetPasswordRequest request = new ResetPasswordRequest("username");
         when(userService.getUserByUserName("username")).thenReturn(user);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        doNothing().when(emailService).sendResetPassword(any(), any(), any(), eq("Password reset"));
+
+        ArgumentCaptor<EmailDetails> emailDetailsCaptor = ArgumentCaptor.forClass(EmailDetails.class);
+        doNothing().when(emailService).sendEmail(emailDetailsCaptor.capture());
 
         // When
         authenticationService.resetPassword(request);
 
         // Then
         verify(userService).saveUser(user);
-        verify(emailService).sendResetPassword(any(), any(), any(), eq("Password reset"));
+        verify(emailService).sendEmail(any(EmailDetails.class));
+
+        EmailDetails capturedDetails = emailDetailsCaptor.getValue();
+        assertNotNull(capturedDetails);
+        assertEquals("email@example.com", capturedDetails.sendTo());  // Replace this with actual user.email
+        assertEquals("username", capturedDetails.userName());
+        assertEquals("New password", capturedDetails.subject());
+        assertNotNull(capturedDetails.content());
+        assertEquals(EmailTemplateName.RESET_PASSWORD, capturedDetails.templateName());
     }
 
     @Test
-    void testResetPasswordWithEmail_Success() throws MessagingException {
+    void testResetPasswordWithEmail_Success() throws MessagingException, GeneralSecurityException, IOException, InterruptedException {
         // Given
         ResetPasswordRequest request = new ResetPasswordRequest("mail@example.com");
         when(userService.getUserByEmail("mail@example.com")).thenReturn(user);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        doNothing().when(emailService).sendResetPassword(any(), any(), any(), eq("Password reset"));
+        doNothing().when(emailService).sendEmail(any(EmailDetails.class));
 
         // When
         authenticationService.resetPassword(request);
 
         // Then
         verify(userService).saveUser(user);
-        verify(emailService).sendResetPassword(any(), any(), any(), eq("Password reset"));
+        verify(emailService).sendEmail(any(EmailDetails.class));
     }
 
     @Test
     void testResetPasswordWithEmail_Failed() throws MessagingException {
         // Given
+        EmailDetails details = new EmailDetails(
+                "sendTo", "email@example.com", "sendFrom", "content", "subject", EmailTemplateName.RESET_PASSWORD);
         ResetPasswordRequest request = new ResetPasswordRequest("email@example.com");
         when(userService.getUserByEmail(request.getCredential()))
                 .thenThrow(new EmailNotFoundException("User with this email not found"));
 
         //When & Then
         assertThrows(EmailNotFoundException.class, () -> authenticationService.resetPassword(request));
-        verify(emailService, never()).sendResetPassword(any(), any(), any(), eq("Password reset"));
+        verify(emailService, never()).sendEmail(details);
     }
 
     @Test
@@ -321,16 +353,17 @@ class AuthenticationServiceTest {
 
         //When & Then
         assertThrows(UsernameNotFoundException.class, () -> authenticationService.resetPassword(request));
-        verify(emailService, never()).sendResetPassword(any(), any(), any(), eq("Password reset"));
+        verify(emailService, never()).sendEmail(any(EmailDetails.class));
     }
 
     @Test
     @DisplayName("sendActivationCodeByRequest: Success")
-    void testSendActivationCodeByRequest_Success() throws MessagingException {
+    void testSendActivationCodeByRequest_Success() throws Exception {
         // Given
         when(userService.getUserByEmail("email@example.com")).thenReturn(user);
         when(tokenService.isTokenExists(user)).thenReturn(false);
-        doNothing().when(emailService).sendValidationEmail(any(), any(), any(), any());
+        ArgumentCaptor<EmailDetails> emailDetailsCaptor = ArgumentCaptor.forClass(EmailDetails.class);
+        doNothing().when(emailService).sendEmail(emailDetailsCaptor.capture());
 
         // When
         authenticationService.sendActivationCodeByRequest("email@example.com");
@@ -338,12 +371,13 @@ class AuthenticationServiceTest {
         // Then
         verify(userService, times(1)).getUserByEmail("email@example.com");
         verify(tokenService, times(1)).isTokenExists(user);
-        verify(emailService, times(1)).sendValidationEmail(
-                eq("email@example.com"),
-                eq("username"),
-                anyString(),
-                eq("Account activation")
-        );
+        verify(emailService, times(1)).sendEmail(any(EmailDetails.class));
+
+        EmailDetails capturedEmailDetails = emailDetailsCaptor.getValue();
+        assertNotNull(capturedEmailDetails);
+        assertEquals("email@example.com", capturedEmailDetails.sendTo());
+        assertEquals("username", capturedEmailDetails.userName());
+        assertEquals(EmailTemplateName.ACTIVATE_ACCOUNT, capturedEmailDetails.templateName());
     }
 
     @Test
@@ -360,12 +394,12 @@ class AuthenticationServiceTest {
         assertEquals("User is already activated", exception.getMessage());
         verify(userService, times(1)).getUserByEmail("email@example.com");
         verify(tokenService, never()).isTokenExists(any());
-        verify(emailService, never()).sendValidationEmail(any(), any(), any(), any());
+        verify(emailService, never()).sendEmail(any(EmailDetails.class));
     }
 
     @Test
     @DisplayName("sendActivationCodeByRequest: Token already exists")
-    void testSendActivationCodeByRequest_TokenAlreadyExists() throws MessagingException {
+    void testSendActivationCodeByRequest_TokenAlreadyExists() throws Exception {
         // Given
         when(userService.getUserByEmail("email@example.com")).thenReturn(user);
         when(tokenService.isTokenExists(user)).thenReturn(true);
@@ -378,6 +412,6 @@ class AuthenticationServiceTest {
         verify(userService, times(1)).getUserByEmail("email@example.com");
         verify(tokenService, times(1)).isTokenExists(user);
         verify(tokenService, times(1)).deleteToken(token);
-        verify(emailService, times(1)).sendValidationEmail(any(), any(), any(), any());
+        verify(emailService, times(1)).sendEmail(any(EmailDetails.class));
     }
 }

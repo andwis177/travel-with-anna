@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS avatars (
-                                       avatar_id BIGSERIAL PRIMARY KEY,
-                                       avatar TEXT
+    avatar_id BIGSERIAL PRIMARY KEY,
+    avatar TEXT
 );
 
 ALTER TABLE users

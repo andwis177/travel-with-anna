@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
     "title": "OpenApi specification for Travel with Anna API",
     "description": "OpenApi documentation for Travel with Anna API",
@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://twa-backend-793077004948.europe-north1.run.app//twa/v1",
+      "url": "https://twa-backend-793077004948.europe-north1.run.app/twa/v1",
       "description": "Local server"
     }
   ],
@@ -334,16 +334,16 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "file"
-                ],
                 "type": "object",
                 "properties": {
                   "file": {
                     "type": "string",
                     "format": "binary"
                   }
-                }
+                },
+                "required": [
+                  "file"
+                ]
               }
             }
           }
@@ -1683,37 +1683,34 @@
   "components": {
     "schemas": {
       "TripCreatorRequest": {
-        "required": [
-          "currency",
-          "toSpend"
-        ],
         "type": "object",
         "properties": {
           "tripName": {
+            "type": "string",
             "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "currency": {
+            "type": "string",
             "maxLength": 10,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "toSpend": {
             "type": "number"
           }
-        }
+        },
+        "required": [
+          "currency",
+          "toSpend"
+        ]
       },
       "NoteRequest": {
-        "required": [
-          "linkedEntityType"
-        ],
         "type": "object",
         "properties": {
           "noteContent": {
+            "type": "string",
             "maxLength": 500,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "noteId": {
             "type": "integer",
@@ -1726,16 +1723,12 @@
           "linkedEntityType": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "linkedEntityType"
+        ]
       },
       "ExpanseRequest": {
-        "required": [
-          "currency",
-          "exchangeRate",
-          "expanseCategory",
-          "paid",
-          "price"
-        ],
         "type": "object",
         "properties": {
           "expanseId": {
@@ -1751,37 +1744,34 @@
             "format": "int64"
           },
           "expanseName": {
+            "type": "string",
             "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "expanseCategory": {
+            "type": "string",
             "maxLength": 255,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "date": {
             "type": "string"
           },
           "currency": {
+            "type": "string",
             "maxLength": 10,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "price": {
-            "minimum": 0.0,
-            "exclusiveMinimum": false,
-            "type": "number"
+            "type": "number",
+            "minimum": 0.0
           },
           "paid": {
-            "minimum": 0.0,
-            "exclusiveMinimum": false,
-            "type": "number"
+            "type": "number",
+            "minimum": 0.0
           },
           "exchangeRate": {
-            "minimum": 0.0,
-            "exclusiveMinimum": true,
-            "type": "number"
+            "type": "number",
+            "minimum": 0.0
           },
           "priceInTripCurrency": {
             "type": "number"
@@ -1792,7 +1782,14 @@
           "entityType": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "currency",
+          "exchangeRate",
+          "expanseCategory",
+          "paid",
+          "price"
+        ]
       },
       "ExpanseResponse": {
         "type": "object",
@@ -1831,29 +1828,26 @@
         }
       },
       "TripCurrencyValuesRequest": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "minimum": 0.0
+          },
+          "paid": {
+            "type": "number",
+            "minimum": 0.0
+          },
+          "exchangeRate": {
+            "type": "number",
+            "minimum": 0.0
+          }
+        },
         "required": [
           "exchangeRate",
           "paid",
           "price"
-        ],
-        "type": "object",
-        "properties": {
-          "price": {
-            "minimum": 0.0,
-            "exclusiveMinimum": false,
-            "type": "number"
-          },
-          "paid": {
-            "minimum": 0.0,
-            "exclusiveMinimum": false,
-            "type": "number"
-          },
-          "exchangeRate": {
-            "minimum": 0.0,
-            "exclusiveMinimum": false,
-            "type": "number"
-          }
-        }
+        ]
       },
       "ExpanseInTripCurrency": {
         "type": "object",
@@ -1867,10 +1861,6 @@
         }
       },
       "DayGeneratorRequest": {
-        "required": [
-          "endDate",
-          "startDate"
-        ],
         "type": "object",
         "properties": {
           "associatedTripId": {
@@ -1883,29 +1873,27 @@
           "endDate": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "endDate",
+          "startDate"
+        ]
       },
       "RegistrationRequest": {
-        "required": [
-          "email",
-          "password",
-          "roleName",
-          "userName"
-        ],
         "type": "object",
         "properties": {
           "userName": {
+            "type": "string",
             "maxLength": 30,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "email": {
             "type": "string"
           },
           "password": {
+            "type": "string",
             "maxLength": 2147483647,
-            "minLength": 8,
-            "type": "string"
+            "minLength": 8
           },
           "confirmPassword": {
             "type": "string"
@@ -1913,13 +1901,15 @@
           "roleName": {
             "type": "string"
           }
-        }
-      },
-      "AuthenticationRequest": {
+        },
         "required": [
           "email",
-          "password"
-        ],
+          "password",
+          "roleName",
+          "userName"
+        ]
+      },
+      "AuthenticationRequest": {
         "type": "object",
         "properties": {
           "email": {
@@ -1928,7 +1918,11 @@
           "password": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "AuthenticationResponse": {
         "type": "object",
@@ -1956,11 +1950,6 @@
         }
       },
       "ActivityRequest": {
-        "required": [
-          "dateTime",
-          "tripId",
-          "type"
-        ],
         "type": "object",
         "properties": {
           "tripId": {
@@ -1974,24 +1963,24 @@
             "type": "string"
           },
           "activityTitle": {
+            "type": "string",
             "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "badge": {
+            "type": "string",
             "maxLength": 20,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "type": {
+            "type": "string",
             "maxLength": 20,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "status": {
+            "type": "string",
             "maxLength": 20,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "addressRequest": {
             "$ref": "#/components/schemas/AddressRequest"
@@ -1999,55 +1988,60 @@
           "dayTag": {
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "dateTime",
+          "tripId",
+          "type"
+        ]
       },
       "AddressRequest": {
         "type": "object",
         "properties": {
           "place": {
+            "type": "string",
             "maxLength": 100,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "country": {
+            "type": "string",
             "maxLength": 100,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "countryCode": {
+            "type": "string",
             "maxLength": 3,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "city": {
+            "type": "string",
             "maxLength": 100,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "address": {
+            "type": "string",
             "maxLength": 255,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "website": {
+            "type": "string",
             "maxLength": 255,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "phoneNumber": {
+            "type": "string",
             "maxLength": 30,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "email": {
+            "type": "string",
             "maxLength": 150,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "currency": {
+            "type": "string",
             "maxLength": 10,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           }
         }
       },
@@ -2066,21 +2060,17 @@
         }
       },
       "UserCredentialsRequest": {
-        "required": [
-          "email",
-          "userName"
-        ],
         "type": "object",
         "properties": {
           "email": {
+            "type": "string",
             "maxLength": 255,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "userName": {
+            "type": "string",
             "maxLength": 30,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "password": {
             "type": "string"
@@ -2088,26 +2078,30 @@
           "role": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "email",
+          "userName"
+        ]
       },
       "ChangePasswordRequest": {
-        "required": [
-          "newPassword"
-        ],
         "type": "object",
         "properties": {
           "currentPassword": {
             "type": "string"
           },
           "newPassword": {
+            "type": "string",
             "maxLength": 255,
-            "minLength": 8,
-            "type": "string"
+            "minLength": 8
           },
           "confirmPassword": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "newPassword"
+        ]
       },
       "UserResponse": {
         "type": "object",
@@ -2124,9 +2118,9 @@
             "$ref": "#/components/schemas/DayGeneratorRequest"
           },
           "tripName": {
+            "type": "string",
             "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           }
         }
       },
@@ -2152,10 +2146,6 @@
         }
       },
       "BudgetRequest": {
-        "required": [
-          "budgetAmount",
-          "currency"
-        ],
         "type": "object",
         "properties": {
           "budgetId": {
@@ -2163,33 +2153,36 @@
             "format": "int64"
           },
           "currency": {
+            "type": "string",
             "maxLength": 3,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "budgetAmount": {
-            "minimum": 0.0,
-            "exclusiveMinimum": false,
-            "type": "number"
+            "type": "number",
+            "minimum": 0.0
           },
           "tripId": {
             "type": "integer",
             "format": "int64"
           }
-        }
+        },
+        "required": [
+          "budgetAmount",
+          "currency"
+        ]
       },
       "ItemRequest": {
         "type": "object",
         "properties": {
           "itemName": {
+            "type": "string",
             "maxLength": 100,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "quantity": {
+            "type": "string",
             "maxLength": 70,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "packed": {
             "type": "boolean"
@@ -2197,21 +2190,17 @@
         }
       },
       "ResetPasswordRequest": {
-        "required": [
-          "credential"
-        ],
         "type": "object",
         "properties": {
           "credential": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "credential"
+        ]
       },
       "UserAdminEditRequest": {
-        "required": [
-          "roleName",
-          "userId"
-        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -2225,16 +2214,17 @@
             "type": "boolean"
           },
           "roleName": {
+            "type": "string",
             "maxLength": 50,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           }
-        }
+        },
+        "required": [
+          "roleName",
+          "userId"
+        ]
       },
       "UserAdminUpdateRequest": {
-        "required": [
-          "userAdminEditRequest"
-        ],
         "type": "object",
         "properties": {
           "userAdminEditRequest": {
@@ -2243,16 +2233,12 @@
           "password": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "userAdminEditRequest"
+        ]
       },
       "ActivityUpdateRequest": {
-        "required": [
-          "activityId",
-          "dayId",
-          "newActivityDate",
-          "oldActivityDate",
-          "startTime"
-        ],
         "type": "object",
         "properties": {
           "activityId": {
@@ -2276,14 +2262,14 @@
             "type": "string"
           },
           "activityTitle": {
+            "type": "string",
             "maxLength": 60,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "type": {
+            "type": "string",
             "maxLength": 20,
-            "minLength": 0,
-            "type": "string"
+            "minLength": 0
           },
           "addressRequest": {
             "$ref": "#/components/schemas/AddressRequest"
@@ -2291,7 +2277,14 @@
           "dayTag": {
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "activityId",
+          "dayId",
+          "newActivityDate",
+          "oldActivityDate",
+          "startTime"
+        ]
       },
       "MessageResponse": {
         "type": "object",
@@ -2802,20 +2795,17 @@
         }
       },
       "PasswordRequest": {
-        "required": [
-          "password"
-        ],
         "type": "object",
         "properties": {
           "password": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "password"
+        ]
       },
       "TripRequest": {
-        "required": [
-          "tripId"
-        ],
         "type": "object",
         "properties": {
           "tripId": {
@@ -2825,12 +2815,12 @@
           "password": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "tripId"
+        ]
       },
       "UserAdminDeleteRequest": {
-        "required": [
-          "userId"
-        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -2840,7 +2830,10 @@
           "password": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "userId"
+        ]
       }
     },
     "securitySchemes": {

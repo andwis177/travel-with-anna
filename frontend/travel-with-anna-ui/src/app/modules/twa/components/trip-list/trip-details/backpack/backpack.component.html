@@ -10,7 +10,7 @@
 </mat-toolbar-row>
 
 <div class="backpack-container-full-height background-color-light container-vertical align-center full-width padding-main-vertical">
-  <div class="margin-big backpack-table-container container-shadow background-color-dark">
+  <div class="margin-main backpack-table-container container-shadow background-color-dark">
     <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)">
       <ng-container matColumnDef="isPacked">
         <th mat-header-cell *matHeaderCellDef  mat-sort-header class="packed-column" sortActionDescription="Sort by packed" >

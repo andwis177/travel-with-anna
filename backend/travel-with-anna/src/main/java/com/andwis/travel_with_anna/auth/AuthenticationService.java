@@ -1,6 +1,8 @@
 package com.andwis.travel_with_anna.auth;
 
+import com.andwis.travel_with_anna.email.EmailDetails;
 import com.andwis.travel_with_anna.email.EmailService;
+import com.andwis.travel_with_anna.email.EmailTemplateName;
 import com.andwis.travel_with_anna.handler.exception.*;
 import com.andwis.travel_with_anna.role.Role;
 import com.andwis.travel_with_anna.role.RoleService;
@@ -13,8 +15,10 @@ import com.andwis.travel_with_anna.user.avatar.AvatarService;
 import com.andwis.travel_with_anna.user.token.Token;
 import com.andwis.travel_with_anna.user.token.TokenService;
 import jakarta.mail.MessagingException;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -26,28 +30,53 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
 import javax.security.auth.login.AccountLockedException;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 @Service
-@RequiredArgsConstructor
 public class AuthenticationService {
 
     private static final int PASSWORD_LENGTH = 20;
     private static final int TOKEN_LENGTH = 6;
     private static final int TOKEN_EXPIRATION_TIME = 10;
+    private static final String ACTIVATION_EMAIL_SUBJECT = "Activation Code";
+    private static final String RESET_PASSWORD_EMAIL_SUBJECT = "New password";
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+    @Value("${spring.mail.sender_email}")
+    private String senderEmail;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final AvatarService avatarService;
     private final TokenService tokenService;
-    private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final EmailService emailService;
+
+    @Autowired
+    public AuthenticationService(RoleService roleService,
+                                 PasswordEncoder passwordEncoder,
+                                 UserService userService,
+                                 AvatarService avatarService,
+                                 TokenService tokenService,
+                                 AuthenticationManager authenticationManager,
+                                 JwtService jwtService,
+                                 @Qualifier("GmailApiEmailSender") EmailService emailService) {
+        this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
+        this.avatarService = avatarService;
+        this.tokenService = tokenService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.emailService = emailService;
+    }
 
     @Transactional
-    public void register(@NotNull RegistrationRequest request) throws RoleNotFoundException, MessagingException, WrongPasswordException {
+    public void register(@NotNull RegistrationRequest request) throws Exception {
         validateRegistrationRequest(request);
 
         var userRole = roleService.getRoleByName(request.getRoleName());
@@ -81,15 +110,17 @@ public class AuthenticationService {
         }
     }
 
-
-    private void sendValidationEmail(@NotNull User user) throws MessagingException {
+    private void sendValidationEmail(@NotNull User user) throws Exception {
         var newToken = generateAndSaveActivationToken(user);
-        emailService.sendValidationEmail(
+        EmailDetails details = new EmailDetails(
                 user.getEmail(),
                 user.getUserName(),
+                senderEmail,
                 newToken,
-                "Account activation"
+                ACTIVATION_EMAIL_SUBJECT,
+                EmailTemplateName.ACTIVATE_ACCOUNT
         );
+        emailService.sendEmail(details);
     }
 
     private @NotNull String generateAndSaveActivationToken(User user) {
@@ -105,14 +136,12 @@ public class AuthenticationService {
     }
 
     private @NotNull String generateRandomCode(int length) {
-        final String characters =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
 
         for(int i = 0; i < length; i++) {
-            int randomIndex = secureRandom.nextInt(characters.length());
-            codeBuilder.append(characters.charAt(randomIndex));
+            int randomIndex = secureRandom.nextInt(CHARACTERS.length());
+            codeBuilder.append(CHARACTERS.charAt(randomIndex));
         }
         return codeBuilder.toString();
     }
@@ -145,7 +174,7 @@ public class AuthenticationService {
         return response;
     }
 
-    public void activateAccount(String token) throws MessagingException {
+    public void activateAccount(String token) throws Exception {
         var tokenEntity = tokenService.getByToken(token);
         if (LocalDateTime.now().isAfter((tokenEntity.getExpiresAt()))) {
             afterTokenExpired(tokenEntity);
@@ -153,7 +182,7 @@ public class AuthenticationService {
         afterTokenAccepted(tokenEntity);
     }
 
-    protected void afterTokenExpired(@NotNull Token token) throws MessagingException {
+    protected void afterTokenExpired(@NotNull Token token) throws Exception {
         User retrivedUser = token.getUser();
         token.setUser(null);
         tokenService.deleteToken(token);
@@ -177,7 +206,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    protected void resetPassword(@NotNull ResetPasswordRequest request) throws MessagingException {
+    protected void resetPassword(@NotNull ResetPasswordRequest request) throws MessagingException, GeneralSecurityException, IOException, InterruptedException {
         User user;
         if (request.getCredential().contains("@")) {
             user = userService.getUserByEmail(request.getCredential());
@@ -185,16 +214,19 @@ public class AuthenticationService {
             user = userService.getUserByUserName(request.getCredential());
         }
         String newPassword = generateAndSaveNewPassword(user);
-        emailService.sendResetPassword(
+        EmailDetails details = new EmailDetails(
                 user.getEmail(),
                 user.getUserName(),
+                senderEmail,
                 newPassword,
-                "Password reset"
+                RESET_PASSWORD_EMAIL_SUBJECT,
+                EmailTemplateName.RESET_PASSWORD
         );
+        emailService.sendEmail(details);
     }
 
     @Transactional
-    public void sendActivationCodeByRequest(String email) throws MessagingException {
+    public void sendActivationCodeByRequest(String email) throws Exception {
         User user = userService.getUserByEmail(email);
         validateActivationCodeRequest(user);
         sendValidationEmail(user);

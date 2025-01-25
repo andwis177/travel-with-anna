@@ -20,7 +20,10 @@ public enum ErrorCodes {
     EXPIRED_TOKEN(1310, "Token has expired", UNAUTHORIZED),
     TOKEN_EXISTS(1320, "Token already exists", CONFLICT),
     ROLE_NOT_FOUND(1400, "Role not found", NOT_FOUND),
+
     MESSAGING_EXCEPTION(1500, "Email was NOT send", INTERNAL_SERVER_ERROR),
+    OAUTH2_TOKEN_ERROR(1510, "Access token could not be retrieved", INTERNAL_SERVER_ERROR),
+
     VALIDATION_ERROR(1700, "Validation error", BAD_REQUEST),
     JWT_PARSING_ERROR(1800, "JWT parsing error", UNAUTHORIZED),
 

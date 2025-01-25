@@ -1,11 +1,12 @@
 spring:
   profiles:
-    active: prod
+    active: oauth2-dev
   servlet:
     multipart:
       max-file-size: 50MB
 springdoc:
   default-produces-media-type: application/json
 server:
+  port: ${PORT:8080}
   servlet:
     context-path: /twa/v1/

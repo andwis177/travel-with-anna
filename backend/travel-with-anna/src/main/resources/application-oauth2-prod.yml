@@ -1,0 +1,74 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql
+
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
+
+  mail:
+    host: ${GMAIL_HOST}
+    port: ${GMAIL_PORT}
+    sender_email: ${GMAIL_USER}
+    protocol: ${GMAIL_PROTOCOL}
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: ${GMAIL_SSL}
+
+gmail:
+  oauth2:
+    client-id: ${OAUTH2_CLIENT_ID}
+    token_uri: ${OAUTH2_TOKEN_URI}
+    send_scope: ${OAUTH2_SEND_SCOPE}
+    api_endpoint_send: ${OAUTH2_API_ENDPOINT_SEND}
+    client_secret: ${OAUTH2_CLIENT_SECRET}
+    refresh_token: ${OAUTH2_REFRESH_TOKEN}
+    local_receiver_port: ${OAUTH2_LOCAL_RECEIVER_PORT:8888}
+
+application:
+  security:
+    jwt:
+      expiration: ${TOKEN_EXPIRATION}
+    cors: ${CORS_ORIGIN}
+  mailing:
+    frontend:
+      activation-url: ${ACTIVATION_URL}
+      login-url: ${LOGIN_URL}
+
+my_apis:
+  country:
+    country_url: ${API_COUNTRY}
+  currency:
+    currency_url: ${API_CURRENCY}
+    header:
+      apikey: ${API_CURRENCY_KEY}
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+
+logging:
+  level:
+    root: INFO
+

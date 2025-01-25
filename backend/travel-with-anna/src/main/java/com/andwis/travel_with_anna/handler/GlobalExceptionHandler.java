@@ -425,6 +425,19 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(OAuth2AccessTokenException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull OAuth2AccessTokenException exp) {
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(
+                        ExceptionResponse.builder()
+                                .errorCode(OAUTH2_TOKEN_ERROR.getCode())
+                                .errors((exp.getMessage() == null || exp.getMessage().isEmpty())
+                                        ? List.of(OAUTH2_TOKEN_ERROR.getMessage()) : List.of(exp.getMessage()))
+                                .build()
+                );
+    }
+
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull RoleNotFoundException exp) {
         return ResponseEntity

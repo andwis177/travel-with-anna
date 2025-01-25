@@ -3,6 +3,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
 
+
 @Component({
   selector: 'app-eat',
   standalone: true,

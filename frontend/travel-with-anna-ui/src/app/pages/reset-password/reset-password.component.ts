@@ -61,7 +61,7 @@ export class ResetPasswordComponent {
         this.router.navigate(['login']).then(() => this._snackBar.open('Your password has been successfully reset and sent to your email.', 'Close'));
       },
       error: (err) => {
-        this.errorMsg = this.errorService.errorHandler(err);
+        this.errorMsg = this.errorService.errorHandlerWithJson(err);
       }
     })
   }

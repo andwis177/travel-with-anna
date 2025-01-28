@@ -82,7 +82,7 @@ public class UserService {
 
     public User getUserByUserName(String userName) {
         return userRepository.findByUserName(userName).orElseThrow(() ->
-                new UsernameNotFoundException("User not found"));
+                new UserNotFoundException("User not found"));
     }
 
     public User getUserById(Long id) {

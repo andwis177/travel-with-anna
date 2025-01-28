@@ -213,16 +213,16 @@ public class AuthenticationService {
         } else {
             user = userService.getUserByUserName(request.getCredential());
         }
-        String newPassword = generateAndSaveNewPassword(user);
-        EmailDetails details = new EmailDetails(
-                user.getEmail(),
-                user.getUserName(),
-                senderEmail,
-                newPassword,
-                RESET_PASSWORD_EMAIL_SUBJECT,
-                EmailTemplateName.RESET_PASSWORD
-        );
-        emailService.sendEmail(details);
+            String newPassword = generateAndSaveNewPassword(user);
+            EmailDetails details = new EmailDetails(
+                    user.getEmail(),
+                    user.getUserName(),
+                    senderEmail,
+                    newPassword,
+                    RESET_PASSWORD_EMAIL_SUBJECT,
+                    EmailTemplateName.RESET_PASSWORD
+            );
+            emailService.sendEmail(details);
     }
 
     @Transactional
